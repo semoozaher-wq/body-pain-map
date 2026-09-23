@@ -121,4 +121,28 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: Fonts.sizes.md,
-    fontFamily: Fonts.
+    fontFamily: Fonts.arabic.bold,
+    textAlign: 'right',
+    marginBottom: Spacing.xs,
+  },
+  infoText: {
+    textAlign: 'right',
+    fontFamily: Fonts.arabic.regular,
+    fontSize: Fonts.sizes.sm,
+  },
+  note: {
+    textAlign: 'right',
+    marginTop: Spacing.xs,
+    fontFamily: Fonts.arabic.regular,
+    fontSize: Fonts.sizes.sm,
+  },
+  urgentText: {
+    textAlign: 'right',
+    fontFamily: Fonts.arabic.bold,
+    fontSize: Fonts.sizes.sm,
+    marginTop: Spacing.xs,
+  },
+  backButton: {
+    marginTop: Spacing.sm,
+  },
+});
