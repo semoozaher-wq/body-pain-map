@@ -11,7 +11,7 @@ interface CardProps {
   variant?: 'default' | 'elevated' | 'outlined';
 }
 
-export default function Card({ children, style, variant = 'default' }: CardProps) {
+export function Card({ children, style, variant = 'default' }: CardProps) {
   const getVariantStyle = (): ViewStyle => {
     switch (variant) {
       case 'elevated':
@@ -29,6 +29,8 @@ export default function Card({ children, style, variant = 'default' }: CardProps
     </View>
   );
 }
+
+export default Card;
 
 const styles = StyleSheet.create({
   card: {

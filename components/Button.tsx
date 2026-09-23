@@ -20,7 +20,7 @@ interface ButtonProps {
   icon?: React.ReactNode;
 }
 
-export default function Button({
+export function Button({
   title,
   onPress,
   variant = 'primary',
@@ -95,7 +95,7 @@ export default function Button({
             style={[
               styles.text,
               { color: getTextColor(), fontSize: getFontSize() },
-              icon && { marginLeft: Spacing.sm },
+              icon ? { marginLeft: Spacing.sm } : null,
             ]}
           >
             {title}
@@ -105,6 +105,8 @@ export default function Button({
     </TouchableOpacity>
   );
 }
+
+export default Button;
 
 const styles = StyleSheet.create({
   button: {

@@ -13,7 +13,7 @@ interface HeaderProps {
   rightAction?: React.ReactNode;
 }
 
-export default function Header({ title, subtitle, onBack, rightAction }: HeaderProps) {
+export function Header({ title, subtitle, onBack, rightAction }: HeaderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.left}>
@@ -31,6 +31,8 @@ export default function Header({ title, subtitle, onBack, rightAction }: HeaderP
     </View>
   );
 }
+
+export default Header;
 
 const styles = StyleSheet.create({
   container: {

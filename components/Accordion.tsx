@@ -18,7 +18,7 @@ interface AccordionProps {
   isWarning?: boolean;
 }
 
-export default function Accordion({ title, icon, children, defaultOpen = false, isWarning = false }: AccordionProps) {
+export function Accordion({ title, icon, children, defaultOpen = false, isWarning = false }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const toggleOpen = () => {
@@ -43,6 +43,8 @@ export default function Accordion({ title, icon, children, defaultOpen = false, 
     </View>
   );
 }
+
+export default Accordion;
 
 const styles = StyleSheet.create({
   container: {
