@@ -10,13 +10,15 @@ import {
 } from 'react-native';
 import { RealisticMuscleViews } from '../components/RealisticMuscleViews';
 import anatomyPainMap from '../data/anatomyPainMap.json';
+import { translate } from '../services/i18n';
 
 interface BodyPickerScreenProps {
   onNavigateToDetails: (muscleData: any) => void;
   onBack?: () => void;
+  language: Parameters<typeof translate>[0];
+  direction: 'rtl' | 'ltr';
 }
 
-// ربط المناطق العامة في الصورة الواقعية بمجموعات العضلات الموثقة في البيانات الطبية
 const areaToGroupMap: Record<string, string> = {
   'الكتف': 'deltoids',
   'الصدر': 'chest',
@@ -39,17 +41,17 @@ const areaToGroupMap: Record<string, string> = {
 export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   onNavigateToDetails,
   onBack,
+  language,
 }) => {
+  const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [showMuscleList, setShowMuscleList] = useState(false);
 
-  // استخراج قائمة العضلات الدقيقة الخاصة بالمنطقة المحددة ديناميكياً
   const musclesInArea = useMemo(() => {
     if (!selectedArea) return [];
     const groupName = areaToGroupMap[selectedArea];
     if (!groupName) return [];
     
-    // تصفية العضلات التي تنتمي لهذه المجموعة من أصل 317 جزءاً
     return Object.values(anatomyPainMap.muscles).filter(
       (muscle: any) => muscle.group === groupName
     );
@@ -57,12 +59,12 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
 
   const handleAreaSelect = (areaName: string) => {
     setSelectedArea(areaName);
-    setShowMuscleList(true); // فتح القائمة فوراً لاختيار الجزء الدقيق
+    setShowMuscleList(true);
   };
 
   const handleMuscleSelect = (muscle: any) => {
     setShowMuscleList(false);
-    onNavigateToDetails(muscle); // الانتقال للبيانات الطبية الموثقة 100%
+    onNavigateToDetails(muscle);
   };
 
   return (
@@ -70,15 +72,15 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
       <View style={styles.header}>
         {onBack && (
           <TouchableOpacity onPress={onBack} style={styles.backButton}>
-            <Text style={styles.backText}>رجوع</Text>
+            <Text style={styles.backText}>{t('back')}</Text>
           </TouchableOpacity>
         )}
-        <Text style={styles.title}>خريطة العضلات التفاعلية</Text>
+        <Text style={styles.title}>{t('bodyPicker.title')}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.instruction}>
-          اضغط على المنطقة المصابة في الصورة الواقعية، ثم اختر الجزء الدقيق من القائمة لضمان دقة طبية 100%:
+          {t('bodyPicker.instruction')}
         </Text>
 
         <View style={styles.visualContainer}>
@@ -90,20 +92,19 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
 
         {selectedArea && (
           <View style={styles.detailsCard}>
-            <Text style={styles.selectedTitle}>المنطقة المحددة: {selectedArea}</Text>
+            <Text style={styles.selectedTitle}>{t('bodyPicker.selectedArea')}{selectedArea}</Text>
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() => setShowMuscleList(true)}
             >
               <Text style={styles.actionButtonText}>
-                عرض الأجزاء الدقيقة ({musclesInArea.length} جزء)
+                {t('bodyPicker.showParts')} ({musclesInArea.length} {t('welcome.statParts')})
               </Text>
             </TouchableOpacity>
           </View>
         )}
       </ScrollView>
 
-      {/* نافذة اختيار الجزء الدقيق (Two-Step Flow) لضمان السلامة الطبية */}
       <Modal
         visible={showMuscleList}
         animationType="slide"
@@ -113,7 +114,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>اختر الجزء الدقيق: {selectedArea}</Text>
+              <Text style={styles.modalTitle}>{t('bodyPicker.selectPartTitle')}: {selectedArea}</Text>
               <TouchableOpacity onPress={() => setShowMuscleList(false)}>
                 <Text style={styles.closeButton}>✕</Text>
               </TouchableOpacity>
@@ -132,7 +133,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                   </TouchableOpacity>
                 ))
               ) : (
-                <Text style={styles.noDataText}>لا توجد بيانات طبية مفصلة لهذه المنطقة حالياً.</Text>
+                <Text style={styles.noDataText}>{t('bodyPicker.noData')}</Text>
               )}
             </ScrollView>
           </View>
@@ -143,26 +144,26 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F8F9FA' },
-  header: { flexDirection: 'row', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E9ECEF' },
-  backButton: { marginRight: 16 },
-  backText: { fontSize: 16, color: '#007AFF', fontWeight: '600' },
-  title: { fontSize: 18, fontWeight: 'bold', color: '#212529' },
+  safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
+  header: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#EEEEEE' },
+  title: { fontSize: 18, fontWeight: 'bold', color: '#111827' },
+  backButton: { padding: 8 },
+  backText: { color: '#007AFF', fontSize: 16 },
   content: { padding: 16 },
-  instruction: { fontSize: 14, color: '#495057', marginBottom: 16, textAlign: 'center', lineHeight: 20 },
-  visualContainer: { borderRadius: 12, overflow: 'hidden', marginBottom: 16, backgroundColor: '#FFFFFF' },
-  detailsCard: { backgroundColor: '#FFFFFF', padding: 16, borderRadius: 12, borderWidth: 1, borderColor: '#E9ECEF' },
-  selectedTitle: { fontSize: 16, fontWeight: 'bold', color: '#212529', marginBottom: 12 },
-  actionButton: { backgroundColor: '#007AFF', paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
-  actionButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
+  instruction: { fontSize: 14, color: '#4B5563', marginBottom: 16, textAlign: 'right', lineHeight: 20 },
+  visualContainer: { marginBottom: 20, borderRadius: 12, overflow: 'hidden', backgroundColor: '#F9FAFB' },
+  detailsCard: { backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E5E7EB' },
+  selectedTitle: { fontSize: 16, fontWeight: 'bold', color: '#1F2937', marginBottom: 12, textAlign: 'right' },
+  actionButton: { backgroundColor: '#2563EB', paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
+  actionButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 14 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '80%', paddingBottom: 20 },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E9ECEF' },
+  modalHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E9ECEF' },
   modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#212529' },
   closeButton: { fontSize: 24, color: '#6C757D', fontWeight: 'bold' },
   muscleList: { padding: 16 },
   muscleItem: { paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F1F3F5' },
-  muscleName: { fontSize: 16, fontWeight: '600', color: '#212529', marginBottom: 4 },
-  muscleLocation: { fontSize: 14, color: '#6C757D' },
+  muscleName: { fontSize: 16, fontWeight: '600', color: '#212529', marginBottom: 4, textAlign: 'right' },
+  muscleLocation: { fontSize: 14, color: '#6C757D', textAlign: 'right' },
   noDataText: { fontSize: 16, color: '#6C757D', textAlign: 'center', marginTop: 20 }
 });
