@@ -1,5 +1,3 @@
-// App.tsx
-
 import React, { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,9 +5,8 @@ import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
 import { translate } from './services/i18n';
-import { Screen, AppGender, BodyView, AnatomyData, Checkup } from './types';
+import { Screen, AppGender, BodyView, AnatomyData, Checkup, Muscle } from './types';
 import { DATA } from './constants/appConstants';
-import { Colors } from './constants/colors';
 
 // المكونات
 import { Header } from './components/Header';
@@ -29,6 +26,10 @@ export default function App() {
   const [gender, setGender] = useState<AppGender>('male');
   const [view, setView] = useState<BodyView>('front');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  
+  // حالة لتخزين بيانات العضلة المختارة (التي تأتي من تدفق الخطوتين الآمن)
+  const [selectedMuscleData, setSelectedMuscleData] = useState<Muscle | null>(null);
+
   const [intensity, setIntensity] = useState(4);
   const [painType, setPainType] = useState('مستمر');
   const [duration, setDuration] = useState('منذ أيام');
@@ -40,7 +41,7 @@ export default function App() {
   const { isDark, colors, toggleTheme } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
 
-  const selected = selectedId ? data.muscles[selectedId] : null;
+  const selected = selectedMuscleData || (selectedId ? data.muscles[selectedId] : null);
   const group = selected ? data.groups[selected.group] : undefined;
 
   // تحميل وحفظ السجل
@@ -54,13 +55,20 @@ export default function App() {
     AsyncStorage.setItem(DATA.HISTORY_STORAGE_KEY, JSON.stringify(history)).catch(() => undefined);
   }, [history]);
 
+  // الانتقال إلى شاشة التفاصيل مع الاحتفاظ ببيانات العضلة المختارة
+  const handleNavigateToDetails = (muscleData: any) => {
+    setSelectedMuscleData(muscleData);
+    setSelectedId(muscleData.id);
+    setScreen('details');
+  };
+
   const saveResults = () => {
-    if (!selectedId) return;
+    if (!selected) return;
     const urgent = intensity >= 8 || redFlags.length > 0;
     setHistory((items) => [
       {
         id: `${Date.now()}`,
-        partId: selectedId,
+        partId: selected.id,
         intensity,
         painType,
         duration,
@@ -75,6 +83,7 @@ export default function App() {
 
   const startOver = () => {
     setSelectedId(null);
+    setSelectedMuscleData(null);
     setIntensity(4);
     setPainType('مستمر');
     setDuration('منذ أيام');
@@ -120,8 +129,8 @@ export default function App() {
             <View style={styles.headerActions}>
               <LanguageSwitcher language={language} onChange={setLanguage} />
               <ThemeToggle dark={isDark} onPress={toggleTheme} />
-              <Pressable onPress={() => setScreen('history')} style={styles.historyButton} accessibilityLabel="فتح سجل الألم">
-                <Text style={styles.historyButtonText}>السجل</Text>
+              <Pressable onPress={() => setScreen('history')} style={styles.historyButton} accessibilityLabel={t('history')}>
+                <Text style={[styles.historyButtonText, { color: colors.primaryDark }]}>{t('history')}</Text>
               </Pressable>
             </View>
           )}
@@ -140,15 +149,12 @@ export default function App() {
           />
         )}
 
+        {/* تم تحديث استدعاء BodyPickerScreen ليمرر الـ props الصحيحة ويتوافق مع التدفق الآمن */}
         {screen === 'body' && (
           <BodyPickerScreen
-            gender={gender}
-            view={view}
-            selectedId={selectedId}
-            setGender={setGender}
-            setView={setView}
-            onSelect={setSelectedId}
-            onNext={() => setScreen('details')}
+            language={language}
+            direction={direction}
+            onNavigateToDetails={handleNavigateToDetails}
             onBack={() => setScreen('welcome')}
           />
         )}
@@ -167,6 +173,8 @@ export default function App() {
             setRedFlags={setRedFlags}
             onBack={() => setScreen('body')}
             onNext={saveResults}
+            language={language}
+            direction={direction}
           />
         )}
 
@@ -182,6 +190,8 @@ export default function App() {
             history={history}
             onRestart={startOver}
             onShare={() => {}}
+            language={language}
+            direction={direction}
           />
         )}
 
@@ -190,6 +200,8 @@ export default function App() {
             history={history}
             onBack={() => setScreen(selected ? 'results' : 'welcome')}
             onClear={clearHistory}
+            language={language}
+            direction={direction}
           />
         )}
       </ScrollView>
@@ -229,7 +241,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   historyButtonText: {
-    color: '#0E6972',
     fontSize: 10,
     fontWeight: '900',
   },
