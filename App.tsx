@@ -1,98 +1,185 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Alert, Platform, Pressable, SafeAreaView, ScrollView, Share, StyleSheet, Text, TextInput, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BodySilhouette } from 'react-native-body-parts-anatomy';
-import anatomyMap from './data/anatomyPainMap.json';
-import { WebBodySilhouette } from './components/WebBodySilhouette';
-import { BrandLogo } from './components/BrandLogo';
-import { AnimatedPainBody } from './components/AnimatedPainBody';
-import { InteractiveTips } from './components/InteractiveTips';
-import { AccordionGroup, AccordionItem } from './components/Accordion';
-import { LanguageSwitcher } from './components/LanguageSwitcher';
-import { useLanguage } from './hooks/useLanguage';
-import { translate } from './services/i18n';
-import { useTheme } from './hooks/useTheme';
-import { ThemeToggle } from './components/ThemeToggle';
-import { ReportExport } from './components/ReportExport';
-import { FirstAidCard } from './components/FirstAidCard';
-import { PainDiary } from './components/PainDiary';
-import { LocalAIChat } from './components/LocalAIChat';
-import { ImageAnalysisDemo } from './components/ImageAnalysisDemo';
-import { LocalReminder } from './components/LocalReminder';
+// App.tsx
 
-type Screen = 'welcome' | 'body' | 'details' | 'results' | 'history';
-type AppGender = 'male' | 'female';
-type BodyView = 'front' | 'back';
-type Muscle = { id: string; partNumber: number; labelAr: string; group: string; groupLabelAr: string; locationAr: string; commonCauses: string[]; warning?: string | null; recommendation?: string | null; medicalSafety: string };
-type Group = { labelAr: string; defaultWarning?: string | null; defaultRecommendation: string };
-type AnatomyData = { groups: Record<string, Group>; muscles: Record<string, Muscle> };
-type Checkup = { id: string; partId: string; intensity: number; painType: string; duration: string; createdAt: string; note?: string; urgent?: boolean };
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import anatomyMap from './data/anatomyPainMap.json';
+import { useLanguage } from './hooks/useLanguage';
+import { useTheme } from './hooks/useTheme';
+import { translate } from './services/i18n';
+import { Screen, AppGender, BodyView, AnatomyData, Checkup } from './types';
+import { DATA } from './constants/appConstants';
+import { Colors } from './constants/colors';
+
+// المكونات
+import { Header } from './components/Header';
+import { WelcomeScreen } from './screens/WelcomeScreen';
+import { BodyPickerScreen } from './screens/BodyPickerScreen';
+import { DetailsScreen } from './screens/DetailsScreen';
+import { ResultsScreen } from './screens/ResultsScreen';
+import { HistoryScreen } from './screens/HistoryScreen';
+
 const data = anatomyMap as unknown as AnatomyData;
-const muscleIds = Object.keys(data.muscles);
-const painTypes = ['حرقان', 'طعن', 'ضغط', 'مستمر', 'متقطع'];
-const durations = ['منذ ساعات', 'منذ أيام', 'منذ أسابيع'];
-const HISTORY_STORAGE_KEY = 'bodymap-pain-history-v2';
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('welcome');
   const [gender, setGender] = useState<AppGender>('male');
   const [view, setView] = useState<BodyView>('front');
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [query, setQuery] = useState('');
   const [intensity, setIntensity] = useState(4);
   const [painType, setPainType] = useState('مستمر');
   const [duration, setDuration] = useState('منذ أيام');
   const [note, setNote] = useState('');
   const [redFlags, setRedFlags] = useState<string[]>([]);
   const [history, setHistory] = useState<Checkup[]>([]);
-  const { language, setLanguage, direction } = useLanguage();
-  const { dark, toggle: toggleTheme } = useTheme();
+
+  const { language, direction } = useLanguage();
+  const { dark, colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
+
   const selected = selectedId ? data.muscles[selectedId] : null;
   const group = selected ? data.groups[selected.group] : undefined;
-  const title = ({ welcome: t('appName'), body: t('body'), details: t('details'), results: t('results'), history: t('historyTitle') } as Record<Screen, string>)[screen];
-  useEffect(() => { AsyncStorage.getItem(HISTORY_STORAGE_KEY).then((saved) => { if (saved) setHistory(JSON.parse(saved) as Checkup[]); }).catch(() => undefined); }, []);
-  useEffect(() => { AsyncStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(history)).catch(() => undefined); }, [history]);
-  const saveResults = () => { if (!selectedId) return; const urgent = intensity >= 8 || redFlags.length > 0; setHistory((items) => [{ id: `${Date.now()}`, partId: selectedId, intensity, painType, duration, note: note.trim(), urgent, createdAt: new Date().toLocaleDateString('ar-EG') }, ...items].slice(0, 50)); setScreen('results'); };
-  const startOver = () => { setSelectedId(null); setQuery(''); setIntensity(4); setPainType('مستمر'); setDuration('منذ أيام'); setNote(''); setRedFlags([]); setScreen('body'); };
-  const clearHistory = () => Alert.alert('حذف السجل', 'سيتم حذف كل الفحوصات المحفوظة على هذا الجهاز.', [{ text: 'إلغاء', style: 'cancel' }, { text: 'حذف', style: 'destructive', onPress: () => setHistory([]) }]);
-  const shareResults = async () => { if (!selected) return; await Share.share({ message: `BodyMap Pain\nby ElSayed\nالجزء رقم ${selected.partNumber}: ${selected.labelAr}\nالموقع: ${selected.locationAr}\nالشدة: ${intensity}/10\nنوع الألم: ${painType}\nالمدة: ${duration}${note ? `\nملاحظات: ${note}` : ''}\n\nهذه معلومات إرشادية وليست تشخيصًا طبيًا.` }); };
 
-  return <SafeAreaView style={[styles.safe, dark && styles.darkSafe]}>
-    <View style={[styles.appBar, dark && styles.darkAppBar]}><View style={styles.headerTools}><LanguageSwitcher language={language} onChange={setLanguage} /><ThemeToggle dark={dark} onPress={toggleTheme} /><BrandLogo compact /></View>{screen !== 'welcome' && <Pressable onPress={() => setScreen('history')} hitSlop={12}><Text style={styles.historyLink}>{t('history')}</Text></Pressable>}</View>
-    <ScrollView contentContainerStyle={[styles.content, dark && styles.darkContent]} showsVerticalScrollIndicator={false}>
-      <Text style={[styles.eyebrow, { textAlign: direction === 'rtl' ? 'right' : 'left' }]}>{screen === 'welcome' ? t('eyebrow') : t('tool')}</Text><Text style={[styles.title, { textAlign: direction === 'rtl' ? 'right' : 'left' }]}>{title}</Text>
-      {screen === 'welcome' && <Welcome onStart={() => setScreen('body')} language={language} />}
-      {screen === 'body' && <BodyPicker gender={gender} view={view} selectedId={selectedId} query={query} setQuery={setQuery} setGender={setGender} setView={setView} onSelect={setSelectedId} onNext={() => setScreen('details')} />}
-      {screen === 'details' && <Details intensity={intensity} setIntensity={setIntensity} painType={painType} setPainType={setPainType} duration={duration} setDuration={setDuration} note={note} setNote={setNote} redFlags={redFlags} setRedFlags={setRedFlags} onBack={() => setScreen('body')} onNext={saveResults} />}
-      {screen === 'results' && selected && <Results selected={selected} group={group} intensity={intensity} painType={painType} duration={duration} note={note} redFlags={redFlags} history={history} onRestart={startOver} onShare={shareResults} />}
-      {screen === 'history' && <History history={history} onBack={() => setScreen(selected ? 'results' : 'welcome')} onClear={clearHistory} />}
-    </ScrollView>
-  </SafeAreaView>;
+  // تحميل وحفظ السجل
+  useEffect(() => {
+    AsyncStorage.getItem(DATA.HISTORY_STORAGE_KEY).then((saved) => {
+      if (saved) setHistory(JSON.parse(saved) as Checkup[]);
+    }).catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.setItem(DATA.HISTORY_STORAGE_KEY, JSON.stringify(history)).catch(() => undefined);
+  }, [history]);
+
+  const saveResults = () => {
+    if (!selectedId) return;
+    const urgent = intensity >= 8 || redFlags.length > 0;
+    setHistory((items) => [
+      {
+        id: `${Date.now()}`,
+        partId: selectedId,
+        intensity,
+        painType,
+        duration,
+        note: note.trim(),
+        urgent,
+        createdAt: new Date().toLocaleDateString('ar-EG'),
+      },
+      ...items,
+    ].slice(0, 50));
+    setScreen('results');
+  };
+
+  const startOver = () => {
+    setSelectedId(null);
+    setIntensity(4);
+    setPainType('مستمر');
+    setDuration('منذ أيام');
+    setNote('');
+    setRedFlags([]);
+    setScreen('body');
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+  };
+
+  const getTitle = (): string => {
+    const titles: Record<Screen, string> = {
+      welcome: t('appName'),
+      body: t('body'),
+      details: t('details'),
+      results: t('results'),
+      history: t('historyTitle'),
+    };
+    return titles[screen];
+  };
+
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+      <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
+      
+      {screen !== 'welcome' && (
+        <Header
+          title={getTitle()}
+          onBack={() => setScreen(screen === 'history' ? 'welcome' : 'body')}
+        />
+      )}
+
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        {screen === 'welcome' && (
+          <WelcomeScreen
+            onStart={() => setScreen('body')}
+            language={language}
+            direction={direction}
+          />
+        )}
+
+        {screen === 'body' && (
+          <BodyPickerScreen
+            gender={gender}
+            view={view}
+            selectedId={selectedId}
+            setGender={setGender}
+            setView={setView}
+            onSelect={setSelectedId}
+            onNext={() => setScreen('details')}
+            onBack={() => setScreen('welcome')}
+          />
+        )}
+
+        {screen === 'details' && (
+          <DetailsScreen
+            intensity={intensity}
+            setIntensity={setIntensity}
+            painType={painType}
+            setPainType={setPainType}
+            duration={duration}
+            setDuration={setDuration}
+            note={note}
+            setNote={setNote}
+            redFlags={redFlags}
+            setRedFlags={setRedFlags}
+            onBack={() => setScreen('body')}
+            onNext={saveResults}
+          />
+        )}
+
+        {screen === 'results' && selected && (
+          <ResultsScreen
+            selected={selected}
+            group={group}
+            intensity={intensity}
+            painType={painType}
+            duration={duration}
+            note={note}
+            redFlags={redFlags}
+            history={history}
+            onRestart={startOver}
+            onShare={() => {}}
+          />
+        )}
+
+        {screen === 'history' && (
+          <HistoryScreen
+            history={history}
+            onBack={() => setScreen(selected ? 'results' : 'welcome')}
+            onClear={clearHistory}
+          />
+        )}
+      </ScrollView>
+    </SafeAreaView>
+  );
 }
 
-function Welcome({ onStart, language }: { onStart: () => void; language: Parameters<typeof translate>[0] }) { const t = (key: Parameters<typeof translate>[1]) => translate(language, key); return <><View style={styles.hero}><AnimatedPainBody /><View style={styles.heroOrb}><Text style={styles.heroIcon}>✦</Text></View><Text style={styles.heroTitle}>{t('welcomeTitle')}</Text><Text style={styles.heroText}>{t('welcomeText')}</Text><View style={styles.stats}><Stat value="317" label="جزءًا" /><Stat value="23" label="مجموعة" /><Stat value="100%" label="محلي" /></View></View><View style={styles.warningCard}><Text style={styles.warningTitle}>تنبيه طبي مهم</Text><Text style={styles.warningText}>التطبيق تعليمي ولا يقدم تشخيصًا. عند ألم شديد أو مفاجئ، أو ضيق نفس أو إغماء، اطلب المساعدة العاجلة.</Text></View><Button label="أوافق وأبدأ" onPress={onStart} /><Text style={styles.disclaimer}>المعلومات عامة ولا تغني عن استشارة طبيب مؤهل.</Text><LocalReminder /><ImageAnalysisDemo /><LocalAIChat /></>; }
-function Stat({ value, label }: { value: string; label: string }) { return <View style={styles.stat}><Text style={styles.statValue}>{value}</Text><Text style={styles.statLabel}>{label}</Text></View>; }
-function BodyPicker({ gender, view, selectedId, query, setQuery, setGender, setView, onSelect, onNext }: { gender: AppGender; view: BodyView; selectedId: string | null; query: string; setQuery: (v: string) => void; setGender: (v: AppGender) => void; setView: (v: BodyView) => void; onSelect: (id: string) => void; onNext: () => void }) {
-  const filtered = useMemo(() => { const q = query.trim().toLowerCase(); if (!q) return []; return muscleIds.filter((id) => { const m = data.muscles[id]; return String(m.partNumber) === q || m.labelAr.toLowerCase().includes(q) || m.groupLabelAr.toLowerCase().includes(q); }).slice(0, 8); }, [query]);
-  const numberForSlug = (id: string) => data.muscles[id]?.partNumber ?? 0;
-  return <><Text style={styles.helper}>اضغط على الجزء مباشرة، أو ابحث برقم من 1 إلى 317 أو باسم المجموعة.</Text><View style={styles.controlCard}><View style={styles.chips}><Chip label="ذكر" active={gender === 'male'} onPress={() => setGender('male')} /><Chip label="أنثى" active={gender === 'female'} onPress={() => setGender('female')} /><Chip label="أمامي" active={view === 'front'} onPress={() => setView('front')} /><Chip label="خلفي" active={view === 'back'} onPress={() => setView('back')} /></View><TextInput value={query} onChangeText={setQuery} placeholder="ابحث برقم الجزء أو اسمه..." placeholderTextColor="#8A9AA5" style={styles.search} textAlign="right" />{filtered.length > 0 && <View style={styles.searchResults}>{filtered.map((id) => <Pressable key={id} onPress={() => { onSelect(id); setQuery(''); }} style={styles.searchRow}><Text style={styles.searchNumber}>#{data.muscles[id].partNumber}</Text><Text style={styles.searchText}>{data.muscles[id].labelAr}</Text></Pressable>)}</View>}</View><View style={styles.anatomyCard}>{Platform.OS === 'web' ? <WebBodySilhouette gender={gender} view={view} selectedSlugs={selectedId ? [selectedId] : []} onFragmentPress={onSelect} numberForSlug={numberForSlug} /> : <BodySilhouette gender={gender} view={view} zoomable selectedSlugs={selectedId ? [selectedId] : []} onFragmentPress={onSelect} selectedFragmentColor="#19C3B1" unselectedFragmentColor="#D9E9EA" outlineColor="#52737A" hitTolerance={10} labels={{ chest: 'الصدر', abs: 'البطن', neck: 'الرقبة', biceps: 'ذات الرأسين', triceps: 'ثلاثية الرؤوس', trapezius: 'شبه المنحرفة', quadriceps: 'الرباعية', calves: 'الساق' }} />}</View>{selectedId && <View style={styles.selectionPill}><Text style={styles.selectionText}>الجزء رقم {numberForSlug(selectedId)} — {data.muscles[selectedId]?.labelAr}</Text></View>}<Button label="التالي" onPress={onNext} disabled={!selectedId} /></>; }
-function Details({ intensity, setIntensity, painType, setPainType, duration, setDuration, note, setNote, redFlags, setRedFlags, onBack, onNext }: { intensity: number; setIntensity: (v: number) => void; painType: string; setPainType: (v: string) => void; duration: string; setDuration: (v: string) => void; note: string; setNote: (v: string) => void; redFlags: string[]; setRedFlags: (v: string[]) => void; onBack: () => void; onNext: () => void }) {
-  const flags = ['ضيق نفس أو ألم ضاغط بالصدر', 'إغماء أو ارتباك شديد', 'ضعف مفاجئ أو صعوبة في الكلام', 'إصابة قوية أو نزيف'];
-  const toggleFlag = (flag: string) => setRedFlags(redFlags.includes(flag) ? redFlags.filter((item) => item !== flag) : [...redFlags, flag]);
-  return <><Text style={styles.helper}>افتح كل قسم وأكمل المعلومات التي تساعد على فهم الألم. يمكنك فتح أكثر من قسم في الوقت نفسه.</Text><AccordionGroup>
-    <AccordionItem title="شدة الألم" summary={intensity + ' / 10'}><Text style={styles.question}>اختر رقمًا من 0 إلى 10</Text><View style={styles.scale}>{Array.from({ length: 11 }, (_, n) => <Pressable key={n} onPress={() => setIntensity(n)} style={[styles.scaleDot, n <= intensity && styles.scaleDotActive]}><Text style={styles.scaleText}>{n}</Text></Pressable>)}</View></AccordionItem>
-    <AccordionItem title="نوع الألم" summary={painType}><Options options={painTypes} value={painType} onChange={setPainType} /></AccordionItem>
-    <AccordionItem title="منذ متى بدأ؟" summary={duration}><Options options={durations} value={duration} onChange={setDuration} /></AccordionItem>
-    <AccordionItem title="علامات تستدعي المساعدة العاجلة" summary={redFlags.length ? 'تم اختيار ' + redFlags.length : 'لم يتم اختيار علامة'} tone="danger"><Text style={styles.accordionHint}>إذا ظهرت أي علامة، لا تؤخر طلب الرعاية الطبية.</Text><View style={styles.flagList}>{flags.map((flag) => <Pressable key={flag} onPress={() => toggleFlag(flag)} style={[styles.flagRow, redFlags.includes(flag) && styles.flagRowActive]}><Text style={styles.flagCheck}>{redFlags.includes(flag) ? '✓' : '○'}</Text><Text style={styles.flagText}>{flag}</Text></Pressable>)}</View></AccordionItem>
-    <AccordionItem title="ملاحظات إضافية" summary={note ? 'تمت إضافة ملاحظة' : 'اختياري'}><TextInput value={note} onChangeText={setNote} placeholder="مثال: يزداد مع الحركة..." placeholderTextColor="#8A9AA5" multiline maxLength={500} style={styles.noteInput} textAlign="right" /><Text style={styles.characterHint}>{note.length}/500</Text></AccordionItem>
-  </AccordionGroup><View style={styles.row}><Button label="رجوع" secondary onPress={onBack} /><Button label="عرض الإرشاد" onPress={onNext} /></View><Text style={styles.disclaimer}>هذه البيانات تساعد على الإرشاد العام فقط، ولا تستخدمها لاتخاذ قرار علاجي دون طبيب.</Text></>;
-}
-function Results({ selected, group, intensity, painType, duration, note, redFlags, history, onRestart, onShare }: { selected: Muscle; group?: Group; intensity: number; painType: string; duration: string; note: string; redFlags: string[]; history: Checkup[]; onRestart: () => void; onShare: () => void }) { const urgent = intensity >= 8 || redFlags.length > 0; const warning = selected.warning ?? group?.defaultWarning; const recommendation = selected.recommendation ?? group?.defaultRecommendation ?? 'استشر طبيبًا إذا استمر الألم أو ازداد.'; return <><View style={styles.summaryCard}><Text style={styles.summaryLabel}>الجزء المختار</Text><Text style={styles.summaryValue}>#{selected.partNumber} — {selected.labelAr}</Text><Text style={styles.summaryLocation}>{selected.locationAr}</Text><Text style={styles.summaryMeta}>الشدة {intensity}/10 · {painType} · {duration}</Text>{note ? <Text style={styles.summaryNote}>ملاحظات: {note}</Text> : null}</View>{urgent && <View style={styles.urgentCard}><Text style={styles.alertTitle}>اطلب المساعدة العاجلة الآن</Text><Text style={styles.alertText}>وجود علامة إنذار أو ألم شديد يستدعي التواصل مع الطوارئ أو طبيب فورًا.</Text></View>}{warning && <View style={styles.alertCard}><Text style={styles.alertTitle}>متى تطلب المساعدة؟</Text><Text style={styles.alertText}>{warning}</Text></View>}<View style={styles.infoCard}><Text style={styles.cardTitle}>أسباب شائعة محتملة</Text>{selected.commonCauses.map((cause) => <Text key={cause} style={styles.bullet}>• {cause}</Text>)}</View><View style={styles.recommendation}><Text style={styles.cardTitle}>إرشاد عام</Text><Text style={styles.infoText}>{recommendation}</Text></View><InteractiveTips groupKey={selected.group} groupLabel={group?.labelAr ?? selected.groupLabelAr} intensity={intensity} urgent={urgent} /><FirstAidCard area={selected.labelAr} urgent={urgent} /><ReportExport title={selected.labelAr} location={selected.locationAr} intensity={intensity} painType={painType} duration={duration} causes={selected.commonCauses} warning={warning} recommendation={recommendation} note={note} /><PainDiary entries={history} /><Text style={styles.disclaimer}>{selected.medicalSafety}</Text><Button label="مشاركة ملخص الفحص" secondary onPress={onShare} /><Button label="فحص جديد" onPress={onRestart} /></>; }
-function History({ history, onBack, onClear }: { history: Checkup[]; onBack: () => void; onClear: () => void }) { const average = history.length ? (history.reduce((sum, item) => sum + item.intensity, 0) / history.length).toFixed(1) : '—'; return <><Text style={styles.helper}>الفحوصات محفوظة على هذا الجهاز فقط. لا تُرفع إلى خادم.</Text>{history.length > 0 && <View style={styles.statsRow}><View style={styles.miniStat}><Text style={styles.miniValue}>{history.length}</Text><Text style={styles.miniLabel}>فحص</Text></View><View style={styles.miniStat}><Text style={styles.miniValue}>{average}</Text><Text style={styles.miniLabel}>متوسط الشدة</Text></View><View style={styles.miniStat}><Text style={styles.miniValue}>{history.filter((item) => item.urgent).length}</Text><Text style={styles.miniLabel}>تنبيه</Text></View></View>}{history.length === 0 ? <View style={styles.infoCard}><Text style={styles.cardTitle}>لا توجد فحوصات محفوظة</Text></View> : history.map((item) => <View key={item.id} style={styles.historyCard}><Text style={styles.cardTitle}>#{data.muscles[item.partId]?.partNumber} — {data.muscles[item.partId]?.labelAr ?? item.partId}</Text><Text style={styles.infoText}>{item.createdAt} · شدة {item.intensity}/10 · {item.painType}</Text>{item.note ? <Text style={styles.historyNote}>{item.note}</Text> : null}{item.urgent && <Text style={styles.historyUrgent}>يتطلب انتباهًا طبيًا</Text>}</View>)}{history.length > 0 && <Button label="حذف السجل بالكامل" secondary onPress={onClear} />}<Button label="رجوع" secondary onPress={onBack} /></>; }
-function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) { return <Pressable onPress={onPress} style={[styles.chip, active && styles.chipActive]}><Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text></Pressable>; }
-function Options({ options, value, onChange }: { options: string[]; value: string; onChange: (v: string) => void }) { return <View style={styles.chips}>{options.map((option) => <Chip key={option} label={option} active={option === value} onPress={() => onChange(option)} />)}</View>; }
-function Button({ label, onPress, secondary = false, disabled = false }: { label: string; onPress: () => void; secondary?: boolean; disabled?: boolean }) { return <Pressable disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.button, secondary && styles.buttonSecondary, disabled && styles.disabled, pressed && !disabled && styles.buttonPressed]}><Text style={[styles.buttonText, secondary && styles.buttonTextSecondary]}>{label}</Text></Pressable>; }
-
-const styles = StyleSheet.create({ safe: { flex: 1, backgroundColor: '#F4F8FA' }, darkSafe: { backgroundColor: '#0A0F14' }, darkAppBar: { backgroundColor: '#0A0F14' }, darkContent: { backgroundColor: '#0A0F14' }, appBar: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 10, flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#F4F8FA' }, headerTools: { flexDirection: 'row', alignItems: 'center', gap: 12 }, brand: { color: '#0E7C86', fontSize: 19, fontWeight: '900' }, byline: { color: '#8797A0', fontSize: 9, textAlign: 'right', marginTop: 1, letterSpacing: 0.8 }, historyLink: { color: '#54727D', fontWeight: '800' }, content: { padding: 22, paddingTop: 8, paddingBottom: 52 }, eyebrow: { color: '#0E7C86', fontWeight: '800', textAlign: 'right', letterSpacing: 0.5 }, title: { color: '#102E3B', fontSize: 31, fontWeight: '900', textAlign: 'right', marginTop: 7, marginBottom: 20 }, hero: { backgroundColor: '#0F3B46', borderRadius: 28, padding: 18, alignItems: 'flex-end', overflow: 'hidden' }, heroOrb: { width: 58, height: 58, borderRadius: 29, backgroundColor: '#19C3B1', justifyContent: 'center', alignItems: 'center', marginBottom: 18 }, heroIcon: { color: '#07353C', fontSize: 31, fontWeight: '900' }, heroTitle: { color: '#FFFFFF', fontSize: 25, fontWeight: '900', textAlign: 'right' }, heroText: { color: '#C4E4E3', lineHeight: 24, fontSize: 16, textAlign: 'right', marginTop: 10 }, stats: { flexDirection: 'row', gap: 10, marginTop: 22, alignSelf: 'stretch', justifyContent: 'space-between' }, stat: { backgroundColor: '#174C57', borderRadius: 14, paddingVertical: 11, paddingHorizontal: 18, alignItems: 'center', flex: 1 }, statValue: { color: '#67E0D2', fontSize: 19, fontWeight: '900' }, statLabel: { color: '#B7D7D6', fontSize: 11, marginTop: 2 }, warningCard: { backgroundColor: '#FFF5DF', borderColor: '#F0D19A', borderWidth: 1, borderRadius: 18, padding: 18, marginTop: 14 }, warningTitle: { color: '#8D5A00', fontWeight: '900', fontSize: 17, textAlign: 'right' }, warningText: { color: '#735828', lineHeight: 22, textAlign: 'right', marginTop: 6 }, disclaimer: { color: '#71808C', textAlign: 'center', fontSize: 12, lineHeight: 19, marginTop: 14 }, button: { backgroundColor: '#0E7C86', borderRadius: 15, minHeight: 54, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, marginTop: 14, flex: 1, shadowColor: '#0E7C86', shadowOpacity: 0.18, shadowRadius: 8, shadowOffset: { width: 0, height: 4 } }, buttonSecondary: { backgroundColor: '#E8F0F2', borderWidth: 1, borderColor: '#D2E0E4', shadowOpacity: 0 }, buttonPressed: { opacity: 0.86, transform: [{ scale: 0.98 }] }, disabled: { opacity: 0.4 }, buttonText: { color: '#FFF', fontSize: 16, fontWeight: '900' }, buttonTextSecondary: { color: '#45606E' }, helper: { color: '#657781', textAlign: 'right', lineHeight: 22, marginBottom: 14 }, controlCard: { backgroundColor: '#FFFFFF', borderRadius: 20, padding: 14, borderWidth: 1, borderColor: '#E0EAED', zIndex: 2 }, chips: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 9 }, chip: { borderRadius: 12, borderWidth: 1, borderColor: '#D6E0E6', backgroundColor: '#FFF', paddingVertical: 12, paddingHorizontal: 16 }, chipActive: { backgroundColor: '#D9F5F1', borderColor: '#0E7C86' }, chipText: { color: '#57707D', fontWeight: '800' }, chipTextActive: { color: '#0E6972' }, search: { backgroundColor: '#F3F7F8', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, marginTop: 13, color: '#1B3742', borderWidth: 1, borderColor: '#E1EAED' }, searchResults: { marginTop: 6, borderWidth: 1, borderColor: '#E1EAED', borderRadius: 12, overflow: 'hidden' }, searchRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', padding: 11, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#EEF3F4' }, searchText: { color: '#294752', fontWeight: '700', flex: 1, textAlign: 'right' }, searchNumber: { color: '#0E7C86', fontWeight: '900', marginLeft: 10 }, anatomyCard: { backgroundColor: '#FFF', borderRadius: 24, padding: 10, marginTop: 16, borderWidth: 1, borderColor: '#E0E8ED', overflow: 'hidden' }, selectionPill: { backgroundColor: '#D9F5F1', borderRadius: 14, padding: 13, marginTop: 12, borderWidth: 1, borderColor: '#9FE5DB' }, selectionText: { color: '#0E6972', textAlign: 'right', fontWeight: '900' }, question: { color: '#203745', fontSize: 17, fontWeight: '900', textAlign: 'right', marginTop: 18, marginBottom: 12 }, scale: { flexDirection: 'row-reverse', justifyContent: 'space-between', backgroundColor: '#FFF', padding: 12, borderRadius: 16 }, scaleDot: { width: 25, height: 25, borderRadius: 13, backgroundColor: '#E5EBEF', justifyContent: 'center', alignItems: 'center' }, scaleDotActive: { backgroundColor: '#0E7C86' }, scaleText: { fontSize: 11, color: '#516570', fontWeight: '800' }, accent: { color: '#0E7C86' }, row: { flexDirection: 'row-reverse', gap: 8 }, summaryCard: { backgroundColor: '#0F3B46', borderRadius: 22, padding: 22, alignItems: 'flex-end' }, summaryLabel: { color: '#9ADBD5' }, summaryValue: { color: '#FFF', fontSize: 24, fontWeight: '900', marginTop: 7, textAlign: 'right' }, summaryLocation: { color: '#BFE4E2', fontSize: 12, marginTop: 8, textAlign: 'right' }, summaryMeta: { color: '#D6ECEA', marginTop: 10 }, alertCard: { backgroundColor: '#FFF0EE', borderColor: '#F2B9B1', borderWidth: 1, borderRadius: 18, padding: 18, marginTop: 14 }, alertTitle: { color: '#A63B2F', fontSize: 18, fontWeight: '900', textAlign: 'right' }, alertText: { color: '#783E38', textAlign: 'right', lineHeight: 23, marginTop: 7 }, infoCard: { backgroundColor: '#FFF', borderRadius: 18, padding: 18, marginTop: 14, borderWidth: 1, borderColor: '#E0E8ED' }, cardTitle: { color: '#203745', fontSize: 17, fontWeight: '900', textAlign: 'right', marginBottom: 9 }, bullet: { color: '#526A75', textAlign: 'right', lineHeight: 27 }, recommendation: { backgroundColor: '#EAF8F5', borderRadius: 18, padding: 18, marginTop: 14 }, infoText: { color: '#526A75', textAlign: 'right', lineHeight: 23 }, historyCard: { backgroundColor: '#FFF', borderRadius: 16, padding: 17, marginTop: 10, borderWidth: 1, borderColor: '#E0E8ED' }, statsRow: { flexDirection: 'row-reverse', gap: 8, marginBottom: 8 }, miniStat: { flex: 1, backgroundColor: '#EAF8F5', borderRadius: 14, padding: 12, alignItems: 'center' }, miniValue: { color: '#0E7C86', fontSize: 20, fontWeight: '900' }, miniLabel: { color: '#526A75', fontSize: 11, marginTop: 3 }, flagList: { gap: 8 }, flagRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, backgroundColor: '#FFF7F5', borderColor: '#F0D5CF', borderWidth: 1, padding: 12, borderRadius: 12 }, flagRowActive: { backgroundColor: '#FFE7E2', borderColor: '#D97666' }, flagText: { flex: 1, textAlign: 'right', color: '#74463D', fontWeight: '700' }, flagCheck: { color: '#A63B2F', fontSize: 21, fontWeight: '900' }, noteInput: { minHeight: 90, borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#E0EAED', backgroundColor: '#F3F7F8', color: '#1B3742', textAlignVertical: 'top' }, urgentCard: { backgroundColor: '#FFDCD7', borderColor: '#C85042', borderWidth: 2, borderRadius: 18, padding: 18, marginTop: 14 }, summaryNote: { color: '#E4F5F2', marginTop: 8, textAlign: 'right' }, historyNote: { color: '#657781', textAlign: 'right', marginTop: 7 }, historyUrgent: { color: '#A63B2F', textAlign: 'right', fontWeight: '900', marginTop: 7 }, accordionHint: { color: '#8B4038', lineHeight: 21, textAlign: 'right', marginBottom: 10 }, characterHint: { color: '#8797A0', fontSize: 11, textAlign: 'right', marginTop: 5 }
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+  },
+  content: {
+    paddingBottom: 40,
+  },
 });
