@@ -15,7 +15,7 @@ import { translate } from '../services/i18n';
 interface BodyPickerScreenProps {
   onNavigateToDetails: (muscleData: any) => void;
   onBack?: () => void;
-  language: Parameters<typeof translate>[0];
+  language: 'ar' | 'en' | 'fr';
   direction: 'rtl' | 'ltr';
 }
 
