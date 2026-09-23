@@ -1,1 +1,75 @@
-{"appName":"BodyMap Pain","by":"by ElSayed","eyebrow":"Un guide intelligent pour comprendre la douleur","tool":"Outil éducatif de dépistage préliminaire","welcomeTitle":"Une carte de douleur plus claire, une décision plus sereine","welcomeText":"Explorez 317 zones anatomiques, décrivez votre douleur et recevez des conseils généraux avec des alertes de sécurité.","start":"J’accepte et je commence","history":"Historique","language":"Langue","light":"Clair","dark":"Sombre","medicalWarning":"Avis médical important","notDiagnosis":"Cette application est éducative et ne fournit pas de diagnostic.","next":"Suivant","back":"Retour","details":"Décrivez la douleur","results":"Résumé des conseils","body":"Choisissez la zone douloureuse","historyTitle":"Examens précédents"}
+{
+  "appName": "BodyMap Pain",
+  "by": "by ElSayed",
+  "eyebrow": "Un guide intelligent pour comprendre la douleur",
+  "tool": "Outil éducatif de dépistage préliminaire",
+  "welcomeTitle": "Une carte de douleur plus claire, une décision plus sereine",
+  "welcomeText": "Explorez 317 zones anatomiques, décrivez votre douleur et recevez des conseils généraux avec des alertes de sécurité.",
+  "start": "J’accepte et je commence",
+  "history": "Historique",
+  "language": "Langue",
+  "light": "Clair",
+  "dark": "Sombre",
+  "medicalWarning": "Avis médical important",
+  "notDiagnosis": "Cette application est éducative et ne fournit pas de diagnostic.",
+  "next": "Suivant",
+  "back": "Retour",
+  "details": "Décrivez la douleur",
+  "results": "Résumé des conseils",
+  "body": "Choisissez la zone douloureuse",
+  "historyTitle": "Examens précédents",
+  "welcome": {
+    "statParts": "Parties",
+    "statGroups": "Groupes",
+    "statLocal": "Local",
+    "warningText": "L'application est éducative et ne fournit pas de diagnostic. En cas de douleur sévère ou soudaine, d'essoufflement ou d'évanouissement, demandez une aide urgente.",
+    "disclaimer": "Les informations sont générales et ne remplacent pas la consultation d'un médecin qualifié."
+  },
+  "history": {
+    "helperText": "Les examens sont enregistrés sur cet appareil uniquement. Ils ne sont pas téléchargés sur un serveur.",
+    "statChecks": "Examens",
+    "statAvgIntensity": "Intensité Moy.",
+    "statAlerts": "Alertes",
+    "emptyText": "Aucun examen enregistré",
+    "urgentText": "Nécessite une attention médicale",
+    "clearAll": "Effacer tout l'historique"
+  },
+  "details": {
+    "intensityTitle": "Intensité de la douleur",
+    "intensityQuestion": "Choisissez un nombre de 0 à 10",
+    "painTypeTitle": "Type de douleur",
+    "durationTitle": "Depuis combien de temps ?",
+    "redFlagsTitle": "Signes nécessitant une aide urgente",
+    "redFlagsHint": "Si un signe apparaît, ne tardez pas à demander des soins médicaux.",
+    "notesTitle": "Notes supplémentaires",
+    "notesPlaceholder": "Exemple : Augmente avec le mouvement...",
+    "showGuidance": "Afficher les conseils"
+  },
+  "results": {
+    "selectedPart": "Partie sélectionnée",
+    "intensity": "Intensité",
+    "type": "Type",
+    "duration": "Durée",
+    "notes": "Notes",
+    "shareDisclaimer": "Il s'agit d'informations d'orientation et non d'un diagnostic médical.",
+    "urgentTitle": "Demandez une aide urgente maintenant",
+    "urgentText": "La présence d'un signe d'alerte ou d'une douleur sévère nécessite un contact immédiat avec les services d'urgence ou un médecin.",
+    "whenToSeekHelp": "Quand demander de l'aide ?",
+    "commonCauses": "Causes communes possibles",
+    "generalGuidance": "Conseils généraux",
+    "shareSummary": "Partager le résumé de l'examen",
+    "newScan": "Nouvel examen"
+  },
+  "bodyPicker": {
+    "title": "Carte musculaire interactive",
+    "instruction": "Appuyez sur la zone affectée sur l'image réaliste, puis sélectionnez la partie exacte dans la liste pour garantir une précision médicale à 100% :",
+    "selectedArea": "Zone sélectionnée : ",
+    "showParts": "Afficher les parties exactes",
+    "selectPartTitle": "Sélectionnez la partie exacte",
+    "noData": "Aucune donnée médicale détaillée disponible pour cette zone actuellement.",
+    "medicalName": "Nom médical : ",
+    "defaultDescription": "Cliquez ci-dessous pour voir toutes les recommandations et avertissements médicaux pour ce muscle.",
+    "showFullAnalysis": "Afficher l'analyse complète et les données médicales",
+    "matching": "Appariement de la zone sélectionnée avec la base de données médicale de 317 éléments..."
+  }
+}
