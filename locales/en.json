@@ -1,1 +1,75 @@
-{"appName":"BodyMap Pain","by":"by ElSayed","eyebrow":"A smarter guide to understanding pain","tool":"Educational preliminary screening tool","welcomeTitle":"A clearer pain map, a calmer decision","welcomeText":"Explore 317 anatomical areas, describe your pain, and receive clear general guidance with safety alerts.","start":"I agree and start","history":"History","language":"Language","light":"Light","dark":"Dark","medicalWarning":"Important medical notice","notDiagnosis":"This app is educational and does not provide a diagnosis.","next":"Next","back":"Back","details":"Describe the pain","results":"Guidance summary","body":"Choose pain location","historyTitle":"Previous checks"}
+{
+  "appName": "BodyMap Pain",
+  "by": "by ElSayed",
+  "eyebrow": "A smarter guide to understanding pain",
+  "tool": "Educational preliminary screening tool",
+  "welcomeTitle": "A clearer pain map, a calmer decision",
+  "welcomeText": "Explore 317 anatomical areas, describe your pain, and receive clear general guidance with safety alerts.",
+  "start": "I agree and start",
+  "history": "History",
+  "language": "Language",
+  "light": "Light",
+  "dark": "Dark",
+  "medicalWarning": "Important medical notice",
+  "notDiagnosis": "This app is educational and does not provide a diagnosis.",
+  "next": "Next",
+  "back": "Back",
+  "details": "Describe the pain",
+  "results": "Guidance summary",
+  "body": "Choose pain location",
+  "historyTitle": "Previous checks",
+  "welcome": {
+    "statParts": "Parts",
+    "statGroups": "Groups",
+    "statLocal": "Local",
+    "warningText": "The app is educational and does not provide a diagnosis. In case of severe or sudden pain, shortness of breath, or fainting, seek urgent help.",
+    "disclaimer": "Information is general and does not replace consultation with a qualified doctor."
+  },
+  "history": {
+    "helperText": "Checks are saved on this device only. They are not uploaded to any server.",
+    "statChecks": "Checks",
+    "statAvgIntensity": "Avg Intensity",
+    "statAlerts": "Alerts",
+    "emptyText": "No saved checks",
+    "urgentText": "Requires medical attention",
+    "clearAll": "Clear all history"
+  },
+  "details": {
+    "intensityTitle": "Pain Intensity",
+    "intensityQuestion": "Choose a number from 0 to 10",
+    "painTypeTitle": "Pain Type",
+    "durationTitle": "How long has it been?",
+    "redFlagsTitle": "Signs requiring urgent help",
+    "redFlagsHint": "If any sign appears, do not delay seeking medical care.",
+    "notesTitle": "Additional Notes",
+    "notesPlaceholder": "Example: Increases with movement...",
+    "showGuidance": "Show Guidance"
+  },
+  "results": {
+    "selectedPart": "Selected Part",
+    "intensity": "Intensity",
+    "type": "Type",
+    "duration": "Duration",
+    "notes": "Notes",
+    "shareDisclaimer": "This is guidance information and not a medical diagnosis.",
+    "urgentTitle": "Seek urgent help now",
+    "urgentText": "Presence of a warning sign or severe pain requires immediate contact with emergency services or a doctor.",
+    "whenToSeekHelp": "When to seek help?",
+    "commonCauses": "Possible Common Causes",
+    "generalGuidance": "General Guidance",
+    "shareSummary": "Share Check Summary",
+    "newScan": "New Check"
+  },
+  "bodyPicker": {
+    "title": "Interactive Muscle Map",
+    "instruction": "Tap the affected area on the realistic image, then select the exact part from the list to ensure 100% medical accuracy:",
+    "selectedArea": "Selected Area: ",
+    "showParts": "Show exact parts",
+    "selectPartTitle": "Select exact part",
+    "noData": "No detailed medical data available for this area currently.",
+    "medicalName": "Medical Name: ",
+    "defaultDescription": "Click below to see all recommendations and medical warnings for this muscle.",
+    "showFullAnalysis": "Show full analysis and medical data",
+    "matching": "Matching selected area with the 317 medical database..."
+  }
+}
