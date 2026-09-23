@@ -9,6 +9,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { useTheme } from '../hooks/useTheme';
 import { WebBodySilhouette } from '../components/WebBodySilhouette';
+import { MuscleSvgMap, MUSCLE_SVG_PARTS } from '../components/MuscleSvgMap';
 import { BodySilhouette } from 'react-native-body-parts-anatomy';
 import anatomyMap from '../data/anatomyPainMap.json';
 import { AnatomyData, AppGender, BodyView } from '../types';
@@ -38,6 +39,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const [query, setQuery] = useState('');
+  const [visualPath, setVisualPath] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -94,6 +96,15 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
           </View>
         )}
       </View>
+
+      <Card style={styles.visualCard}>
+        <Text style={[styles.visualTitle, { color: colors.textPrimary }]}>الخريطة العضلية البصرية</Text>
+        <Text style={[styles.visualHint, { color: colors.textLight }]}>اضغط على أي مسار لرؤية رقمه. هذه الخريطة للتحديد البصري، بينما الخريطة الطبية أدناه مرتبطة ببيانات الـ317 جزءًا.</Text>
+        <View style={styles.visualMap}>
+          <MuscleSvgMap viewBox="0 0 406.99026 354.43411" selectedId={visualPath} onPartPress={(id) => setVisualPath(id)} selectedColor={colors.primary} />
+        </View>
+        {visualPath && <Text style={[styles.visualSelection, { color: colors.primaryDark }]}>المسار البصري المحدد: {(MUSCLE_SVG_PARTS.find((part) => part.id === visualPath)?.index ?? 0) + 1}</Text>}
+      </Card>
 
       {/* Body Map */}
       <Card style={styles.anatomyCard}>
@@ -215,6 +226,35 @@ const styles = StyleSheet.create({
   anatomyCard: {
     padding: Spacing.sm,
     marginBottom: Spacing.md,
+  },
+  visualCard: {
+    marginBottom: Spacing.md,
+  },
+  visualTitle: {
+    fontFamily: Fonts.arabic.bold,
+    fontSize: Fonts.sizes.lg,
+    textAlign: 'right',
+    marginBottom: Spacing.xs,
+  },
+  visualHint: {
+    fontFamily: Fonts.arabic.regular,
+    fontSize: Fonts.sizes.sm,
+    lineHeight: 21,
+    textAlign: 'right',
+    marginBottom: Spacing.md,
+  },
+  visualMap: {
+    width: '100%',
+    minHeight: 440,
+    backgroundColor: '#F7FBFB',
+    borderRadius: BorderRadius.lg,
+    overflow: 'hidden',
+  },
+  visualSelection: {
+    fontFamily: Fonts.arabic.bold,
+    fontSize: Fonts.sizes.sm,
+    textAlign: 'right',
+    marginTop: Spacing.sm,
   },
   selectionPill: {
     borderRadius: BorderRadius.md,
