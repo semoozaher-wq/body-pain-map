@@ -5,7 +5,7 @@ import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
 import { translate } from './services/i18n';
-import { Screen, AppGender, BodyView, AnatomyData, Checkup, Muscle } from './types';
+import { Screen, AnatomyData, Checkup, Muscle } from './types';
 import { DATA } from './constants/appConstants';
 
 import { Header } from './components/Header';
