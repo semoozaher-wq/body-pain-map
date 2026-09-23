@@ -1,7 +1,7 @@
 // App.tsx
 
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet } from 'react-native';
+import { Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
@@ -18,6 +18,9 @@ import { BodyPickerScreen } from './screens/BodyPickerScreen';
 import { DetailsScreen } from './screens/DetailsScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
+import { BrandLogo } from './components/BrandLogo';
+import { LanguageSwitcher } from './components/LanguageSwitcher';
+import { ThemeToggle } from './components/ThemeToggle';
 
 const data = anatomyMap as unknown as AnatomyData;
 
@@ -33,8 +36,8 @@ export default function App() {
   const [redFlags, setRedFlags] = useState<string[]>([]);
   const [history, setHistory] = useState<Checkup[]>([]);
 
-  const { language, direction } = useLanguage();
-  const { isDark, colors } = useTheme();
+  const { language, direction, setLanguage } = useLanguage();
+  const { isDark, colors, toggleTheme } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
 
   const selected = selectedId ? data.muscles[selectedId] : null;
@@ -96,13 +99,32 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}> 
       <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+
+      {screen === 'welcome' && (
+        <View style={styles.welcomeTopBar}>
+          <BrandLogo compact />
+          <View style={styles.topControls}>
+            <LanguageSwitcher language={language} onChange={setLanguage} />
+            <ThemeToggle dark={isDark} onPress={toggleTheme} />
+          </View>
+        </View>
+      )}
       
       {screen !== 'welcome' && (
         <Header
           title={getTitle()}
           onBack={() => setScreen(screen === 'history' ? 'welcome' : 'body')}
+          rightAction={(
+            <View style={styles.headerActions}>
+              <LanguageSwitcher language={language} onChange={setLanguage} />
+              <ThemeToggle dark={isDark} onPress={toggleTheme} />
+              <Pressable onPress={() => setScreen('history')} style={styles.historyButton} accessibilityLabel="فتح سجل الألم">
+                <Text style={styles.historyButtonText}>السجل</Text>
+              </Pressable>
+            </View>
+          )}
         />
       )}
 
@@ -181,5 +203,34 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 40,
+  },
+  welcomeTopBar: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  topControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  historyButton: {
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: '#D6E0E6',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  historyButtonText: {
+    color: '#0E6972',
+    fontSize: 10,
+    fontWeight: '900',
   },
 });
