@@ -13,11 +13,9 @@ async function optimizeImages() {
   for (const imgPath of images) {
     const outputPath = imgPath.replace('.png', '.webp');
     try {
-      // التحقق من وجود الملف الأصلي أولاً
       await fs.access(imgPath);
-      
       await sharp(imgPath)
-        .webp({ quality: 85, effort: 6 }) // جودة عالية مع ضغط ممتاز
+        .webp({ quality: 85, effort: 6 })
         .toFile(outputPath);
       
       const originalStats = await fs.stat(imgPath);
@@ -33,7 +31,7 @@ async function optimizeImages() {
       }
     }
   }
-  console.log('🎉 اكتملت عملية تحسين الصور! يمكنك الآن تحديث الكود لاستخدام .webp وحذف ملفات .png القديمة.');
+  console.log('🎉 اكتملت عملية تحسين الصور! قم بتحديث مسارات الصور في الكود إلى .webp');
 }
 
 optimizeImages();
