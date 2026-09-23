@@ -9,6 +9,11 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { useTheme } from '../hooks/useTheme';
 import { Checkup, Group, Muscle } from '../types';
+import { InteractiveTips } from '../components/InteractiveTips';
+import { FirstAidCard } from '../components/FirstAidCard';
+import { ReportExport } from '../components/ReportExport';
+import { LocalAIChat } from '../components/LocalAIChat';
+import { ImageAnalysisDemo } from '../components/ImageAnalysisDemo';
 
 interface ResultsScreenProps {
   selected: Muscle;
@@ -86,10 +91,31 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
       </Card>
 
       {/* Recommendation */}
-      <View style={[styles.recommendation, { backgroundColor: colors.successLight }]}>
+      <View style={[styles.recommendation, { backgroundColor: colors.successLight }]}> 
         <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>إرشاد عام</Text>
         <Text style={[styles.infoText, { color: colors.textSecondary }]}>{recommendation}</Text>
       </View>
+
+      <InteractiveTips
+        groupKey={selected.group}
+        groupLabel={group?.labelAr ?? selected.locationAr}
+        intensity={intensity}
+        urgent={urgent}
+      />
+      <FirstAidCard area={selected.locationAr} urgent={urgent} />
+      <ReportExport
+        title={selected.labelAr}
+        location={selected.locationAr}
+        intensity={intensity}
+        painType={painType}
+        duration={duration}
+        causes={selected.commonCauses}
+        warning={warning}
+        recommendation={recommendation}
+        note={note}
+      />
+      <LocalAIChat />
+      <ImageAnalysisDemo />
 
       {/* Disclaimer */}
       <Text style={[styles.disclaimer, { color: colors.textLight }]}>{selected.medicalSafety}</Text>

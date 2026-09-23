@@ -11,6 +11,8 @@ import { useTheme } from '../hooks/useTheme';
 import { Checkup } from '../types';
 import anatomyMap from '../data/anatomyPainMap.json';
 import { AnatomyData } from '../types';
+import { PainDiary } from '../components/PainDiary';
+import { LocalReminder } from '../components/LocalReminder';
 
 const data = anatomyMap as unknown as AnatomyData;
 
@@ -71,6 +73,9 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
           </Card>
         ))
       )}
+
+      <PainDiary entries={history.map((item) => ({ intensity: item.intensity, createdAt: item.createdAt, partId: item.partId }))} />
+      <LocalReminder />
 
       {/* Actions */}
       {history.length > 0 && (
