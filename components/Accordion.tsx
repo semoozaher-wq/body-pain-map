@@ -1,40 +1,90 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
+// components/Accordion.tsx
 
-type AccordionItemProps = { title: string; summary?: string; children: React.ReactNode; tone?: 'default' | 'danger' };
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { Colors } from '../constants/colors';
+import { Fonts } from '../constants/fonts';
+import { Spacing, BorderRadius, Shadows } from '../constants/spacing';
 
-export function AccordionItem({ title, summary, children, tone = 'default' }: AccordionItemProps) {
-  const [open, setOpen] = useState(false);
-  const progress = useRef(new Animated.Value(0)).current;
-  useEffect(() => {
-    Animated.timing(progress, { toValue: open ? 1 : 0, duration: 280, useNativeDriver: true }).start();
-  }, [open, progress]);
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+interface AccordionProps {
+  title: string;
+  icon?: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  isWarning?: boolean;
+}
+
+export default function Accordion({ title, icon, children, defaultOpen = false, isWarning = false }: AccordionProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  const toggleOpen = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <View style={[styles.item, open && styles.openItem, tone === 'danger' && styles.dangerItem]}>
-      <Pressable onPress={() => setOpen((value) => !value)} style={styles.header} accessibilityRole="button" accessibilityState={{ expanded: open }}>
-        <Text style={[styles.arrow, open && styles.arrowOpen]}>{open ? '⌃' : '⌄'}</Text>
-        <View style={styles.headerCopy}><Text style={[styles.title, tone === 'danger' && styles.dangerTitle]}>{title}</Text>{summary && !open ? <Text style={styles.summary}>{summary}</Text> : null}</View>
-      </Pressable>
-      {open ? <Animated.View style={[styles.content, { opacity: progress, transform: [{ scaleY: progress }] }]}>{children}</Animated.View> : null}
+    <View style={[styles.container, isOpen && Shadows.sm]}>
+      <TouchableOpacity onPress={toggleOpen} activeOpacity={0.7} style={styles.header}>
+        <View style={styles.headerLeft}>
+          {icon && <Text style={styles.icon}>{icon}</Text>}
+          <Text style={[styles.title, isWarning && { color: Colors.danger }]}>{title}</Text>
+        </View>
+        <Text style={[styles.arrow, isOpen && styles.arrowOpen]}>▼</Text>
+      </TouchableOpacity>
+      {isOpen && (
+        <View style={styles.content}>
+          {children}
+        </View>
+      )}
     </View>
   );
 }
 
-export function AccordionGroup({ children }: { children: React.ReactNode }) {
-  return <View style={styles.group}>{children}</View>;
-}
-
 const styles = StyleSheet.create({
-  group: { gap: 9 },
-  item: { backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#E0EAED', borderRadius: 16, overflow: 'hidden' },
-  openItem: { borderColor: '#B9E5DF', shadowColor: '#0E7C86', shadowOpacity: 0.08, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
-  dangerItem: { borderColor: '#F0D5CF', backgroundColor: '#FFFDFC' },
-  header: { flexDirection: 'row-reverse', alignItems: 'center', minHeight: 62, paddingHorizontal: 16, paddingVertical: 10, gap: 12 },
-  arrow: { color: '#0E7C86', fontSize: 24, fontWeight: '900', width: 24, textAlign: 'center' },
-  arrowOpen: { color: '#0E5962' },
-  headerCopy: { flex: 1 },
-  title: { color: '#203745', fontSize: 16, fontWeight: '900', textAlign: 'right' },
-  dangerTitle: { color: '#A63B2F' },
-  summary: { color: '#71808C', fontSize: 11, textAlign: 'right', marginTop: 3 },
-  content: { paddingHorizontal: 16, paddingBottom: 16, transformOrigin: 'top' as any },
+  container: {
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    marginBottom: Spacing.md,
+    overflow: 'hidden',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: Spacing.lg,
+    backgroundColor: Colors.surface,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  icon: {
+    fontSize: 20,
+    marginRight: Spacing.md,
+  },
+  title: {
+    fontFamily: Fonts.arabic.bold,
+    fontSize: Fonts.sizes.md,
+    color: Colors.textPrimary,
+  },
+  arrow: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    transform: [{ rotate: '0deg' }],
+  },
+  arrowOpen: {
+    transform: [{ rotate: '180deg' }],
+  },
+  content: {
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: Colors.borderLight,
+    paddingTop: Spacing.md,
+  },
 });
