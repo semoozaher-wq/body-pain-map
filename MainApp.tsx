@@ -1,3 +1,5 @@
+// MainApp.tsx
+
 import React, { useEffect, useState } from 'react';
 import { Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -5,9 +7,10 @@ import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
 import { translate } from './services/i18n';
-import { Screen, AnatomyData, Checkup, Muscle } from './types';
+import { Screen, AppGender, BodyView, AnatomyData, Checkup, Muscle } from './types';
 import { DATA } from './constants/appConstants';
 
+// المكونات
 import { Header } from './components/Header';
 import { WelcomeScreen } from './screens/WelcomeScreen';
 import { BodyPickerScreen } from './screens/BodyPickerScreen';
@@ -22,6 +25,9 @@ const data = anatomyMap as unknown as AnatomyData;
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('welcome');
+  const [gender, setGender] = useState<AppGender>('male');
+  const [view, setView] = useState<BodyView>('front');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedMuscleData, setSelectedMuscleData] = useState<Muscle | null>(null);
   const [intensity, setIntensity] = useState(4);
   const [painType, setPainType] = useState('مستمر');
@@ -34,9 +40,10 @@ export default function App() {
   const { isDark, colors, toggleTheme } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
 
-  const selected = selectedMuscleData;
+  const selected = selectedMuscleData || (selectedId ? data.muscles[selectedId] : null);
   const group = selected ? data.groups[selected.group] : undefined;
 
+  // تحميل وحفظ السجل
   useEffect(() => {
     AsyncStorage.getItem(DATA.HISTORY_STORAGE_KEY).then((saved) => {
       if (saved) setHistory(JSON.parse(saved) as Checkup[]);
@@ -47,8 +54,10 @@ export default function App() {
     AsyncStorage.setItem(DATA.HISTORY_STORAGE_KEY, JSON.stringify(history)).catch(() => undefined);
   }, [history]);
 
+  // الانتقال إلى شاشة التفاصيل مع الاحتفاظ ببيانات العضلة المختارة
   const handleNavigateToDetails = (muscleData: any) => {
     setSelectedMuscleData(muscleData);
+    setSelectedId(muscleData.id);
     setScreen('details');
   };
 
@@ -72,6 +81,7 @@ export default function App() {
   };
 
   const startOver = () => {
+    setSelectedId(null);
     setSelectedMuscleData(null);
     setIntensity(4);
     setPainType('مستمر');
@@ -79,6 +89,10 @@ export default function App() {
     setNote('');
     setRedFlags([]);
     setScreen('body');
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
   };
 
   const getTitle = (): string => {
@@ -122,27 +136,45 @@ export default function App() {
         />
       )}
 
-      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         {screen === 'welcome' && (
-          <WelcomeScreen onStart={() => setScreen('body')} language={language} direction={direction} />
+          <WelcomeScreen
+            onStart={() => setScreen('body')}
+            language={language}
+            direction={direction}
+          />
         )}
 
         {screen === 'body' && (
           <BodyPickerScreen
-            language={language}
-            direction={direction}
+            gender={gender}
+            view={view}
+            selectedId={selectedId}
+            setGender={setGender}
+            setView={setView}
+            onSelect={setSelectedId}
             onNavigateToDetails={handleNavigateToDetails}
             onBack={() => setScreen('welcome')}
+            language={language}
+            direction={direction}
           />
         )}
 
         {screen === 'details' && (
           <DetailsScreen
-            intensity={intensity} setIntensity={setIntensity}
-            painType={painType} setPainType={setPainType}
-            duration={duration} setDuration={setDuration}
-            note={note} setNote={setNote}
-            redFlags={redFlags} setRedFlags={setRedFlags}
+            intensity={intensity}
+            setIntensity={setIntensity}
+            painType={painType}
+            setPainType={setPainType}
+            duration={duration}
+            setDuration={setDuration}
+            note={note}
+            setNote={setNote}
+            redFlags={redFlags}
+            setRedFlags={setRedFlags}
             onBack={() => setScreen('body')}
             onNext={saveResults}
             language={language}
@@ -152,11 +184,18 @@ export default function App() {
 
         {screen === 'results' && selected && (
           <ResultsScreen
-            selected={selected} group={group}
-            intensity={intensity} painType={painType} duration={duration}
-            note={note} redFlags={redFlags} history={history}
-            onRestart={startOver} onShare={() => {}}
-            language={language} direction={direction}
+            selected={selected}
+            group={group}
+            intensity={intensity}
+            painType={painType}
+            duration={duration}
+            note={note}
+            redFlags={redFlags}
+            history={history}
+            onRestart={startOver}
+            onShare={() => {}}
+            language={language}
+            direction={direction}
           />
         )}
 
@@ -164,7 +203,7 @@ export default function App() {
           <HistoryScreen
             history={history}
             onBack={() => setScreen(selected ? 'results' : 'welcome')}
-            onClear={() => setHistory([])}
+            onClear={clearHistory}
             language={language}
             direction={direction}
           />
@@ -175,11 +214,39 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  content: { paddingBottom: 40 },
-  welcomeTopBar: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 10 },
-  topControls: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  historyButton: { borderRadius: 9, borderWidth: 1, borderColor: '#D6E0E6', paddingHorizontal: 8, paddingVertical: 6 },
-  historyButtonText: { fontSize: 10, fontWeight: '900' },
+  safe: {
+    flex: 1,
+  },
+  content: {
+    paddingBottom: 40,
+  },
+  welcomeTopBar: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  topControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  historyButton: {
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: '#D6E0E6',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+  historyButtonText: {
+    color: '#0E6972',
+    fontSize: 10,
+    fontWeight: '900',
+  },
 });
