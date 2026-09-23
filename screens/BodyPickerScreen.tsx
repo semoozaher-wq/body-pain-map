@@ -9,7 +9,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { useTheme } from '../hooks/useTheme';
 import { WebBodySilhouette } from '../components/WebBodySilhouette';
-import { MuscleSvgMap, MUSCLE_SVG_PARTS } from '../components/MuscleSvgMap';
+import { RealisticMuscleViews } from '../components/RealisticMuscleViews';
 import { BodySilhouette } from 'react-native-body-parts-anatomy';
 import anatomyMap from '../data/anatomyPainMap.json';
 import { AnatomyData, AppGender, BodyView } from '../types';
@@ -39,7 +39,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const [query, setQuery] = useState('');
-  const [visualPath, setVisualPath] = useState<string | null>(null);
+  const [visualRegion, setVisualRegion] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -97,14 +97,12 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
         )}
       </View>
 
-      <Card style={styles.visualCard}>
-        <Text style={[styles.visualTitle, { color: colors.textPrimary }]}>الخريطة العضلية البصرية</Text>
-        <Text style={[styles.visualHint, { color: colors.textLight }]}>اضغط على أي مسار لرؤية رقمه. هذه الخريطة للتحديد البصري، بينما الخريطة الطبية أدناه مرتبطة ببيانات الـ317 جزءًا.</Text>
-        <View style={styles.visualMap}>
-          <MuscleSvgMap viewBox="0 0 406.99026 354.43411" selectedId={visualPath} onPartPress={(id) => setVisualPath(id)} selectedColor={colors.primary} />
+      <RealisticMuscleViews onRegionSelect={(_, label) => setVisualRegion(label)} />
+      {visualRegion && (
+        <View style={[styles.selectionPill, { backgroundColor: colors.primaryLight }]}>
+          <Text style={[styles.selectionText, { color: colors.primaryDark }]}>اختيار بصري: {visualRegion} — اختر الجزء الدقيق من الخريطة أسفلها</Text>
         </View>
-        {visualPath && <Text style={[styles.visualSelection, { color: colors.primaryDark }]}>المسار البصري المحدد: {(MUSCLE_SVG_PARTS.find((part) => part.id === visualPath)?.index ?? 0) + 1}</Text>}
-      </Card>
+      )}
 
       {/* Body Map */}
       <Card style={styles.anatomyCard}>
