@@ -34,7 +34,7 @@ export default function App() {
   const [history, setHistory] = useState<Checkup[]>([]);
 
   const { language, direction } = useLanguage();
-  const { dark, colors } = useTheme();
+  const { isDark, colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
 
   const selected = selectedId ? data.muscles[selectedId] : null;
@@ -97,7 +97,7 @@ export default function App() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
       
       {screen !== 'welcome' && (
         <Header
@@ -183,4 +183,3 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 });
-
