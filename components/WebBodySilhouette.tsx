@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { BODY_REGIONS, type BodyView, type Gender } from 'react-native-body-parts-anatomy';
 
@@ -34,10 +34,13 @@ export function WebBodySilhouette({
 }: Props) {
   const region = BODY_REGIONS[gender][view];
   const selected = new Set(selectedSlugs);
+  const [zoom, setZoom] = useState(1);
+  const changeZoom = (delta: number) => setZoom((value) => Math.min(1.45, Math.max(0.85, Number((value + delta).toFixed(2)))));
 
   return (
     <View style={styles.container} accessibilityLabel="خريطة الجسم التفاعلية">
-      <Svg viewBox={region.viewBox} width="100%" height="100%" accessibilityRole="image">
+      <View style={styles.viewport}>
+      <Svg viewBox={region.viewBox} width="100%" height="100%" style={{ transform: [{ scale: zoom }] }} accessibilityRole="image">
         <Path
           d={region.outlineD}
           stroke={outlineColor}
@@ -58,6 +61,12 @@ export function WebBodySilhouette({
           />
         ))}
       </Svg>
+      </View>
+      <View style={styles.zoomControls} accessibilityLabel="أدوات تكبير الخريطة">
+        <Pressable onPress={() => changeZoom(0.15)} style={styles.zoomButton} accessibilityLabel="تكبير"><Text style={styles.zoomText}>+</Text></Pressable>
+        <Pressable onPress={() => setZoom(1)} style={styles.zoomButton} accessibilityLabel="إعادة ضبط التكبير"><Text style={styles.resetText}>١×</Text></Pressable>
+        <Pressable onPress={() => changeZoom(-0.15)} style={styles.zoomButton} accessibilityLabel="تصغير"><Text style={styles.zoomText}>−</Text></Pressable>
+      </View>
     </View>
   );
 }
@@ -68,5 +77,44 @@ const styles = StyleSheet.create({
     aspectRatio: 724 / 1448,
     minHeight: 420,
     alignSelf: 'center',
+    position: 'relative',
+  },
+  viewport: {
+    width: '100%',
+    height: '100%',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  zoomControls: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    gap: 6,
+  },
+  zoomButton: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D4E3E6',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#123B42',
+    shadowOpacity: 0.12,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  zoomText: {
+    color: '#0E7C86',
+    fontSize: 22,
+    fontWeight: '900',
+    lineHeight: 24,
+  },
+  resetText: {
+    color: '#54727D',
+    fontSize: 11,
+    fontWeight: '900',
   },
 });
