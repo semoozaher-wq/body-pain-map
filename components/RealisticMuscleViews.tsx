@@ -1,102 +1,132 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Colors } from '../constants/colors';
 import { BorderRadius, Spacing } from '../constants/spacing';
 
 type ViewKey = 'front' | 'back' | 'side';
-type Region = { key: string; label: string; top: `${number}%`; left: `${number}%`; width: `${number}%`; height: `${number}%` };
+type Hotspot = {
+  key: string;
+  label: string;
+  top: `${number}%`;
+  left: `${number}%`;
+};
 
-const views: Record<ViewKey, { label: string; source: number; regions: Region[] }> = {
+type ViewDefinition = {
+  label: string;
+  source: number;
+  hotspots: Hotspot[];
+};
+
+// نقاط صغيرة بدل مناطق شفافة كبيرة؛ كل نقطة تربط بمجموعة عضلية محددة.
+const views: Record<ViewKey, ViewDefinition> = {
   front: {
     label: 'أمامي',
     source: require('../assets/anatomy/muscle-front-realistic.png'),
-    regions: [
-      { key: 'head', label: 'الرأس', top: '8%', left: '39%', width: '22%', height: '10%' },
-      { key: 'neck', label: 'الرقبة', top: '17%', left: '40%', width: '20%', height: '8%' },
-      { key: 'chest', label: 'الصدر', top: '24%', left: '32%', width: '36%', height: '12%' },
-      { key: 'abs', label: 'البطن', top: '36%', left: '37%', width: '26%', height: '15%' },
-      { key: 'upper-limb', label: 'الذراع', top: '26%', left: '15%', width: '20%', height: '29%' },
-      { key: 'upper-limb', label: 'الذراع', top: '26%', left: '65%', width: '20%', height: '29%' },
-      { key: 'lower-limb', label: 'الفخذ', top: '49%', left: '31%', width: '18%', height: '23%' },
-      { key: 'lower-limb', label: 'الفخذ', top: '49%', left: '51%', width: '18%', height: '23%' },
-      { key: 'lower-limb', label: 'الساق', top: '71%', left: '32%', width: '16%', height: '23%' },
-      { key: 'lower-limb', label: 'الساق', top: '71%', left: '52%', width: '16%', height: '23%' },
+    hotspots: [
+      { key: 'head', label: 'الرأس', top: '13%', left: '50%' },
+      { key: 'neck', label: 'الرقبة', top: '21%', left: '50%' },
+      { key: 'deltoids', label: 'الكتف', top: '28%', left: '29%' },
+      { key: 'deltoids', label: 'الكتف', top: '28%', left: '71%' },
+      { key: 'chest', label: 'الصدر', top: '31%', left: '43%' },
+      { key: 'chest', label: 'الصدر', top: '31%', left: '57%' },
+      { key: 'biceps', label: 'مقدمة الذراع', top: '39%', left: '23%' },
+      { key: 'biceps', label: 'مقدمة الذراع', top: '39%', left: '77%' },
+      { key: 'abs', label: 'البطن', top: '44%', left: '50%' },
+      { key: 'obliques', label: 'جانب البطن', top: '44%', left: '39%' },
+      { key: 'obliques', label: 'جانب البطن', top: '44%', left: '61%' },
+      { key: 'quadriceps', label: 'مقدمة الفخذ', top: '62%', left: '43%' },
+      { key: 'quadriceps', label: 'مقدمة الفخذ', top: '62%', left: '57%' },
+      { key: 'knees', label: 'الركبة', top: '74%', left: '43%' },
+      { key: 'knees', label: 'الركبة', top: '74%', left: '57%' },
+      { key: 'calves', label: 'الساق', top: '86%', left: '44%' },
+      { key: 'calves', label: 'الساق', top: '86%', left: '56%' },
     ],
   },
   back: {
     label: 'خلفي',
     source: require('../assets/anatomy/muscle-back-realistic.png'),
-    regions: [
-      { key: 'head', label: 'الرأس', top: '8%', left: '39%', width: '22%', height: '10%' },
-      { key: 'neck', label: 'الرقبة', top: '17%', left: '40%', width: '20%', height: '8%' },
-      { key: 'upper-back', label: 'أعلى الظهر', top: '24%', left: '30%', width: '40%', height: '16%' },
-      { key: 'lower-back', label: 'أسفل الظهر', top: '40%', left: '34%', width: '32%', height: '15%' },
-      { key: 'upper-limb', label: 'الذراع', top: '26%', left: '15%', width: '20%', height: '29%' },
-      { key: 'upper-limb', label: 'الذراع', top: '26%', left: '65%', width: '20%', height: '29%' },
-      { key: 'lower-limb', label: 'الفخذ', top: '51%', left: '31%', width: '18%', height: '23%' },
-      { key: 'lower-limb', label: 'الفخذ', top: '51%', left: '51%', width: '18%', height: '23%' },
-      { key: 'lower-limb', label: 'الساق', top: '73%', left: '32%', width: '16%', height: '22%' },
-      { key: 'lower-limb', label: 'الساق', top: '73%', left: '52%', width: '16%', height: '22%' },
+    hotspots: [
+      { key: 'head', label: 'الرأس', top: '13%', left: '50%' },
+      { key: 'neck', label: 'الرقبة', top: '21%', left: '50%' },
+      { key: 'trapezius', label: 'أعلى الكتف', top: '28%', left: '40%' },
+      { key: 'trapezius', label: 'أعلى الكتف', top: '28%', left: '60%' },
+      { key: 'upper-back', label: 'أعلى الظهر', top: '35%', left: '50%' },
+      { key: 'triceps', label: 'خلف الذراع', top: '40%', left: '23%' },
+      { key: 'triceps', label: 'خلف الذراع', top: '40%', left: '77%' },
+      { key: 'lower-back', label: 'أسفل الظهر', top: '47%', left: '50%' },
+      { key: 'gluteal', label: 'الأرداف', top: '58%', left: '43%' },
+      { key: 'gluteal', label: 'الأرداف', top: '58%', left: '57%' },
+      { key: 'hamstring', label: 'خلف الفخذ', top: '68%', left: '43%' },
+      { key: 'hamstring', label: 'خلف الفخذ', top: '68%', left: '57%' },
+      { key: 'calves', label: 'الساق الخلفية', top: '86%', left: '44%' },
+      { key: 'calves', label: 'الساق الخلفية', top: '86%', left: '56%' },
     ],
   },
   side: {
     label: 'جانبي',
     source: require('../assets/anatomy/muscle-side-realistic.png'),
-    regions: [
-      { key: 'head', label: 'الرأس', top: '8%', left: '39%', width: '22%', height: '10%' },
-      { key: 'neck', label: 'جانب الرقبة', top: '17%', left: '39%', width: '22%', height: '9%' },
-      { key: 'chest', label: 'الصدر الجانبي', top: '25%', left: '31%', width: '37%', height: '13%' },
-      { key: 'upper-back', label: 'الظهر الجانبي', top: '30%', left: '54%', width: '24%', height: '20%' },
-      { key: 'upper-limb', label: 'الذراع', top: '27%', left: '20%', width: '22%', height: '30%' },
-      { key: 'lower-back', label: 'أسفل الظهر', top: '39%', left: '45%', width: '25%', height: '15%' },
-      { key: 'lower-limb', label: 'الفخذ', top: '50%', left: '31%', width: '28%', height: '24%' },
-      { key: 'lower-limb', label: 'الساق', top: '72%', left: '33%', width: '23%', height: '24%' },
+    hotspots: [
+      { key: 'head', label: 'الرأس', top: '13%', left: '50%' },
+      { key: 'neck', label: 'جانب الرقبة', top: '21%', left: '50%' },
+      { key: 'chest', label: 'الصدر الجانبي', top: '31%', left: '49%' },
+      { key: 'deltoids', label: 'الكتف', top: '29%', left: '35%' },
+      { key: 'biceps', label: 'الذراع', top: '40%', left: '31%' },
+      { key: 'obliques', label: 'جانب البطن', top: '43%', left: '50%' },
+      { key: 'upper-back', label: 'الظهر الجانبي', top: '37%', left: '68%' },
+      { key: 'lower-back', label: 'أسفل الظهر', top: '47%', left: '64%' },
+      { key: 'quadriceps', label: 'مقدمة الفخذ', top: '64%', left: '43%' },
+      { key: 'hamstring', label: 'خلف الفخذ', top: '64%', left: '61%' },
+      { key: 'calves', label: 'الساق', top: '86%', left: '49%' },
     ],
   },
 };
 
 export function RealisticMuscleViews({ onRegionSelect }: { onRegionSelect?: (groupKey: string, label: string) => void }) {
   const [activeView, setActiveView] = useState<ViewKey>('front');
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const current = views[activeView];
-  const visibleRegions = useMemo(() => current.regions, [current]);
 
-  const selectRegion = (region: Region) => {
-    setSelected(region.label);
-    onRegionSelect?.(region.key, region.label);
+  const selectHotspot = (hotspot: Hotspot, index: number) => {
+    setSelectedKey(`${hotspot.key}-${index}`);
+    onRegionSelect?.(hotspot.key, hotspot.label);
   };
 
   return (
     <View style={styles.card}>
       <View style={styles.headingRow}>
         <View style={styles.headingCopy}>
-          <Text style={styles.title}>الخريطة العضلية الواقعية</Text>
-          <Text style={styles.subtitle}>اختر الزاوية ثم اضغط على المنطقة التقريبية</Text>
+          <Text style={styles.title}>خريطة العضلات التفاعلية</Text>
+          <Text style={styles.subtitle}>اضغط على نقطة صغيرة لمعرفة العضلة فورًا</Text>
         </View>
-        <Text style={styles.badge}>3D</Text>
+        <Text style={styles.badge}>HOT</Text>
       </View>
       <View style={styles.tabs}>
         {(Object.keys(views) as ViewKey[]).map((key) => (
-          <Pressable key={key} onPress={() => { setActiveView(key); setSelected(null); }} style={[styles.tab, key === activeView && styles.activeTab]}>
+          <Pressable key={key} onPress={() => { setActiveView(key); setSelectedKey(null); }} style={[styles.tab, key === activeView && styles.activeTab]}>
             <Text style={[styles.tabText, key === activeView && styles.activeTabText]}>{views[key].label}</Text>
           </Pressable>
         ))}
       </View>
       <View style={styles.imageFrame}>
-        <Image source={current.source} style={styles.image} resizeMode="contain" accessibilityLabel={`رسم عضلي ${current.label}`} />
-        {visibleRegions.map((region, index) => (
-          <Pressable
-            key={`${region.key}-${region.label}-${index}`}
-            onPress={() => selectRegion(region)}
-            accessibilityRole="button"
-            accessibilityLabel={`اختيار ${region.label}`}
-            style={[styles.hotspot, { top: region.top, left: region.left, width: region.width, height: region.height }, selected === region.label && styles.selectedHotspot]}
-          >
-            <Text style={styles.hotspotText}>{selected === region.label ? region.label : ''}</Text>
-          </Pressable>
-        ))}
+        <Image source={current.source} style={styles.image} resizeMode="contain" accessibilityLabel={`صورة عضلات ${current.label}`} />
+        {current.hotspots.map((hotspot, index) => {
+          const id = `${hotspot.key}-${index}`;
+          const selected = selectedKey === id;
+          return (
+            <Pressable
+              key={id}
+              onPress={() => selectHotspot(hotspot, index)}
+              accessibilityRole="button"
+              accessibilityLabel={`نقطة ${hotspot.label}`}
+              style={[styles.hotspot, { top: hotspot.top, left: hotspot.left }, selected && styles.selectedHotspot]}
+            >
+              <View style={styles.dot} />
+              {selected && <Text style={styles.hotspotLabel}>{hotspot.label}</Text>}
+            </Pressable>
+          );
+        })}
       </View>
-      {selected ? <Text style={styles.selection}>المنطقة المختارة بصريًا: {selected}</Text> : <Text style={styles.helper}>هذه طبقة بصرية لتسهيل التحديد. اعتمد على الخريطة الدقيقة أسفلها لربط البيانات الطبية.</Text>}
+      <Text style={styles.helper}>كل نقطة تمثل عضلة أو منطقة محددة. اضغط عليها لعرض التفاصيل.</Text>
     </View>
   );
 }
@@ -107,7 +137,7 @@ const styles = StyleSheet.create({
   headingCopy: { flex: 1 },
   title: { color: '#173D48', textAlign: 'right', fontSize: 18, fontWeight: '900' },
   subtitle: { color: '#6A8088', textAlign: 'right', fontSize: 12, marginTop: 4 },
-  badge: { width: 38, height: 30, borderRadius: 10, backgroundColor: Colors.primary, color: '#FFFFFF', textAlign: 'center', lineHeight: 30, fontWeight: '900' },
+  badge: { width: 42, height: 30, borderRadius: 10, backgroundColor: Colors.primary, color: '#FFFFFF', textAlign: 'center', lineHeight: 30, fontWeight: '900', fontSize: 10 },
   tabs: { flexDirection: 'row-reverse', gap: 8, marginTop: 14 },
   tab: { flex: 1, borderRadius: 10, borderWidth: 1, borderColor: '#D5E4E6', paddingVertical: 9, alignItems: 'center' },
   activeTab: { backgroundColor: '#DDF5F1', borderColor: Colors.primary },
@@ -115,9 +145,9 @@ const styles = StyleSheet.create({
   activeTabText: { color: Colors.primaryDark },
   imageFrame: { aspectRatio: 0.86, marginTop: 14, borderRadius: 16, overflow: 'hidden', backgroundColor: '#FBFDFD', position: 'relative' },
   image: { width: '100%', height: '100%' },
-  hotspot: { position: 'absolute', borderRadius: 999, borderWidth: 1, borderColor: 'rgba(14,124,134,0.18)', backgroundColor: 'rgba(255,255,255,0.03)', alignItems: 'center', justifyContent: 'center' },
-  selectedHotspot: { borderColor: Colors.primary, borderWidth: 3, backgroundColor: 'rgba(25,195,177,0.18)' },
-  hotspotText: { color: Colors.primaryDark, backgroundColor: '#FFFFFFDD', borderRadius: 7, paddingHorizontal: 5, fontSize: 10, fontWeight: '900' },
-  selection: { color: Colors.primaryDark, textAlign: 'right', marginTop: 11, fontWeight: '900' },
+  hotspot: { position: 'absolute', width: 28, height: 28, marginLeft: -14, marginTop: -14, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.82)', borderWidth: 2, borderColor: Colors.primary },
+  selectedHotspot: { width: 34, height: 34, marginLeft: -17, marginTop: -17, backgroundColor: 'rgba(25,195,177,0.25)', borderColor: Colors.primaryDark, zIndex: 3 },
+  dot: { width: 10, height: 10, borderRadius: 999, backgroundColor: Colors.primaryDark },
+  hotspotLabel: { position: 'absolute', top: 27, right: -34, minWidth: 68, paddingHorizontal: 5, paddingVertical: 3, borderRadius: 6, backgroundColor: '#173D48', color: '#FFFFFF', textAlign: 'center', fontSize: 10, fontWeight: '900' },
   helper: { color: '#71858D', textAlign: 'right', marginTop: 11, lineHeight: 20, fontSize: 12 },
 });
