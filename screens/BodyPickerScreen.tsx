@@ -9,7 +9,7 @@ import {
   Modal,
 } from 'react-native';
 import { RealisticMuscleViews } from '../components/RealisticMuscleViews';
-import anatomyPainMap from '../data/anatomyPainMap.json';
+import anatomyPainMap from '../data/cleanAnatomyData';
 import { translate } from '../services/i18n';
 
 interface BodyPickerScreenProps {
@@ -47,14 +47,14 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [showMuscleList, setShowMuscleList] = useState(false);
 
-  // الحل السحري: استخدام .trim() لتجاهل أي مسافات زائدة في ملف JSON تلقائياً
   const musclesInArea = useMemo(() => {
     if (!selectedArea) return [];
     const groupName = areaToGroupMap[selectedArea];
     if (!groupName) return [];
     
-    return Object.values(anatomyPainMap.muscles).filter(
-      (muscle: any) => muscle.group && muscle.group.trim() === groupName.trim()
+    const muscles = anatomyPainMap.muscles || {};
+    return Object.values(muscles).filter(
+      (muscle: any) => muscle && muscle.group === groupName
     );
   }, [selectedArea]);
 
