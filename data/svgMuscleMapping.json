@@ -1,6 +1,6 @@
 {
   "version": "2.0.0",
-  "description": "ربط مباشر بين SVG IDs و anatomyPainMap IDs",
+  "description": "ربط مباشر بين SVG IDs و anatomyPainMap IDs — يدعم male/female",
   "totalMapped": 20,
   "elements": [
     {
