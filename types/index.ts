@@ -35,6 +35,7 @@ export type Checkup = {
   painType: string;
   duration: string;
   createdAt: string;
+  createdAtIso?: string;
   note?: string;
   urgent?: boolean;
   afterIntensity?: number;
