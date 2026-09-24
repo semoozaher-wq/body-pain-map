@@ -1,66 +1,207 @@
 {
-  "version": "1.0.0",
-  "totalMapped": 10,
+  "version": "2.0.0",
+  "description": "ربط مباشر بين SVG IDs و anatomyPainMap IDs",
+  "totalMapped": 20,
   "elements": [
     {
-      "svgId": "deltoid_front",
-      "muscleId": "m_deltoid",
-      "label": "العضلة الدالية (الكتف)",
-      "view": "front"
+      "svgId": "deltoid_front_left",
+      "svgView": "front",
+      "anatomyMaleId": "deltoids-male-front-1",
+      "anatomyFemaleId": "deltoids-female-front-1",
+      "labelAr": "العضلة الدالية اليسرى",
+      "labelEn": "Left Deltoid",
+      "side": "left",
+      "group": "deltoids"
     },
     {
-      "svgId": "pectoralis_major",
-      "muscleId": "m_pectoralis",
-      "label": "عضلة الصدر الكبرى",
-      "view": "front"
+      "svgId": "deltoid_front_right",
+      "svgView": "front",
+      "anatomyMaleId": "deltoids-male-front-2",
+      "anatomyFemaleId": "deltoids-female-front-2",
+      "labelAr": "العضلة الدالية اليمنى",
+      "labelEn": "Right Deltoid",
+      "side": "right",
+      "group": "deltoids"
     },
     {
-      "svgId": "biceps_brachii",
-      "muscleId": "m_biceps",
-      "label": "العضلة ثنائية الرأس (البايسبس)",
-      "view": "front"
+      "svgId": "pectoralis_left",
+      "svgView": "front",
+      "anatomyMaleId": "chest-male-front-1",
+      "anatomyFemaleId": "chest-female-front-1",
+      "labelAr": "عضلة الصدر اليسرى",
+      "labelEn": "Left Pectoralis",
+      "side": "left",
+      "group": "chest"
     },
     {
-      "svgId": "rectus_abdominis",
-      "muscleId": "m_abs",
-      "label": "عضلات البطن المستقيم",
-      "view": "front"
+      "svgId": "pectoralis_right",
+      "svgView": "front",
+      "anatomyMaleId": "chest-male-front-2",
+      "anatomyFemaleId": "chest-female-front-2",
+      "labelAr": "عضلة الصدر اليمنى",
+      "labelEn": "Right Pectoralis",
+      "side": "right",
+      "group": "chest"
     },
     {
-      "svgId": "quadriceps_femoris",
-      "muscleId": "m_quads",
-      "label": "عضلات الفخذ الأمامية",
-      "view": "front"
+      "svgId": "biceps_left",
+      "svgView": "front",
+      "anatomyMaleId": "biceps-male-front-1",
+      "anatomyFemaleId": "biceps-female-front-1",
+      "labelAr": "العضلة ذات الرأسين اليسرى",
+      "labelEn": "Left Biceps",
+      "side": "left",
+      "group": "biceps"
     },
     {
-      "svgId": "trapezius_back",
-      "muscleId": "m_trapezius",
-      "label": "العضلة شبه المنحرفة (أعلى الظهر والرقبة)",
-      "view": "back"
+      "svgId": "biceps_right",
+      "svgView": "front",
+      "anatomyMaleId": "biceps-male-front-2",
+      "anatomyFemaleId": "biceps-female-front-2",
+      "labelAr": "العضلة ذات الرأسين اليمنى",
+      "labelEn": "Right Biceps",
+      "side": "right",
+      "group": "biceps"
     },
     {
-      "svgId": "latissimus_dorsi",
-      "muscleId": "m_lats",
-      "label": "العضلة العريضة الظهرية",
-      "view": "back"
+      "svgId": "abs_upper_left",
+      "svgView": "front",
+      "anatomyMaleId": "abs-male-front-1",
+      "anatomyFemaleId": "abs-female-front-1",
+      "labelAr": "عضلات البطن العلوية اليسرى",
+      "labelEn": "Upper Left Abs",
+      "side": "left",
+      "group": "abs"
     },
     {
-      "svgId": "gluteus_maximus",
-      "muscleId": "m_glutes",
-      "label": "عضلات الأرداف (المقعدة)",
-      "view": "back"
+      "svgId": "abs_upper_right",
+      "svgView": "front",
+      "anatomyMaleId": "abs-male-front-5",
+      "anatomyFemaleId": "abs-female-front-5",
+      "labelAr": "عضلات البطن العلوية اليمنى",
+      "labelEn": "Upper Right Abs",
+      "side": "right",
+      "group": "abs"
     },
     {
-      "svgId": "hamstrings",
-      "muscleId": "m_hamstrings",
-      "label": "عضلات الفخذ الخلفية",
-      "view": "back"
+      "svgId": "abs_lower_left",
+      "svgView": "front",
+      "anatomyMaleId": "abs-male-front-4",
+      "anatomyFemaleId": "abs-female-front-4",
+      "labelAr": "عضلات البطن السفلية اليسرى",
+      "labelEn": "Lower Left Abs",
+      "side": "left",
+      "group": "abs"
     },
     {
-      "svgId": "gastrocnemius",
-      "muscleId": "m_calves",
-      "label": "عضلة الساق (السمانة)",
-      "view": "back"
+      "svgId": "abs_lower_right",
+      "svgView": "front",
+      "anatomyMaleId": "abs-male-front-8",
+      "anatomyFemaleId": "abs-female-front-8",
+      "labelAr": "عضلات البطن السفلية اليمنى",
+      "labelEn": "Lower Right Abs",
+      "side": "right",
+      "group": "abs"
+    },
+    {
+      "svgId": "obliques_left",
+      "svgView": "front",
+      "anatomyMaleId": "obliques-male-front-1",
+      "anatomyFemaleId": "obliques-female-front-1",
+      "labelAr": "العضلات المائلة اليسرى",
+      "labelEn": "Left Obliques",
+      "side": "left",
+      "group": "obliques"
+    },
+    {
+      "svgId": "obliques_right",
+      "svgView": "front",
+      "anatomyMaleId": "obliques-male-front-9",
+      "anatomyFemaleId": "obliques-female-front-9",
+      "labelAr": "العضلات المائلة اليمنى",
+      "labelEn": "Right Obliques",
+      "side": "right",
+      "group": "obliques"
+    },
+    {
+      "svgId": "quadriceps_left",
+      "svgView": "front",
+      "anatomyMaleId": "quadriceps-male-front-1",
+      "anatomyFemaleId": "quadriceps-female-front-1",
+      "labelAr": "العضلات الرباعية اليسرى",
+      "labelEn": "Left Quadriceps",
+      "side": "left",
+      "group": "quadriceps"
+    },
+    {
+      "svgId": "quadriceps_right",
+      "svgView": "front",
+      "anatomyMaleId": "quadriceps-male-front-4",
+      "anatomyFemaleId": "quadriceps-female-front-4",
+      "labelAr": "العضلات الرباعية اليمنى",
+      "labelEn": "Right Quadriceps",
+      "side": "right",
+      "group": "quadriceps"
+    },
+    {
+      "svgId": "knee_left",
+      "svgView": "front",
+      "anatomyMaleId": "knees-male-front-1",
+      "anatomyFemaleId": "knees-female-front-1",
+      "labelAr": "الركبة اليسرى",
+      "labelEn": "Left Knee",
+      "side": "left",
+      "group": "knees"
+    },
+    {
+      "svgId": "knee_right",
+      "svgView": "front",
+      "anatomyMaleId": "knees-male-front-3",
+      "anatomyFemaleId": "knees-female-front-3",
+      "labelAr": "الركبة اليمنى",
+      "labelEn": "Right Knee",
+      "side": "right",
+      "group": "knees"
+    },
+    {
+      "svgId": "trapezius_back_left",
+      "svgView": "back",
+      "anatomyMaleId": "trapezius-male-front-1",
+      "anatomyFemaleId": "trapezius-female-front-1",
+      "labelAr": "العضلة شبه المنحرفة اليسرى",
+      "labelEn": "Left Trapezius",
+      "side": "left",
+      "group": "trapezius"
+    },
+    {
+      "svgId": "trapezius_back_right",
+      "svgView": "back",
+      "anatomyMaleId": "trapezius-male-front-2",
+      "anatomyFemaleId": "trapezius-female-front-2",
+      "labelAr": "العضلة شبه المنحرفة اليمنى",
+      "labelEn": "Right Trapezius",
+      "side": "right",
+      "group": "trapezius"
+    },
+    {
+      "svgId": "lats_left",
+      "svgView": "back",
+      "anatomyMaleId": "lats-male-back-1",
+      "anatomyFemaleId": "lats-female-back-1",
+      "labelAr": "العضلة العريضة الظهرية اليسرى",
+      "labelEn": "Left Latissimus Dorsi",
+      "side": "left",
+      "group": "lats"
+    },
+    {
+      "svgId": "lats_right",
+      "svgView": "back",
+      "anatomyMaleId": "lats-male-back-2",
+      "anatomyFemaleId": "lats-female-back-2",
+      "labelAr": "العضلة العريضة الظهرية اليمنى",
+      "labelEn": "Right Latissimus Dorsi",
+      "side": "right",
+      "group": "lats"
     }
   ]
 }
