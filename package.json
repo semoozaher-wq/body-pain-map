@@ -17,6 +17,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.2.2",
+    "sharp": "^0.33.5",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -27,7 +28,9 @@
     "build:web": "expo export --platform web",
     "enrich:anatomy": "node scripts/enrich-anatomy-data.js",
     "generate:anatomy": "node scripts/generate-317-pain-map.js data/anatomyPainMap.json",
-    "validate:pain-map": "node scripts/validate-pain-map.js data/anatomyPainMap.json"
+    "validate:pain-map": "node scripts/validate-pain-map.js data/anatomyPainMap.json",
+    "optimize:images": "node scripts/optimize-images.js",
+    "clean:data": "node scripts/clean-anatomy-data.js"
   },
   "private": true
 }
