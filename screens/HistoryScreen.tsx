@@ -63,12 +63,13 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
         history.map((item) => (
           <Card key={item.id} style={styles.historyCard}>
             <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
-              #{data.muscles[item.partId]?.partNumber} — {data.muscles[item.partId]?.labelAr ?? item.partId}
+              {item.selfCareGuide ? `خطة تخفيف ذاتي — ${item.selfCareGuide}` : `#${data.muscles[item.partId]?.partNumber} — ${data.muscles[item.partId]?.labelAr ?? item.partId}`}
             </Text>
             <Text style={[styles.infoText, { color: colors.textSecondary }]}>
               {item.createdAt} · شدة {item.intensity}/10 · {item.painType}
             </Text>
             {item.note ? <Text style={[styles.note, { color: colors.textSecondary }]}>{item.note}</Text> : null}
+            {item.afterIntensity !== undefined && <Text style={[styles.note, { color: colors.primary }]}>قبل {item.intensity}/10 ← بعد {item.afterIntensity}/10</Text>}
             {item.urgent && <Text style={[styles.urgentText, { color: colors.danger }]}>يتطلب انتباهًا طبيًا</Text>}
           </Card>
         ))

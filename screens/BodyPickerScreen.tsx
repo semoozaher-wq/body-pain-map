@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RealisticMuscleViews } from '../components/RealisticMuscleViews';
 import { InternalOrganCard } from '../components/InternalOrganCard';
+import { PainReliefPanel } from '../components/PainReliefPanel';
 import { cleanData } from '../data/cleanData';
 import internalOrgans from '../data/internalOrgans.json';
 import { translate } from '../services/i18n';
@@ -11,6 +12,7 @@ type Organ = (typeof internalOrgans)[keyof typeof internalOrgans]['organs'][numb
 
 interface BodyPickerScreenProps {
   onNavigateToDetails: (muscleData: any) => void;
+  onSaveSelfCare?: (result: { guideKey: string; pointId?: string; before: number; after: number }) => void;
   onBack?: () => void;
   language: 'ar' | 'en' | 'fr';
   direction?: 'rtl' | 'ltr';
@@ -44,7 +46,7 @@ const simpleDescriptions: Record<string, string> = {
 function simpleName(muscle: any) { return simpleGroupNames[muscle.group] ?? muscle.groupLabelAr ?? muscle.labelAr; }
 function simpleDescription(muscle: any) { return simpleDescriptions[muscle.group] ?? 'عضلات تساعد على الحركة والثبات في هذه المنطقة.'; }
 
-export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateToDetails, onBack, language }) => {
+export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateToDetails, onSaveSelfCare, onBack, language }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const [mode, setMode] = useState<Mode>('surface');
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
@@ -96,7 +98,10 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateTo
           <>
             <Text style={styles.sectionTitle}>خريطة العضلات</Text>
             <Text style={styles.sectionHint}>النقاط الصغيرة هي مناطق تفاعلية. اضغط على أي نقطة لعرض المعلومات فورًا.</Text>
-            <RealisticMuscleViews onRegionSelect={handleAreaSelect} />
+            <RealisticMuscleViews
+              onRegionSelect={handleAreaSelect}
+              onViewChange={() => { setSelectedArea(null); setSelectedAreaLabel(null); setShowMuscleList(false); }}
+            />
             <View style={styles.improvementSummary}>
               <Text style={styles.improvementTitle}>ماذا ستجد عند اختيار نقطة؟</Text>
               <Text style={styles.improvementItem}>اسم مبسط ووصف مفهوم للعضلة</Text>
@@ -115,6 +120,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateTo
                   <Text style={styles.instantLocation}>الموقع: {selectedMuscle.locationAr}</Text>
                 </View>
                 <TouchableOpacity style={styles.primaryButton} onPress={() => setShowMuscleList(true)}><Text style={styles.primaryButtonText}>عرض باقي الأجزاء ({musclesInArea.length})</Text></TouchableOpacity>
+                <PainReliefPanel guideKey={selectedMuscle.group} onSaveResult={onSaveSelfCare} />
               </View>
             )}
           </>
