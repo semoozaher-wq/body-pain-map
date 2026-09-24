@@ -9,7 +9,7 @@ import {
   Modal,
 } from 'react-native';
 import { RealisticMuscleViews } from '../components/RealisticMuscleViews';
-import anatomyPainMap from '../data/cleanAnatomyData';
+import { cleanData } from '../data/cleanData';
 import { translate } from '../services/i18n';
 
 interface BodyPickerScreenProps {
@@ -52,7 +52,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
     const groupName = areaToGroupMap[selectedArea];
     if (!groupName) return [];
     
-    const muscles = anatomyPainMap.muscles || {};
+    const muscles = cleanData.muscles || {};
     return Object.values(muscles).filter(
       (muscle: any) => muscle && muscle.group === groupName
     );
