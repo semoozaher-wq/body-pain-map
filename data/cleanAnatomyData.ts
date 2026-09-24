@@ -1,22 +1,17 @@
-import rawAnatomyData from './anatomyPainMap.json';
+import rawJson from './anatomyPainMap.json';
 
-// دالة لتنظيف المسافات الزائدة من المفاتيح والقيم النصية
-function cleanObject(obj: any): any {
-  if (Array.isArray(obj)) {
-    return obj.map(cleanObject);
-  } else if (obj !== null && typeof obj === 'object') {
+function deepClean(obj: any): any {
+  if (typeof obj === 'string') return obj.trim();
+  if (Array.isArray(obj)) return obj.map(deepClean);
+  if (obj !== null && typeof obj === 'object') {
     const cleaned: any = {};
     for (const [key, value] of Object.entries(obj)) {
-      const cleanKey = key.trim();
-      const cleanValue = typeof value === 'string' ? value.trim() : cleanObject(value);
-      cleaned[cleanKey] = cleanValue;
+      cleaned[key.trim()] = deepClean(value);
     }
     return cleaned;
   }
   return obj;
 }
 
-// تنظيف البيانات مرة واحدة عند التحميل
-export const anatomyPainMap = cleanObject(rawAnatomyData) as any;
-
+export const anatomyPainMap = deepClean(rawJson);
 export default anatomyPainMap;
