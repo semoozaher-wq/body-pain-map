@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
 import { Colors } from '../constants/colors';
 import { BorderRadius, Spacing } from '../constants/spacing';
+import { cleanData } from '../data/cleanData';
 
 type ViewKey = 'front' | 'back' | 'side';
 type Hotspot = {
@@ -115,6 +116,8 @@ export function RealisticMuscleViews({ onRegionSelect, onViewChange, hotspotInte
         {current.hotspots.map((hotspot, index) => {
           const id = `${hotspot.key}-${index}`;
           const selected = selectedKey === id;
+          const anatomyPart = Object.values(cleanData.muscles || {}).find((muscle: any) => muscle.group === hotspot.key) as any;
+          const partNumber = anatomyPart?.partNumber ?? index + 1;
           return (
             <Pressable
               key={id}
@@ -124,6 +127,7 @@ export function RealisticMuscleViews({ onRegionSelect, onViewChange, hotspotInte
               style={[styles.hotspot, { top: hotspot.top, left: hotspot.left, borderColor: heatColor }, selected && [styles.selectedHotspot, { backgroundColor: `${heatColor}33`, borderColor: heatColor }] ]}
             >
               <View style={[styles.dot, { backgroundColor: heatColor }]} />
+              <Text style={styles.hotspotNumber}>#{partNumber}</Text>
               {selected && <Text style={styles.hotspotLabel}>{hotspot.label}</Text>}
             </Pressable>
           );
@@ -151,6 +155,7 @@ const styles = StyleSheet.create({
   hotspot: { position: 'absolute', width: 28, height: 28, marginLeft: -14, marginTop: -14, borderRadius: 999, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.82)', borderWidth: 2, borderColor: Colors.primary },
   selectedHotspot: { width: 34, height: 34, marginLeft: -17, marginTop: -17, backgroundColor: 'rgba(25,195,177,0.25)', borderColor: Colors.primaryDark, zIndex: 3 },
   dot: { width: 10, height: 10, borderRadius: 999, backgroundColor: Colors.primaryDark },
+  hotspotNumber: { position: 'absolute', top: -17, minWidth: 30, paddingHorizontal: 3, paddingVertical: 2, borderRadius: 6, backgroundColor: '#173D48', color: '#FFFFFF', textAlign: 'center', fontSize: 9, fontWeight: '900' },
   hotspotLabel: { position: 'absolute', top: 27, right: -34, minWidth: 68, paddingHorizontal: 5, paddingVertical: 3, borderRadius: 6, backgroundColor: '#173D48', color: '#FFFFFF', textAlign: 'center', fontSize: 10, fontWeight: '900' },
   helper: { color: '#71858D', textAlign: 'right', marginTop: 11, lineHeight: 20, fontSize: 12 },
 });
