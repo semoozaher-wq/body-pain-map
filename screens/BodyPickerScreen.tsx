@@ -1,16 +1,13 @@
-import React, { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Modal,
-} from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Modal, Pressable, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RealisticMuscleViews } from '../components/RealisticMuscleViews';
+import { InternalOrganCard } from '../components/InternalOrganCard';
 import { cleanData } from '../data/cleanData';
+import internalOrgans from '../data/internalOrgans.json';
 import { translate } from '../services/i18n';
+
+type Mode = 'surface' | 'deep';
+type Organ = (typeof internalOrgans)[keyof typeof internalOrgans]['organs'][number];
 
 interface BodyPickerScreenProps {
   onNavigateToDetails: (muscleData: any) => void;
@@ -20,240 +17,143 @@ interface BodyPickerScreenProps {
 }
 
 const areaToGroups: Record<string, string[]> = {
-  head: ['neck'],
-  neck: ['neck', 'trapezius'],
-  chest: ['chest'],
-  abs: ['abs', 'obliques'],
+  head: ['neck'], neck: ['neck', 'trapezius'], chest: ['chest'], abs: ['abs', 'obliques'],
   'upper-limb': ['deltoids', 'biceps', 'triceps', 'forearm', 'hands'],
   'lower-limb': ['quadriceps', 'hamstring', 'adductors', 'knees', 'tibialis', 'calves', 'gluteal'],
-  'upper-back': ['trapezius', 'upper-back'],
-  'lower-back': ['lower-back'],
+  'upper-back': ['trapezius', 'upper-back'], 'lower-back': ['lower-back'],
 };
 
 const simpleGroupNames: Record<string, string> = {
-  abs: 'عضلات البطن',
-  adductors: 'عضلات داخل الفخذ',
-  biceps: 'عضلة مقدمة الذراع',
-  calves: 'عضلات الساق الخلفية',
-  chest: 'عضلات الصدر',
-  deltoids: 'عضلات الكتف',
-  forearm: 'عضلات الساعد',
-  gluteal: 'عضلات الأرداف',
-  hamstring: 'عضلات خلف الفخذ',
-  hands: 'عضلات اليد',
-  knees: 'منطقة الركبة',
-  neck: 'عضلات الرقبة',
-  obliques: 'عضلات جانب البطن',
-  quadriceps: 'عضلات مقدمة الفخذ',
-  tibialis: 'عضلات مقدمة الساق',
-  trapezius: 'عضلات أعلى الظهر',
-  'upper-back': 'عضلات أعلى الظهر',
-  'lower-back': 'عضلات أسفل الظهر',
+  abs: 'عضلات البطن', adductors: 'عضلات داخل الفخذ', biceps: 'عضلة مقدمة الذراع', calves: 'عضلات الساق الخلفية',
+  chest: 'عضلات الصدر', deltoids: 'عضلات الكتف', forearm: 'عضلات الساعد', gluteal: 'عضلات الأرداف',
+  hamstring: 'عضلات خلف الفخذ', hands: 'عضلات اليد', knees: 'منطقة الركبة', neck: 'عضلات الرقبة',
+  obliques: 'عضلات جانب البطن', quadriceps: 'عضلات مقدمة الفخذ', tibialis: 'عضلات مقدمة الساق',
+  trapezius: 'عضلات أعلى الظهر', 'upper-back': 'عضلات أعلى الظهر', 'lower-back': 'عضلات أسفل الظهر',
 };
 
 const simpleDescriptions: Record<string, string> = {
-  abs: 'العضلات التي تساعد على ثني الجذع وتثبيت البطن.',
-  biceps: 'العضلة التي تظهر عند ثني الذراع ورفع الساعد.',
-  chest: 'العضلات التي تساعد على دفع الذراعين إلى الأمام.',
-  deltoids: 'العضلات المستديرة التي تغطي مفصل الكتف.',
-  forearm: 'عضلات تساعد على تحريك الرسغ والأصابع.',
-  hamstring: 'العضلات الموجودة خلف الفخذ وتساعد على ثني الركبة.',
-  quadriceps: 'العضلات الموجودة أمام الفخذ وتساعد على مد الركبة.',
-  calves: 'العضلات التي تظهر خلف الساق وتساعد على الوقوف والمشي.',
-  gluteal: 'عضلات الأرداف التي تساعد على مد الورك والحركة.',
-  neck: 'عضلات تساعد على تحريك الرأس وتثبيت الرقبة.',
-  trapezius: 'عضلات أعلى الظهر التي تساعد على تحريك الكتفين.',
-  'upper-back': 'عضلات أعلى الظهر التي تساعد على تثبيت لوح الكتف.',
-  'lower-back': 'عضلات أسفل الظهر التي تساعد على تثبيت الجذع.',
+  abs: 'عضلات تساعد على ثني الجذع وتثبيت البطن.', biceps: 'عضلة تظهر عند ثني الذراع ورفع الساعد.',
+  chest: 'عضلات تساعد على دفع الذراعين إلى الأمام.', deltoids: 'عضلات تغطي مفصل الكتف وتساعد على رفع الذراع.',
+  forearm: 'عضلات تساعد على تحريك الرسغ والأصابع.', hamstring: 'عضلات خلف الفخذ وتساعد على ثني الركبة.',
+  quadriceps: 'عضلات أمام الفخذ وتساعد على مد الركبة.', calves: 'عضلات خلف الساق وتساعد على الوقوف والمشي.',
+  gluteal: 'عضلات الأرداف التي تساعد على الحركة ومد الورك.', neck: 'عضلات تحرك الرأس وتثبت الرقبة.',
+  trapezius: 'عضلات أعلى الظهر التي تساعد على تحريك الكتفين.', 'upper-back': 'عضلات تثبت لوح الكتف.',
+  'lower-back': 'عضلات تثبت الجذع في أسفل الظهر.',
 };
 
-function simpleName(muscle: any): string {
-  return simpleGroupNames[muscle.group] ?? muscle.groupLabelAr ?? muscle.labelAr;
-}
+function simpleName(muscle: any) { return simpleGroupNames[muscle.group] ?? muscle.groupLabelAr ?? muscle.labelAr; }
+function simpleDescription(muscle: any) { return simpleDescriptions[muscle.group] ?? 'عضلات تساعد على الحركة والثبات في هذه المنطقة.'; }
 
-function simpleDescription(muscle: any): string {
-  return simpleDescriptions[muscle.group] ?? 'عضلات تساعد على الحركة والثبات في هذه المنطقة.';
-}
-
-export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
-  onNavigateToDetails,
-  onBack,
-  language,
-}) => {
+export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateToDetails, onBack, language }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
+  const [mode, setMode] = useState<Mode>('surface');
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedAreaLabel, setSelectedAreaLabel] = useState<string | null>(null);
   const [showMuscleList, setShowMuscleList] = useState(false);
+  const [selectedOrgan, setSelectedOrgan] = useState<Organ | null>(null);
 
   const musclesInArea = useMemo(() => {
     if (!selectedArea) return [];
-    const groupNames = areaToGroups[selectedArea] ?? [];
-    if (!groupNames.length) return [];
-    
-    const muscles = cleanData.muscles || {};
-    return Object.values(muscles).filter(
-      (muscle: any) => muscle && groupNames.includes(muscle.group)
-    );
+    const groups = areaToGroups[selectedArea] ?? [];
+    return Object.values(cleanData.muscles || {}).filter((muscle: any) => groups.includes(muscle.group));
   }, [selectedArea]);
 
   const selectedMuscle = musclesInArea[0] as any;
+  const internalRegions = Object.entries(internalOrgans);
 
   const handleAreaSelect = (groupKey: string, areaLabel: string) => {
+    setMode('surface');
     setSelectedArea(groupKey);
     setSelectedAreaLabel(areaLabel);
     setShowMuscleList(false);
   };
 
-  const handleMuscleSelect = (muscle: any) => {
-    setShowMuscleList(false);
-    onNavigateToDetails(muscle);
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        {onBack && (
-          <TouchableOpacity onPress={onBack} style={styles.backButton}>
-            <Text style={styles.backText}>{t('back')}</Text>
-          </TouchableOpacity>
-        )}
+        {onBack && <TouchableOpacity onPress={onBack} style={styles.backButton}><Text style={styles.backText}>{t('back')}</Text></TouchableOpacity>}
         <Text style={styles.title}>{t('bodyPicker.title')}</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.instruction}>
-          {t('bodyPicker.instruction')}
-        </Text>
-
-        <View style={styles.visualContainer}>
-          <RealisticMuscleViews
-            onRegionSelect={handleAreaSelect}
-          />
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <View style={styles.introCard}>
+          <Text style={styles.introTitle}>حدد مصدر الألم بسهولة</Text>
+          <Text style={styles.introText}>اختر ألمًا سطحيًا في العضلات أو ألمًا عميقًا من الأعضاء الداخلية، ثم اضغط على المنطقة المناسبة.</Text>
         </View>
 
-        <View style={styles.improvementSummary}>
-          <Text style={styles.improvementTitle}>ملخص المعلومات على صورة العضلات</Text>
-          <Text style={styles.improvementItem}>• اسم مبسط بدل الاسم الطبي المعقد</Text>
-          <Text style={styles.improvementItem}>• وصف توضيحي لوظيفة العضلة</Text>
-          <Text style={styles.improvementItem}>• رقم الجزء مثل #176 للرجوع السريع</Text>
-          <Text style={styles.improvementItem}>• الموقع التفصيلي مثل: الأيسر — الأمامي</Text>
+        <View style={styles.modeSwitch}>
+          <Pressable style={[styles.modeButton, mode === 'surface' && styles.modeButtonActive]} onPress={() => setMode('surface')}>
+            <Text style={[styles.modeTitle, mode === 'surface' && styles.modeTitleActive]}>ألم سطحي</Text>
+            <Text style={styles.modeHint}>عضلات ومفاصل</Text>
+          </Pressable>
+          <Pressable style={[styles.modeButton, mode === 'deep' && styles.modeButtonActive]} onPress={() => setMode('deep')}>
+            <Text style={[styles.modeTitle, mode === 'deep' && styles.modeTitleActive]}>ألم عميق</Text>
+            <Text style={styles.modeHint}>أعضاء داخلية</Text>
+          </Pressable>
         </View>
 
-        {selectedArea && (
-          <View style={styles.detailsCard}>
-            <Text style={styles.selectedTitle}>{t('bodyPicker.selectedArea')}{selectedAreaLabel}</Text>
-            {selectedMuscle ? (
-              <View style={styles.instantInfoCard}>
-                <View style={styles.instantTitleRow}>
-                  <Text style={styles.instantPartNumber}>#{selectedMuscle.partNumber}</Text>
-                  <Text style={styles.instantTitle}>{simpleName(selectedMuscle)}</Text>
+        {mode === 'surface' ? (
+          <>
+            <Text style={styles.sectionTitle}>خريطة العضلات</Text>
+            <Text style={styles.sectionHint}>النقاط الصغيرة هي مناطق تفاعلية. اضغط على أي نقطة لعرض المعلومات فورًا.</Text>
+            <RealisticMuscleViews onRegionSelect={handleAreaSelect} />
+            <View style={styles.improvementSummary}>
+              <Text style={styles.improvementTitle}>ماذا ستجد عند اختيار نقطة؟</Text>
+              <Text style={styles.improvementItem}>اسم مبسط ووصف مفهوم للعضلة</Text>
+              <Text style={styles.improvementItem}>رقم الجزء والموقع التفصيلي</Text>
+              <Text style={styles.improvementItem}>أسباب محتملة وإرشاد عام آمن</Text>
+            </View>
+            {selectedArea && selectedMuscle && (
+              <View style={styles.detailsCard}>
+                <Text style={styles.selectedTitle}>المنطقة المحددة: {selectedAreaLabel}</Text>
+                <View style={styles.instantInfoCard}>
+                  <View style={styles.instantTitleRow}><Text style={styles.instantPartNumber}>#{selectedMuscle.partNumber}</Text><Text style={styles.instantTitle}>{simpleName(selectedMuscle)}</Text></View>
+                  <Text style={styles.instantExactName}>{selectedMuscle.labelAr}</Text>
+                  <Text style={styles.instantLabel}>ما هذه العضلة؟</Text><Text style={styles.instantText}>{simpleDescription(selectedMuscle)}</Text>
+                  <Text style={styles.instantLabel}>أسباب محتملة</Text><Text style={styles.instantText}>{(selectedMuscle.commonCauses ?? []).slice(0, 3).join(' • ')}</Text>
+                  <Text style={styles.instantLabel}>الإرشاد العام</Text><Text style={styles.instantText}>{selectedMuscle.recommendation ?? 'خفف النشاط المسبب واستشر طبيبًا إذا استمر الألم أو ازداد.'}</Text>
+                  <Text style={styles.instantLocation}>الموقع: {selectedMuscle.locationAr}</Text>
                 </View>
-                <Text style={styles.instantExactName}>{selectedMuscle.labelAr}</Text>
-                <Text style={styles.instantLabel}>ما هذه العضلة؟</Text>
-                <Text style={styles.instantText}>{simpleDescription(selectedMuscle)}</Text>
-                <Text style={styles.instantLabel}>لماذا قد تؤلم؟</Text>
-                <Text style={styles.instantText}>{selectedMuscle.warning ?? selectedMuscle.commonCauses?.[0] ?? 'إجهاد أو حركة متكررة في المنطقة.'}</Text>
-                <Text style={styles.instantLabel}>الأسباب المحتملة</Text>
-                {(selectedMuscle.commonCauses ?? []).slice(0, 3).map((cause: string) => (
-                  <Text key={cause} style={styles.instantText}>• {cause}</Text>
-                ))}
-                <Text style={styles.instantLabel}>ما الحل العام؟</Text>
-                <Text style={styles.instantText}>{selectedMuscle.recommendation ?? 'خفف النشاط المسبب وراقب الأعراض. استشر طبيبًا إذا استمر الألم أو ازداد.'}</Text>
-                <Text style={styles.instantLocation}>الموقع: {selectedMuscle.locationAr}</Text>
+                <TouchableOpacity style={styles.primaryButton} onPress={() => setShowMuscleList(true)}><Text style={styles.primaryButtonText}>عرض باقي الأجزاء ({musclesInArea.length})</Text></TouchableOpacity>
               </View>
-            ) : null}
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => setShowMuscleList(true)}
-            >
-              <Text style={styles.actionButtonText}>
-                {t('bodyPicker.showParts')} ({musclesInArea.length} {t('welcome.statParts')})
-              </Text>
-            </TouchableOpacity>
-          </View>
+            )}
+          </>
+        ) : (
+          <>
+            <Text style={styles.sectionTitle}>خريطة الأعضاء الداخلية</Text>
+            <Text style={styles.sectionHint}>هذه معلومات إرشادية عامة وليست تشخيصًا. اختر المنطقة لعرض الأعضاء المرتبطة بها.</Text>
+            {internalRegions.map(([key, region]) => (
+              <View key={key} style={styles.regionCard}>
+                <View style={styles.regionHeader}><Text style={styles.regionCount}>{region.organs.length} أعضاء</Text><Text style={styles.regionTitle}>{region.labelAr}</Text></View>
+                <View style={styles.organGrid}>{region.organs.map((organ) => <Pressable key={organ.id} style={styles.organChip} onPress={() => setSelectedOrgan(organ)}><Text style={styles.organChipText}>{organ.nameAr}</Text></Pressable>)}</View>
+              </View>
+            ))}
+          </>
         )}
       </ScrollView>
 
-      <Modal
-        visible={showMuscleList}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowMuscleList(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('bodyPicker.selectPartTitle')}: {selectedAreaLabel}</Text>
-              <TouchableOpacity onPress={() => setShowMuscleList(false)}>
-                <Text style={styles.closeButton}>✕</Text>
-              </TouchableOpacity>
-            </View>
-            
-            <ScrollView style={styles.muscleList}>
-              {musclesInArea.length > 0 ? (
-                musclesInArea.map((muscle: any) => (
-                  <TouchableOpacity
-                    key={muscle.id}
-                    style={styles.muscleItem}
-                    onPress={() => handleMuscleSelect(muscle)}
-                    accessibilityLabel={`${simpleName(muscle)}، الجزء رقم ${muscle.partNumber}`}
-                  >
-                    <View style={styles.muscleTitleRow}>
-                      <Text style={styles.partNumber}>#{muscle.partNumber}</Text>
-                      <Text style={styles.muscleName}>{simpleName(muscle)}</Text>
-                    </View>
-                    <Text style={styles.muscleExactName}>{muscle.labelAr}</Text>
-                    <Text style={styles.muscleDescription}>{simpleDescription(muscle)}</Text>
-                    <Text style={styles.muscleLocation}>الموقع: {muscle.locationAr}</Text>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.noDataText}>{t('bodyPicker.noData')}</Text>
-              )}
-            </ScrollView>
-          </View>
-        </View>
+      <Modal visible={showMuscleList} animationType="slide" transparent onRequestClose={() => setShowMuscleList(false)}>
+        <View style={styles.modalOverlay}><View style={styles.modalContent}>
+          <View style={styles.modalHeader}><Text style={styles.modalTitle}>الأجزاء في: {selectedAreaLabel}</Text><TouchableOpacity onPress={() => setShowMuscleList(false)}><Text style={styles.closeButton}>×</Text></TouchableOpacity></View>
+          <ScrollView style={styles.muscleList}>{musclesInArea.map((muscle: any) => <TouchableOpacity key={muscle.id} style={styles.muscleItem} onPress={() => { setShowMuscleList(false); onNavigateToDetails(muscle); }}><View style={styles.muscleTitleRow}><Text style={styles.partNumber}>#{muscle.partNumber}</Text><Text style={styles.muscleName}>{simpleName(muscle)}</Text></View><Text style={styles.muscleDescription}>{simpleDescription(muscle)}</Text><Text style={styles.muscleLocation}>الموقع: {muscle.locationAr}</Text></TouchableOpacity>)}</ScrollView>
+        </View></View>
+      </Modal>
+
+      <Modal visible={Boolean(selectedOrgan)} animationType="slide" transparent onRequestClose={() => setSelectedOrgan(null)}>
+        <View style={styles.modalOverlay}><View style={styles.modalContent}><View style={styles.modalHeader}><Text style={styles.modalTitle}>تفاصيل إرشادية</Text><TouchableOpacity onPress={() => setSelectedOrgan(null)}><Text style={styles.closeButton}>×</Text></TouchableOpacity></View>{selectedOrgan && <ScrollView style={styles.organDetail}><InternalOrganCard organ={selectedOrgan} /></ScrollView>}</View></View>
       </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
-  header: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#EEEEEE' },
-  title: { fontSize: 18, fontWeight: 'bold', color: '#111827' },
-  backButton: { padding: 8 },
-  backText: { color: '#007AFF', fontSize: 16 },
-  content: { padding: 16 },
-  instruction: { fontSize: 14, color: '#4B5563', marginBottom: 16, textAlign: 'right', lineHeight: 20 },
-  visualContainer: { marginBottom: 20, borderRadius: 12, overflow: 'hidden', backgroundColor: '#F9FAFB' },
-  improvementSummary: { backgroundColor: '#EAF8F5', borderRadius: 14, padding: 14, marginBottom: 16, borderWidth: 1, borderColor: '#B9E4DE' },
-  improvementTitle: { color: '#0E6972', fontSize: 16, fontWeight: '900', textAlign: 'right', marginBottom: 7 },
-  improvementItem: { color: '#315B63', fontSize: 13, lineHeight: 23, textAlign: 'right' },
-  detailsCard: { backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E5E7EB' },
-  selectedTitle: { fontSize: 16, fontWeight: 'bold', color: '#1F2937', marginBottom: 12, textAlign: 'right' },
-  instantInfoCard: { backgroundColor: '#FFFFFF', borderRadius: 12, padding: 13, marginBottom: 12, borderWidth: 1, borderColor: '#B9E4DE' },
-  instantTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
-  instantTitle: { flex: 1, fontSize: 18, fontWeight: '900', color: '#173D48', textAlign: 'right' },
-  instantPartNumber: { color: '#FFFFFF', backgroundColor: '#0E6972', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, fontSize: 14, fontWeight: '900' },
-  instantExactName: { color: '#60757D', fontSize: 12, textAlign: 'right', marginTop: 4 },
-  instantLabel: { color: '#0E6972', fontSize: 13, fontWeight: '900', textAlign: 'right', marginTop: 9 },
-  instantText: { color: '#315B63', fontSize: 13, lineHeight: 20, textAlign: 'right', marginTop: 2 },
-  instantLocation: { color: '#60757D', fontSize: 13, textAlign: 'right', marginTop: 10 },
-  actionButton: { backgroundColor: '#2563EB', paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
-  actionButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 14 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '80%', paddingBottom: 20 },
-  modalHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E9ECEF' },
-  modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#212529' },
-  closeButton: { fontSize: 24, color: '#6C757D', fontWeight: 'bold' },
-  muscleList: { padding: 16 },
-  muscleItem: { padding: 13, marginBottom: 10, borderRadius: 12, borderWidth: 1, borderColor: '#DDE8EA', backgroundColor: '#FBFDFD' },
-  muscleTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
-  partNumber: { color: '#0E6972', fontSize: 14, fontWeight: '900', backgroundColor: '#DDF5F1', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
-  muscleName: { fontSize: 16, fontWeight: '600', color: '#212529', marginBottom: 4, textAlign: 'right' },
-  muscleExactName: { fontSize: 12, color: '#60757D', textAlign: 'right', marginTop: 3 },
-  muscleDescription: { fontSize: 13, color: '#315B63', textAlign: 'right', lineHeight: 20, marginTop: 7 },
-  muscleLocation: { fontSize: 14, color: '#6C757D', textAlign: 'right' },
-  noDataText: { fontSize: 16, color: '#6C757D', textAlign: 'center', marginTop: 20 }
+  safeArea: { flex: 1, backgroundColor: '#F7FBFB' },
+  header: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 18, paddingVertical: 14, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E5EFF0' },
+  title: { fontSize: 19, fontWeight: '900', color: '#173D48' }, backButton: { padding: 8 }, backText: { color: '#0E6972', fontSize: 15, fontWeight: '800' },
+  content: { padding: 16, paddingBottom: 42 }, introCard: { backgroundColor: '#0E6972', borderRadius: 20, padding: 18, marginBottom: 14 }, introTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '900', textAlign: 'right' }, introText: { color: '#D7F0ED', lineHeight: 23, textAlign: 'right', marginTop: 7 },
+  modeSwitch: { flexDirection: 'row-reverse', gap: 10, marginBottom: 20 }, modeButton: { flex: 1, backgroundColor: '#FFFFFF', borderRadius: 15, borderWidth: 1, borderColor: '#D7E6E8', padding: 13, alignItems: 'center' }, modeButtonActive: { backgroundColor: '#DDF5F1', borderColor: '#0E7C86' }, modeTitle: { color: '#315B63', fontSize: 16, fontWeight: '900' }, modeTitleActive: { color: '#0E6972' }, modeHint: { color: '#71858D', fontSize: 11, marginTop: 3 },
+  sectionTitle: { color: '#173D48', fontSize: 20, fontWeight: '900', textAlign: 'right' }, sectionHint: { color: '#60757D', textAlign: 'right', lineHeight: 21, marginTop: 4, marginBottom: 12 }, visualContainer: { marginBottom: 12 }, improvementSummary: { backgroundColor: '#EAF8F5', borderRadius: 16, padding: 15, marginBottom: 15, borderWidth: 1, borderColor: '#B9E4DE' }, improvementTitle: { color: '#0E6972', fontSize: 16, fontWeight: '900', textAlign: 'right', marginBottom: 6 }, improvementItem: { color: '#315B63', textAlign: 'right', lineHeight: 23 },
+  detailsCard: { backgroundColor: '#FFFFFF', borderRadius: 18, padding: 15, borderWidth: 1, borderColor: '#D9E7EA', marginBottom: 14 }, selectedTitle: { color: '#173D48', fontSize: 16, fontWeight: '900', textAlign: 'right', marginBottom: 10 }, instantInfoCard: { backgroundColor: '#F8FCFC', borderRadius: 14, padding: 13 }, instantTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }, instantTitle: { flex: 1, color: '#173D48', fontSize: 18, fontWeight: '900', textAlign: 'right' }, instantPartNumber: { color: '#FFFFFF', backgroundColor: '#0E6972', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, fontWeight: '900' }, instantExactName: { color: '#60757D', textAlign: 'right', marginTop: 4 }, instantLabel: { color: '#0E6972', fontWeight: '900', textAlign: 'right', marginTop: 9 }, instantText: { color: '#315B63', textAlign: 'right', lineHeight: 21, marginTop: 2 }, instantLocation: { color: '#60757D', textAlign: 'right', marginTop: 9 }, primaryButton: { backgroundColor: '#0E6972', borderRadius: 12, padding: 13, alignItems: 'center', marginTop: 12 }, primaryButtonText: { color: '#FFFFFF', fontWeight: '900' },
+  regionCard: { backgroundColor: '#FFFFFF', borderRadius: 17, padding: 15, borderWidth: 1, borderColor: '#D9E7EA', marginBottom: 12 }, regionHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }, regionTitle: { color: '#173D48', fontSize: 18, fontWeight: '900', textAlign: 'right' }, regionCount: { color: '#0E6972', backgroundColor: '#EAF8F5', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, fontSize: 12, fontWeight: '800' }, organGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }, organChip: { borderRadius: 10, backgroundColor: '#F2F8F8', borderWidth: 1, borderColor: '#CFE1E3', paddingHorizontal: 10, paddingVertical: 9 }, organChipText: { color: '#315B63', fontWeight: '800' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(10,35,42,0.48)', justifyContent: 'flex-end' }, modalContent: { backgroundColor: '#F7FBFB', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '88%', paddingBottom: 22 }, modalHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 17, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E2EFF0' }, modalTitle: { color: '#173D48', fontSize: 18, fontWeight: '900', textAlign: 'right' }, closeButton: { color: '#0E6972', fontSize: 30, lineHeight: 30 }, muscleList: { padding: 15 }, organDetail: { padding: 15 }, muscleItem: { backgroundColor: '#FFFFFF', borderRadius: 13, padding: 13, marginBottom: 9, borderWidth: 1, borderColor: '#D9E7EA' }, muscleTitleRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }, partNumber: { color: '#FFFFFF', backgroundColor: '#0E6972', borderRadius: 7, paddingHorizontal: 7, paddingVertical: 3, fontWeight: '900' }, muscleName: { color: '#173D48', fontSize: 16, fontWeight: '900', textAlign: 'right' }, muscleDescription: { color: '#315B63', textAlign: 'right', lineHeight: 20, marginTop: 7 }, muscleLocation: { color: '#60757D', textAlign: 'right', marginTop: 6, fontSize: 12 },
 });
