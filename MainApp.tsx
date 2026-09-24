@@ -25,6 +25,7 @@ const data = anatomyMap as unknown as AnatomyData;
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('welcome');
+  const [quickRelief, setQuickRelief] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedMuscleData, setSelectedMuscleData] = useState<Muscle | null>(null);
   const [intensity, setIntensity] = useState(4);
@@ -72,6 +73,7 @@ export default function App() {
         note: note.trim(),
         urgent,
         createdAt: new Date().toLocaleDateString('ar-EG'),
+        createdAtIso: new Date().toISOString(),
       },
       ...items,
     ].slice(0, 50));
@@ -91,6 +93,7 @@ export default function App() {
       note: 'تقييم قبل وبعد خطة التخفيف الذاتي',
       urgent: false,
       createdAt: new Date().toLocaleDateString('ar-EG'),
+      createdAtIso: new Date().toISOString(),
     }, ...items].slice(0, 50));
   };
 
@@ -156,7 +159,8 @@ export default function App() {
       >
         {screen === 'welcome' && (
           <WelcomeScreen
-            onStart={() => setScreen('body')}
+            onStart={() => { setQuickRelief(false); setScreen('body'); }}
+            onQuickRelief={() => { setQuickRelief(true); setScreen('body'); }}
             language={language}
             direction={direction}
           />
@@ -169,6 +173,7 @@ export default function App() {
             onBack={() => setScreen('welcome')}
             language={language}
             direction={direction}
+            quickRelief={quickRelief}
           />
         )}
 
@@ -188,6 +193,7 @@ export default function App() {
             onNext={saveResults}
             language={language}
             direction={direction}
+            contextWarning={selected?.warning ?? group?.defaultWarning}
           />
         )}
 
