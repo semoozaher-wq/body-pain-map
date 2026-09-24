@@ -96,10 +96,12 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
     );
   }, [selectedArea]);
 
+  const selectedMuscle = musclesInArea[0] as any;
+
   const handleAreaSelect = (groupKey: string, areaLabel: string) => {
     setSelectedArea(groupKey);
     setSelectedAreaLabel(areaLabel);
-    setShowMuscleList(true);
+    setShowMuscleList(false);
   };
 
   const handleMuscleSelect = (muscle: any) => {
@@ -140,6 +142,26 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
         {selectedArea && (
           <View style={styles.detailsCard}>
             <Text style={styles.selectedTitle}>{t('bodyPicker.selectedArea')}{selectedAreaLabel}</Text>
+            {selectedMuscle ? (
+              <View style={styles.instantInfoCard}>
+                <View style={styles.instantTitleRow}>
+                  <Text style={styles.instantPartNumber}>#{selectedMuscle.partNumber}</Text>
+                  <Text style={styles.instantTitle}>{simpleName(selectedMuscle)}</Text>
+                </View>
+                <Text style={styles.instantExactName}>{selectedMuscle.labelAr}</Text>
+                <Text style={styles.instantLabel}>ما هذه العضلة؟</Text>
+                <Text style={styles.instantText}>{simpleDescription(selectedMuscle)}</Text>
+                <Text style={styles.instantLabel}>لماذا قد تؤلم؟</Text>
+                <Text style={styles.instantText}>{selectedMuscle.warning ?? selectedMuscle.commonCauses?.[0] ?? 'إجهاد أو حركة متكررة في المنطقة.'}</Text>
+                <Text style={styles.instantLabel}>الأسباب المحتملة</Text>
+                {(selectedMuscle.commonCauses ?? []).slice(0, 3).map((cause: string) => (
+                  <Text key={cause} style={styles.instantText}>• {cause}</Text>
+                ))}
+                <Text style={styles.instantLabel}>ما الحل العام؟</Text>
+                <Text style={styles.instantText}>{selectedMuscle.recommendation ?? 'خفف النشاط المسبب وراقب الأعراض. استشر طبيبًا إذا استمر الألم أو ازداد.'}</Text>
+                <Text style={styles.instantLocation}>الموقع: {selectedMuscle.locationAr}</Text>
+              </View>
+            ) : null}
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() => setShowMuscleList(true)}
@@ -210,6 +232,14 @@ const styles = StyleSheet.create({
   improvementItem: { color: '#315B63', fontSize: 13, lineHeight: 23, textAlign: 'right' },
   detailsCard: { backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E5E7EB' },
   selectedTitle: { fontSize: 16, fontWeight: 'bold', color: '#1F2937', marginBottom: 12, textAlign: 'right' },
+  instantInfoCard: { backgroundColor: '#FFFFFF', borderRadius: 12, padding: 13, marginBottom: 12, borderWidth: 1, borderColor: '#B9E4DE' },
+  instantTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
+  instantTitle: { flex: 1, fontSize: 18, fontWeight: '900', color: '#173D48', textAlign: 'right' },
+  instantPartNumber: { color: '#FFFFFF', backgroundColor: '#0E6972', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, fontSize: 14, fontWeight: '900' },
+  instantExactName: { color: '#60757D', fontSize: 12, textAlign: 'right', marginTop: 4 },
+  instantLabel: { color: '#0E6972', fontSize: 13, fontWeight: '900', textAlign: 'right', marginTop: 9 },
+  instantText: { color: '#315B63', fontSize: 13, lineHeight: 20, textAlign: 'right', marginTop: 2 },
+  instantLocation: { color: '#60757D', fontSize: 13, textAlign: 'right', marginTop: 10 },
   actionButton: { backgroundColor: '#2563EB', paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
   actionButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 14 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
