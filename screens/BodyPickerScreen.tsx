@@ -7,31 +7,73 @@ import {
   ScrollView,
   SafeAreaView,
   Modal,
-  Image,
-  Pressable,
 } from 'react-native';
-import anatomyPainMap from '../data/anatomyPainMap.json';
+import { RealisticMuscleViews } from '../components/RealisticMuscleViews';
+import { cleanData } from '../data/cleanData';
 import { translate } from '../services/i18n';
 
 interface BodyPickerScreenProps {
   onNavigateToDetails: (muscleData: any) => void;
   onBack?: () => void;
   language: 'ar' | 'en' | 'fr';
-  direction: 'rtl' | 'ltr';
+  direction?: 'rtl' | 'ltr';
 }
 
-// خريطة المناطق التفاعلية على الصورة
-const interactiveZones = [
-  { id: 'head', label: 'الرأس', top: 0, left: 35, width: 30, height: 12, group: 'head' },
-  { id: 'neck', label: 'الرقبة', top: 12, left: 38, width: 24, height: 6, group: 'neck' },
-  { id: 'chest', label: 'الصدر', top: 18, left: 20, width: 60, height: 20, group: 'chest' },
-  { id: 'shoulders', label: 'الأكتاف', top: 18, left: 0, width: 100, height: 15, group: 'deltoids' },
-  { id: 'arms', label: 'الذراعين', top: 33, left: 0, width: 100, height: 25, group: 'biceps' },
-  { id: 'abs', label: 'البطن', top: 38, left: 25, width: 50, height: 20, group: 'abs' },
-  { id: 'obliques', label: 'الجنب', top: 38, left: 0, width: 100, height: 20, group: 'obliques' },
-  { id: 'thighs', label: 'الفخذين', top: 58, left: 10, width: 80, height: 25, group: 'quadriceps' },
-  { id: 'calves', label: 'الساقين', top: 83, left: 15, width: 70, height: 17, group: 'calves' },
-];
+const areaToGroups: Record<string, string[]> = {
+  head: ['neck'],
+  neck: ['neck', 'trapezius'],
+  chest: ['chest'],
+  abs: ['abs', 'obliques'],
+  'upper-limb': ['deltoids', 'biceps', 'triceps', 'forearm', 'hands'],
+  'lower-limb': ['quadriceps', 'hamstring', 'adductors', 'knees', 'tibialis', 'calves', 'gluteal'],
+  'upper-back': ['trapezius', 'upper-back'],
+  'lower-back': ['lower-back'],
+};
+
+const simpleGroupNames: Record<string, string> = {
+  abs: 'عضلات البطن',
+  adductors: 'عضلات داخل الفخذ',
+  biceps: 'عضلة مقدمة الذراع',
+  calves: 'عضلات الساق الخلفية',
+  chest: 'عضلات الصدر',
+  deltoids: 'عضلات الكتف',
+  forearm: 'عضلات الساعد',
+  gluteal: 'عضلات الأرداف',
+  hamstring: 'عضلات خلف الفخذ',
+  hands: 'عضلات اليد',
+  knees: 'منطقة الركبة',
+  neck: 'عضلات الرقبة',
+  obliques: 'عضلات جانب البطن',
+  quadriceps: 'عضلات مقدمة الفخذ',
+  tibialis: 'عضلات مقدمة الساق',
+  trapezius: 'عضلات أعلى الظهر',
+  'upper-back': 'عضلات أعلى الظهر',
+  'lower-back': 'عضلات أسفل الظهر',
+};
+
+const simpleDescriptions: Record<string, string> = {
+  abs: 'العضلات التي تساعد على ثني الجذع وتثبيت البطن.',
+  biceps: 'العضلة التي تظهر عند ثني الذراع ورفع الساعد.',
+  chest: 'العضلات التي تساعد على دفع الذراعين إلى الأمام.',
+  deltoids: 'العضلات المستديرة التي تغطي مفصل الكتف.',
+  forearm: 'عضلات تساعد على تحريك الرسغ والأصابع.',
+  hamstring: 'العضلات الموجودة خلف الفخذ وتساعد على ثني الركبة.',
+  quadriceps: 'العضلات الموجودة أمام الفخذ وتساعد على مد الركبة.',
+  calves: 'العضلات التي تظهر خلف الساق وتساعد على الوقوف والمشي.',
+  gluteal: 'عضلات الأرداف التي تساعد على مد الورك والحركة.',
+  neck: 'عضلات تساعد على تحريك الرأس وتثبيت الرقبة.',
+  trapezius: 'عضلات أعلى الظهر التي تساعد على تحريك الكتفين.',
+  'upper-back': 'عضلات أعلى الظهر التي تساعد على تثبيت لوح الكتف.',
+  'lower-back': 'عضلات أسفل الظهر التي تساعد على تثبيت الجذع.',
+};
+
+function simpleName(muscle: any): string {
+  return simpleGroupNames[muscle.group] ?? muscle.groupLabelAr ?? muscle.labelAr;
+}
+
+function simpleDescription(muscle: any): string {
+  return simpleDescriptions[muscle.group] ?? 'عضلات تساعد على الحركة والثبات في هذه المنطقة.';
+}
 
 export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   onNavigateToDetails,
@@ -39,47 +81,30 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   language,
 }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
-  const [selectedZone, setSelectedZone] = useState<string | null>(null);
+  const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [selectedAreaLabel, setSelectedAreaLabel] = useState<string | null>(null);
   const [showMuscleList, setShowMuscleList] = useState(false);
-  const [activeView, setActiveView] = useState<'front' | 'back'>('front');
 
-  const musclesInZone = useMemo(() => {
-    if (!selectedZone) return [];
+  const musclesInArea = useMemo(() => {
+    if (!selectedArea) return [];
+    const groupNames = areaToGroups[selectedArea] ?? [];
+    if (!groupNames.length) return [];
     
-    const muscles = anatomyPainMap.muscles || {};
-    return Object.values(muscles).filter((muscle: any) => {
-      const muscleGroup = muscle.group || '';
-      const views = muscle.views || [];
-      return muscleGroup === selectedZone && views.includes(activeView);
-    });
-  }, [selectedZone, activeView]);
+    const muscles = cleanData.muscles || {};
+    return Object.values(muscles).filter(
+      (muscle: any) => muscle && groupNames.includes(muscle.group)
+    );
+  }, [selectedArea]);
 
-  const handleZonePress = (zoneId: string) => {
-    const zone = interactiveZones.find(z => z.id === zoneId);
-    if (zone) {
-      setSelectedZone(zone.group);
-      setShowMuscleList(true);
-    }
+  const handleAreaSelect = (groupKey: string, areaLabel: string) => {
+    setSelectedArea(groupKey);
+    setSelectedAreaLabel(areaLabel);
+    setShowMuscleList(true);
   };
 
   const handleMuscleSelect = (muscle: any) => {
     setShowMuscleList(false);
     onNavigateToDetails(muscle);
-  };
-
-  const getZoneLabel = (group: string) => {
-    const labels: Record<string, string> = {
-      'head': 'الرأس',
-      'neck': 'الرقبة',
-      'chest': 'الصدر',
-      'deltoids': 'الأكتاف',
-      'biceps': 'الذراعين',
-      'abs': 'البطن',
-      'obliques': 'الجنب',
-      'quadriceps': 'الفخذين',
-      'calves': 'الساقين',
-    };
-    return labels[group] || group;
   };
 
   return (
@@ -98,64 +123,35 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
           {t('bodyPicker.instruction')}
         </Text>
 
-        {/* أزرار التبديل بين الأمامي والخلفي */}
-        <View style={styles.viewToggle}>
-          <TouchableOpacity
-            style={[styles.toggleButton, activeView === 'front' && styles.activeToggle]}
-            onPress={() => setActiveView('front')}
-          >
-            <Text style={[styles.toggleText, activeView === 'front' && styles.activeToggleText]}>
-              أمامي
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.toggleButton, activeView === 'back' && styles.activeToggle]}
-            onPress={() => setActiveView('back')}
-          >
-            <Text style={[styles.toggleText, activeView === 'back' && styles.activeToggleText]}>
-              خلفي
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* الصورة التفاعلية */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={
-              activeView === 'front'
-                ? require('../assets/anatomy/muscle-front-realistic.png')
-                : require('../assets/anatomy/muscle-back-realistic.png')
-            }
-            style={styles.bodyImage}
-            resizeMode="contain"
+        <View style={styles.visualContainer}>
+          <RealisticMuscleViews
+            onRegionSelect={handleAreaSelect}
           />
-          
-          {/* المناطق التفاعلية الشفافة */}
-          {interactiveZones.map((zone) => (
-            <Pressable
-              key={zone.id}
-              style={[
-                styles.interactiveZone,
-                {
-                  top: `${zone.top}%`,
-                  left: `${zone.left}%`,
-                  width: `${zone.width}%`,
-                  height: `${zone.height}%`,
-                },
-              ]}
-              onPress={() => handleZonePress(zone.id)}
-            >
-              <Text style={styles.zoneLabel}>{zone.label}</Text>
-            </Pressable>
-          ))}
         </View>
 
-        <Text style={styles.hint}>
-          💡 اضغط على أي منطقة في الصورة لعرض العضلات الموجودة فيها
-        </Text>
+        <View style={styles.improvementSummary}>
+          <Text style={styles.improvementTitle}>ملخص المعلومات على صورة العضلات</Text>
+          <Text style={styles.improvementItem}>• اسم مبسط بدل الاسم الطبي المعقد</Text>
+          <Text style={styles.improvementItem}>• وصف توضيحي لوظيفة العضلة</Text>
+          <Text style={styles.improvementItem}>• رقم الجزء مثل #176 للرجوع السريع</Text>
+          <Text style={styles.improvementItem}>• الموقع التفصيلي مثل: الأيسر — الأمامي</Text>
+        </View>
+
+        {selectedArea && (
+          <View style={styles.detailsCard}>
+            <Text style={styles.selectedTitle}>{t('bodyPicker.selectedArea')}{selectedAreaLabel}</Text>
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => setShowMuscleList(true)}
+            >
+              <Text style={styles.actionButtonText}>
+                {t('bodyPicker.showParts')} ({musclesInArea.length} {t('welcome.statParts')})
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
 
-      {/* Modal لعرض قائمة العضلات */}
       <Modal
         visible={showMuscleList}
         animationType="slide"
@@ -165,30 +161,32 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                العضلات في منطقة: {getZoneLabel(selectedZone || '')}
-              </Text>
+              <Text style={styles.modalTitle}>{t('bodyPicker.selectPartTitle')}: {selectedAreaLabel}</Text>
               <TouchableOpacity onPress={() => setShowMuscleList(false)}>
                 <Text style={styles.closeButton}>✕</Text>
               </TouchableOpacity>
             </View>
             
             <ScrollView style={styles.muscleList}>
-              {musclesInZone.length > 0 ? (
-                musclesInZone.map((muscle: any) => (
+              {musclesInArea.length > 0 ? (
+                musclesInArea.map((muscle: any) => (
                   <TouchableOpacity
                     key={muscle.id}
                     style={styles.muscleItem}
                     onPress={() => handleMuscleSelect(muscle)}
+                    accessibilityLabel={`${simpleName(muscle)}، الجزء رقم ${muscle.partNumber}`}
                   >
-                    <Text style={styles.muscleName}>{muscle.labelAr}</Text>
-                    <Text style={styles.muscleLocation}>{muscle.locationAr}</Text>
+                    <View style={styles.muscleTitleRow}>
+                      <Text style={styles.partNumber}>#{muscle.partNumber}</Text>
+                      <Text style={styles.muscleName}>{simpleName(muscle)}</Text>
+                    </View>
+                    <Text style={styles.muscleExactName}>{muscle.labelAr}</Text>
+                    <Text style={styles.muscleDescription}>{simpleDescription(muscle)}</Text>
+                    <Text style={styles.muscleLocation}>الموقع: {muscle.locationAr}</Text>
                   </TouchableOpacity>
                 ))
               ) : (
-                <Text style={styles.noDataText}>
-                  لا توجد عضلات مسجلة في هذه المنطقة للعرض {activeView === 'front' ? 'الأمامي' : 'الخلفي'}
-                </Text>
+                <Text style={styles.noDataText}>{t('bodyPicker.noData')}</Text>
               )}
             </ScrollView>
           </View>
@@ -200,141 +198,32 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#FFFFFF' },
-  header: { 
-    flexDirection: 'row-reverse', 
-    alignItems: 'center', 
-    justifyContent: 'space-between', 
-    paddingHorizontal: 16, 
-    paddingVertical: 12, 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#EEEEEE' 
-  },
+  header: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#EEEEEE' },
   title: { fontSize: 18, fontWeight: 'bold', color: '#111827' },
   backButton: { padding: 8 },
   backText: { color: '#007AFF', fontSize: 16 },
   content: { padding: 16 },
-  instruction: { 
-    fontSize: 14, 
-    color: '#4B5563', 
-    marginBottom: 16, 
-    textAlign: 'right', 
-    lineHeight: 20 
-  },
-  viewToggle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 16,
-    gap: 12,
-  },
-  toggleButton: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-  },
-  activeToggle: {
-    backgroundColor: '#2563EB',
-    borderColor: '#2563EB',
-  },
-  toggleText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#4B5563',
-  },
-  activeToggleText: {
-    color: '#FFFFFF',
-  },
-  imageContainer: {
-    position: 'relative',
-    width: '100%',
-    aspectRatio: 0.5,
-    marginBottom: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#F3F4F6',
-  },
-  bodyImage: {
-    width: '100%',
-    height: '100%',
-  },
-  interactiveZone: {
-    position: 'absolute',
-    backgroundColor: 'rgba(37, 99, 235, 0.15)',
-    borderWidth: 1,
-    borderColor: 'rgba(37, 99, 235, 0.3)',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  zoneLabel: {
-    fontSize: 10,
-    fontWeight: 'bold',
-    color: '#2563EB',
-    textAlign: 'center',
-  },
-  hint: {
-    fontSize: 12,
-    color: '#6B7280',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  modalOverlay: { 
-    flex: 1, 
-    backgroundColor: 'rgba(0,0,0,0.5)', 
-    justifyContent: 'flex-end' 
-  },
-  modalContent: { 
-    backgroundColor: '#FFFFFF', 
-    borderTopLeftRadius: 20, 
-    borderTopRightRadius: 20, 
-    maxHeight: '80%', 
-    paddingBottom: 20 
-  },
-  modalHeader: { 
-    flexDirection: 'row-reverse', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    padding: 16, 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#E9ECEF' 
-  },
-  modalTitle: { 
-    fontSize: 16, 
-    fontWeight: 'bold', 
-    color: '#212529' 
-  },
-  closeButton: { 
-    fontSize: 24, 
-    color: '#6C757D', 
-    fontWeight: 'bold' 
-  },
-  muscleList: { 
-    padding: 16 
-  },
-  muscleItem: { 
-    paddingVertical: 12, 
-    borderBottomWidth: 1, 
-    borderBottomColor: '#F1F3F5' 
-  },
-  muscleName: { 
-    fontSize: 15, 
-    fontWeight: '600', 
-    color: '#212529', 
-    marginBottom: 4, 
-    textAlign: 'right' 
-  },
-  muscleLocation: { 
-    fontSize: 13, 
-    color: '#6C757D', 
-    textAlign: 'right' 
-  },
-  noDataText: { 
-    fontSize: 14, 
-    color: '#6C757D', 
-    textAlign: 'center', 
-    marginTop: 20 
-  }
+  instruction: { fontSize: 14, color: '#4B5563', marginBottom: 16, textAlign: 'right', lineHeight: 20 },
+  visualContainer: { marginBottom: 20, borderRadius: 12, overflow: 'hidden', backgroundColor: '#F9FAFB' },
+  improvementSummary: { backgroundColor: '#EAF8F5', borderRadius: 14, padding: 14, marginBottom: 16, borderWidth: 1, borderColor: '#B9E4DE' },
+  improvementTitle: { color: '#0E6972', fontSize: 16, fontWeight: '900', textAlign: 'right', marginBottom: 7 },
+  improvementItem: { color: '#315B63', fontSize: 13, lineHeight: 23, textAlign: 'right' },
+  detailsCard: { backgroundColor: '#F3F4F6', borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#E5E7EB' },
+  selectedTitle: { fontSize: 16, fontWeight: 'bold', color: '#1F2937', marginBottom: 12, textAlign: 'right' },
+  actionButton: { backgroundColor: '#2563EB', paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
+  actionButtonText: { color: '#FFFFFF', fontWeight: 'bold', fontSize: 14 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#FFFFFF', borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '80%', paddingBottom: 20 },
+  modalHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#E9ECEF' },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#212529' },
+  closeButton: { fontSize: 24, color: '#6C757D', fontWeight: 'bold' },
+  muscleList: { padding: 16 },
+  muscleItem: { padding: 13, marginBottom: 10, borderRadius: 12, borderWidth: 1, borderColor: '#DDE8EA', backgroundColor: '#FBFDFD' },
+  muscleTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' },
+  partNumber: { color: '#0E6972', fontSize: 14, fontWeight: '900', backgroundColor: '#DDF5F1', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
+  muscleName: { fontSize: 16, fontWeight: '600', color: '#212529', marginBottom: 4, textAlign: 'right' },
+  muscleExactName: { fontSize: 12, color: '#60757D', textAlign: 'right', marginTop: 3 },
+  muscleDescription: { fontSize: 13, color: '#315B63', textAlign: 'right', lineHeight: 20, marginTop: 7 },
+  muscleLocation: { fontSize: 14, color: '#6C757D', textAlign: 'right' },
+  noDataText: { fontSize: 16, color: '#6C757D', textAlign: 'center', marginTop: 20 }
 });
