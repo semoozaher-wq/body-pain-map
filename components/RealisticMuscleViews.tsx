@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
 import { Colors } from '../constants/colors';
 import { BorderRadius, Spacing } from '../constants/spacing';
 
@@ -81,15 +81,18 @@ const views: Record<ViewKey, ViewDefinition> = {
   },
 };
 
-export function RealisticMuscleViews({ onRegionSelect }: { onRegionSelect?: (groupKey: string, label: string) => void }) {
+export function RealisticMuscleViews({ onRegionSelect, onViewChange, hotspotIntensity = 4 }: { onRegionSelect?: (groupKey: string, label: string) => void; onViewChange?: (view: ViewKey) => void; hotspotIntensity?: number }) {
   const [activeView, setActiveView] = useState<ViewKey>('front');
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const current = views[activeView];
 
   const selectHotspot = (hotspot: Hotspot, index: number) => {
     setSelectedKey(`${hotspot.key}-${index}`);
+    Vibration.vibrate(12);
     onRegionSelect?.(hotspot.key, hotspot.label);
   };
+
+  const heatColor = hotspotIntensity >= 8 ? '#D64545' : hotspotIntensity >= 5 ? '#D98B25' : '#3182CE';
 
   return (
     <View style={styles.card}>
@@ -102,7 +105,7 @@ export function RealisticMuscleViews({ onRegionSelect }: { onRegionSelect?: (gro
       </View>
       <View style={styles.tabs}>
         {(Object.keys(views) as ViewKey[]).map((key) => (
-          <Pressable key={key} onPress={() => { setActiveView(key); setSelectedKey(null); }} style={[styles.tab, key === activeView && styles.activeTab]}>
+          <Pressable key={key} onPress={() => { setActiveView(key); setSelectedKey(null); onViewChange?.(key); }} style={[styles.tab, key === activeView && styles.activeTab]}>
             <Text style={[styles.tabText, key === activeView && styles.activeTabText]}>{views[key].label}</Text>
           </Pressable>
         ))}
@@ -118,9 +121,9 @@ export function RealisticMuscleViews({ onRegionSelect }: { onRegionSelect?: (gro
               onPress={() => selectHotspot(hotspot, index)}
               accessibilityRole="button"
               accessibilityLabel={`نقطة ${hotspot.label}`}
-              style={[styles.hotspot, { top: hotspot.top, left: hotspot.left }, selected && styles.selectedHotspot]}
+              style={[styles.hotspot, { top: hotspot.top, left: hotspot.left, borderColor: heatColor }, selected && [styles.selectedHotspot, { backgroundColor: `${heatColor}33`, borderColor: heatColor }] ]}
             >
-              <View style={styles.dot} />
+              <View style={[styles.dot, { backgroundColor: heatColor }]} />
               {selected && <Text style={styles.hotspotLabel}>{hotspot.label}</Text>}
             </Pressable>
           );
