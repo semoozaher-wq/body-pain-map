@@ -24,7 +24,6 @@ interface ResultsScreenProps {
   redFlags: string[];
   history: Checkup[];
   onRestart: () => void;
-  onShare: () => void;
   language: Parameters<typeof translate>[0];
   direction: 'rtl' | 'ltr';
 }

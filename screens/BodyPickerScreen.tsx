@@ -16,26 +16,18 @@ interface BodyPickerScreenProps {
   onNavigateToDetails: (muscleData: any) => void;
   onBack?: () => void;
   language: 'ar' | 'en' | 'fr';
-  direction: 'rtl' | 'ltr';
+  direction?: 'rtl' | 'ltr';
 }
 
-const areaToGroupMap: Record<string, string> = {
-  'الكتف': 'deltoids',
-  'الصدر': 'chest',
-  'العضد / البايسبس': 'biceps',
-  'الساعد': 'forearm',
-  'اليد': 'hands',
-  'البطن': 'abs',
-  'العضلات المائلة': 'obliques',
-  'الفخذ الأمامي': 'quadriceps',
-  'الركبة': 'knees',
-  'السمانة': 'calves',
-  'الرقبة والأكتاف': 'trapezius',
-  'أعلى الظهر': 'upper-back',
-  'أسفل الظهر': 'lower-back',
-  'الأرداف': 'gluteal',
-  'الفخذ الخلفي': 'hamstring',
-  'العضلات المقربة': 'adductors',
+const areaToGroups: Record<string, string[]> = {
+  head: ['neck'],
+  neck: ['neck', 'trapezius'],
+  chest: ['chest'],
+  abs: ['abs', 'obliques'],
+  'upper-limb': ['deltoids', 'biceps', 'triceps', 'forearm', 'hands'],
+  'lower-limb': ['quadriceps', 'hamstring', 'adductors', 'knees', 'tibialis', 'calves', 'gluteal'],
+  'upper-back': ['trapezius', 'upper-back'],
+  'lower-back': ['lower-back'],
 };
 
 export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
@@ -45,21 +37,23 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
 }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
+  const [selectedAreaLabel, setSelectedAreaLabel] = useState<string | null>(null);
   const [showMuscleList, setShowMuscleList] = useState(false);
 
   const musclesInArea = useMemo(() => {
     if (!selectedArea) return [];
-    const groupName = areaToGroupMap[selectedArea];
-    if (!groupName) return [];
+    const groupNames = areaToGroups[selectedArea] ?? [];
+    if (!groupNames.length) return [];
     
     const muscles = cleanData.muscles || {};
     return Object.values(muscles).filter(
-      (muscle: any) => muscle && muscle.group === groupName
+      (muscle: any) => muscle && groupNames.includes(muscle.group)
     );
   }, [selectedArea]);
 
-  const handleAreaSelect = (areaName: string) => {
-    setSelectedArea(areaName);
+  const handleAreaSelect = (groupKey: string, areaLabel: string) => {
+    setSelectedArea(groupKey);
+    setSelectedAreaLabel(areaLabel);
     setShowMuscleList(true);
   };
 
@@ -86,14 +80,13 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
 
         <View style={styles.visualContainer}>
           <RealisticMuscleViews
-            onSelectArea={handleAreaSelect}
-            selectedArea={selectedArea}
+            onRegionSelect={handleAreaSelect}
           />
         </View>
 
         {selectedArea && (
           <View style={styles.detailsCard}>
-            <Text style={styles.selectedTitle}>{t('bodyPicker.selectedArea')}{selectedArea}</Text>
+            <Text style={styles.selectedTitle}>{t('bodyPicker.selectedArea')}{selectedAreaLabel}</Text>
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() => setShowMuscleList(true)}
@@ -115,7 +108,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('bodyPicker.selectPartTitle')}: {selectedArea}</Text>
+              <Text style={styles.modalTitle}>{t('bodyPicker.selectPartTitle')}: {selectedAreaLabel}</Text>
               <TouchableOpacity onPress={() => setShowMuscleList(false)}>
                 <Text style={styles.closeButton}>✕</Text>
               </TouchableOpacity>
