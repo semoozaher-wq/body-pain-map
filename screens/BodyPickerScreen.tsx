@@ -47,13 +47,14 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [showMuscleList, setShowMuscleList] = useState(false);
 
+  // الحل السحري: استخدام .trim() لتجاهل أي مسافات زائدة في ملف JSON تلقائياً
   const musclesInArea = useMemo(() => {
     if (!selectedArea) return [];
     const groupName = areaToGroupMap[selectedArea];
     if (!groupName) return [];
     
     return Object.values(anatomyPainMap.muscles).filter(
-      (muscle: any) => muscle.group === groupName
+      (muscle: any) => muscle.group && muscle.group.trim() === groupName.trim()
     );
   }, [selectedArea]);
 
