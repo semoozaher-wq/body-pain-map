@@ -78,6 +78,22 @@ export default function App() {
     setScreen('results');
   };
 
+  const saveSelfCareResult = (result: { guideKey: string; pointId?: string; before: number; after: number }) => {
+    setHistory((items) => [{
+      id: `self-care-${Date.now()}`,
+      partId: `self-care:${result.guideKey}`,
+      intensity: result.before,
+      afterIntensity: result.after,
+      painType: 'خطة تخفيف ذاتي',
+      duration: '5 دقائق',
+      selfCareGuide: result.guideKey,
+      selfCarePointId: result.pointId,
+      note: 'تقييم قبل وبعد خطة التخفيف الذاتي',
+      urgent: false,
+      createdAt: new Date().toLocaleDateString('ar-EG'),
+    }, ...items].slice(0, 50));
+  };
+
   const startOver = () => {
     setSelectedId(null);
     setSelectedMuscleData(null);
@@ -149,6 +165,7 @@ export default function App() {
         {screen === 'body' && (
           <BodyPickerScreen
             onNavigateToDetails={handleNavigateToDetails}
+            onSaveSelfCare={saveSelfCareResult}
             onBack={() => setScreen('welcome')}
             language={language}
             direction={direction}
