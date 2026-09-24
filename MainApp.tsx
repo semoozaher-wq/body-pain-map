@@ -7,7 +7,7 @@ import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
 import { translate } from './services/i18n';
-import { Screen, AppGender, BodyView, AnatomyData, Checkup, Muscle } from './types';
+import { Screen, AnatomyData, Checkup, Muscle } from './types';
 import { DATA } from './constants/appConstants';
 
 // المكونات
@@ -25,8 +25,6 @@ const data = anatomyMap as unknown as AnatomyData;
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('welcome');
-  const [gender, setGender] = useState<AppGender>('male');
-  const [view, setView] = useState<BodyView>('front');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedMuscleData, setSelectedMuscleData] = useState<Muscle | null>(null);
   const [intensity, setIntensity] = useState(4);
@@ -150,12 +148,6 @@ export default function App() {
 
         {screen === 'body' && (
           <BodyPickerScreen
-            gender={gender}
-            view={view}
-            selectedId={selectedId}
-            setGender={setGender}
-            setView={setView}
-            onSelect={setSelectedId}
             onNavigateToDetails={handleNavigateToDetails}
             onBack={() => setScreen('welcome')}
             language={language}
@@ -193,7 +185,6 @@ export default function App() {
             redFlags={redFlags}
             history={history}
             onRestart={startOver}
-            onShare={() => {}}
             language={language}
             direction={direction}
           />
@@ -204,8 +195,6 @@ export default function App() {
             history={history}
             onBack={() => setScreen(selected ? 'results' : 'welcome')}
             onClear={clearHistory}
-            language={language}
-            direction={direction}
           />
         )}
       </ScrollView>
