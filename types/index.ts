@@ -37,4 +37,7 @@ export type Checkup = {
   createdAt: string;
   note?: string;
   urgent?: boolean;
+  afterIntensity?: number;
+  selfCareGuide?: string;
+  selfCarePointId?: string;
 };
