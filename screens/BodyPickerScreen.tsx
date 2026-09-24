@@ -13,6 +13,7 @@ type Organ = (typeof internalOrgans)[keyof typeof internalOrgans]['organs'][numb
 interface BodyPickerScreenProps {
   onNavigateToDetails: (muscleData: any) => void;
   onSaveSelfCare?: (result: { guideKey: string; pointId?: string; before: number; after: number }) => void;
+  quickRelief?: boolean;
   onBack?: () => void;
   language: 'ar' | 'en' | 'fr';
   direction?: 'rtl' | 'ltr';
@@ -46,13 +47,14 @@ const simpleDescriptions: Record<string, string> = {
 function simpleName(muscle: any) { return simpleGroupNames[muscle.group] ?? muscle.groupLabelAr ?? muscle.labelAr; }
 function simpleDescription(muscle: any) { return simpleDescriptions[muscle.group] ?? 'عضلات تساعد على الحركة والثبات في هذه المنطقة.'; }
 
-export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateToDetails, onSaveSelfCare, onBack, language }) => {
+export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateToDetails, onSaveSelfCare, onBack, language, quickRelief = false }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const [mode, setMode] = useState<Mode>('surface');
   const [selectedArea, setSelectedArea] = useState<string | null>(null);
   const [selectedAreaLabel, setSelectedAreaLabel] = useState<string | null>(null);
   const [showMuscleList, setShowMuscleList] = useState(false);
   const [selectedOrgan, setSelectedOrgan] = useState<Organ | null>(null);
+  const [mapIntensity, setMapIntensity] = useState(4);
 
   const musclesInArea = useMemo(() => {
     if (!selectedArea) return [];
@@ -62,6 +64,11 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateTo
 
   const selectedMuscle = musclesInArea[0] as any;
   const internalRegions = Object.entries(internalOrgans);
+  const quickAreas = [
+    { key: 'neck', label: 'الرقبة', group: 'neck' },
+    { key: 'lower-back', label: 'أسفل الظهر', group: 'lower-back' },
+    { key: 'forearm', label: 'الساعد واليد', group: 'forearm' },
+  ];
 
   const handleAreaSelect = (groupKey: string, areaLabel: string) => {
     setMode('surface');
@@ -96,10 +103,19 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({ onNavigateTo
 
         {mode === 'surface' ? (
           <>
+            {quickRelief && (
+              <View style={styles.quickReliefCard}>
+                <Text style={styles.quickReliefTitle}>عناية سريعة</Text>
+                <Text style={styles.quickReliefText}>اختر منطقة شائعة لفتح خطة التخفيف مباشرة.</Text>
+                <View style={styles.quickReliefRow}>{quickAreas.map((area) => <Pressable key={area.key} style={styles.quickReliefButton} onPress={() => handleAreaSelect(area.group, area.label)}><Text style={styles.quickReliefButtonText}>{area.label}</Text></Pressable>)}</View>
+              </View>
+            )}
             <Text style={styles.sectionTitle}>خريطة العضلات</Text>
             <Text style={styles.sectionHint}>النقاط الصغيرة هي مناطق تفاعلية. اضغط على أي نقطة لعرض المعلومات فورًا.</Text>
+            <View style={styles.intensityBar}><Text style={styles.intensityLabel}>شدة الألم للخريطة الحرارية: {mapIntensity}/10</Text><View style={styles.intensityRow}>{Array.from({ length: 11 }, (_, value) => <Pressable key={value} onPress={() => setMapIntensity(value)} style={[styles.intensityDot, { backgroundColor: value <= mapIntensity ? (mapIntensity >= 8 ? '#D64545' : mapIntensity >= 5 ? '#D98B25' : '#3182CE') : '#D8E5E7' }]}><Text style={styles.intensityDotText}>{value}</Text></Pressable>)}</View></View>
             <RealisticMuscleViews
               onRegionSelect={handleAreaSelect}
+              hotspotIntensity={mapIntensity}
               onViewChange={() => { setSelectedArea(null); setSelectedAreaLabel(null); setShowMuscleList(false); }}
             />
             <View style={styles.improvementSummary}>
@@ -159,6 +175,7 @@ const styles = StyleSheet.create({
   content: { padding: 16, paddingBottom: 42 }, introCard: { backgroundColor: '#0E6972', borderRadius: 20, padding: 18, marginBottom: 14 }, introTitle: { color: '#FFFFFF', fontSize: 21, fontWeight: '900', textAlign: 'right' }, introText: { color: '#D7F0ED', lineHeight: 23, textAlign: 'right', marginTop: 7 },
   modeSwitch: { flexDirection: 'row-reverse', gap: 10, marginBottom: 20 }, modeButton: { flex: 1, backgroundColor: '#FFFFFF', borderRadius: 15, borderWidth: 1, borderColor: '#D7E6E8', padding: 13, alignItems: 'center' }, modeButtonActive: { backgroundColor: '#DDF5F1', borderColor: '#0E7C86' }, modeTitle: { color: '#315B63', fontSize: 16, fontWeight: '900' }, modeTitleActive: { color: '#0E6972' }, modeHint: { color: '#71858D', fontSize: 11, marginTop: 3 },
   sectionTitle: { color: '#173D48', fontSize: 20, fontWeight: '900', textAlign: 'right' }, sectionHint: { color: '#60757D', textAlign: 'right', lineHeight: 21, marginTop: 4, marginBottom: 12 }, visualContainer: { marginBottom: 12 }, improvementSummary: { backgroundColor: '#EAF8F5', borderRadius: 16, padding: 15, marginBottom: 15, borderWidth: 1, borderColor: '#B9E4DE' }, improvementTitle: { color: '#0E6972', fontSize: 16, fontWeight: '900', textAlign: 'right', marginBottom: 6 }, improvementItem: { color: '#315B63', textAlign: 'right', lineHeight: 23 },
+  quickReliefCard: { backgroundColor: '#173D48', borderRadius: 17, padding: 15, marginBottom: 16 }, quickReliefTitle: { color: '#FFFFFF', fontSize: 19, fontWeight: '900', textAlign: 'right' }, quickReliefText: { color: '#D7F0ED', textAlign: 'right', lineHeight: 20, marginTop: 4 }, quickReliefRow: { flexDirection: 'row-reverse', gap: 8, marginTop: 11 }, quickReliefButton: { flex: 1, backgroundColor: '#0E7C86', borderRadius: 10, paddingVertical: 10, alignItems: 'center' }, quickReliefButtonText: { color: '#FFFFFF', fontSize: 12, fontWeight: '900', textAlign: 'center' }, intensityBar: { backgroundColor: '#FFFFFF', borderRadius: 13, borderWidth: 1, borderColor: '#D9E7EA', padding: 11, marginBottom: 12 }, intensityLabel: { color: '#315B63', fontSize: 12, fontWeight: '900', textAlign: 'right' }, intensityRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', marginTop: 8 }, intensityDot: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' }, intensityDotText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900' },
   detailsCard: { backgroundColor: '#FFFFFF', borderRadius: 18, padding: 15, borderWidth: 1, borderColor: '#D9E7EA', marginBottom: 14 }, selectedTitle: { color: '#173D48', fontSize: 16, fontWeight: '900', textAlign: 'right', marginBottom: 10 }, instantInfoCard: { backgroundColor: '#F8FCFC', borderRadius: 14, padding: 13 }, instantTitleRow: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between' }, instantTitle: { flex: 1, color: '#173D48', fontSize: 18, fontWeight: '900', textAlign: 'right' }, instantPartNumber: { color: '#FFFFFF', backgroundColor: '#0E6972', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4, fontWeight: '900' }, instantExactName: { color: '#60757D', textAlign: 'right', marginTop: 4 }, instantLabel: { color: '#0E6972', fontWeight: '900', textAlign: 'right', marginTop: 9 }, instantText: { color: '#315B63', textAlign: 'right', lineHeight: 21, marginTop: 2 }, instantLocation: { color: '#60757D', textAlign: 'right', marginTop: 9 }, primaryButton: { backgroundColor: '#0E6972', borderRadius: 12, padding: 13, alignItems: 'center', marginTop: 12 }, primaryButtonText: { color: '#FFFFFF', fontWeight: '900' },
   regionCard: { backgroundColor: '#FFFFFF', borderRadius: 17, padding: 15, borderWidth: 1, borderColor: '#D9E7EA', marginBottom: 12 }, regionHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }, regionTitle: { color: '#173D48', fontSize: 18, fontWeight: '900', textAlign: 'right' }, regionCount: { color: '#0E6972', backgroundColor: '#EAF8F5', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, fontSize: 12, fontWeight: '800' }, organGrid: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }, organChip: { borderRadius: 10, backgroundColor: '#F2F8F8', borderWidth: 1, borderColor: '#CFE1E3', paddingHorizontal: 10, paddingVertical: 9 }, organChipText: { color: '#315B63', fontWeight: '800' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(10,35,42,0.48)', justifyContent: 'flex-end' }, modalContent: { backgroundColor: '#F7FBFB', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '88%', paddingBottom: 22 }, modalHeader: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', padding: 17, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: '#E2EFF0' }, modalTitle: { color: '#173D48', fontSize: 18, fontWeight: '900', textAlign: 'right' }, closeButton: { color: '#0E6972', fontSize: 30, lineHeight: 30 }, muscleList: { padding: 15 }, organDetail: { padding: 15 }, muscleItem: { backgroundColor: '#FFFFFF', borderRadius: 13, padding: 13, marginBottom: 9, borderWidth: 1, borderColor: '#D9E7EA' }, muscleTitleRow: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }, partNumber: { color: '#FFFFFF', backgroundColor: '#0E6972', borderRadius: 7, paddingHorizontal: 7, paddingVertical: 3, fontWeight: '900' }, muscleName: { color: '#173D48', fontSize: 16, fontWeight: '900', textAlign: 'right' }, muscleDescription: { color: '#315B63', textAlign: 'right', lineHeight: 20, marginTop: 7 }, muscleLocation: { color: '#60757D', textAlign: 'right', marginTop: 6, fontSize: 12 },

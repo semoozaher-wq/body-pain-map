@@ -69,6 +69,12 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         </Card>
       )}
 
+      <Card style={styles.doctorCard}>
+        <Text style={[styles.cardTitle, { color: colors.danger }]}>متى تزور الطبيب؟</Text>
+        <Text style={[styles.alertText, { color: colors.textSecondary }]}>اطلب تقييمًا طبيًا إذا استمر الألم أو ازداد، أو ظهر تورم/حمى/تنميل/ضعف، أو كانت هناك إصابة، أو لم تتحسن الأعراض مع الراحة.</Text>
+        <Text style={[styles.alertText, { color: colors.textSecondary }]}>{selected.medicalSafety}</Text>
+      </Card>
+
       <Card style={styles.infoCard}>
         <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>{t('results.commonCauses')}</Text>
         {selected.commonCauses.map((cause) => (
@@ -97,7 +103,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
       <LocalAIChat />
       <ImageAnalysisDemo />
 
-      <Text style={[styles.disclaimer, { color: colors.textLight }]}>{selected.medicalSafety}</Text>
+      <Text style={[styles.disclaimer, { color: colors.textLight }]}>محتوى إرشادي عام لأغراض التثقيف الصحي فقط، ولا يغني عن استشارة الطبيب المختص للتشخيص أو العلاج.</Text>
 
       <Button title={t('results.shareSummary')} onPress={handleShare} variant="secondary" />
       <Button title={t('results.newScan')} onPress={onRestart} style={styles.newScanButton} />
@@ -115,6 +121,7 @@ const styles = StyleSheet.create({
   summaryNote: { color: '#E4F5F2', marginTop: Spacing.sm, textAlign: 'center', fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm },
   urgentCard: { borderRadius: BorderRadius.lg, padding: Spacing.lg, marginBottom: Spacing.md, borderWidth: 2 },
   alertCard: { marginBottom: Spacing.md },
+  doctorCard: { marginBottom: Spacing.md, borderWidth: 1, borderColor: '#F3C9C9' },
   alertTitle: { fontSize: Fonts.sizes.lg, fontFamily: Fonts.arabic.bold, textAlign: 'right', marginBottom: Spacing.sm },
   alertText: { textAlign: 'right', lineHeight: 23, fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm },
   infoCard: { marginBottom: Spacing.md },

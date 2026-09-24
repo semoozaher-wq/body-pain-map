@@ -9,11 +9,12 @@ import { translate } from '../services/i18n';
 
 interface WelcomeScreenProps {
   onStart: () => void;
+  onQuickRelief: () => void;
   language: Parameters<typeof translate>[0];
   direction: 'rtl' | 'ltr';
 }
 
-export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, language }) => {
+export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, onQuickRelief, language }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
 
@@ -75,6 +76,14 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, language 
         style={styles.ctaButton}
       />
 
+      <Button
+        title="عناية سريعة: الرقبة والظهر والساعد"
+        onPress={onQuickRelief}
+        variant="secondary"
+        size="md"
+        style={styles.quickButton}
+      />
+
       <Text style={[styles.disclaimer, { color: colors.textLight }]}>
         {t('welcome.disclaimer')}
       </Text>
@@ -103,5 +112,6 @@ const styles = StyleSheet.create({
   warningTitle: { fontSize: Fonts.sizes.lg, fontFamily: Fonts.arabic.bold, marginBottom: Spacing.sm, textAlign: 'center' },
   warningText: { fontSize: Fonts.sizes.sm, fontFamily: Fonts.arabic.regular, lineHeight: 22, textAlign: 'center' },
   ctaButton: { marginTop: Spacing.lg },
+  quickButton: { marginTop: Spacing.sm },
   disclaimer: { fontSize: Fonts.sizes.xs, fontFamily: Fonts.arabic.regular, textAlign: 'center', marginTop: Spacing.md }
 });

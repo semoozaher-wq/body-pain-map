@@ -24,14 +24,16 @@ interface DetailsScreenProps {
   onNext: () => void;
   language: Parameters<typeof translate>[0];
   direction: 'rtl' | 'ltr';
+  contextWarning?: string | null;
 }
 
 export const DetailsScreen: React.FC<DetailsScreenProps> = ({
   intensity, setIntensity, painType, setPainType, duration, setDuration,
-  note, setNote, redFlags, setRedFlags, onBack, onNext, language
+  note, setNote, redFlags, setRedFlags, onBack, onNext, language, contextWarning
 }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
+  const urgent = intensity >= 8 || redFlags.length > 0;
 
   const toggleFlag = (flag: string) => {
     setRedFlags(redFlags.includes(flag) ? redFlags.filter((f) => f !== flag) : [...redFlags, flag]);
@@ -39,6 +41,12 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
 
   return (
     <View style={styles.container}>
+      {urgent && (
+        <View style={[styles.triageAlert, { backgroundColor: colors.dangerLight, borderColor: colors.danger }]}>
+          <Text style={[styles.triageTitle, { color: colors.danger }]}>تنبيه طبي قبل العناية الذاتية</Text>
+          <Text style={[styles.triageText, { color: colors.textPrimary }]}>{contextWarning ? `${contextWarning} ` : ''}الشدة أو العلامات التي اخترتها قد تحتاج تقييمًا طبيًا. أوقف التمارين والضغط، واطلب مساعدة عاجلة إذا كان الألم شديدًا أو مفاجئًا أو مصحوبًا بضيق نفس أو إغماء.</Text>
+        </View>
+      )}
       <Accordion title={t('details.intensityTitle')} icon="📊" defaultOpen>
         <Text style={[styles.question, { color: colors.textPrimary }]}>{t('details.intensityQuestion')}</Text>
         <View style={styles.scale}>
@@ -125,6 +133,9 @@ const Chip = ({ label, active, onPress, colors }: any) => (
 
 const styles = StyleSheet.create({
   container: { padding: Spacing.lg },
+  triageAlert: { borderRadius: BorderRadius.lg, borderWidth: 2, padding: Spacing.lg, marginBottom: Spacing.md },
+  triageTitle: { fontFamily: Fonts.arabic.bold, fontSize: Fonts.sizes.lg, textAlign: 'right', marginBottom: Spacing.sm },
+  triageText: { fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm, lineHeight: 23, textAlign: 'right' },
   question: { fontFamily: Fonts.arabic.bold, fontSize: Fonts.sizes.md, marginBottom: Spacing.md },
   scale: { flexDirection: 'row-reverse', justifyContent: 'space-between', flexWrap: 'wrap', gap: Spacing.xs },
   scaleDot: { width: 30, height: 30, borderRadius: 15, justifyContent: 'center', alignItems: 'center' },

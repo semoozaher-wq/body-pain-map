@@ -27,6 +27,14 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
   const average = history.length
     ? (history.reduce((sum, item) => sum + item.intensity, 0) / history.length).toFixed(1)
     : '—';
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const recent = history.filter((item) => !item.createdAtIso || new Date(item.createdAtIso).getTime() >= weekAgo);
+  const areaCounts = recent.reduce<Record<string, number>>((counts, item) => {
+    const label = item.selfCareGuide ?? data.muscles[item.partId]?.groupLabelAr ?? data.muscles[item.partId]?.labelAr ?? 'منطقة أخرى';
+    counts[label] = (counts[label] ?? 0) + 1;
+    return counts;
+  }, {});
+  const topArea = Object.entries(areaCounts).sort((a, b) => b[1] - a[1])[0];
 
   return (
     <View style={styles.container}>
@@ -52,6 +60,15 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
             <Text style={[styles.miniLabel, { color: colors.textSecondary }]}>تنبيه</Text>
           </View>
         </View>
+      )}
+
+      {history.length > 0 && (
+        <Card style={styles.analyticsCard}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>ملخص آخر 7 أيام</Text>
+          <Text style={[styles.analyticsText, { color: colors.textSecondary }]}>سجلت {recent.length} متابعة، ومتوسط الشدة العام {average}/10.</Text>
+          {topArea && <Text style={[styles.analyticsText, { color: colors.primary }]}>المنطقة الأكثر تكرارًا: {topArea[0]} ({topArea[1]} مرات).</Text>}
+          <Text style={[styles.analyticsAdvice, { color: colors.textSecondary }]}>اقتراح: خذ فواصل حركة قصيرة كل ساعة، وراقب ما إذا كان الألم يتحسن مع الراحة والحركة اللطيفة.</Text>
+        </Card>
       )}
 
       {/* History List */}
@@ -125,6 +142,9 @@ const styles = StyleSheet.create({
   historyCard: {
     marginBottom: Spacing.sm,
   },
+  analyticsCard: { marginBottom: Spacing.md, borderWidth: 1, borderColor: '#CFE4E5' },
+  analyticsText: { textAlign: 'right', fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm, lineHeight: 22, marginBottom: Spacing.xs },
+  analyticsAdvice: { textAlign: 'right', fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.xs, lineHeight: 20, marginTop: Spacing.xs },
   cardTitle: {
     fontSize: Fonts.sizes.md,
     fontFamily: Fonts.arabic.bold,
