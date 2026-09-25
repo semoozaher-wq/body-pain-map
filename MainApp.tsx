@@ -35,6 +35,8 @@ export default function App() {
   const [duration, setDuration] = useState('منذ أيام');
   const [note, setNote] = useState('');
   const [redFlags, setRedFlags] = useState<string[]>([]);
+  const [symptoms, setSymptoms] = useState<string[]>([]);
+  const [afterIntensity, setAfterIntensity] = useState('');
   const [history, setHistory] = useState<Checkup[]>([]);
   const [historyLoaded, setHistoryLoaded] = useState(false);
   const [medication, setMedication] = useState('');
@@ -102,6 +104,8 @@ export default function App() {
         urgent,
         triageStatus,
         redFlags: [...redFlags],
+        symptoms: [...symptoms],
+        afterIntensity: afterIntensity.trim() ? Number(afterIntensity) : undefined,
         createdAt: new Date().toLocaleDateString('ar-EG'),
         createdAtIso: new Date().toISOString(),
       },
@@ -141,6 +145,8 @@ export default function App() {
     setSleepHours('');
     setActivity('');
     setRedFlags([]);
+    setSymptoms([]);
+    setAfterIntensity('');
     setScreen('body');
   };
 
@@ -249,6 +255,10 @@ export default function App() {
             setActivity={setActivity}
             redFlags={redFlags}
             setRedFlags={setRedFlags}
+            symptoms={symptoms}
+            setSymptoms={setSymptoms}
+            afterIntensity={afterIntensity}
+            setAfterIntensity={setAfterIntensity}
             onBack={() => setScreen('body')}
             onNext={saveResults}
             language={language}
