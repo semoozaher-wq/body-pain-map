@@ -18,6 +18,14 @@ interface DetailsScreenProps {
   setDuration: (v: string) => void;
   note: string;
   setNote: (v: string) => void;
+  medication: string;
+  setMedication: (v: string) => void;
+  triggers: string;
+  setTriggers: (v: string) => void;
+  sleepHours: string;
+  setSleepHours: (v: string) => void;
+  activity: string;
+  setActivity: (v: string) => void;
   redFlags: string[];
   setRedFlags: (v: string[]) => void;
   onBack: () => void;
@@ -29,7 +37,8 @@ interface DetailsScreenProps {
 
 export const DetailsScreen: React.FC<DetailsScreenProps> = ({
   intensity, setIntensity, painType, setPainType, duration, setDuration,
-  note, setNote, redFlags, setRedFlags, onBack, onNext, language, contextWarning
+  note, setNote, medication, setMedication, triggers, setTriggers, sleepHours, setSleepHours, activity, setActivity,
+  redFlags, setRedFlags, onBack, onNext, language, contextWarning
 }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
@@ -114,6 +123,14 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
         <Text style={[styles.charHint, { color: colors.textLight }]}>{note.length}/500</Text>
       </Accordion>
 
+      <Accordion title={t('details.contextTitle')} icon="🧩">
+        <Text style={[styles.hint, { color: colors.textSecondary }]}>{t('details.contextHint')}</Text>
+        <TextInput value={medication} onChangeText={setMedication} placeholder={t('details.medicationPlaceholder')} maxLength={180} style={[styles.contextInput, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} textAlign="right" />
+        <TextInput value={triggers} onChangeText={setTriggers} placeholder={t('details.triggersPlaceholder')} maxLength={180} style={[styles.contextInput, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} textAlign="right" />
+        <TextInput value={sleepHours} onChangeText={(v) => setSleepHours(v.replace(/[^0-9.]/g, '').slice(0, 4))} placeholder={t('details.sleepPlaceholder')} keyboardType="decimal-pad" maxLength={4} style={[styles.contextInput, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} textAlign="right" />
+        <TextInput value={activity} onChangeText={setActivity} placeholder={t('details.activityPlaceholder')} maxLength={160} style={[styles.contextInput, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} textAlign="right" />
+      </Accordion>
+
       <View style={styles.actions}>
         <Button title={t('back')} onPress={onBack} variant="secondary" style={styles.actionButton} />
         <Button title={t('details.showGuidance')} onPress={onNext} style={styles.actionButton} />
@@ -149,6 +166,7 @@ const styles = StyleSheet.create({
   flagCheck: { fontSize: 20, fontWeight: '900' },
   flagText: { flex: 1, textAlign: 'right', fontFamily: Fonts.arabic.medium, fontSize: Fonts.sizes.sm },
   noteInput: { minHeight: 90, borderRadius: BorderRadius.md, padding: Spacing.md, borderWidth: 1, fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.md, textAlignVertical: 'top' },
+  contextInput: { borderWidth: 1, borderRadius: BorderRadius.md, padding: Spacing.md, marginTop: Spacing.sm, fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm, minHeight: 46 },
   charHint: { fontSize: Fonts.sizes.xs, textAlign: 'right', marginTop: Spacing.xs },
   actions: { flexDirection: 'row-reverse', gap: Spacing.sm, marginTop: Spacing.lg },
   actionButton: { flex: 1 }

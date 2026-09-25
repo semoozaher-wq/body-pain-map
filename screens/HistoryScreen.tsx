@@ -11,8 +11,11 @@ import { useTheme } from '../hooks/useTheme';
 import { Checkup } from '../types';
 import anatomyMap from '../data/anatomyPainMap.json';
 import { AnatomyData } from '../types';
-import { PainDiary } from '../components/PainDiary';
 import { LocalReminder } from '../components/LocalReminder';
+import { PainDashboard } from '../components/PainDashboard';
+import { DoctorReport } from '../components/DoctorReport';
+import { LocalDataTools } from '../components/LocalDataTools';
+import type { Language } from '../services/i18n';
 
 const data = anatomyMap as unknown as AnatomyData;
 
@@ -20,9 +23,11 @@ interface HistoryScreenProps {
   history: Checkup[];
   onBack: () => void;
   onClear: () => void;
+  onImport: (records: Checkup[]) => void;
+  language: Language;
 }
 
-export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, onClear }) => {
+export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, onClear, onImport, language }) => {
   const { colors } = useTheme();
   const average = history.length
     ? (history.reduce((sum, item) => sum + item.intensity, 0) / history.length).toFixed(1)
@@ -30,7 +35,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
   const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   const recent = history.filter((item) => !item.createdAtIso || new Date(item.createdAtIso).getTime() >= weekAgo);
   const areaCounts = recent.reduce<Record<string, number>>((counts, item) => {
-    const label = item.selfCareGuide ?? data.muscles[item.partId]?.groupLabelAr ?? data.muscles[item.partId]?.labelAr ?? 'منطقة أخرى';
+    const label = item.selfCareGuide ?? item.areaLabel ?? data.muscles[item.partId]?.groupLabelAr ?? data.muscles[item.partId]?.labelAr ?? 'منطقة أخرى';
     counts[label] = (counts[label] ?? 0) + 1;
     return counts;
   }, {});
@@ -39,8 +44,11 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
   return (
     <View style={styles.container}>
       <Text style={[styles.helper, { color: colors.textSecondary }]}>
-        الفحوصات محفوظة على هذا الجهاز فقط. لا تُرفع إلى خادم.
+        السجل محفوظ على الجهاز. استخدم التصدير لمشاركة نسخة بنفسك؛ لا نرفع بياناتك تلقائيًا.
       </Text>
+      <PainDashboard history={history} language={language} />
+      <DoctorReport records={history} />
+      <LocalDataTools records={history} onImport={onImport} />
 
       {/* Stats */}
       {history.length > 0 && (
@@ -80,19 +88,22 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
         history.map((item) => (
           <Card key={item.id} style={styles.historyCard}>
             <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
-              {item.selfCareGuide ? `خطة تخفيف ذاتي — ${item.selfCareGuide}` : `#${data.muscles[item.partId]?.partNumber} — ${data.muscles[item.partId]?.labelAr ?? item.partId}`}
+              {item.selfCareGuide ? `خطة تخفيف ذاتي — ${item.selfCareGuide}` : item.areaLabel ?? `#${data.muscles[item.partId]?.partNumber} — ${data.muscles[item.partId]?.labelAr ?? item.partId}`}
             </Text>
             <Text style={[styles.infoText, { color: colors.textSecondary }]}>
               {item.createdAt} · شدة {item.intensity}/10 · {item.painType}
             </Text>
             {item.note ? <Text style={[styles.note, { color: colors.textSecondary }]}>{item.note}</Text> : null}
+            {item.medication ? <Text style={[styles.note, { color: colors.textSecondary }]}>دواء مسجّل: {item.medication}</Text> : null}
+            {item.triggers ? <Text style={[styles.note, { color: colors.textSecondary }]}>محفزات ملاحظة: {item.triggers}</Text> : null}
+            {item.sleepHours !== undefined ? <Text style={[styles.note, { color: colors.textSecondary }]}>النوم المسجل: {item.sleepHours} ساعة</Text> : null}
+            {item.activity ? <Text style={[styles.note, { color: colors.textSecondary }]}>النشاط المسجل: {item.activity}</Text> : null}
             {item.afterIntensity !== undefined && <Text style={[styles.note, { color: colors.primary }]}>قبل {item.intensity}/10 ← بعد {item.afterIntensity}/10</Text>}
             {item.urgent && <Text style={[styles.urgentText, { color: colors.danger }]}>يتطلب انتباهًا طبيًا</Text>}
           </Card>
         ))
       )}
 
-      <PainDiary entries={history.map((item) => ({ intensity: item.intensity, createdAt: item.createdAt, partId: item.partId }))} />
       <LocalReminder />
 
       {/* Actions */}

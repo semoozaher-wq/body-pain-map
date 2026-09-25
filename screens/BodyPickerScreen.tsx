@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { BodySilhouette, type BodyView, type Gender } from 'react-native-body-parts-anatomy';
+import { BodySilhouette, type BodyView, type Gender, type GroupLabelOverrides } from 'react-native-body-parts-anatomy';
 import rawAnatomyData from '../data/anatomyPainMap.json';
 import hotspotsData from '../data/anatomyHotspots.json';
 import organDetails from '../data/organDetails.json';
 import { translate } from '../services/i18n';
 import type { Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
-import { cleanData } from '../data/cleanData';
+import cleanData from '../data/cleanData';
 
 type PickerMuscle = Muscle & { labelEn?: string };
 type Organ = (typeof organDetails)[keyof typeof organDetails];
@@ -21,9 +21,10 @@ type Hotspot = {
   muscleId?: string;
   organId?: string;
 };
-const anatomyData = cleanData(rawAnatomyData) as { muscles: Record<string, PickerMuscle> };
+const anatomyData = cleanData as { muscles: Record<string, PickerMuscle> };
 const hotspots = hotspotsData as unknown as Hotspot[];
 const organs = organDetails as unknown as Record<string, Organ>;
+const groupLabels = Object.fromEntries(Object.entries((rawAnatomyData as { groups: Record<string, { labelAr: string }> }).groups).map(([key, group]) => [key, group.labelAr])) as GroupLabelOverrides;
 type Selection =
   | { kind: 'muscle'; label: string; muscle: Muscle }
   | { kind: 'organ'; label: string; organ: Organ };
@@ -206,6 +207,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 selectedSlugs={selectedMuscleId ? [selectedMuscleId] : []}
                 onFragmentPress={handleFragmentPress}
                 accessibilityLabel={t('bodyPicker.mapAccessibilityLabel')}
+                labels={groupLabels}
                 hitTolerance={12}
                 zoomable
               />

@@ -6,15 +6,19 @@ import { Spacing, BorderRadius, Shadows } from '../constants/spacing';
 import { Button } from '../components/Button';
 import { useTheme } from '../hooks/useTheme';
 import { translate } from '../services/i18n';
+import { QuickLogCard } from '../components/QuickLogCard';
+import type { Checkup } from '../types';
 
 interface WelcomeScreenProps {
   onStart: () => void;
   onQuickRelief: () => void;
   language: Parameters<typeof translate>[0];
   direction: 'rtl' | 'ltr';
+  quickAreas: { id: string; label: string }[];
+  onQuickSave: (record: Checkup) => void;
 }
 
-export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, onQuickRelief, language }) => {
+export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, onQuickRelief, language, quickAreas, onQuickSave }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
 
@@ -77,12 +81,14 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, onQuickRe
       />
 
       <Button
-        title="عناية سريعة: الرقبة والظهر والساعد"
+        title={t('welcome.quickCare')}
         onPress={onQuickRelief}
         variant="secondary"
         size="md"
         style={styles.quickButton}
       />
+
+            <QuickLogCard areas={quickAreas} onSave={onQuickSave} language={language} />
 
       <Text style={[styles.disclaimer, { color: colors.textLight }]}>
         {t('welcome.disclaimer')}
