@@ -31,12 +31,17 @@ export type AnatomyData = {
 export type Checkup = {
   id: string;
   partId: string;
+  areaLabel?: string;
   intensity: number;
   painType: string;
   duration: string;
   createdAt: string;
   createdAtIso?: string;
   note?: string;
+  medication?: string;
+  triggers?: string;
+  sleepHours?: number;
+  activity?: string;
   urgent?: boolean;
   afterIntensity?: number;
   selfCareGuide?: string;
