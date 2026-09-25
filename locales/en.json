@@ -71,7 +71,7 @@
   },
   "bodyPicker": {
     "title": "Interactive Muscle Map",
-    "instruction": "Tap the affected area on the realistic image, then select the exact part from the list to ensure 100% medical accuracy:",
+    "instruction": "Choose the area closest to your pain, then review general guidance and safety alerts. Location alone cannot diagnose the cause:",
     "selectedArea": "Selected Area: ",
     "showParts": "Show exact parts",
     "selectPartTitle": "Select exact part",
@@ -85,6 +85,9 @@
     "guide": { "neck": "Neck", "upper-back": "Upper back", "lower-back": "Lower back", "forearm": "Forearm" },
     "muscles": "Muscles",
     "organs": "Internal organs",
+    "acupressure": "Acupressure points",
+    "naturalRelief": "Natural self-care",
+    "organPainNotice": "Pain location alone cannot identify an organ or cause. Unexplained chest, abdominal, or flank pain needs medical assessment; seek emergency help with shortness of breath or fainting.",
     "male": "Male",
     "female": "Female",
     "front": "Front",
