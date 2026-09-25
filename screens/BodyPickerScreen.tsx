@@ -6,7 +6,7 @@ import hotspotsData from '../data/anatomyHotspots.json';
 import organDetails from '../data/organDetails.json';
 import { translate } from '../services/i18n';
 import { AcupressurePanel } from '../components/AcupressurePanel';
-import { InternalOrgansMap } from '../components/InternalOrgansMap';
+import { IllustratedBodyMap } from '../components/IllustratedBodyMap';
 import { NaturalReliefPanel } from '../components/NaturalReliefPanel';
 import type { BodyView, Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
@@ -42,6 +42,14 @@ type BodyPickerScreenProps = {
 };
 
 const quickGuides = ['neck', 'upper-back', 'lower-back', 'forearm'] as const;
+const translatedGroups: Record<'en' | 'fr', Record<string, string>> = {
+  en: { abs: 'Abdomen', adductors: 'Inner thigh', ankles: 'Ankles', biceps: 'Biceps', calves: 'Calves', chest: 'Chest', deltoids: 'Shoulders', feet: 'Feet', forearm: 'Forearm', gluteal: 'Glutes', hair: 'Scalp', hamstring: 'Hamstrings', hands: 'Hands', head: 'Head', knees: 'Knees', 'lower-back': 'Lower back', neck: 'Neck', obliques: 'Side abdomen', quadriceps: 'Front thigh', tibialis: 'Shin', trapezius: 'Upper shoulder', triceps: 'Triceps', 'upper-back': 'Upper back' },
+  fr: { abs: 'Abdomen', adductors: 'Adducteurs', ankles: 'Chevilles', biceps: 'Biceps', calves: 'Mollets', chest: 'Poitrine', deltoids: 'Épaules', feet: 'Pieds', forearm: 'Avant-bras', gluteal: 'Fessiers', hair: 'Cuir chevelu', hamstring: 'Ischio-jambiers', hands: 'Mains', head: 'Tête', knees: 'Genoux', 'lower-back': 'Bas du dos', neck: 'Cou', obliques: 'Côtés de l’abdomen', quadriceps: 'Avant de la cuisse', tibialis: 'Tibia', trapezius: 'Trapèze', triceps: 'Triceps', 'upper-back': 'Haut du dos' },
+};
+const localizedOrganNames: Record<'en' | 'fr', Record<string, string>> = {
+  en: { heart: 'Heart', lungs: 'Lungs', stomach: 'Stomach', liver: 'Liver', kidneys: 'Kidneys', thyroid: 'Thyroid' },
+  fr: { heart: 'Cœur', lungs: 'Poumons', stomach: 'Estomac', liver: 'Foie', kidneys: 'Reins', thyroid: 'Thyroïde' },
+};
 
 export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   onNavigateToDetails,
@@ -60,12 +68,21 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   const [showOrganMode, setShowOrganMode] = useState(false);
   const [showAcupressureMode, setShowAcupressureMode] = useState(false);
   const [showNaturalReliefMode, setShowNaturalReliefMode] = useState(false);
+  const [bodyViewMode, setBodyViewMode] = useState<'illustration' | 'detailed'>('illustration');
   const [quickGuide, setQuickGuide] = useState<(typeof quickGuides)[number]>('neck');
 
   const visibleHotspots = useMemo(
     () => hotspots.filter((hotspot) => hotspot.view === activeView && hotspot.type === 'organ'),
     [activeView],
   );
+  const visibleMuscleHotspots = useMemo(() => hotspots.filter((spot) => spot.view === activeView && spot.type === 'muscle').flatMap((spot) => {
+    const groupKey = spot.muscleId?.split('-')[0];
+    if (!groupKey) return [];
+    const exactId = spot.muscleId?.replace(/-(male|female)-/, `-${gender}-`);
+    const muscle = (exactId && anatomyData.muscles[exactId]) || Object.values(anatomyData.muscles).find((part) => part.group === groupKey && part.id.includes(`-${gender}-${activeView}-`));
+    if (!muscle) return [];
+    return [{ ...spot, muscleId: muscle.id, label: language === 'ar' ? muscle.groupLabelAr : translatedGroups[language][groupKey] ?? muscle.groupLabelAr }];
+  }), [activeView, gender, language]);
   const matchingMuscles = useMemo(() => {
     const query = search.trim().toLocaleLowerCase();
     return Object.values(anatomyData.muscles).filter((muscle) => {
@@ -135,7 +152,12 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
             <ModeButton title={t('bodyPicker.naturalRelief')} selected={showNaturalReliefMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(true); }} />
           </View>
 
-          {!showAcupressureMode && !showNaturalReliefMode && <View style={styles.toggleRow}>
+          {!showAcupressureMode && !showNaturalReliefMode && !showOrganMode && <View style={styles.toggleRow}>
+            <Pressable style={[styles.toggleButton, bodyViewMode === 'illustration' && styles.activeToggle]} onPress={() => setBodyViewMode('illustration')} accessibilityRole="button" accessibilityState={{ selected: bodyViewMode === 'illustration' }}><Text style={[styles.toggleText, bodyViewMode === 'illustration' && styles.activeToggleText]}>{t('bodyPicker.visualImage')}</Text></Pressable>
+            <Pressable style={[styles.toggleButton, bodyViewMode === 'detailed' && styles.activeToggle]} onPress={() => setBodyViewMode('detailed')} accessibilityRole="button" accessibilityState={{ selected: bodyViewMode === 'detailed' }}><Text style={[styles.toggleText, bodyViewMode === 'detailed' && styles.activeToggleText]}>{t('bodyPicker.detailMap')}</Text></Pressable>
+          </View>}
+
+          {!showAcupressureMode && !showNaturalReliefMode && !showOrganMode && bodyViewMode === 'detailed' && <View style={styles.toggleRow}>
             <Pressable
               style={[styles.toggleButton, gender === 'male' && styles.activeToggle]}
               onPress={() => setGender('male')}
@@ -169,12 +191,26 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
             <>
               <Text style={styles.helper}>{t('bodyPicker.organHint')}</Text>
               <Text style={styles.organNotice}>{t('bodyPicker.organPainNotice')}</Text>
-              <InternalOrgansMap view="organs" surface={activeView} spots={visibleHotspots} language={language} onSelect={handleHotspotPress} />
+              <IllustratedBodyMap
+                source={activeView === 'front' ? require('../assets/anatomy/internal-organs-atlas.png') : require('../assets/anatomy/muscle-back-atlas.png')}
+                markers={visibleHotspots.map((spot) => ({ id: spot.id, x: spot.x, y: spot.y, label: language === 'ar' ? spot.label : localizedOrganNames[language][spot.organId ?? ''] ?? spot.label }))}
+                language={language}
+                title={t('bodyPicker.organs')}
+                hint={t('bodyPicker.organImageHint')}
+                onSelect={(marker) => { const spot = visibleHotspots.find((item) => item.id === marker.id); if (spot) handleHotspotPress(spot); }}
+              />
             </>
           ) : (
             <>
               <Text style={styles.helper}>{t('bodyPicker.anatomyMapHint')}</Text>
-              <BodySilhouette
+              {bodyViewMode === 'illustration' ? <IllustratedBodyMap
+                source={activeView === 'front' ? require('../assets/anatomy/muscle-front-atlas.png') : require('../assets/anatomy/muscle-back-atlas.png')}
+                markers={visibleMuscleHotspots.map((spot) => ({ id: spot.id, x: spot.x, y: spot.y, label: spot.label }))}
+                language={language}
+                title={t('bodyPicker.title')}
+                hint={t('bodyPicker.visualHintText')}
+                onSelect={(marker) => { const spot = visibleMuscleHotspots.find((item) => item.id === marker.id); if (spot) handleHotspotPress(spot); }}
+              /> : <BodySilhouette
                 gender={gender}
                 view={activeView as MuscleMapView}
                 selectedSlugs={selectedMuscleId ? [selectedMuscleId] : []}
@@ -183,7 +219,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 labels={groupLabels}
                 hitTolerance={12}
                 zoomable
-              />
+              />}
               <TextInput
                 value={search}
                 onChangeText={setSearch}
@@ -239,6 +275,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                   {selectedItem.muscle.warning ? <Info title={t('bodyPicker.warning')} text={selectedItem.muscle.warning} warning /> : null}
                   <Info title={t('bodyPicker.recommendation')} text={selectedItem.muscle.recommendation ?? t('bodyPicker.defaultRecommendation')} />
                   <Text style={styles.medicalNotice}>{selectedItem.muscle.medicalSafety}</Text>
+                  <Pressable style={[styles.actionButton, styles.detailMapButton]} onPress={() => { setShowOrganMode(false); setBodyViewMode('detailed'); setSelectedMuscleId(selectedItem.muscle.id); dismissDetails(); }} accessibilityRole="button"><Text style={styles.actionButtonText}>{t('bodyPicker.openExactParts')}</Text></Pressable>
                   <Pressable
                     style={styles.actionButton}
                     onPress={() => { dismissDetails(); onNavigateToDetails(selectedItem.muscle); }}
@@ -308,5 +345,6 @@ const styles = StyleSheet.create({
   warningText: { color: '#823E37' },
   medicalNotice: { color: '#657781', textAlign: 'center', fontSize: 11, lineHeight: 18, marginBottom: 8 },
   actionButton: { backgroundColor: '#176F79', borderRadius: 11, padding: 13, alignItems: 'center', marginTop: 4 },
+  detailMapButton: { backgroundColor: '#28556A' },
   actionButtonText: { color: '#FFF', fontWeight: '900' },
 });

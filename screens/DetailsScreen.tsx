@@ -8,6 +8,7 @@ import { Accordion } from '../components/Accordion';
 import { useTheme } from '../hooks/useTheme';
 import { PAIN_TYPES, DURATIONS, RED_FLAGS } from '../constants/appConstants';
 import { translate } from '../services/i18n';
+import { getTriageStatus } from '../services/triage.js';
 
 interface DetailsScreenProps {
   intensity: number;
@@ -42,7 +43,14 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
-  const urgent = intensity >= 8 || redFlags.length > 0;
+  const triageStatus = getTriageStatus(intensity, redFlags);
+  const urgent = triageStatus === 'urgent';
+  const highReportedIntensity = triageStatus === 'high_reported_intensity';
+  const redFlagLabels = language === 'en'
+    ? ['Shortness of breath or crushing chest pain', 'Fainting or severe confusion', 'Sudden weakness or difficulty speaking', 'Serious injury or bleeding']
+    : language === 'fr'
+      ? ['Essoufflement ou douleur thoracique oppressive', 'Évanouissement ou confusion sévère', 'Faiblesse soudaine ou difficulté à parler', 'Blessure grave ou saignement']
+      : RED_FLAGS;
 
   const toggleFlag = (flag: string) => {
     setRedFlags(redFlags.includes(flag) ? redFlags.filter((f) => f !== flag) : [...redFlags, flag]);
@@ -52,10 +60,27 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
     <View style={styles.container}>
       {urgent && (
         <View style={[styles.triageAlert, { backgroundColor: colors.dangerLight, borderColor: colors.danger }]}>
-          <Text style={[styles.triageTitle, { color: colors.danger }]}>تنبيه طبي قبل العناية الذاتية</Text>
-          <Text style={[styles.triageText, { color: colors.textPrimary }]}>{contextWarning ? `${contextWarning} ` : ''}الشدة أو العلامات التي اخترتها قد تحتاج تقييمًا طبيًا. أوقف التمارين والضغط، واطلب مساعدة عاجلة إذا كان الألم شديدًا أو مفاجئًا أو مصحوبًا بضيق نفس أو إغماء.</Text>
+          <Text style={[styles.triageTitle, { color: colors.danger }]}>{t('details.urgentFlagTitle')}</Text>
+          <Text style={[styles.triageText, { color: colors.textPrimary }]}>{contextWarning ? `${contextWarning} ` : ''}{t('details.urgentFlagText')}</Text>
         </View>
       )}
+      {highReportedIntensity && (
+        <View style={[styles.triageAlert, { backgroundColor: colors.warningLight, borderColor: colors.warning }]}>
+          <Text style={[styles.triageTitle, { color: colors.warning }]}>{t('details.highIntensityTitle')}</Text>
+          <Text style={[styles.triageText, { color: colors.textPrimary }]}>{t('details.highIntensityText')}</Text>
+        </View>
+      )}
+      <Accordion title={t('details.redFlagsTitle')} icon="⚠️" isWarning defaultOpen>
+        <Text style={[styles.hint, { color: colors.danger }]}>{t('details.redFlagsHint')}</Text>
+        <View style={styles.flagList}>
+          {RED_FLAGS.map((flag, index) => (
+            <Pressable key={flag} onPress={() => toggleFlag(flag)} style={[styles.flagRow, { backgroundColor: redFlags.includes(flag) ? colors.dangerLight : colors.backgroundAlt, borderColor: redFlags.includes(flag) ? colors.danger : colors.border }]} accessibilityRole="checkbox" accessibilityState={{ checked: redFlags.includes(flag) }}>
+              <Text style={[styles.flagCheck, { color: colors.danger }]}>{redFlags.includes(flag) ? '✓' : '○'}</Text>
+              <Text style={[styles.flagText, { color: colors.textPrimary }]}>{redFlagLabels[index]}</Text>
+            </Pressable>
+          ))}
+        </View>
+      </Accordion>
       <Accordion title={t('details.intensityTitle')} icon="📊" defaultOpen>
         <Text style={[styles.question, { color: colors.textPrimary }]}>{t('details.intensityQuestion')}</Text>
         <View style={styles.scale}>
@@ -83,28 +108,6 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
         <View style={styles.chips}>
           {DURATIONS.map((d) => (
             <Chip key={d} label={d} active={d === duration} onPress={() => setDuration(d)} colors={colors} />
-          ))}
-        </View>
-      </Accordion>
-
-      <Accordion title={t('details.redFlagsTitle')} icon="⚠️" isWarning>
-        <Text style={[styles.hint, { color: colors.danger }]}>{t('details.redFlagsHint')}</Text>
-        <View style={styles.flagList}>
-          {RED_FLAGS.map((flag) => (
-            <Pressable
-              key={flag}
-              onPress={() => toggleFlag(flag)}
-              style={[
-                styles.flagRow,
-                {
-                  backgroundColor: redFlags.includes(flag) ? colors.dangerLight : colors.backgroundAlt,
-                  borderColor: redFlags.includes(flag) ? colors.danger : colors.border,
-                },
-              ]}
-            >
-              <Text style={[styles.flagCheck, { color: colors.danger }]}>{redFlags.includes(flag) ? '✓' : '○'}</Text>
-              <Text style={[styles.flagText, { color: colors.textPrimary }]}>{flag}</Text>
-            </Pressable>
           ))}
         </View>
       </Accordion>

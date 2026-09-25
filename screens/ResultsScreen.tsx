@@ -10,9 +10,8 @@ import { Checkup, Group, Muscle } from '../types';
 import { InteractiveTips } from '../components/InteractiveTips';
 import { FirstAidCard } from '../components/FirstAidCard';
 import { ReportExport } from '../components/ReportExport';
-import { LocalAIChat } from '../components/LocalAIChat';
-import { ImageAnalysisDemo } from '../components/ImageAnalysisDemo';
 import { translate } from '../services/i18n';
+import { getTriageStatus } from '../services/triage.js';
 
 interface ResultsScreenProps {
   selected: Muscle;
@@ -33,7 +32,9 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
 }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
-  const urgent = intensity >= 8 || redFlags.length > 0;
+  const triageStatus = getTriageStatus(intensity, redFlags);
+  const urgent = triageStatus === 'urgent';
+  const highReportedIntensity = triageStatus === 'high_reported_intensity';
   const warning = selected.warning ?? group?.defaultWarning;
   const recommendation = selected.recommendation ?? group?.defaultRecommendation ?? 'استشر طبيبًا إذا استمر الألم أو ازداد.';
 
@@ -59,6 +60,14 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         <View style={[styles.urgentCard, { backgroundColor: colors.dangerLight, borderColor: colors.danger }]}>
           <Text style={[styles.alertTitle, { color: colors.danger }]}>{t('results.urgentTitle')}</Text>
           <Text style={[styles.alertText, { color: colors.textPrimary }]}>{t('results.urgentText')}</Text>
+          {redFlags.length > 0 && <Text style={[styles.alertText, styles.selectedRedFlags, { color: colors.danger }]}>{redFlags.join(' • ')}</Text>}
+        </View>
+      )}
+
+      {highReportedIntensity && (
+        <View style={[styles.highIntensityCard, { backgroundColor: colors.warningLight, borderColor: colors.warning }]}>
+          <Text style={[styles.alertTitle, { color: colors.warning }]}>{t('results.highIntensityTitle')}</Text>
+          <Text style={[styles.alertText, { color: colors.textPrimary }]}>{t('results.highIntensityText')}</Text>
         </View>
       )}
 
@@ -70,25 +79,27 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
       )}
 
       <Card style={styles.doctorCard}>
-        <Text style={[styles.cardTitle, { color: colors.danger }]}>متى تزور الطبيب؟</Text>
-        <Text style={[styles.alertText, { color: colors.textSecondary }]}>اطلب تقييمًا طبيًا إذا استمر الألم أو ازداد، أو ظهر تورم/حمى/تنميل/ضعف، أو كانت هناك إصابة، أو لم تتحسن الأعراض مع الراحة.</Text>
+        <Text style={[styles.cardTitle, { color: colors.danger }]}>{t('results.whenToSeekHelp')}</Text>
+        <Text style={[styles.alertText, { color: colors.textSecondary }]}>{t('results.assessmentHint')}</Text>
         <Text style={[styles.alertText, { color: colors.textSecondary }]}>{selected.medicalSafety}</Text>
       </Card>
 
-      <Card style={styles.infoCard}>
-        <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>{t('results.commonCauses')}</Text>
-        {selected.commonCauses.map((cause) => (
-          <Text key={cause} style={[styles.bullet, { color: colors.textSecondary }]}>• {cause}</Text>
-        ))}
-      </Card>
+      {!urgent && <>
+        <Card style={styles.infoCard}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>{t('results.commonCauses')}</Text>
+          {selected.commonCauses.map((cause) => (
+            <Text key={cause} style={[styles.bullet, { color: colors.textSecondary }]}>• {cause}</Text>
+          ))}
+        </Card>
 
-      <View style={[styles.recommendation, { backgroundColor: colors.successLight }]}> 
-        <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>{t('results.generalGuidance')}</Text>
-        <Text style={[styles.infoText, { color: colors.textSecondary }]}>{recommendation}</Text>
-      </View>
+        <View style={[styles.recommendation, { backgroundColor: colors.successLight }]}> 
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>{t('results.generalGuidance')}</Text>
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>{recommendation}</Text>
+        </View>
 
-      <InteractiveTips groupKey={selected.group} groupLabel={group?.labelAr ?? selected.locationAr} intensity={intensity} urgent={urgent} />
-      <FirstAidCard area={selected.locationAr} urgent={urgent} />
+        <InteractiveTips groupKey={selected.group} groupLabel={group?.labelAr ?? selected.locationAr} intensity={intensity} urgent={false} />
+        <FirstAidCard area={selected.locationAr} urgent={false} />
+      </>}
       <ReportExport
         title={selected.labelAr}
         location={selected.locationAr}
@@ -100,9 +111,6 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         recommendation={recommendation}
         note={note}
       />
-      <LocalAIChat />
-      <ImageAnalysisDemo />
-
       <Text style={[styles.disclaimer, { color: colors.textLight }]}>محتوى إرشادي عام لأغراض التثقيف الصحي فقط، ولا يغني عن استشارة الطبيب المختص للتشخيص أو العلاج.</Text>
 
       <Button title={t('results.shareSummary')} onPress={handleShare} variant="secondary" />
@@ -120,10 +128,12 @@ const styles = StyleSheet.create({
   summaryMeta: { color: '#D6ECEA', marginTop: Spacing.sm, fontFamily: Fonts.arabic.medium, fontSize: Fonts.sizes.sm },
   summaryNote: { color: '#E4F5F2', marginTop: Spacing.sm, textAlign: 'center', fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm },
   urgentCard: { borderRadius: BorderRadius.lg, padding: Spacing.lg, marginBottom: Spacing.md, borderWidth: 2 },
+  highIntensityCard: { borderRadius: BorderRadius.lg, padding: Spacing.lg, marginBottom: Spacing.md, borderWidth: 1.5 },
   alertCard: { marginBottom: Spacing.md },
   doctorCard: { marginBottom: Spacing.md, borderWidth: 1, borderColor: '#F3C9C9' },
   alertTitle: { fontSize: Fonts.sizes.lg, fontFamily: Fonts.arabic.bold, textAlign: 'right', marginBottom: Spacing.sm },
   alertText: { textAlign: 'right', lineHeight: 23, fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm },
+  selectedRedFlags: { fontWeight: '900', marginTop: 6 },
   infoCard: { marginBottom: Spacing.md },
   cardTitle: { fontSize: Fonts.sizes.lg, fontFamily: Fonts.arabic.bold, textAlign: 'right', marginBottom: Spacing.md },
   bullet: { textAlign: 'right', lineHeight: 27, fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm },
