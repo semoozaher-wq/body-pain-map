@@ -1,11 +1,14 @@
 import React, { useMemo, useState } from 'react';
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { BodySilhouette, type BodyView, type Gender, type GroupLabelOverrides } from 'react-native-body-parts-anatomy';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { BodySilhouette, type BodyView as MuscleMapView, type Gender, type GroupLabelOverrides } from 'react-native-body-parts-anatomy';
 import rawAnatomyData from '../data/anatomyPainMap.json';
 import hotspotsData from '../data/anatomyHotspots.json';
 import organDetails from '../data/organDetails.json';
 import { translate } from '../services/i18n';
-import type { Muscle } from '../types';
+import { AcupressurePanel } from '../components/AcupressurePanel';
+import { InternalOrgansMap } from '../components/InternalOrgansMap';
+import { NaturalReliefPanel } from '../components/NaturalReliefPanel';
+import type { BodyView, Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
 import cleanData from '../data/cleanData';
 
@@ -48,13 +51,15 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   quickRelief,
 }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
-  const [activeView, setActiveView] = useState<BodyView>('front');
+  const [activeView, setActiveView] = useState<Exclude<BodyView, 'organs'>>('front');
   const [gender, setGender] = useState<Gender>('male');
   const [selectedMuscleId, setSelectedMuscleId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [selectedItem, setSelectedItem] = useState<Selection | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showOrganMode, setShowOrganMode] = useState(false);
+  const [showAcupressureMode, setShowAcupressureMode] = useState(false);
+  const [showNaturalReliefMode, setShowNaturalReliefMode] = useState(false);
   const [quickGuide, setQuickGuide] = useState<(typeof quickGuides)[number]>('neck');
 
   const visibleHotspots = useMemo(
@@ -124,25 +129,13 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
       ) : (
         <>
           <View style={styles.modeToggle}>
-            <Pressable
-              style={[styles.modeButton, !showOrganMode && styles.modeActive]}
-              onPress={() => setShowOrganMode(false)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: !showOrganMode }}
-            >
-              <Text style={[styles.modeText, !showOrganMode && styles.modeTextActive]}>{t('bodyPicker.muscles')}</Text>
-            </Pressable>
-            <Pressable
-              style={[styles.modeButton, showOrganMode && styles.modeActive]}
-              onPress={() => setShowOrganMode(true)}
-              accessibilityRole="button"
-              accessibilityState={{ selected: showOrganMode }}
-            >
-              <Text style={[styles.modeText, showOrganMode && styles.modeTextActive]}>{t('bodyPicker.organs')}</Text>
-            </Pressable>
+            <ModeButton title={t('bodyPicker.muscles')} selected={!showOrganMode && !showAcupressureMode && !showNaturalReliefMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(false); }} />
+            <ModeButton title={t('bodyPicker.organs')} selected={showOrganMode} onPress={() => { setShowOrganMode(true); setShowAcupressureMode(false); setShowNaturalReliefMode(false); }} />
+            <ModeButton title={t('bodyPicker.acupressure')} selected={showAcupressureMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(true); setShowNaturalReliefMode(false); }} />
+            <ModeButton title={t('bodyPicker.naturalRelief')} selected={showNaturalReliefMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(true); }} />
           </View>
 
-          <View style={styles.toggleRow}>
+          {!showAcupressureMode && !showNaturalReliefMode && <View style={styles.toggleRow}>
             <Pressable
               style={[styles.toggleButton, gender === 'male' && styles.activeToggle]}
               onPress={() => setGender('male')}
@@ -155,9 +148,9 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
               accessibilityRole="button"
               accessibilityState={{ selected: gender === 'female' }}
             ><Text style={[styles.toggleText, gender === 'female' && styles.activeToggleText]}>{t('bodyPicker.female')}</Text></Pressable>
-          </View>
+          </View>}
 
-          <View style={styles.toggleRow}>
+          {!showAcupressureMode && !showNaturalReliefMode && <View style={styles.toggleRow}>
             <Pressable
               style={[styles.toggleButton, activeView === 'front' && styles.activeToggle]}
               onPress={() => setActiveView('front')}
@@ -170,40 +163,20 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
               accessibilityRole="button"
               accessibilityState={{ selected: activeView === 'back' }}
             ><Text style={[styles.toggleText, activeView === 'back' && styles.activeToggleText]}>{t('bodyPicker.backView')}</Text></Pressable>
-          </View>
+          </View>}
 
-          {showOrganMode ? (
+          {showAcupressureMode ? <AcupressurePanel language={language} /> : showNaturalReliefMode ? <NaturalReliefPanel language={language} /> : showOrganMode ? (
             <>
               <Text style={styles.helper}>{t('bodyPicker.organHint')}</Text>
-              <View style={styles.imageContainer}>
-                <Image
-                  source={activeView === 'front'
-                    ? require('../assets/anatomy/muscle-front-realistic.png')
-                    : require('../assets/anatomy/muscle-back-realistic.png')}
-                  style={styles.bodyImage}
-                  resizeMode="contain"
-                  accessibilityLabel={t('bodyPicker.bodyImageLabel')}
-                />
-                {visibleHotspots.map((spot) => (
-                  <Pressable
-                    key={spot.id}
-                    style={[styles.organHotspot, { left: `${spot.x}%`, top: `${spot.y}%` }]}
-                    onPress={() => handleHotspotPress(spot)}
-                    accessibilityRole="button"
-                    accessibilityLabel={spot.label}
-                  >
-                    <View style={styles.organDot} />
-                    <Text style={styles.hotspotLabel}>{spot.label}</Text>
-                  </Pressable>
-                ))}
-              </View>
+              <Text style={styles.organNotice}>{t('bodyPicker.organPainNotice')}</Text>
+              <InternalOrgansMap view="organs" surface={activeView} spots={visibleHotspots} language={language} onSelect={handleHotspotPress} />
             </>
           ) : (
             <>
               <Text style={styles.helper}>{t('bodyPicker.anatomyMapHint')}</Text>
               <BodySilhouette
                 gender={gender}
-                view={activeView}
+                view={activeView as MuscleMapView}
                 selectedSlugs={selectedMuscleId ? [selectedMuscleId] : []}
                 onFragmentPress={handleFragmentPress}
                 accessibilityLabel={t('bodyPicker.mapAccessibilityLabel')}
@@ -281,6 +254,10 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   );
 };
 
+function ModeButton({ title, selected, onPress }: { title: string; selected: boolean; onPress: () => void }) {
+  return <Pressable style={[styles.modeButton, selected && styles.modeActive]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected }}><Text style={[styles.modeText, selected && styles.modeTextActive]}>{title}</Text></Pressable>;
+}
+
 function Info({ title, text, warning = false }: { title: string; text: string; warning?: boolean }) {
   return <View style={[styles.infoCard, warning && styles.warningCard]}><Text style={[styles.infoLabel, warning && styles.warningLabel]}>{title}</Text><Text style={[styles.infoText, warning && styles.warningText]}>{text}</Text></View>;
 }
@@ -288,8 +265,8 @@ function Info({ title, text, warning = false }: { title: string; text: string; w
 const styles = StyleSheet.create({
   container: { padding: 16 },
   heading: { color: '#123B42', fontSize: 20, fontWeight: '900', textAlign: 'right', marginBottom: 6 },
-  modeToggle: { flexDirection: 'row', gap: 10, marginBottom: 12 },
-  modeButton: { flex: 1, borderRadius: 10, borderWidth: 1, borderColor: '#CCD9DC', backgroundColor: '#FFF', padding: 11, alignItems: 'center' },
+  modeToggle: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginBottom: 12 },
+  modeButton: { flexGrow: 1, flexBasis: '45%', borderRadius: 10, borderWidth: 1, borderColor: '#CCD9DC', backgroundColor: '#FFF', padding: 11, alignItems: 'center' },
   modeActive: { backgroundColor: '#0E6972', borderColor: '#0E6972' },
   modeText: { color: '#40545B', fontWeight: '700' },
   modeTextActive: { color: '#FFF' },
@@ -299,6 +276,7 @@ const styles = StyleSheet.create({
   toggleText: { color: '#40545B', fontWeight: '700' },
   activeToggleText: { color: '#FFF' },
   helper: { color: '#586E75', textAlign: 'right', lineHeight: 21, marginVertical: 8, fontSize: 12 },
+  organNotice: { color: '#764A00', backgroundColor: '#FFF6E5', borderRadius: 10, padding: 10, lineHeight: 19, textAlign: 'right', fontSize: 12, marginBottom: 9 },
   imageContainer: { width: '100%', aspectRatio: 0.55, backgroundColor: '#FFF', borderRadius: 16, overflow: 'hidden', position: 'relative', marginBottom: 14 },
   bodyImage: { width: '100%', height: '100%' },
   organHotspot: { position: 'absolute', width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginLeft: -24, marginTop: -24 },
