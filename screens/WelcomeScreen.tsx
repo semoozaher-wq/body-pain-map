@@ -5,6 +5,7 @@ import { Fonts } from '../constants/fonts';
 import { Spacing, BorderRadius, Shadows } from '../constants/spacing';
 import { Button } from '../components/Button';
 import { QuickLogCard } from '../components/QuickLogCard';
+import { ClinicalAnalysisPanel } from '../components/ClinicalAnalysisPanel';
 import { useTheme } from '../hooks/useTheme';
 import { translate } from '../services/i18n';
 import type { Checkup } from '../types';
@@ -61,6 +62,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, onQuickRe
     </View>
 
     <QuickLogCard areas={quickAreas} onSave={onQuickSave} language={language} />
+
+    <ClinicalAnalysisPanel />
 
     <View style={[styles.safetyCard, { backgroundColor: colors.warningLight, borderColor: colors.warning }]}>
       <Text style={[styles.safetyTitle, { color: colors.warning }]}>{t('medicalWarning')}</Text>
