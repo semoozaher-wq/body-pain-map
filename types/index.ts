@@ -2,7 +2,7 @@
 
 export type Screen = 'welcome' | 'body' | 'details' | 'results' | 'history';
 export type AppGender = 'male' | 'female';
-export type BodyView = 'front' | 'back';
+export type BodyView = 'front' | 'back' | 'organs';
 
 export type Muscle = {
   id: string;
