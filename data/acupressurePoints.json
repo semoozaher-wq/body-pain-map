@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 1,
+  "notice": {
+    "ar": "ضغط إرشادي خارجي فقط؛ لا توجد إبر في التطبيق. هذه المعلومات لا تشخّص ولا تستبدل الطبيب أو أخصائي الوخز المرخّص.",
+    "en": "Educational external pressure only; this app does not use needles. This is not a diagnosis or a substitute for a clinician or licensed acupuncture professional.",
+    "fr": "Pression externe à visée éducative uniquement ; aucune aiguille n'est utilisée. Ceci ne constitue pas un diagnostic ni un remplacement d'un professionnel de santé."
+  },
+  "safety": {
+    "ar": "لا تضغط على جرح أو كدمة أو تورم شديد أو جلد ملتهب/مصاب بعدوى أو منطقة مخدّرة أو بها جلطة حديثة. استخدم ضغطًا لطيفًا لا يسبب ألمًا، وتوقف فورًا عند ألم أو دوخة أو تنميل أو أعراض غير معتادة. في الحمل، لا تستخدم LI4 أو SP6، واستشيري مقدم الرعاية قبل أي ضغط علاجي. عند اضطراب التجلط أو انخفاض الصفائح أو استخدام مميعات الدم، استشر الطبيب أولًا.",
+    "en": "Do not press on wounds, bruises, marked swelling, infected/irritated or numb skin, or a recent clot. Use gentle, comfortable pressure and stop for pain, dizziness, numbness, or unusual symptoms. During pregnancy, avoid LI4 and SP6 and consult a clinician before therapeutic acupressure. Ask a clinician first if you have a bleeding disorder, low platelets, or take blood thinners.",
+    "fr": "Ne pas appuyer sur une plaie, une ecchymose, un gonflement important, une peau infectée/irritée ou insensible, ni sur une zone de caillot récent. Pression douce et confortable ; arrêter en cas de douleur, vertige, engourdissement ou symptôme inhabituel. Pendant la grossesse, éviter LI4 et SP6 et demander conseil à un professionnel. Demander conseil en cas de trouble de coagulation, thrombopénie ou anticoagulants."
+  },
+  "points": [
+    {
+      "id": "li4-hegu",
+      "code": "LI4",
+      "traditionalName": "Hegu",
+      "region": "hand",
+      "mapPosition": {
+        "x": 82,
+        "y": 46,
+        "side": "right"
+      },
+      "name": {
+        "ar": "هي-غو (LI4)",
+        "en": "Hegu (LI4)",
+        "fr": "Hegu (LI4)"
+      },
+      "location": {
+        "ar": "على ظهر اليد، في المسافة بين قاعدة الإبهام والسبابة؛ عند ضم الإبهام والسبابة تظهر بروز عضلي، والنقطة قرب أعلى هذا البروز. توجد نقطة مقابلة في اليد الأخرى.",
+        "en": "On the back of the hand in the web between the thumb and index finger; bringing them together raises a muscle bulge, with the point near its highest part. A corresponding point is on the other hand.",
+        "fr": "Sur le dos de la main, dans l'espace entre le pouce et l'index ; rapprocher les doigts fait apparaître un relief musculaire, près de son point le plus haut. Le point existe aussi sur l'autre main."
+      },
+      "use": {
+        "ar": "تذكره مراجع تعليمية للضغط اللطيف المساعد مع الصداع وبعض الآلام؛ لا يعني ذلك تشخيص سبب الألم أو ضمان الاستجابة.",
+        "en": "Educational acupressure materials describe it as an adjunct for headache and some pain; this does not diagnose the cause or guarantee benefit.",
+        "fr": "Des supports éducatifs le décrivent comme complément possible pour les céphalées et certaines douleurs ; cela ne diagnostique pas la cause et ne garantit pas un effet."
+      },
+      "technique": {
+        "ar": "استخدم الإبهام للضغط برفق أو بحركة دائرية مريحة؛ لا تجعل الضغط مؤلمًا. جرّب الجهة الأخرى فقط إذا كان ذلك مريحًا.",
+        "en": "Use the thumb for gentle, comfortable pressure or small circles; it should not hurt. Try the other side only if comfortable.",
+        "fr": "Avec le pouce, exercer une pression douce ou de petits cercles confortables ; cela ne doit pas faire mal. Essayer l'autre côté uniquement si cela reste confortable."
+      },
+      "evidence": {
+        "level": "limited_complementary",
+        "ar": "دليل محدود/مكمّل؛ الإرشاد الموضعي لا يثبت الفاعلية لكل أنواع الألم.",
+        "en": "Limited complementary evidence; location guidance does not establish effectiveness for every pain condition.",
+        "fr": "Données complémentaires limitées ; la description du point ne prouve pas l'efficacité pour toutes les douleurs."
+      },
+      "caution": {
+        "ar": "ممنوع أثناء الحمل وفق دليل UCI؛ لا تستخدمه على جلد متأذٍ. اطلب المساعدة بدل الضغط إذا كان الصداع مفاجئًا شديدًا أو معه ضعف/خدر/اضطراب كلام أو رؤية.",
+        "en": "UCI guidance contraindicates this point during pregnancy; do not use on damaged skin. Seek care rather than pressing for sudden severe headache or headache with weakness, numbness, or speech/vision changes.",
+        "fr": "Le guide UCI contre-indique ce point pendant la grossesse ; ne pas l'utiliser sur une peau lésée. Demander des soins en cas de céphalée brutale intense ou accompagnée de faiblesse, engourdissement ou troubles de la parole/vision."
+      },
+      "sources": [
+        {
+          "title": "WHO: Standard acupuncture nomenclature (361 classical point names)",
+          "url": "https://www.who.int/publications/i/item/9290611057",
+          "supports": "standardized point nomenclature; not efficacy"
+        },
+        {
+          "title": "UCI Health acupressure manual",
+          "url": "https://www.ucihealth.org/-/media/files/pdf/samueli-integrative-health-institute/revised-acupressure-manual.pdf",
+          "supports": "code, location, pregnancy caution"
+        },
+        {
+          "title": "Memorial Sloan Kettering: Acupressure for Pain and Headaches",
+          "url": "https://www.mskcc.org/cancer-care/patient-education/acupressure-pain-and-headaches",
+          "supports": "location, gentle technique, pain/headache use and skin precautions"
+        },
+        {
+          "title": "NHS headache red flags",
+          "url": "https://www.nhs.uk/symptoms/headaches/",
+          "supports": "headache emergency warning signs"
+        }
+      ]
+    },
+    {
+      "id": "pc6-neiguan",
+      "code": "PC6",
+      "traditionalName": "Neiguan",
+      "region": "inner_wrist",
+      "mapPosition": {
+        "x": 80,
+        "y": 50,
+        "side": "right"
+      },
+      "name": {
+        "ar": "ني-غوان (PC6)",
+        "en": "Neiguan (PC6)",
+        "fr": "Neiguan (PC6)"
+      },
+      "location": {
+        "ar": "باطن الساعد، نحو ثلاثة عروض أصابع أعلى ثنية الرسغ، بين الوترين الظاهرين في منتصف الساعد. توجد نقطة مقابلة في الذراع الأخرى.",
+        "en": "Palm-side forearm, about three finger-widths above the wrist crease, between the two visible central tendons. A corresponding point is on the other arm.",
+        "fr": "Face interne de l'avant-bras, environ trois largeurs de doigts au-dessus du pli du poignet, entre les deux tendons centraux visibles. Le point existe aussi sur l'autre bras."
+      },
+      "use": {
+        "ar": "يُستخدم في إرشادات الضغط لتخفيف الغثيان، خصوصًا في سياقات محددة مثل الغثيان بعد العمليات؛ لا يؤخر تقييم القيء الشديد أو المستمر.",
+        "en": "Acupressure guidance uses it for nausea, especially in defined contexts such as postoperative nausea; it must not delay assessment of severe or persistent vomiting.",
+        "fr": "Les guides d'acupression le proposent contre les nausées, notamment dans des contextes précis comme après une opération ; ne pas retarder l'évaluation de vomissements sévères ou persistants."
+      },
+      "technique": {
+        "ar": "ضع إصبعًا أو إبهامًا واضغط ضغطًا مريحًا على جانبي الرسغ؛ لا تضغط حتى الألم أو ظهور كدمة. يمكن التوقف بمجرد عدم الارتياح.",
+        "en": "Use a finger or thumb for comfortable pressure; do not press to pain or bruising. Stop as soon as it feels uncomfortable.",
+        "fr": "Avec un doigt ou le pouce, exercer une pression confortable ; ne pas aller jusqu'à la douleur ou l'ecchymose. Arrêter dès que cela devient inconfortable."
+      },
+      "evidence": {
+        "level": "low_certainty_context_specific",
+        "ar": "الدليل أفضل للغثيان بعد العمليات عند جمع التحفيز مع العلاج المعتاد، لكن ثقة مراجعة كوكرين منخفضة؛ لا نعممه على كل أنواع الغثيان.",
+        "en": "Evidence is most relevant to postoperative nausea when stimulation is added to usual care; Cochrane rated confidence low, so it should not be generalized to all nausea.",
+        "fr": "Les données concernent surtout les nausées postopératoires en complément des soins habituels ; la confiance Cochrane est faible et ne permet pas de généraliser à toutes les nausées."
+      },
+      "caution": {
+        "ar": "أوقف الضغط عند تهيّج الجلد أو الألم. اطلب تقييمًا عند قيء متكرر، عدم القدرة على الاحتفاظ بالسوائل، علامات جفاف أو دم في القيء.",
+        "en": "Stop for skin irritation or pain. Seek assessment for repeated vomiting, inability to keep fluids down, dehydration signs, or blood in vomit.",
+        "fr": "Arrêter en cas d'irritation cutanée ou de douleur. Demander une évaluation en cas de vomissements répétés, impossibilité de garder les liquides, signes de déshydratation ou sang dans les vomissements."
+      },
+      "sources": [
+        {
+          "title": "WHO: Standard acupuncture nomenclature (361 classical point names)",
+          "url": "https://www.who.int/publications/i/item/9290611057",
+          "supports": "standardized point nomenclature; not efficacy"
+        },
+        {
+          "title": "UCI Health acupressure manual",
+          "url": "https://www.ucihealth.org/-/media/files/pdf/samueli-integrative-health-institute/revised-acupressure-manual.pdf",
+          "supports": "code, location, described indications and safety"
+        },
+        {
+          "title": "North Bristol NHS: P6 pressure point for nausea",
+          "url": "https://www.nbt.nhs.uk/our-services/a-z-services/anaesthetics/anaesthesia-patient-information/using-pressure-points-relieve-nausea",
+          "supports": "location and self-use instructions"
+        },
+        {
+          "title": "Cochrane: PC6 stimulation and postoperative nausea/vomiting",
+          "url": "https://www.cochrane.org/evidence/CD003281_what-are-benefits-and-risks-different-wrist-pc6-acupoint-stimulation-techniques-preventing-nausea",
+          "supports": "condition-specific evidence and certainty"
+        },
+        {
+          "title": "NHS dehydration",
+          "url": "https://www.nhs.uk/conditions/dehydration/",
+          "supports": "when dehydration requires medical attention"
+        }
+      ]
+    },
+    {
+      "id": "gb20-fengchi",
+      "code": "GB20",
+      "traditionalName": "Fengchi",
+      "region": "base_of_skull",
+      "mapPosition": {
+        "x": 50,
+        "y": 18,
+        "side": "center"
+      },
+      "name": {
+        "ar": "فنغ-تشي (GB20)",
+        "en": "Fengchi (GB20)",
+        "fr": "Fengchi (GB20)"
+      },
+      "location": {
+        "ar": "في انخفاضين تحت قاعدة الجمجمة، على جانبي الرقبة قرب العضلات الخلفية. هذا وصف تعليمي تقريبي فقط؛ لا تحاول الضغط العميق على الرقبة.",
+        "en": "In the hollows just below the base of the skull, on either side of the back of the neck near the posterior muscles. This is an educational description; do not apply deep pressure to the neck.",
+        "fr": "Dans les creux sous la base du crâne, de part et d'autre de l'arrière du cou près des muscles postérieurs. Description éducative ; ne pas exercer de pression profonde sur le cou."
+      },
+      "use": {
+        "ar": "يذكره دليل UCI ضمن نقاط تُستخدم تقليديًا للصداع وشد الرقبة والكتف؛ ليس هناك ما يثبت أنه يعالج سببًا طبيًا بعينه.",
+        "en": "The UCI manual lists it among points traditionally used for headache and neck/shoulder tension; this does not show that it treats a specific medical cause.",
+        "fr": "Le guide UCI le cite parmi les points traditionnellement utilisés pour les céphalées et les tensions cervicales/épaules ; cela ne prouve pas le traitement d'une cause médicale précise."
+      },
+      "technique": {
+        "ar": "إن جُرّب، فليكن لمسًا أو ضغطًا سطحيًا لطيفًا فقط، دون ضغط على مقدمة الرقبة أو النبض أو دفع الرأس. الأفضل تجنبه إذا لم تكن متأكدًا من الموضع.",
+        "en": "If tried, use only light, superficial touch; do not press the front of the neck, pulse, or push the head. Avoid if you are unsure of the location.",
+        "fr": "Si l'on essaie, n'utiliser qu'un contact léger et superficiel ; ne pas appuyer sur l'avant du cou, le pouls ni pousser la tête. Éviter en cas d'incertitude sur l'emplacement."
+      },
+      "evidence": {
+        "level": "traditional_guidance_limited",
+        "ar": "معلومات موضعية/تقليدية؛ الدليل السريري المحدد للضغط الذاتي على هذه النقطة محدود.",
+        "en": "Traditional/location guidance; condition-specific clinical evidence for self-acupressure at this point is limited.",
+        "fr": "Indication traditionnelle et descriptive ; les preuves cliniques spécifiques pour l'auto-acupression sont limitées."
+      },
+      "caution": {
+        "ar": "تجنب الضغط على الرقبة إذا كان هناك إصابة حديثة أو دوخة أو خدر أو ضعف أو ألم شديد؛ لا تستخدمه بدل تقييم الصداع الخطير.",
+        "en": "Avoid neck pressure after recent injury or with dizziness, numbness, weakness, or severe pain; do not use it instead of evaluating a dangerous headache.",
+        "fr": "Éviter toute pression cervicale après une blessure récente ou en cas de vertige, engourdissement, faiblesse ou douleur intense ; ne pas remplacer l'évaluation d'une céphalée grave."
+      },
+      "sources": [
+        {
+          "title": "WHO: Standard acupuncture nomenclature (361 classical point names)",
+          "url": "https://www.who.int/publications/i/item/9290611057",
+          "supports": "standardized point nomenclature; not efficacy"
+        },
+        {
+          "title": "UCI Health acupressure manual",
+          "url": "https://www.ucihealth.org/-/media/files/pdf/samueli-integrative-health-institute/revised-acupressure-manual.pdf",
+          "supports": "code, location, traditionally described indications"
+        },
+        {
+          "title": "VA Portland: Acupressure for Headaches",
+          "url": "https://www.va.gov/PAINMANAGEMENT/Veteran_Public/Veteran_docs/AcupressureforHeadaches.pdf",
+          "supports": "headache points, gentle short-duration technique and safety cautions"
+        },
+        {
+          "title": "NHS neck pain",
+          "url": "https://www.nhs.uk/symptoms/neck-pain-and-stiff-neck/",
+          "supports": "neck-pain care and symptoms warranting medical assessment"
+        }
+      ]
+    },
+    {
+      "id": "sp6-sanyinjiao",
+      "code": "SP6",
+      "traditionalName": "Sanyinjiao",
+      "region": "inner_ankle",
+      "mapPosition": {
+        "x": 56,
+        "y": 76,
+        "side": "right"
+      },
+      "name": {
+        "ar": "سان-يين-جياو (SP6)",
+        "en": "Sanyinjiao (SP6)",
+        "fr": "Sanyinjiao (SP6)"
+      },
+      "location": {
+        "ar": "على الجانب الداخلي للساق، نحو أربعة عروض أصابع أعلى قمة عظمة الكاحل الداخلية، بمحاذاة العظمة. توجد نقطة مقابلة في الساق الأخرى.",
+        "en": "On the inner lower leg, about four finger-widths above the highest point of the inner ankle bone, in line with the bone. A corresponding point is on the other leg.",
+        "fr": "Sur la face interne de la jambe, environ quatre largeurs de doigts au-dessus du sommet de la malléole interne, dans son alignement. Le point existe aussi sur l'autre jambe."
+      },
+      "use": {
+        "ar": "دُرس الضغط على SP6 لتقلصات الدورة؛ مراجعة منهجية وجدت فائدة محتملة لكن الدراسات قليلة ومتغايرة، لذا لا نعده علاجًا مؤكدًا.",
+        "en": "SP6 pressure has been studied for menstrual cramps; one systematic review found a possible benefit but noted few, heterogeneous studies, so it is not a proven treatment.",
+        "fr": "La pression sur SP6 a été étudiée pour les crampes menstruelles ; une revue systématique suggère un bénéfice possible mais souligne le petit nombre et l'hétérogénéité des études. Ce n'est pas un traitement établi."
+      },
+      "technique": {
+        "ar": "استخدم لمسة أو ضغطًا لطيفًا على الجانب الداخلي للساق فقط إذا لم يكن مؤلمًا، وتوقف عند أي وجع أو تنميل. لا تضغط قرب كدمة أو تورم أو دوالي مؤلمة.",
+        "en": "Use light touch or gentle pressure on the inner lower leg only if comfortable; stop for pain or numbness. Do not press near bruising, swelling, or painful varicose veins.",
+        "fr": "N'utiliser qu'un contact léger ou une pression douce sur la face interne de la jambe si cela reste confortable ; arrêter en cas de douleur ou d'engourdissement. Éviter les ecchymoses, gonflements ou varices douloureuses."
+      },
+      "evidence": {
+        "level": "limited_mixed",
+        "ar": "دليل محدود ومتغاير؛ وردت فائدة محتملة في الضغط، ولا يصح خلطها بنتائج الوخز بالإبر.",
+        "en": "Limited, heterogeneous evidence; possible benefit has been reported for pressure, which should not be conflated with needle-acupuncture findings.",
+        "fr": "Données limitées et hétérogènes ; un bénéfice possible a été rapporté pour la pression, à distinguer des résultats de l'acupuncture avec aiguilles."
+      },
+      "caution": {
+        "ar": "ممنوع أثناء الحمل وفق دليل UCI. ألم الدورة الجديد أو الشديد جدًا، أو المصحوب بإغماء/حمى/نزف غير معتاد، يحتاج تقييمًا طبيًا.",
+        "en": "UCI guidance contraindicates this point during pregnancy. New or very severe period pain, or pain with fainting, fever, or unusual bleeding, needs medical assessment.",
+        "fr": "Le guide UCI contre-indique ce point pendant la grossesse. Une douleur menstruelle nouvelle ou très intense, avec malaise, fièvre ou saignement inhabituel, nécessite une évaluation médicale."
+      },
+      "sources": [
+        {
+          "title": "WHO: Standard acupuncture nomenclature (361 classical point names)",
+          "url": "https://www.who.int/publications/i/item/9290611057",
+          "supports": "standardized point nomenclature; not efficacy"
+        },
+        {
+          "title": "UCI Health acupressure manual",
+          "url": "https://www.ucihealth.org/-/media/files/pdf/samueli-integrative-health-institute/revised-acupressure-manual.pdf",
+          "supports": "code, location and pregnancy contraindication"
+        },
+        {
+          "title": "Systematic review: SP6 for primary dysmenorrhea",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3600281/",
+          "supports": "possible acupressure benefit and limitations"
+        },
+        {
+          "title": "NHS period pain",
+          "url": "https://www.nhs.uk/symptoms/period-pain/",
+          "supports": "when period pain needs medical assessment"
+        }
+      ]
+    }
+  ]
+}

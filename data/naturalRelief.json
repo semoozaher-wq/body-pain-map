@@ -1,0 +1,344 @@
+{
+  "schemaVersion": 1,
+  "globalNotice": {
+    "ar": "إرشادات مساعدة للأعراض البسيطة فقط، وليست تشخيصًا أو بديلًا للرعاية الطبية. لا توجد وصفة عشبية أو جرعة دواء هنا.",
+    "en": "Supportive guidance for mild symptoms only; not a diagnosis or substitute for medical care. No herbal prescription or medication dose is provided.",
+    "fr": "Conseils d'accompagnement pour symptômes légers uniquement ; ne remplacent ni diagnostic ni soins médicaux. Aucune prescription de plante ou dose de médicament n'est fournie."
+  },
+  "redFlagLink": "https://www.nhs.uk/conditions/heart-attack/",
+  "remedies": [
+    {
+      "id": "acute-muscle-strain-cold",
+      "category": "muscle_strain",
+      "name": {
+        "ar": "إصابة أو شد حديث: حماية وثلج ملفوف",
+        "en": "Recent sprain or strain: protect and wrapped ice",
+        "fr": "Entorse ou élongation récente : protéger et glace enveloppée"
+      },
+      "instructions": {
+        "ar": "خلال أول يومين أو ثلاثة بعد التواء/شد بسيط: أرح المنطقة واحمِها، وضع كيسًا باردًا ملفوفًا بقماش لمدة تصل إلى 20 دقيقة كل 2–3 ساعات. تجنب الحرارة والتدليك في أول يومين؛ وارجع للحركة تدريجيًا عندما تسمح الأعراض.",
+        "en": "For the first 2–3 days after a mild sprain/strain: protect and rest the area, and apply a wrapped ice pack for up to 20 minutes every 2–3 hours. Avoid heat and massage for the first couple of days; return to movement gradually as symptoms allow.",
+        "fr": "Pendant les 2–3 premiers jours après une entorse/élongation légère : protéger et reposer la zone, appliquer une poche froide enveloppée jusqu'à 20 minutes toutes les 2–3 heures. Éviter chaleur et massage les premiers jours ; reprendre progressivement le mouvement selon les symptômes."
+      },
+      "evidence": {
+        "level": "clinical_guideline",
+        "ar": "إرشاد رعاية ذاتية من NHS للإصابات البسيطة؛ لا يحدد سبب الألم دون فحص.",
+        "en": "NHS self-care guidance for minor injuries; it does not establish the cause of pain without assessment.",
+        "fr": "Conseil d'autosoins du NHS pour blessures mineures ; ne détermine pas la cause sans examen."
+      },
+      "contraindications": {
+        "ar": "لا تضع الثلج مباشرة على الجلد أو على جلد فاقد الإحساس/ضعيف الدورة. لا تستخدمه لتأخير الرعاية عند إصابة شديدة أو تشوه أو خدر.",
+        "en": "Do not apply ice directly to skin or to skin with reduced sensation/circulation. Do not use it to delay care after a severe injury, deformity, or numbness.",
+        "fr": "Ne pas appliquer la glace directement sur la peau ni sur une zone insensible ou mal vascularisée. Ne pas retarder les soins en cas de blessure grave, déformation ou engourdissement."
+      },
+      "redFlags": {
+        "ar": "اطلب رعاية عاجلة إذا كان الألم شديدًا أو يزداد، أو كان التورم كبيرًا، أو تعذر تحميل الوزن، أو ظهر خدر/تغير لون/برودة بالطرف.",
+        "en": "Seek urgent care for severe or worsening pain, major swelling, inability to bear weight, numbness, color change, or a cold limb.",
+        "fr": "Demander rapidement des soins si douleur sévère ou croissante, gonflement important, impossibilité de prendre appui, engourdissement, changement de couleur ou membre froid."
+      },
+      "source": {
+        "title": "NHS: Sprains and strains",
+        "url": "https://www.nhs.uk/conditions/sprains-and-strains/"
+      },
+      "redFlagSource": {
+        "title": "NHS: Sprains and strains",
+        "url": "https://www.nhs.uk/conditions/sprains-and-strains/",
+        "supports": "symptom-specific red flags and when to seek assessment"
+      },
+      "specialPopulations": {
+        "ar": "الحمل أو الرضاعة أو استخدام مميعات الدم: لا تبدأ أعشابًا أو مكملات من أجل الألم دون مراجعة الطبيب/الصيدلي، ولا توقف أو تعدّل دواء موصوف. الإرشاد هنا غير دوائي. مع مميع الدم، أي إصابة بالرأس أو نزف/كدمات غير مفسرة تحتاج نصيحة طبية عاجلة.",
+        "en": "Pregnancy, breastfeeding, or blood thinners: do not start herbs or supplements for pain without clinician/pharmacist advice, and do not stop or change prescribed medicine. This guide is non-drug self-care. If taking an anticoagulant, head injury or unexplained bleeding/bruising needs urgent medical advice.",
+        "fr": "Grossesse, allaitement ou anticoagulants : ne pas commencer de plantes ou compléments contre la douleur sans avis médical/pharmaceutique et ne pas arrêter/modifier un traitement prescrit. Ces conseils sont non médicamenteux. Sous anticoagulant, un traumatisme crânien ou des saignements/ecchymoses inexpliqués nécessitent un avis médical urgent."
+      },
+      "safetySources": [
+        {
+          "title": "NCCIH: Using Dietary Supplements Wisely",
+          "url": "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"
+        },
+        {
+          "title": "NHS: Warfarin — bleeding and medicine interactions",
+          "url": "https://www.nhs.uk/medicines/warfarin/"
+        }
+      ]
+    },
+    {
+      "id": "back-pain-movement-heat",
+      "category": "back_pain",
+      "name": {
+        "ar": "ألم الظهر البسيط: حركة لطيفة وحرارة/برودة حسب الملاءمة",
+        "en": "Mild back pain: gentle activity and suitable heat/cold",
+        "fr": "Lombalgie légère : activité douce et chaleur/froid adaptés"
+      },
+      "instructions": {
+        "ar": "حافظ على نشاط يومي لطيف بدل ملازمة السرير. يمكن تجربة كمادة دافئة ملفوفة لتشنج العضلات أو كمادة باردة ملفوفة لتخفيف الألم، مع حركة وتمدد خفيفين والتوقف إذا زاد الألم.",
+        "en": "Stay gently active rather than staying in bed. A wrapped heat pack may ease muscle spasm, or wrapped cold may reduce pain; try gentle movement and stretches, stopping if pain worsens.",
+        "fr": "Rester doucement actif plutôt que de garder le lit. Une compresse chaude enveloppée peut soulager les spasmes, ou le froid enveloppé la douleur ; essayer des mouvements/étirements doux et arrêter si la douleur augmente."
+      },
+      "evidence": {
+        "level": "clinical_guideline",
+        "ar": "إرشاد NHS للرعاية الذاتية؛ التحسن يختلف حسب السبب.",
+        "en": "NHS self-care guidance; response varies by cause.",
+        "fr": "Conseil d'autosoins du NHS ; la réponse varie selon la cause."
+      },
+      "contraindications": {
+        "ar": "احمِ الجلد من الحرارة والبرودة المباشرة، وتجنب الكمادات على جلد مخدّر أو ضعيف الإحساس. لا تبدأ تمارينًا تزيد الألم.",
+        "en": "Protect skin from direct heat/cold; avoid packs on numb or poorly sensitive skin. Do not continue exercises that increase pain.",
+        "fr": "Protéger la peau de la chaleur/froid directs ; éviter les compresses sur une peau insensible. Ne pas poursuivre un exercice qui augmente la douleur."
+      },
+      "redFlags": {
+        "ar": "ألم الظهر مع ألم صدر، ضعف/خدر بالساقين، فقد الإحساس حول الأعضاء التناسلية، أو تغير التحكم بالبول/البراز يستدعي الطوارئ فورًا.",
+        "en": "Back pain with chest pain, leg weakness/numbness, loss of sensation around the genitals, or bladder/bowel changes requires emergency care.",
+        "fr": "Une lombalgie avec douleur thoracique, faiblesse/engourdissement des jambes, perte de sensation génitale ou troubles urinaires/intestinaux nécessite des soins d'urgence."
+      },
+      "source": {
+        "title": "NHS: Back pain",
+        "url": "https://www.nhs.uk/conditions/back-pain/"
+      },
+      "redFlagSource": {
+        "title": "NHS: Back pain",
+        "url": "https://www.nhs.uk/conditions/back-pain/",
+        "supports": "symptom-specific red flags and when to seek assessment"
+      },
+      "specialPopulations": {
+        "ar": "الحمل أو الرضاعة أو استخدام مميعات الدم: لا تبدأ أعشابًا أو مكملات من أجل الألم دون مراجعة الطبيب/الصيدلي، ولا توقف أو تعدّل دواء موصوف. الإرشاد هنا غير دوائي. مع مميع الدم، أي إصابة بالرأس أو نزف/كدمات غير مفسرة تحتاج نصيحة طبية عاجلة.",
+        "en": "Pregnancy, breastfeeding, or blood thinners: do not start herbs or supplements for pain without clinician/pharmacist advice, and do not stop or change prescribed medicine. This guide is non-drug self-care. If taking an anticoagulant, head injury or unexplained bleeding/bruising needs urgent medical advice.",
+        "fr": "Grossesse, allaitement ou anticoagulants : ne pas commencer de plantes ou compléments contre la douleur sans avis médical/pharmaceutique et ne pas arrêter/modifier un traitement prescrit. Ces conseils sont non médicamenteux. Sous anticoagulant, un traumatisme crânien ou des saignements/ecchymoses inexpliqués nécessitent un avis médical urgent."
+      },
+      "safetySources": [
+        {
+          "title": "NCCIH: Using Dietary Supplements Wisely",
+          "url": "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"
+        },
+        {
+          "title": "NHS: Warfarin — bleeding and medicine interactions",
+          "url": "https://www.nhs.uk/medicines/warfarin/"
+        }
+      ]
+    },
+    {
+      "id": "neck-pain-gentle-care",
+      "category": "neck_pain",
+      "name": {
+        "ar": "ألم الرقبة البسيط: كمادة وحركة هادئة",
+        "en": "Mild neck pain: pack and gentle movement",
+        "fr": "Douleur cervicale légère : compresse et mouvement doux"
+      },
+      "instructions": {
+        "ar": "جرّب كمادة دافئة أو باردة ملفوفة بقماش، وحركة مرونة لطيفة ضمن مدى مريح؛ لا تثبت الرقبة دون توجيه طبي.",
+        "en": "Try a warm or cold pack wrapped in a towel and gentle flexibility movement within a comfortable range; do not immobilize the neck unless advised by a clinician.",
+        "fr": "Essayer une compresse chaude ou froide enveloppée et des mouvements souples dans une amplitude confortable ; ne pas immobiliser le cou sans avis professionnel."
+      },
+      "evidence": {
+        "level": "clinical_guideline",
+        "ar": "إرشاد NHS للرعاية الذاتية لألم الرقبة.",
+        "en": "NHS self-care guidance for neck pain.",
+        "fr": "Conseil d'autosoins du NHS pour les douleurs cervicales."
+      },
+      "contraindications": {
+        "ar": "لا تستخدم حرارة/برودة مباشرة أو على جلد ضعيف الإحساس. بعد إصابة أو حادث، لا تبدأ تمارين الرقبة قبل التقييم.",
+        "en": "Do not apply heat/cold directly or to skin with reduced sensation. After an injury or accident, do not start neck exercises before assessment.",
+        "fr": "Ne pas appliquer chaleur/froid directement ni sur peau insensible. Après blessure ou accident, ne pas commencer d'exercices cervicaux avant évaluation."
+      },
+      "redFlags": {
+        "ar": "اطلب تقييمًا إذا صاحب الألم وخز أو خدر أو برودة في الذراع، أو كان بعد إصابة، أو لم يتحسن.",
+        "en": "Seek assessment if pain comes with pins and needles, numbness, or a cold arm, follows an injury, or does not improve.",
+        "fr": "Demander une évaluation si la douleur s'accompagne de fourmillements, engourdissement ou bras froid, suit une blessure ou ne s'améliore pas."
+      },
+      "source": {
+        "title": "NHS: Neck pain and stiff neck",
+        "url": "https://www.nhs.uk/symptoms/neck-pain-and-stiff-neck/"
+      },
+      "redFlagSource": {
+        "title": "NHS: Neck pain and stiff neck",
+        "url": "https://www.nhs.uk/symptoms/neck-pain-and-stiff-neck/",
+        "supports": "symptom-specific red flags and when to seek assessment"
+      },
+      "specialPopulations": {
+        "ar": "الحمل أو الرضاعة أو استخدام مميعات الدم: لا تبدأ أعشابًا أو مكملات من أجل الألم دون مراجعة الطبيب/الصيدلي، ولا توقف أو تعدّل دواء موصوف. الإرشاد هنا غير دوائي. مع مميع الدم، أي إصابة بالرأس أو نزف/كدمات غير مفسرة تحتاج نصيحة طبية عاجلة.",
+        "en": "Pregnancy, breastfeeding, or blood thinners: do not start herbs or supplements for pain without clinician/pharmacist advice, and do not stop or change prescribed medicine. This guide is non-drug self-care. If taking an anticoagulant, head injury or unexplained bleeding/bruising needs urgent medical advice.",
+        "fr": "Grossesse, allaitement ou anticoagulants : ne pas commencer de plantes ou compléments contre la douleur sans avis médical/pharmaceutique et ne pas arrêter/modifier un traitement prescrit. Ces conseils sont non médicamenteux. Sous anticoagulant, un traumatisme crânien ou des saignements/ecchymoses inexpliqués nécessitent un avis médical urgent."
+      },
+      "safetySources": [
+        {
+          "title": "NCCIH: Using Dietary Supplements Wisely",
+          "url": "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"
+        },
+        {
+          "title": "NHS: Warfarin — bleeding and medicine interactions",
+          "url": "https://www.nhs.uk/medicines/warfarin/"
+        }
+      ]
+    },
+    {
+      "id": "period-pain-heat-movement",
+      "category": "period_pain",
+      "name": {
+        "ar": "تقلصات الدورة: دفء وحركة خفيفة",
+        "en": "Period cramps: warmth and gentle movement",
+        "fr": "Crampes menstruelles : chaleur et mouvement doux"
+      },
+      "instructions": {
+        "ar": "حمام دافئ أو كمادة/قِربة دافئة ملفوفة على البطن، تدليك لطيف للبطن أو الظهر، ونشاط خفيف مثل المشي أو اليوغا قد يساعد. أوقف أي شيء يزيد الألم.",
+        "en": "A warm bath or a wrapped heat pad/hot-water bottle on the abdomen, gentle abdominal/back massage, and light activity such as walking or yoga may help. Stop anything that worsens pain.",
+        "fr": "Un bain chaud ou une bouillotte/compresse enveloppée sur le ventre, un massage doux du ventre/dos et une activité légère comme la marche ou le yoga peuvent aider. Arrêter si la douleur augmente."
+      },
+      "evidence": {
+        "level": "clinical_guideline",
+        "ar": "خيارات مساعدة موصى بها ذاتيًا من NHS؛ الألم الشديد أو المتغير يحتاج تقييمًا.",
+        "en": "NHS-listed self-care options; severe or changing pain needs assessment.",
+        "fr": "Options d'autosoins citées par le NHS ; une douleur sévère ou changeante nécessite une évaluation."
+      },
+      "contraindications": {
+        "ar": "لفّ مصدر الحرارة لتجنب الحروق، ولا تنم فوقه. لا تضغط على البطن أثناء الحمل المحتمل أو عند ألم بطني حاد غير مفسر.",
+        "en": "Wrap heat sources to prevent burns and do not sleep on them. Avoid abdominal pressure if pregnancy is possible or pain is acute and unexplained.",
+        "fr": "Envelopper la source de chaleur pour éviter les brûlures et ne pas dormir dessus. Éviter la pression abdominale si une grossesse est possible ou si la douleur aiguë est inexpliquée."
+      },
+      "redFlags": {
+        "ar": "اطلب تقييمًا عاجلًا إذا كان ألم الحوض شديدًا أو أسوأ من المعتاد ولم تساعد الرعاية المعتادة؛ راجعي الطبيب إذا أصبح الألم متكررًا أو مع نزيف غير معتاد.",
+        "en": "Seek urgent assessment for severe or unusually worse pelvic pain not helped by usual care; consult a clinician for recurrent pain or unusual bleeding.",
+        "fr": "Demander une évaluation urgente si la douleur pelvienne est sévère ou bien pire que d'habitude et ne cède pas ; consulter en cas de récidive ou saignement inhabituel."
+      },
+      "source": {
+        "title": "NHS: Period pain",
+        "url": "https://www.nhs.uk/symptoms/period-pain/"
+      },
+      "redFlagSource": {
+        "title": "NHS: Period pain",
+        "url": "https://www.nhs.uk/symptoms/period-pain/",
+        "supports": "symptom-specific red flags and when to seek assessment"
+      },
+      "specialPopulations": {
+        "ar": "الحمل أو الرضاعة أو استخدام مميعات الدم: لا تبدأ أعشابًا أو مكملات من أجل الألم دون مراجعة الطبيب/الصيدلي، ولا توقف أو تعدّل دواء موصوف. الإرشاد هنا غير دوائي. مع مميع الدم، أي إصابة بالرأس أو نزف/كدمات غير مفسرة تحتاج نصيحة طبية عاجلة.",
+        "en": "Pregnancy, breastfeeding, or blood thinners: do not start herbs or supplements for pain without clinician/pharmacist advice, and do not stop or change prescribed medicine. This guide is non-drug self-care. If taking an anticoagulant, head injury or unexplained bleeding/bruising needs urgent medical advice.",
+        "fr": "Grossesse, allaitement ou anticoagulants : ne pas commencer de plantes ou compléments contre la douleur sans avis médical/pharmaceutique et ne pas arrêter/modifier un traitement prescrit. Ces conseils sont non médicamenteux. Sous anticoagulant, un traumatisme crânien ou des saignements/ecchymoses inexpliqués nécessitent un avis médical urgent."
+      },
+      "safetySources": [
+        {
+          "title": "NCCIH: Using Dietary Supplements Wisely",
+          "url": "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"
+        },
+        {
+          "title": "NHS: Warfarin — bleeding and medicine interactions",
+          "url": "https://www.nhs.uk/medicines/warfarin/"
+        }
+      ]
+    },
+    {
+      "id": "headache-hydration-rest",
+      "category": "headache",
+      "name": {
+        "ar": "الصداع المعتاد: ماء وراحة وتقليل المحفزات",
+        "en": "Common headache: water, rest, and reducing triggers",
+        "fr": "Céphalée courante : eau, repos et réduction des facteurs déclenchants"
+      },
+      "instructions": {
+        "ar": "اشرب ماءً، استرح إذا كنت مريضًا أو مرهقًا، جرّب الاسترخاء، لا تفوّت الوجبات، وخذ استراحة من الشاشة. هذه الخطوات لا تناسب الصداع المفاجئ الشديد أو المصحوب بعلامات عصبية.",
+        "en": "Drink water, rest if unwell or tired, try relaxation, do not skip meals, and take a screen break. These steps are not appropriate as a substitute for care for sudden severe headache or neurological symptoms.",
+        "fr": "Boire de l'eau, se reposer en cas de maladie/fatigue, essayer la relaxation, ne pas sauter de repas et faire une pause d'écran. Ces mesures ne remplacent pas les soins en cas de céphalée brutale intense ou de signes neurologiques."
+      },
+      "evidence": {
+        "level": "clinical_guideline",
+        "ar": "نصائح NHS للتعامل الذاتي مع الصداع الشائع.",
+        "en": "NHS self-care advice for common headaches.",
+        "fr": "Conseils d'autosoins du NHS pour les céphalées courantes."
+      },
+      "contraindications": {
+        "ar": "لا تؤخر الرعاية إذا كان الصداع شديدًا مفاجئًا، بعد إصابة الرأس، أو مع ضعف/خدر أو اضطراب كلام/توازن/رؤية أو حمى وتيبس رقبة.",
+        "en": "Do not delay care for sudden severe headache, after head injury, or with weakness/numbness, speech/balance/vision problems, fever, or stiff neck.",
+        "fr": "Ne pas retarder les soins en cas de céphalée brutale intense, après traumatisme crânien ou avec faiblesse/engourdissement, troubles de parole/équilibre/vision, fièvre ou raideur de nuque."
+      },
+      "redFlags": {
+        "ar": "اتصل بالطوارئ فورًا عند صداع مفاجئ شديد جدًا أو تشنج أو ضعف/خدر أو صعوبة كلام/مشي أو فقد رؤية أو ارتباك.",
+        "en": "Call emergency services for a sudden extremely painful headache, seizure, weakness/numbness, difficulty speaking/walking, vision loss, or confusion.",
+        "fr": "Appeler les urgences en cas de céphalée brutale extrême, convulsion, faiblesse/engourdissement, difficulté à parler/marcher, perte de vision ou confusion."
+      },
+      "source": {
+        "title": "NHS: Headaches",
+        "url": "https://www.nhs.uk/symptoms/headaches/"
+      },
+      "redFlagSource": {
+        "title": "NHS: Headaches",
+        "url": "https://www.nhs.uk/symptoms/headaches/",
+        "supports": "symptom-specific red flags and when to seek assessment"
+      },
+      "specialPopulations": {
+        "ar": "الحمل أو الرضاعة أو استخدام مميعات الدم: لا تبدأ أعشابًا أو مكملات من أجل الألم دون مراجعة الطبيب/الصيدلي، ولا توقف أو تعدّل دواء موصوف. الإرشاد هنا غير دوائي. مع مميع الدم، أي إصابة بالرأس أو نزف/كدمات غير مفسرة تحتاج نصيحة طبية عاجلة.",
+        "en": "Pregnancy, breastfeeding, or blood thinners: do not start herbs or supplements for pain without clinician/pharmacist advice, and do not stop or change prescribed medicine. This guide is non-drug self-care. If taking an anticoagulant, head injury or unexplained bleeding/bruising needs urgent medical advice.",
+        "fr": "Grossesse, allaitement ou anticoagulants : ne pas commencer de plantes ou compléments contre la douleur sans avis médical/pharmaceutique et ne pas arrêter/modifier un traitement prescrit. Ces conseils sont non médicamenteux. Sous anticoagulant, un traumatisme crânien ou des saignements/ecchymoses inexpliqués nécessitent un avis médical urgent."
+      },
+      "safetySources": [
+        {
+          "title": "NCCIH: Using Dietary Supplements Wisely",
+          "url": "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"
+        },
+        {
+          "title": "NHS: Warfarin — bleeding and medicine interactions",
+          "url": "https://www.nhs.uk/medicines/warfarin/"
+        }
+      ]
+    },
+    {
+      "id": "nausea-small-sips",
+      "category": "nausea",
+      "name": {
+        "ar": "غثيان خفيف: رشفات سوائل ومراقبة الجفاف",
+        "en": "Mild nausea: small sips and watch for dehydration",
+        "fr": "Nausée légère : petites gorgées et surveillance de la déshydratation"
+      },
+      "instructions": {
+        "ar": "جرّب رشفات صغيرة ومتكررة من السوائل بدل كمية كبيرة دفعة واحدة. إذا كان القيء مستمرًا، أو لم تستطع الاحتفاظ بالسوائل، أو ظهرت علامات جفاف، اطلب نصيحة طبية/صيدلية؛ قد تناسب محاليل الإماهة بعض الحالات.",
+        "en": "Try frequent small sips of fluid rather than a large amount at once. If vomiting continues, you cannot keep fluids down, or dehydration signs appear, seek medical/pharmacy advice; oral rehydration solution may suit some cases.",
+        "fr": "Essayer de petites gorgées fréquentes plutôt qu'une grande quantité à la fois. Si les vomissements persistent, si les liquides ne restent pas ou si des signes de déshydratation apparaissent, demander conseil médical/pharmaceutique ; une solution de réhydratation peut convenir dans certains cas."
+      },
+      "evidence": {
+        "level": "clinical_guideline",
+        "ar": "إرشاد NHS للجفاف؛ لا يعالج سبب الغثيان.",
+        "en": "NHS dehydration guidance; it does not treat the cause of nausea.",
+        "fr": "Conseil NHS sur la déshydratation ; ne traite pas la cause de la nausée."
+      },
+      "contraindications": {
+        "ar": "إذا لديك تقييد سوائل بسبب القلب أو الكلى أو حالة أخرى، اتبع خطة الطبيب بدل زيادة السوائل تلقائيًا.",
+        "en": "If you have a fluid restriction for heart, kidney, or another condition, follow your clinician's plan rather than increasing fluids automatically.",
+        "fr": "En cas de restriction hydrique liée au cœur, aux reins ou à une autre maladie, suivre le plan du professionnel plutôt que d'augmenter automatiquement les apports."
+      },
+      "redFlags": {
+        "ar": "اطلب رعاية عاجلة عند علامات جفاف واضحة، تدهور سريع، دم في القيء، إغماء، أو عدم القدرة على الاحتفاظ بالسوائل.",
+        "en": "Seek urgent care for clear dehydration, rapid deterioration, blood in vomit, fainting, or inability to keep fluids down.",
+        "fr": "Demander rapidement des soins en cas de déshydratation manifeste, aggravation rapide, sang dans les vomissements, évanouissement ou impossibilité de garder les liquides."
+      },
+      "source": {
+        "title": "NHS: Dehydration",
+        "url": "https://www.nhs.uk/conditions/dehydration/"
+      },
+      "redFlagSource": {
+        "title": "NHS: Dehydration",
+        "url": "https://www.nhs.uk/conditions/dehydration/",
+        "supports": "symptom-specific red flags and when to seek assessment"
+      },
+      "specialPopulations": {
+        "ar": "الحمل أو الرضاعة أو استخدام مميعات الدم: لا تبدأ أعشابًا أو مكملات من أجل الألم دون مراجعة الطبيب/الصيدلي، ولا توقف أو تعدّل دواء موصوف. الإرشاد هنا غير دوائي. مع مميع الدم، أي إصابة بالرأس أو نزف/كدمات غير مفسرة تحتاج نصيحة طبية عاجلة.",
+        "en": "Pregnancy, breastfeeding, or blood thinners: do not start herbs or supplements for pain without clinician/pharmacist advice, and do not stop or change prescribed medicine. This guide is non-drug self-care. If taking an anticoagulant, head injury or unexplained bleeding/bruising needs urgent medical advice.",
+        "fr": "Grossesse, allaitement ou anticoagulants : ne pas commencer de plantes ou compléments contre la douleur sans avis médical/pharmaceutique et ne pas arrêter/modifier un traitement prescrit. Ces conseils sont non médicamenteux. Sous anticoagulant, un traumatisme crânien ou des saignements/ecchymoses inexpliqués nécessitent un avis médical urgent."
+      },
+      "safetySources": [
+        {
+          "title": "NCCIH: Using Dietary Supplements Wisely",
+          "url": "https://www.nccih.nih.gov/health/using-dietary-supplements-wisely"
+        },
+        {
+          "title": "NHS: Warfarin — bleeding and medicine interactions",
+          "url": "https://www.nhs.uk/medicines/warfarin/"
+        }
+      ]
+    }
+  ],
+  "organPainNotice": {
+    "ar": "لا يمكن تحديد العضو المصاب من مكان الألم وحده. لا توجد هنا علاجات منزلية لآلام الصدر أو البطن/الخاصرة غير المفسرة؛ اطلب تقييمًا، والطوارئ فورًا عند ألم الصدر أو ضيق النفس أو الإغماء.",
+    "en": "Pain location alone cannot identify an affected organ. This app does not offer home remedies for unexplained chest, abdominal, or flank pain; seek assessment and emergency help for chest pain, breathlessness, or fainting.",
+    "fr": "La localisation seule ne permet pas d'identifier un organe atteint. L'application ne propose pas de remède domestique pour une douleur thoracique, abdominale ou lombaire inexpliquée ; demander une évaluation, et appeler les urgences pour douleur thoracique, essoufflement ou évanouissement."
+  },
+  "organRedFlagSource": {
+    "title": "NHS: Heart attack symptoms",
+    "url": "https://www.nhs.uk/conditions/heart-attack/"
+  }
+}
