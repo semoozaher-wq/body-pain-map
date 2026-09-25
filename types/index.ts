@@ -43,6 +43,8 @@ export type Checkup = {
   sleepHours?: number;
   activity?: string;
   urgent?: boolean;
+  triageStatus?: 'routine' | 'high_reported_intensity' | 'urgent';
+  redFlags?: string[];
   afterIntensity?: number;
   selfCareGuide?: string;
   selfCarePointId?: string;
