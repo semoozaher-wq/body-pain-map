@@ -45,6 +45,7 @@ export type Checkup = {
   urgent?: boolean;
   triageStatus?: 'routine' | 'high_reported_intensity' | 'urgent';
   redFlags?: string[];
+  symptoms?: string[];
   afterIntensity?: number;
   selfCareGuide?: string;
   selfCarePointId?: string;
