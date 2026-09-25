@@ -18,12 +18,15 @@
   "results": "Résumé des conseils",
   "body": "Choisissez la zone douloureuse",
   "historyTitle": "Examens précédents",
+  "historyButton": "Historique",
+  "quickLog": { "neck": "Cou", "shoulder": "Épaule", "lowerBack": "Bas du dos", "chest": "Poitrine", "abdomen": "Abdomen" },
   "welcome": {
     "statParts": "Parties",
     "statGroups": "Groupes",
     "statLocal": "Local",
     "warningText": "L'application est éducative et ne fournit pas de diagnostic. En cas de douleur sévère ou soudaine, d'essoufflement ou d'évanouissement, demandez une aide urgente.",
-    "disclaimer": "Les informations sont générales et ne remplacent pas la consultation d'un médecin qualifié."
+    "disclaimer": "Les informations sont générales et ne remplacent pas la consultation d'un médecin qualifié.",
+    "quickCare": "Autosoins rapides pour le cou, le dos et l’avant-bras"
   },
   "history": {
     "helperText": "Les examens sont enregistrés sur cet appareil uniquement. Ils ne sont pas téléchargés sur un serveur.",
@@ -43,7 +46,13 @@
     "redFlagsHint": "Si un signe apparaît, ne tardez pas à demander des soins médicaux.",
     "notesTitle": "Notes supplémentaires",
     "notesPlaceholder": "Exemple : Augmente avec le mouvement...",
-    "showGuidance": "Afficher les conseils"
+    "showGuidance": "Afficher les conseils",
+    "contextTitle": "Facteurs à suivre avec la douleur",
+    "contextHint": "Notez seulement ce que vous avez observé ; cela ne prouve pas qu’un facteur a causé la douleur.",
+    "medicationPlaceholder": "Médicament ou traitement utilisé (facultatif)",
+    "triggersPlaceholder": "Déclencheur possible observé (facultatif)",
+    "sleepPlaceholder": "Heures de sommeil la nuit dernière (facultatif)",
+    "activityPlaceholder": "Activité ou effort observé (facultatif)"
   },
   "results": {
     "selectedPart": "Partie sélectionnée",

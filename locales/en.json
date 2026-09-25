@@ -18,12 +18,15 @@
   "results": "Guidance summary",
   "body": "Choose pain location",
   "historyTitle": "Previous checks",
+  "historyButton": "History",
+  "quickLog": { "neck": "Neck", "shoulder": "Shoulder", "lowerBack": "Lower back", "chest": "Chest", "abdomen": "Abdomen" },
   "welcome": {
     "statParts": "Parts",
     "statGroups": "Groups",
     "statLocal": "Local",
     "warningText": "The app is educational and does not provide a diagnosis. In case of severe or sudden pain, shortness of breath, or fainting, seek urgent help.",
-    "disclaimer": "Information is general and does not replace consultation with a qualified doctor."
+    "disclaimer": "Information is general and does not replace consultation with a qualified doctor.",
+    "quickCare": "Quick self-care for neck, back and forearm"
   },
   "history": {
     "helperText": "Checks are saved on this device only. They are not uploaded to any server.",
@@ -43,7 +46,13 @@
     "redFlagsHint": "If any sign appears, do not delay seeking medical care.",
     "notesTitle": "Additional Notes",
     "notesPlaceholder": "Example: Increases with movement...",
-    "showGuidance": "Show Guidance"
+    "showGuidance": "Show Guidance",
+    "contextTitle": "Factors to track alongside pain",
+    "contextHint": "Record what you noticed only; this does not establish that a factor caused the pain.",
+    "medicationPlaceholder": "Medication or treatment used (optional)",
+    "triggersPlaceholder": "Possible trigger noticed (optional)",
+    "sleepPlaceholder": "Hours of sleep last night (optional)",
+    "activityPlaceholder": "Activity or exertion noticed (optional)"
   },
   "results": {
     "selectedPart": "Selected Part",
