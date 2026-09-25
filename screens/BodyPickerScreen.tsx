@@ -1,428 +1,332 @@
-import React, { useState, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Modal,
-  Image,
-  Pressable,
-} from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { BodySilhouette, type BodyView, type Gender } from 'react-native-body-parts-anatomy';
 import rawAnatomyData from '../data/anatomyPainMap.json';
 import hotspotsData from '../data/anatomyHotspots.json';
 import organDetails from '../data/organDetails.json';
 import { translate } from '../services/i18n';
+import type { Muscle } from '../types';
+import { PainReliefPanel } from '../components/PainReliefPanel';
+import { cleanData } from '../data/cleanData';
 
-// دالة تنظيف المسافات الزائدة
-function cleanData(obj: any): any {
-  if (typeof obj === 'string') return obj.trim();
-  if (Array.isArray(obj)) return obj.map(cleanData);
-  if (obj !== null && typeof obj === 'object') {
-    const cleaned: any = {};
-    for (const [key, value] of Object.entries(obj)) {
-      cleaned[key.trim()] = cleanData(value);
-    }
-    return cleaned;
-  }
-  return obj;
-}
+type PickerMuscle = Muscle & { labelEn?: string };
+type Organ = (typeof organDetails)[keyof typeof organDetails];
+type Hotspot = {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  view: 'front' | 'back';
+  type: 'muscle' | 'organ';
+  muscleId?: string;
+  organId?: string;
+};
+const anatomyData = cleanData(rawAnatomyData) as { muscles: Record<string, PickerMuscle> };
+const hotspots = hotspotsData as unknown as Hotspot[];
+const organs = organDetails as unknown as Record<string, Organ>;
+type Selection =
+  | { kind: 'muscle'; label: string; muscle: Muscle }
+  | { kind: 'organ'; label: string; organ: Organ };
+type SelfCareResult = { guideKey: string; pointId?: string; before: number; after: number };
 
-const anatomyData = cleanData(rawAnatomyData);
-
-interface BodyPickerScreenProps {
-  onNavigateToDetails: (muscleData: any) => void;
-  onBack?: () => void;
+type BodyPickerScreenProps = {
+  onNavigateToDetails: (muscle: Muscle) => void;
+  onSaveSelfCare: (result: SelfCareResult) => void;
   language: 'ar' | 'en' | 'fr';
   direction: 'rtl' | 'ltr';
-}
+  quickRelief: boolean;
+};
+
+const quickGuides = ['neck', 'upper-back', 'lower-back', 'forearm'] as const;
 
 export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   onNavigateToDetails,
-  onBack,
+  onSaveSelfCare,
   language,
+  direction,
+  quickRelief,
 }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
-  const [activeView, setActiveView] = useState<'front' | 'back'>('front');
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [activeView, setActiveView] = useState<BodyView>('front');
+  const [gender, setGender] = useState<Gender>('male');
+  const [selectedMuscleId, setSelectedMuscleId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [selectedItem, setSelectedItem] = useState<Selection | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [showOrganMode, setShowOrganMode] = useState(false);
+  const [quickGuide, setQuickGuide] = useState<(typeof quickGuides)[number]>('neck');
 
-  // تصفية النقاط حسب العرض الحالي
-  const visibleHotspots = useMemo(() => {
-    return hotspotsData.filter((h: any) => h.view === activeView);
-  }, [activeView]);
+  const visibleHotspots = useMemo(
+    () => hotspots.filter((hotspot) => hotspot.view === activeView && hotspot.type === 'organ'),
+    [activeView],
+  );
+  const matchingMuscles = useMemo(() => {
+    const query = search.trim().toLocaleLowerCase();
+    return Object.values(anatomyData.muscles).filter((muscle) => {
+      if (!muscle.id.includes(`-${gender}-${activeView}-`)) return false;
+      if (!query) return false;
+      return `${muscle.partNumber} ${muscle.id} ${muscle.labelAr} ${muscle.labelEn ?? ''}`
+        .toLocaleLowerCase()
+        .includes(query);
+    }).slice(0, 12);
+  }, [activeView, gender, search]);
 
-  // عند الضغط على أي نقطة
-  const handlePress = (hotspot: any) => {
-    if (hotspot.type === 'organ') {
-      // عرض معلومات العضو الداخلي
-      const organ = organDetails[hotspot.organId];
+  const showMuscle = (muscle: Muscle) => {
+    setSelectedMuscleId(muscle.id);
+    setSelectedItem({ kind: 'muscle', label: muscle.labelAr, muscle });
+    setShowDetails(true);
+  };
+
+  const handleFragmentPress = (fragmentSlug: string) => {
+    const muscle = anatomyData.muscles[fragmentSlug];
+    if (muscle) showMuscle(muscle);
+  };
+
+  const handleHotspotPress = (hotspot: Hotspot) => {
+    if (hotspot.type === 'organ' && hotspot.organId) {
+      const organ = organs[hotspot.organId];
       if (organ) {
-        setSelectedItem({ ...hotspot, organData: organ });
+        setSelectedItem({ kind: 'organ', label: hotspot.label, organ });
         setShowDetails(true);
       }
-    } else {
-      // عرض معلومات العضلة
-      const muscle = anatomyData.muscles?.[hotspot.muscleId];
-      if (muscle) {
-        setSelectedItem({ ...hotspot, muscleData: muscle });
-        setShowDetails(true);
-      } else {
-        // إذا لم نجد العضلة، نعرض رسالة
-        setSelectedItem({ ...hotspot, error: 'لم يتم العثور على بيانات هذا الجزء' });
-        setShowDetails(true);
-      }
+    } else if (hotspot.muscleId) {
+      const muscle = anatomyData.muscles[hotspot.muscleId];
+      if (muscle) showMuscle(muscle);
     }
   };
 
-  const handleGoToDetails = () => {
-    if (selectedItem?.muscleData) {
-      setShowDetails(false);
-      onNavigateToDetails(selectedItem.muscleData);
-    }
-  };
+  const dismissDetails = () => setShowDetails(false);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        {onBack && (
-          <TouchableOpacity onPress={onBack} style={styles.backButton}>
-            <Text style={styles.backText}>← {t('back')}</Text>
-          </TouchableOpacity>
-        )}
-        <Text style={styles.title}>{t('bodyPicker.title')}</Text>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.content}>
-        {/* زر تبديل الوضع: عضلات / أعضاء داخلية */}
-        <View style={styles.modeToggle}>
-          <TouchableOpacity
-            style={[styles.modeButton, !showOrganMode && styles.activeMode]}
-            onPress={() => setShowOrganMode(false)}
-          >
-            <Text style={[styles.modeText, !showOrganMode && styles.activeModeText]}>
-               العضلات
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.modeButton, showOrganMode && styles.activeMode]}
-            onPress={() => setShowOrganMode(true)}
-          >
-            <Text style={[styles.modeText, showOrganMode && styles.activeModeText]}>
-              🫀 أعضاء داخلية
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* أزرار التبديل أمامي/خلفي */}
-        <View style={styles.viewToggle}>
-          <TouchableOpacity
-            style={[styles.toggleButton, activeView === 'front' && styles.activeToggle]}
-            onPress={() => setActiveView('front')}
-          >
-            <Text style={[styles.toggleText, activeView === 'front' && styles.activeToggleText]}>
-              أمامي
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.toggleButton, activeView === 'back' && styles.activeToggle]}
-            onPress={() => setActiveView('back')}
-          >
-            <Text style={[styles.toggleText, activeView === 'back' && styles.activeToggleText]}>
-              خلفي
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* الصورة مع النقاط التفاعلية */}
-        <View style={styles.imageContainer}>
-          <Image
-            source={
-              activeView === 'front'
-                ? require('../assets/anatomy/muscle-front-realistic.png')
-                : require('../assets/anatomy/muscle-back-realistic.png')
-            }
-            style={styles.bodyImage}
-            resizeMode="contain"
-          />
-
-          {visibleHotspots
-            .filter((h: any) => showOrganMode ? h.type === 'organ' : h.type === 'muscle')
-            .map((spot: any) => (
+    <View style={styles.container}>
+      {quickRelief ? (
+        <View>
+          <Text style={styles.heading}>{t('bodyPicker.quickCareTitle')}</Text>
+          <Text style={styles.helper}>{t('bodyPicker.quickCareHint')}</Text>
+          <View style={styles.chipRow}>
+            {quickGuides.map((key) => (
               <Pressable
-                key={spot.id}
-                style={[
-                  styles.hotspot,
-                  { left: `${spot.x}%`, top: `${spot.y}%` },
-                ]}
-                onPress={() => handlePress(spot)}
+                key={key}
+                onPress={() => setQuickGuide(key)}
+                accessibilityRole="button"
+                accessibilityState={{ selected: quickGuide === key }}
+                style={[styles.chip, quickGuide === key && styles.activeChip]}
               >
-                <View style={[
-                  styles.hotspotDot,
-                  spot.type === 'organ' && styles.organDot
-                ]} />
-                <Text style={styles.hotspotLabel}>{spot.label}</Text>
+                <Text style={[styles.chipText, quickGuide === key && styles.activeChipText]}>
+                  {t(`bodyPicker.guide.${key}`)}
+                </Text>
               </Pressable>
             ))}
+          </View>
+          <PainReliefPanel guideKey={quickGuide} onSaveResult={onSaveSelfCare} />
         </View>
+      ) : (
+        <>
+          <View style={styles.modeToggle}>
+            <Pressable
+              style={[styles.modeButton, !showOrganMode && styles.modeActive]}
+              onPress={() => setShowOrganMode(false)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: !showOrganMode }}
+            >
+              <Text style={[styles.modeText, !showOrganMode && styles.modeTextActive]}>{t('bodyPicker.muscles')}</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.modeButton, showOrganMode && styles.modeActive]}
+              onPress={() => setShowOrganMode(true)}
+              accessibilityRole="button"
+              accessibilityState={{ selected: showOrganMode }}
+            >
+              <Text style={[styles.modeText, showOrganMode && styles.modeTextActive]}>{t('bodyPicker.organs')}</Text>
+            </Pressable>
+          </View>
 
-        <Text style={styles.hint}>
-          💡 اضغط على أي نقطة لعرض المعلومات فوراً
-        </Text>
-      </ScrollView>
+          <View style={styles.toggleRow}>
+            <Pressable
+              style={[styles.toggleButton, gender === 'male' && styles.activeToggle]}
+              onPress={() => setGender('male')}
+              accessibilityRole="button"
+              accessibilityState={{ selected: gender === 'male' }}
+            ><Text style={[styles.toggleText, gender === 'male' && styles.activeToggleText]}>{t('bodyPicker.male')}</Text></Pressable>
+            <Pressable
+              style={[styles.toggleButton, gender === 'female' && styles.activeToggle]}
+              onPress={() => setGender('female')}
+              accessibilityRole="button"
+              accessibilityState={{ selected: gender === 'female' }}
+            ><Text style={[styles.toggleText, gender === 'female' && styles.activeToggleText]}>{t('bodyPicker.female')}</Text></Pressable>
+          </View>
 
-      {/* Modal عرض المعلومات */}
-      <Modal
-        visible={showDetails}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowDetails(false)}
-      >
+          <View style={styles.toggleRow}>
+            <Pressable
+              style={[styles.toggleButton, activeView === 'front' && styles.activeToggle]}
+              onPress={() => setActiveView('front')}
+              accessibilityRole="button"
+              accessibilityState={{ selected: activeView === 'front' }}
+            ><Text style={[styles.toggleText, activeView === 'front' && styles.activeToggleText]}>{t('bodyPicker.front')}</Text></Pressable>
+            <Pressable
+              style={[styles.toggleButton, activeView === 'back' && styles.activeToggle]}
+              onPress={() => setActiveView('back')}
+              accessibilityRole="button"
+              accessibilityState={{ selected: activeView === 'back' }}
+            ><Text style={[styles.toggleText, activeView === 'back' && styles.activeToggleText]}>{t('bodyPicker.backView')}</Text></Pressable>
+          </View>
+
+          {showOrganMode ? (
+            <>
+              <Text style={styles.helper}>{t('bodyPicker.organHint')}</Text>
+              <View style={styles.imageContainer}>
+                <Image
+                  source={activeView === 'front'
+                    ? require('../assets/anatomy/muscle-front-realistic.png')
+                    : require('../assets/anatomy/muscle-back-realistic.png')}
+                  style={styles.bodyImage}
+                  resizeMode="contain"
+                  accessibilityLabel={t('bodyPicker.bodyImageLabel')}
+                />
+                {visibleHotspots.map((spot) => (
+                  <Pressable
+                    key={spot.id}
+                    style={[styles.organHotspot, { left: `${spot.x}%`, top: `${spot.y}%` }]}
+                    onPress={() => handleHotspotPress(spot)}
+                    accessibilityRole="button"
+                    accessibilityLabel={spot.label}
+                  >
+                    <View style={styles.organDot} />
+                    <Text style={styles.hotspotLabel}>{spot.label}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            </>
+          ) : (
+            <>
+              <Text style={styles.helper}>{t('bodyPicker.anatomyMapHint')}</Text>
+              <BodySilhouette
+                gender={gender}
+                view={activeView}
+                selectedSlugs={selectedMuscleId ? [selectedMuscleId] : []}
+                onFragmentPress={handleFragmentPress}
+                accessibilityLabel={t('bodyPicker.mapAccessibilityLabel')}
+                hitTolerance={12}
+                zoomable
+              />
+              <TextInput
+                value={search}
+                onChangeText={setSearch}
+                placeholder={t('bodyPicker.searchPlaceholder')}
+                placeholderTextColor="#73838B"
+                style={[styles.search, { textAlign: direction === 'rtl' ? 'right' : 'left' }]}
+                accessibilityLabel={t('bodyPicker.searchLabel')}
+                returnKeyType="search"
+              />
+              {search.trim() ? (
+                <View style={styles.searchResults}>
+                  {matchingMuscles.length ? matchingMuscles.map((muscle) => (
+                    <Pressable
+                      key={muscle.id}
+                      onPress={() => showMuscle(muscle)}
+                      style={styles.searchResult}
+                      accessibilityRole="button"
+                    >
+                      <Text style={styles.resultTitle}>{muscle.labelAr}</Text>
+                      <Text style={styles.resultMeta}>#{muscle.partNumber} · {muscle.locationAr}</Text>
+                    </Pressable>
+                  )) : <Text style={styles.emptyText}>{t('bodyPicker.noSearchResults')}</Text>}
+                </View>
+              ) : null}
+            </>
+          )}
+        </>
+      )}
+
+      <Modal visible={showDetails} animationType="slide" transparent onRequestClose={dismissDetails}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                {selectedItem?.type === 'organ' ? '🫀' : '💪'} {selectedItem?.label}
-              </Text>
-              <TouchableOpacity onPress={() => setShowDetails(false)}>
+              <Text style={styles.modalTitle}>{selectedItem?.label ?? ''}</Text>
+              <Pressable onPress={dismissDetails} accessibilityRole="button" accessibilityLabel={t('back')}>
                 <Text style={styles.closeButton}>✕</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
-
             <ScrollView style={styles.modalBody}>
-              {selectedItem?.error ? (
-                <Text style={styles.errorText}>{selectedItem.error}</Text>
-              ) : selectedItem?.type === 'organ' ? (
-                // عرض معلومات العضو
+              {selectedItem?.kind === 'organ' ? (
                 <>
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoLabel}>📍 الموقع:</Text>
-                    <Text style={styles.infoText}>{selectedItem.organData.location}</Text>
-                  </View>
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoLabel}>️ تلميح بصري:</Text>
-                    <Text style={styles.infoText}>{selectedItem.organData.visualHint}</Text>
-                  </View>
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoLabel}>⚠️ الأعراض الشائعة:</Text>
-                    {selectedItem.organData.symptoms.map((s: string, i: number) => (
-                      <Text key={i} style={styles.listItem}>• {s}</Text>
-                    ))}
-                  </View>
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoLabel}>🔍 الأسباب المحتملة:</Text>
-                    {selectedItem.organData.causes.map((c: string, i: number) => (
-                      <Text key={i} style={styles.listItem}>• {c}</Text>
-                    ))}
-                  </View>
-                  {selectedItem.organData.warning && (
-                    <View style={[styles.infoCard, styles.warningCard]}>
-                      <Text style={styles.warningText}>{selectedItem.organData.warning}</Text>
-                    </View>
-                  )}
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoLabel}>💊 التوصية:</Text>
-                    <Text style={styles.infoText}>{selectedItem.organData.recommendation}</Text>
-                  </View>
+                  <Info title={t('bodyPicker.location')} text={selectedItem.organ.location} />
+                  <Info title={t('bodyPicker.visualHint')} text={selectedItem.organ.visualHint} />
+                  <Info title={t('bodyPicker.symptoms')} text={selectedItem.organ.symptoms.join(' • ')} />
+                  <Info title={t('bodyPicker.causes')} text={selectedItem.organ.causes.join(' • ')} />
+                  {selectedItem.organ.warning ? <Info title={t('bodyPicker.warning')} text={selectedItem.organ.warning} warning /> : null}
+                  <Info title={t('bodyPicker.recommendation')} text={selectedItem.organ.recommendation} />
                 </>
-              ) : (
-                // عرض معلومات العضلة
+              ) : selectedItem?.kind === 'muscle' ? (
                 <>
-                  <View style={styles.partBadge}>
-                    <Text style={styles.partBadgeText}>
-                      جزء #{selectedItem.muscleData.partNumber}
-                    </Text>
-                  </View>
-                  <View style={styles.infoCard}>
-                    <Text style={styles.infoLabel}>📍 الموقع:</Text>
-                    <Text style={styles.infoText}>{selectedItem.muscleData.locationAr}</Text>
-                  </View>
-                  {selectedItem.muscleData.commonCauses?.length > 0 && (
-                    <View style={styles.infoCard}>
-                      <Text style={styles.infoLabel}>💡 الأسباب الشائعة:</Text>
-                      {selectedItem.muscleData.commonCauses.map((c: string, i: number) => (
-                        <Text key={i} style={styles.listItem}>• {c}</Text>
-                      ))}
-                    </View>
-                  )}
-                  {selectedItem.muscleData.warning && (
-                    <View style={[styles.infoCard, styles.warningCard]}>
-                      <Text style={styles.warningLabel}>⚠️ تحذير:</Text>
-                      <Text style={styles.warningText}>{selectedItem.muscleData.warning}</Text>
-                    </View>
-                  )}
-                  {selectedItem.muscleData.recommendation && (
-                    <View style={styles.infoCard}>
-                      <Text style={styles.infoLabel}>💊 التوصية:</Text>
-                      <Text style={styles.infoText}>{selectedItem.muscleData.recommendation}</Text>
-                    </View>
-                  )}
-                  <TouchableOpacity style={styles.actionButton} onPress={handleGoToDetails}>
-                    <Text style={styles.actionButtonText}>
-                      📋 انتقل لوصف الألم والتفاصيل
-                    </Text>
-                  </TouchableOpacity>
+                  <Text style={styles.partBadge}>#{selectedItem.muscle.partNumber} · {selectedItem.muscle.locationAr}</Text>
+                  <Info title={t('bodyPicker.causes')} text={selectedItem.muscle.commonCauses.join(' • ')} />
+                  {selectedItem.muscle.warning ? <Info title={t('bodyPicker.warning')} text={selectedItem.muscle.warning} warning /> : null}
+                  <Info title={t('bodyPicker.recommendation')} text={selectedItem.muscle.recommendation ?? t('bodyPicker.defaultRecommendation')} />
+                  <Text style={styles.medicalNotice}>{selectedItem.muscle.medicalSafety}</Text>
+                  <Pressable
+                    style={styles.actionButton}
+                    onPress={() => { dismissDetails(); onNavigateToDetails(selectedItem.muscle); }}
+                    accessibilityRole="button"
+                  ><Text style={styles.actionButtonText}>{t('bodyPicker.describePain')}</Text></Pressable>
                 </>
-              )}
+              ) : null}
             </ScrollView>
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
+function Info({ title, text, warning = false }: { title: string; text: string; warning?: boolean }) {
+  return <View style={[styles.infoCard, warning && styles.warningCard]}><Text style={[styles.infoLabel, warning && styles.warningLabel]}>{title}</Text><Text style={[styles.infoText, warning && styles.warningText]}>{text}</Text></View>;
+}
+
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#F8F9FA' },
-  header: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#FFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  title: { fontSize: 18, fontWeight: 'bold', color: '#111827' },
-  backButton: { padding: 8 },
-  backText: { color: '#2563EB', fontSize: 16, fontWeight: '600' },
-  content: { padding: 16 },
-  modeToggle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 12,
-    gap: 12,
-  },
-  modeButton: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  activeMode: {
-    backgroundColor: '#059669',
-    borderColor: '#059669',
-  },
-  modeText: { fontSize: 14, fontWeight: '600', color: '#4B5563' },
-  activeModeText: { color: '#FFFFFF' },
-  viewToggle: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 16,
-    gap: 12,
-  },
-  toggleButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#D1D5DB',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  activeToggle: { backgroundColor: '#2563EB', borderColor: '#2563EB' },
-  toggleText: { fontSize: 14, fontWeight: '600', color: '#4B5563' },
-  activeToggleText: { color: '#FFFFFF' },
-  imageContainer: {
-    width: '100%',
-    aspectRatio: 0.55,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    overflow: 'hidden',
-    position: 'relative',
-    elevation: 4,
-    marginBottom: 16,
-  },
+  container: { padding: 16 },
+  heading: { color: '#123B42', fontSize: 20, fontWeight: '900', textAlign: 'right', marginBottom: 6 },
+  modeToggle: { flexDirection: 'row', gap: 10, marginBottom: 12 },
+  modeButton: { flex: 1, borderRadius: 10, borderWidth: 1, borderColor: '#CCD9DC', backgroundColor: '#FFF', padding: 11, alignItems: 'center' },
+  modeActive: { backgroundColor: '#0E6972', borderColor: '#0E6972' },
+  modeText: { color: '#40545B', fontWeight: '700' },
+  modeTextActive: { color: '#FFF' },
+  toggleRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
+  toggleButton: { flex: 1, borderRadius: 10, borderWidth: 1, borderColor: '#CCD9DC', backgroundColor: '#FFF', padding: 10, alignItems: 'center' },
+  activeToggle: { backgroundColor: '#176F79', borderColor: '#176F79' },
+  toggleText: { color: '#40545B', fontWeight: '700' },
+  activeToggleText: { color: '#FFF' },
+  helper: { color: '#586E75', textAlign: 'right', lineHeight: 21, marginVertical: 8, fontSize: 12 },
+  imageContainer: { width: '100%', aspectRatio: 0.55, backgroundColor: '#FFF', borderRadius: 16, overflow: 'hidden', position: 'relative', marginBottom: 14 },
   bodyImage: { width: '100%', height: '100%' },
-  hotspot: {
-    position: 'absolute',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: -25,
-    marginTop: -25,
-  },
-  hotspotDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#2563EB',
-    borderWidth: 2,
-    borderColor: '#FFF',
-    elevation: 3,
-  },
-  organDot: {
-    backgroundColor: '#DC2626',
-  },
-  hotspotLabel: {
-    position: 'absolute',
-    top: -18,
-    fontSize: 9,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    paddingHorizontal: 4,
-    borderRadius: 4,
-    whiteSpace: 'nowrap',
-  },
-  hint: { fontSize: 12, color: '#6B7280', textAlign: 'center', marginTop: 8 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
-  modalContent: {
-    backgroundColor: '#FFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    maxHeight: '85%',
-    paddingBottom: 20,
-  },
-  modalHeader: {
-    flexDirection: 'row-reverse',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  modalTitle: { fontSize: 18, fontWeight: 'bold', color: '#111827', flex: 1, textAlign: 'right' },
-  closeButton: { fontSize: 24, color: '#6B7280', fontWeight: 'bold', marginLeft: 12 },
-  modalBody: { padding: 20 },
-  partBadge: {
-    backgroundColor: '#2563EB',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    alignSelf: 'flex-end',
-    marginBottom: 16,
-  },
-  partBadgeText: { color: '#FFF', fontWeight: 'bold', fontSize: 14 },
-  infoCard: {
-    backgroundColor: '#F9FAFB',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  infoLabel: { fontSize: 14, fontWeight: 'bold', color: '#374151', marginBottom: 8, textAlign: 'right' },
-  infoText: { fontSize: 14, color: '#4B5563', textAlign: 'right', lineHeight: 22 },
-  listItem: { fontSize: 13, color: '#4B5563', textAlign: 'right', marginBottom: 4, lineHeight: 20 },
-  warningCard: { backgroundColor: '#FEF2F2', borderColor: '#FECACA' },
-  warningLabel: { fontSize: 14, fontWeight: 'bold', color: '#991B1B', marginBottom: 8, textAlign: 'right' },
-  warningText: { fontSize: 13, color: '#991B1B', textAlign: 'right', lineHeight: 20 },
-  errorText: { fontSize: 14, color: '#DC2626', textAlign: 'center', padding: 20 },
-  actionButton: {
-    backgroundColor: '#2563EB',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  actionButtonText: { color: '#FFF', fontWeight: 'bold', fontSize: 15 },
+  organHotspot: { position: 'absolute', width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginLeft: -24, marginTop: -24 },
+  organDot: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#C23434', borderWidth: 2, borderColor: '#FFF' },
+  hotspotLabel: { position: 'absolute', top: -18, fontSize: 9, fontWeight: 'bold', color: '#1F2937', backgroundColor: '#FFFFFFE8', paddingHorizontal: 4, borderRadius: 4 },
+  search: { backgroundColor: '#FFF', borderWidth: 1, borderColor: '#CCD9DC', borderRadius: 11, padding: 12, marginTop: 12, color: '#203745' },
+  searchResults: { marginTop: 8, gap: 7 },
+  searchResult: { borderWidth: 1, borderColor: '#D9E7EA', borderRadius: 10, backgroundColor: '#FFF', padding: 11 },
+  resultTitle: { color: '#173D48', textAlign: 'right', fontWeight: '800' },
+  resultMeta: { color: '#657781', textAlign: 'right', fontSize: 11, marginTop: 3 },
+  emptyText: { color: '#657781', textAlign: 'center', padding: 12 },
+  chipRow: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 7, marginVertical: 8 },
+  chip: { borderWidth: 1, borderColor: '#BDD0D4', borderRadius: 18, paddingHorizontal: 12, paddingVertical: 8, backgroundColor: '#FFF' },
+  activeChip: { backgroundColor: '#0E6972', borderColor: '#0E6972' },
+  chipText: { color: '#38535B', fontSize: 12, fontWeight: '700' },
+  activeChipText: { color: '#FFF' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: '#FFF', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '85%', paddingBottom: 20 },
+  modalHeader: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', padding: 18, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
+  modalTitle: { flex: 1, color: '#123B42', textAlign: 'right', fontSize: 18, fontWeight: '900' },
+  closeButton: { color: '#64757B', fontSize: 24, paddingHorizontal: 8 },
+  modalBody: { padding: 18 },
+  partBadge: { color: '#0E6972', textAlign: 'right', fontWeight: '900', marginBottom: 10 },
+  infoCard: { backgroundColor: '#F7FAFB', borderWidth: 1, borderColor: '#E1E9EB', borderRadius: 12, padding: 13, marginBottom: 10 },
+  infoLabel: { color: '#0E6972', textAlign: 'right', fontWeight: '900', marginBottom: 5 },
+  infoText: { color: '#405A62', textAlign: 'right', lineHeight: 22 },
+  warningCard: { backgroundColor: '#FFF4F2', borderColor: '#F2C3BC' },
+  warningLabel: { color: '#993E35' },
+  warningText: { color: '#823E37' },
+  medicalNotice: { color: '#657781', textAlign: 'center', fontSize: 11, lineHeight: 18, marginBottom: 8 },
+  actionButton: { backgroundColor: '#176F79', borderRadius: 11, padding: 13, alignItems: 'center', marginTop: 4 },
+  actionButtonText: { color: '#FFF', fontWeight: '900' },
 });
