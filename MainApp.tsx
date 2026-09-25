@@ -1,7 +1,7 @@
 // MainApp.tsx
 
 import React, { useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
@@ -34,24 +34,45 @@ export default function App() {
   const [note, setNote] = useState('');
   const [redFlags, setRedFlags] = useState<string[]>([]);
   const [history, setHistory] = useState<Checkup[]>([]);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [medication, setMedication] = useState('');
+  const [triggers, setTriggers] = useState('');
+  const [sleepHours, setSleepHours] = useState('');
+  const [activity, setActivity] = useState('');
 
   const { language, direction, setLanguage } = useLanguage();
   const { isDark, colors, toggleTheme } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
+  const quickLogAreas = [
+    { id: 'neck-male-back-1', label: t('quickLog.neck') },
+    { id: 'deltoids-male-back-1', label: t('quickLog.shoulder') },
+    { id: 'lower-back-male-back-1', label: t('quickLog.lowerBack') },
+    { id: 'chest-male-front-1', label: t('quickLog.chest') },
+    { id: 'abs-male-front-1', label: t('quickLog.abdomen') },
+  ];
 
   const selected = selectedMuscleData || (selectedId ? data.muscles[selectedId] : null);
   const group = selected ? data.groups[selected.group] : undefined;
 
   // تحميل وحفظ السجل
   useEffect(() => {
+    let mounted = true;
     AsyncStorage.getItem(DATA.HISTORY_STORAGE_KEY).then((saved) => {
-      if (saved) setHistory(JSON.parse(saved) as Checkup[]);
-    }).catch(() => undefined);
+      if (!mounted) return;
+      if (saved) {
+        try {
+          const parsed: unknown = JSON.parse(saved);
+          if (Array.isArray(parsed)) setHistory(parsed as Checkup[]);
+        } catch { /* keep an empty local history if stored JSON is damaged */ }
+      }
+    }).catch(() => undefined).finally(() => { if (mounted) setHistoryLoaded(true); });
+    return () => { mounted = false; };
   }, []);
 
   useEffect(() => {
+    if (!historyLoaded) return;
     AsyncStorage.setItem(DATA.HISTORY_STORAGE_KEY, JSON.stringify(history)).catch(() => undefined);
-  }, [history]);
+  }, [history, historyLoaded]);
 
   // الانتقال إلى شاشة التفاصيل مع الاحتفاظ ببيانات العضلة المختارة
   const handleNavigateToDetails = (muscleData: Muscle) => {
@@ -71,14 +92,20 @@ export default function App() {
         painType,
         duration,
         note: note.trim(),
+        medication: medication.trim(),
+        triggers: triggers.trim(),
+        sleepHours: sleepHours.trim() ? Number(sleepHours) : undefined,
+        activity: activity.trim(),
         urgent,
         createdAt: new Date().toLocaleDateString('ar-EG'),
         createdAtIso: new Date().toISOString(),
       },
       ...items,
-    ].slice(0, 50));
+    ].slice(0, 1000));
     setScreen('results');
   };
+
+  const saveQuickLog = (record: Checkup) => setHistory((items) => [record, ...items].slice(0, 1000));
 
   const saveSelfCareResult = (result: { guideKey: string; pointId?: string; before: number; after: number }) => {
     setHistory((items) => [{
@@ -94,7 +121,7 @@ export default function App() {
       urgent: false,
       createdAt: new Date().toLocaleDateString('ar-EG'),
       createdAtIso: new Date().toISOString(),
-    }, ...items].slice(0, 50));
+    }, ...items].slice(0, 1000));
   };
 
   const startOver = () => {
@@ -104,12 +131,32 @@ export default function App() {
     setPainType('مستمر');
     setDuration('منذ أيام');
     setNote('');
+    setMedication('');
+    setTriggers('');
+    setSleepHours('');
+    setActivity('');
     setRedFlags([]);
     setScreen('body');
   };
 
   const clearHistory = () => {
-    setHistory([]);
+    const clear = () => setHistory([]);
+    if (Platform.OS === 'web') {
+      if (window.confirm('حذف كل تسجيلات الألم المحفوظة على هذا الجهاز؟ لا يمكن التراجع عن الحذف.')) clear();
+      return;
+    }
+    Alert.alert('حذف السجل؟', 'سيتم حذف كل التسجيلات من هذا الجهاز. لا يمكن التراجع عن الحذف.', [
+      { text: 'إلغاء', style: 'cancel' },
+      { text: 'حذف السجل', style: 'destructive', onPress: clear },
+    ]);
+  };
+
+  const importHistory = (records: Checkup[]) => {
+    setHistory((current) => {
+      const byId = new Map(current.map((entry) => [entry.id, entry]));
+      records.forEach((entry) => byId.set(entry.id, entry));
+      return [...byId.values()].sort((a, b) => (b.createdAtIso ?? '').localeCompare(a.createdAtIso ?? '')).slice(0, 1000);
+    });
   };
 
   const getTitle = (): string => {
@@ -145,8 +192,8 @@ export default function App() {
             <View style={styles.headerActions}>
               <LanguageSwitcher language={language} onChange={setLanguage} />
               <ThemeToggle dark={isDark} onPress={toggleTheme} />
-              <Pressable onPress={() => setScreen('history')} style={styles.historyButton} accessibilityLabel={t('history')}>
-                <Text style={[styles.historyButtonText, { color: colors.primaryDark }]}>{t('history')}</Text>
+              <Pressable onPress={() => setScreen('history')} style={styles.historyButton} accessibilityLabel={t('historyButton')}>
+                <Text style={[styles.historyButtonText, { color: colors.primaryDark }]}>{t('historyButton')}</Text>
               </Pressable>
             </View>
           )}
@@ -163,6 +210,8 @@ export default function App() {
             onQuickRelief={() => { setQuickRelief(true); setScreen('body'); }}
             language={language}
             direction={direction}
+            quickAreas={quickLogAreas}
+            onQuickSave={saveQuickLog}
           />
         )}
 
@@ -186,6 +235,14 @@ export default function App() {
             setDuration={setDuration}
             note={note}
             setNote={setNote}
+            medication={medication}
+            setMedication={setMedication}
+            triggers={triggers}
+            setTriggers={setTriggers}
+            sleepHours={sleepHours}
+            setSleepHours={setSleepHours}
+            activity={activity}
+            setActivity={setActivity}
             redFlags={redFlags}
             setRedFlags={setRedFlags}
             onBack={() => setScreen('body')}
@@ -217,6 +274,8 @@ export default function App() {
             history={history}
             onBack={() => setScreen(selected ? 'results' : 'welcome')}
             onClear={clearHistory}
+            onImport={importHistory}
+            language={language}
           />
         )}
       </ScrollView>
