@@ -9,6 +9,8 @@ import { useTheme } from './hooks/useTheme';
 import { translate } from './services/i18n';
 import { Screen, AnatomyData, Checkup, Muscle } from './types';
 import { DATA } from './constants/appConstants';
+import { Colors } from './constants/colors';
+import { getTriageStatus } from './services/triage.js';
 
 // المكونات
 import { Header } from './components/Header';
@@ -83,7 +85,8 @@ export default function App() {
 
   const saveResults = () => {
     if (!selected) return;
-    const urgent = intensity >= 8 || redFlags.length > 0;
+    const triageStatus = getTriageStatus(intensity, redFlags);
+    const urgent = triageStatus === 'urgent';
     setHistory((items) => [
       {
         id: `${Date.now()}`,
@@ -97,6 +100,8 @@ export default function App() {
         sleepHours: sleepHours.trim() ? Number(sleepHours) : undefined,
         activity: activity.trim(),
         urgent,
+        triageStatus,
+        redFlags: [...redFlags],
         createdAt: new Date().toLocaleDateString('ar-EG'),
         createdAtIso: new Date().toISOString(),
       },
@@ -192,9 +197,6 @@ export default function App() {
             <View style={styles.headerActions}>
               <LanguageSwitcher language={language} onChange={setLanguage} />
               <ThemeToggle dark={isDark} onPress={toggleTheme} />
-              <Pressable onPress={() => setScreen('history')} style={styles.historyButton} accessibilityLabel={t('historyButton')}>
-                <Text style={[styles.historyButtonText, { color: colors.primaryDark }]}>{t('historyButton')}</Text>
-              </Pressable>
             </View>
           )}
         />
@@ -210,6 +212,8 @@ export default function App() {
             onQuickRelief={() => { setQuickRelief(true); setScreen('body'); }}
             language={language}
             direction={direction}
+            history={history}
+            onOpenHistory={() => setScreen('history')}
             quickAreas={quickLogAreas}
             onQuickSave={saveQuickLog}
           />
@@ -279,8 +283,20 @@ export default function App() {
           />
         )}
       </ScrollView>
+      <View style={[styles.bottomNav, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <NavItem icon="⌂" title={t('nav.home')} active={screen === 'welcome'} onPress={() => setScreen('welcome')} colors={colors} />
+        <NavItem icon="◎" title={t('nav.map')} active={screen === 'body' || screen === 'details' || screen === 'results'} onPress={() => { setQuickRelief(false); setScreen('body'); }} colors={colors} />
+        <NavItem icon="◷" title={t('nav.history')} active={screen === 'history'} onPress={() => setScreen('history')} colors={colors} />
+      </View>
     </SafeAreaView>
   );
+}
+
+function NavItem({ icon, title, active, onPress, colors }: { icon: string; title: string; active: boolean; onPress: () => void; colors: typeof Colors }) {
+  return <Pressable onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: active }} style={styles.navItem}>
+    <Text style={[styles.navIcon, { color: active ? colors.primary : colors.textLight }]}>{icon}</Text>
+    <Text style={[styles.navLabel, { color: active ? colors.primaryDark : colors.textSecondary }]}>{title}</Text>
+  </Pressable>;
 }
 
 const styles = StyleSheet.create({
@@ -288,8 +304,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingBottom: 40,
+    paddingBottom: 18,
   },
+  bottomNav: { flexDirection: 'row-reverse', justifyContent: 'space-around', alignItems: 'center', minHeight: 62, borderTopWidth: 1, paddingBottom: Platform.OS === 'ios' ? 2 : 0 },
+  navItem: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 58, gap: 1 },
+  navIcon: { fontSize: 21, fontWeight: '800', lineHeight: 25 },
+  navLabel: { fontSize: 10, fontWeight: '800' },
   welcomeTopBar: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -307,16 +327,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  historyButton: {
-    borderRadius: 9,
-    borderWidth: 1,
-    borderColor: '#D6E0E6',
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-  },
-  historyButtonText: {
-    color: '#0E6972',
-    fontSize: 10,
-    fontWeight: '900',
-  },
+
 });

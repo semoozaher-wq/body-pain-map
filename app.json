@@ -1,15 +1,18 @@
 {
   "expo": {
-    "name": "bodymap-pain",
+    "name": "BodyMap Pain",
     "slug": "bodymap-pain",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "bodymap-pain",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
+      "bundleIdentifier": "com.bodymappain.mobile",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.bodymappain.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",

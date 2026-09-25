@@ -5,8 +5,13 @@ MainApp.tsx
 PRIVACY.md
 README.md
 app.json
+assets/anatomy/ASSET_ATTRIBUTION.md
+assets/anatomy/internal-organs-atlas.png
+assets/anatomy/muscle-back-atlas.png
+assets/anatomy/muscle-front-atlas.png
 components/AcupressurePanel.tsx
 components/DoctorReport.tsx
+components/IllustratedBodyMap.tsx
 components/InternalOrgansMap.tsx
 components/LocalDataTools.tsx
 components/LocalReminder.tsx
@@ -17,6 +22,7 @@ components/ReportExport.tsx
 data/acupressurePoints.json
 data/anatomyHotspots.json
 data/naturalRelief.json
+eas.json
 locales/ar.json
 locales/en.json
 locales/fr.json
@@ -25,6 +31,10 @@ package.json
 screens/BodyPickerScreen.tsx
 screens/DetailsScreen.tsx
 screens/HistoryScreen.tsx
+screens/ResultsScreen.tsx
 screens/WelcomeScreen.tsx
 scripts/validate-clinical-guides.js
+services/triage.d.ts
+services/triage.js
+tests/triage.test.cjs
 types/index.ts

@@ -39,7 +39,11 @@
     "validate:pain-map": "node scripts/validate-pain-map.js data/anatomyPainMap.json",
     "optimize:images": "node scripts/optimize-images.js",
     "clean:data": "node scripts/clean-anatomy-data.js",
-    "validate:clinical-guides": "node scripts/validate-clinical-guides.js"
+    "validate:clinical-guides": "node scripts/validate-clinical-guides.js",
+    "test": "node --test"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": "^20.19.4 || ^22.13.0 || ^24.3.0"
+  }
 }
