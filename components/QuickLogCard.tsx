@@ -15,8 +15,13 @@ export function QuickLogCard({ areas, onSave, language = 'ar' }: Props) {
     title: 'سجّل الألم في أقل من دقيقة', subtitle: 'تسجيل شخصي سريع من غير فحص طويل', expand: 'ابدأ تسجيل سريع', collapse: 'اقفل التسجيل السريع', area: 'مكان الألم', intensity: 'الشدة من 0 إلى 10', type: 'نوع الإحساس', medicine: 'دواء/علاج استخدمته (اختياري)', triggers: 'محفّز محتمل (اختياري)', save: 'حفظ التسجيل السريع', saved: '✓ تم تسجيل المتابعة', disclaimer: 'المعلومات دي سجل شخصي للملاحظة وليست تشخيصًا طبيًا.', severe: 'لو الألم شديد أو مفاجئ أو معاه ضيق نفس أو إغماء، اطلب مساعدة طبية عاجلة. الرقم وحده لا يحدد السبب أو درجة الخطورة.', kinds: ['مستمر', 'متقطع', 'ضغط', 'حرقان', 'وخز'], areas: areas,
   };
   const PAIN_TYPES = copy.kinds;
-
+  const SYMPTOMS = language === 'en' ? ['Tenderness', 'Stiffness', 'Swelling', 'Numbness', 'Weakness'] : language === 'fr' ? ['Sensibilité', 'Raideur', 'Gonflement', 'Engourdissement', 'Faiblesse'] : ['حساسية للمس', 'تيبّس', 'تورّم', 'تنميل', 'ضعف'];
+  const RED_FLAG_OPTIONS = language === 'en' ? ['Chest pressure/pain', 'Severe trouble breathing', 'Fainting or new confusion', 'Sudden weakness or speech trouble'] : language === 'fr' ? ['Pression/douleur thoracique', 'Difficulté sévère à respirer', 'Évanouissement ou confusion nouvelle', 'Faiblesse soudaine ou trouble de la parole'] : ['ضغط/ألم بالصدر', 'صعوبة شديدة في التنفس', 'إغماء أو ارتباك جديد', 'ضعف مفاجئ أو صعوبة كلام'];
   const [areaId, setAreaId] = useState(areas[0]?.id ?? '');
+  const [symptoms, setSymptoms] = useState<string[]>([]);
+  const [redFlags, setRedFlags] = useState<string[]>([]);
+  const [note, setNote] = useState('');
+  const redFlagAlert = language === 'en' ? 'A potentially emergency warning sign is selected. Contact local emergency services now; this app cannot assess emergencies.' : language === 'fr' ? 'Un signe potentiellement urgent est sélectionné. Contactez les services d’urgence locaux ; cette application ne peut pas évaluer les urgences.' : 'تم اختيار علامة قد تشير لطوارئ. اتصل بالطوارئ المحلية الآن؛ التطبيق لا يقيّم الحالات الطارئة.';
   const [intensity, setIntensity] = useState(4);
   const [painType, setPainType] = useState(copy.kinds[0]);
   const [medication, setMedication] = useState('');
@@ -27,7 +32,7 @@ export function QuickLogCard({ areas, onSave, language = 'ar' }: Props) {
   const save = () => {
     if (!areaId) return;
     const now = new Date();
-    const triageStatus = getTriageStatus(intensity, []);
+    const triageStatus = getTriageStatus(intensity, redFlags);
     onSave({
       id: `quick-${now.getTime()}-${Math.random().toString(36).slice(2, 7)}`,
       partId: areaId,
@@ -39,12 +44,14 @@ export function QuickLogCard({ areas, onSave, language = 'ar' }: Props) {
       triggers: triggers.trim(),
       createdAt: now.toLocaleDateString(language === 'en' ? 'en' : language === 'fr' ? 'fr-FR' : 'ar-EG'),
       createdAtIso: now.toISOString(),
-      urgent: false,
+      urgent: redFlags.length > 0,
       triageStatus,
-      note: language === 'en' ? 'Quick log' : language === 'fr' ? 'Note rapide' : 'تسجيل سريع',
+      redFlags: [...redFlags],
+      symptoms: [...symptoms],
+      note: [language === 'en' ? 'Quick log' : language === 'fr' ? 'Note rapide' : 'تسجيل سريع', note.trim()].filter(Boolean).join(' — '),
     });
     setSaved(true);
-    setMedication(''); setTriggers('');
+    setMedication(''); setTriggers(''); setNote(''); setSymptoms([]); setRedFlags([]);
   };
 
   return <View style={styles.card}>
@@ -56,9 +63,13 @@ export function QuickLogCard({ areas, onSave, language = 'ar' }: Props) {
     <View style={styles.scale}>{Array.from({ length: 11 }, (_, score) => <Pressable key={score} onPress={() => { setIntensity(score); setSaved(false); }} accessibilityRole="button" accessibilityLabel={`${copy.intensity} ${score}/10`} accessibilityState={{ selected: intensity === score }} style={[styles.score, intensity === score && styles.scoreActive]}><Text style={[styles.scoreText, intensity === score && styles.scoreTextActive]}>{score}</Text></Pressable>)}</View>
     <Text style={styles.label}>{copy.type}</Text>
     <View style={styles.row}>{PAIN_TYPES.map((kind) => <Pressable key={kind} onPress={() => { setPainType(kind); setSaved(false); }} accessibilityRole="button" accessibilityState={{ selected: painType === kind }} style={[styles.chip, painType === kind && styles.activeChip]}><Text style={[styles.chipText, painType === kind && styles.activeChipText]}>{kind}</Text></Pressable>)}</View>
-    <View style={styles.optionalRow}><TextInput value={medication} onChangeText={(v) => { setMedication(v); setSaved(false); }} placeholder={copy.medicine} placeholderTextColor="#87989C" style={styles.optionalInput} textAlign="right" maxLength={100} /><TextInput value={triggers} onChangeText={(v) => { setTriggers(v); setSaved(false); }} placeholder={copy.triggers} placeholderTextColor="#87989C" style={styles.optionalInput} textAlign="right" maxLength={100} /></View>
+    <Text style={styles.label}>{language === 'en' ? 'Other symptoms' : language === 'fr' ? 'Autres symptômes' : 'أعراض أخرى'}</Text>
+    <View style={styles.row}>{SYMPTOMS.map((symptom) => { const active = symptoms.includes(symptom); return <Pressable key={symptom} onPress={() => { setSymptoms((items) => active ? items.filter((item) => item !== symptom) : [...items, symptom]); setSaved(false); }} accessibilityRole="checkbox" accessibilityState={{ checked: active }} style={[styles.chip, active && styles.activeChip]}><Text style={[styles.chipText, active && styles.activeChipText]}>{symptom}</Text></Pressable>; })}</View>
+    <Text style={styles.label}>{language === 'en' ? 'Emergency warning signs' : language === 'fr' ? 'Signes d’alerte urgente' : 'علامات تستدعي طوارئ'}</Text>
+    <View style={styles.row}>{RED_FLAG_OPTIONS.map((flag) => { const active = redFlags.includes(flag); return <Pressable key={flag} onPress={() => { setRedFlags((items) => active ? items.filter((item) => item !== flag) : [...items, flag]); setSaved(false); }} accessibilityRole="checkbox" accessibilityState={{ checked: active }} style={[styles.chip, active && styles.flagActiveChip]}><Text style={[styles.chipText, active && styles.activeChipText]}>{flag}</Text></Pressable>; })}</View>
+    <View style={styles.optionalRow}><TextInput value={medication} onChangeText={(v) => { setMedication(v); setSaved(false); }} placeholder={copy.medicine} placeholderTextColor="#87989C" style={styles.optionalInput} textAlign="right" maxLength={100} /><TextInput value={triggers} onChangeText={(v) => { setTriggers(v); setSaved(false); }} placeholder={copy.triggers} placeholderTextColor="#87989C" style={styles.optionalInput} textAlign="right" maxLength={100} /><TextInput value={note} onChangeText={(v) => { setNote(v); setSaved(false); }} placeholder={language === 'en' ? 'Notes (optional)' : language === 'fr' ? 'Notes (facultatif)' : 'ملاحظات (اختياري)'} placeholderTextColor="#87989C" style={styles.optionalInput} textAlign="right" maxLength={280} /></View>
     <Pressable onPress={save} accessibilityRole="button" style={styles.save}><Text style={styles.saveText}>{saved ? copy.saved : copy.save}</Text></Pressable>
-    {intensity >= 8 ? <Text style={styles.alert}>{copy.severe}</Text> : <Text style={styles.disclaimer}>{copy.disclaimer}</Text>}
+    {redFlags.length > 0 ? <Text accessibilityRole="alert" style={styles.alert}>{redFlagAlert}</Text> : intensity >= 8 ? <Text style={styles.alert}>{copy.severe}</Text> : <Text style={styles.disclaimer}>{copy.disclaimer}</Text>}
     </> : <Text style={styles.collapsedHint}>{copy.disclaimer}</Text>}
   </View>;
 }
@@ -77,6 +88,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 6 },
   chip: { backgroundColor: '#F6FAF9', borderColor: '#D7E4E3', borderWidth: 1, paddingHorizontal: 10, paddingVertical: 7, borderRadius: 18 },
   activeChip: { backgroundColor: '#0B7774', borderColor: '#0B7774' },
+  flagActiveChip: { backgroundColor: '#B42318', borderColor: '#B42318' },
   chipText: { color: '#486167', fontSize: 11, fontWeight: '700' },
   activeChipText: { color: '#FFF' },
   scale: { flexDirection: 'row-reverse', justifyContent: 'space-between', gap: 3 },

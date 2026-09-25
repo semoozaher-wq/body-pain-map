@@ -17,7 +17,11 @@ function isRecord(value: unknown): value is Checkup {
     && item.intensity >= 0 && item.intensity <= 10
     && typeof item.painType === 'string'
     && typeof item.duration === 'string'
-    && typeof item.createdAt === 'string';
+    && typeof item.createdAt === 'string'
+    && (!item.createdAtIso || (typeof item.createdAtIso === 'string' && Number.isFinite(Date.parse(item.createdAtIso))))
+    && (item.afterIntensity === undefined || (Number.isFinite(item.afterIntensity) && item.afterIntensity >= 0 && item.afterIntensity <= 10))
+    && (!item.symptoms || (Array.isArray(item.symptoms) && item.symptoms.length <= 20 && item.symptoms.every((value) => typeof value === 'string' && value.length <= 100)))
+    && (!item.redFlags || (Array.isArray(item.redFlags) && item.redFlags.length <= 20 && item.redFlags.every((value) => typeof value === 'string' && value.length <= 200)));
 }
 
 export function LocalDataTools({ records, onImport }: Props) {
@@ -57,7 +61,7 @@ export function LocalDataTools({ records, onImport }: Props) {
         : await FileSystem.readAsStringAsync(asset.uri, { encoding: FileSystem.EncodingType.UTF8 });
       const parsed: unknown = JSON.parse(contents);
       const rawRecords = Array.isArray(parsed) ? parsed : (parsed as Partial<BackupFile>)?.records;
-      if (!Array.isArray(rawRecords) || !rawRecords.every(isRecord)) {
+      if (!Array.isArray(rawRecords) || rawRecords.length > 1000 || !rawRecords.every(isRecord)) {
         setMessage('الملف مش نسخة صالحة من سجل BodyMap Pain؛ مافيش أي بيانات اتغيرت.');
         return;
       }
