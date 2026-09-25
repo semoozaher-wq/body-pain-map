@@ -536,5 +536,51 @@
       "neck-male-front-4",
       "neck-male-front-5"
     ]
+  },
+  {
+    "id": "organ-uterus",
+    "label": "الرحم",
+    "organId": "uterus",
+    "x": 50,
+    "y": 50,
+    "view": "front",
+    "type": "organ",
+    "gender": "female",
+    "relatedGroupSlugs": [
+      "abs"
+    ],
+    "relatedPartIds": [
+      "abs-female-front-1",
+      "abs-female-front-2",
+      "abs-female-front-3",
+      "abs-female-front-4",
+      "abs-female-front-5",
+      "abs-female-front-6",
+      "abs-female-front-7",
+      "abs-female-front-8"
+    ]
+  },
+  {
+    "id": "organ-ovaries",
+    "label": "المبيضان",
+    "organId": "ovaries",
+    "x": 44,
+    "y": 49,
+    "view": "front",
+    "type": "organ",
+    "gender": "female",
+    "relatedGroupSlugs": [
+      "abs"
+    ],
+    "relatedPartIds": [
+      "abs-female-front-1",
+      "abs-female-front-2",
+      "abs-female-front-3",
+      "abs-female-front-4",
+      "abs-female-front-5",
+      "abs-female-front-6",
+      "abs-female-front-7",
+      "abs-female-front-8"
+    ]
   }
 ]
