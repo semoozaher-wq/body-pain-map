@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { BodySilhouette, type BodyView as MuscleMapView, type Gender, type GroupLabelOverrides } from 'react-native-body-parts-anatomy';
 import rawAnatomyData from '../data/anatomyPainMap.json';
@@ -23,10 +24,29 @@ type Hotspot = {
   type: 'muscle' | 'organ';
   muscleId?: string;
   organId?: string;
+  gender?: 'male' | 'female';
 };
 const anatomyData = cleanData as { muscles: Record<string, PickerMuscle> };
 const hotspots = hotspotsData as unknown as Hotspot[];
 const organs = organDetails as unknown as Record<string, Organ>;
+// Female-illustration coordinates calibrated against the generated atlas; male coordinates remain in anatomyHotspots.json.
+const femaleFrontAdjustments: Record<string, { x: number; y: number }> = {
+  'hotspot-head-front': { x: 50, y: 10 }, 'hotspot-neck-front': { x: 50, y: 18 },
+  'hotspot-chest-left-front': { x: 40, y: 27 }, 'hotspot-chest-right-front': { x: 60, y: 27 }, 'hotspot-abs-center-front': { x: 50, y: 36 },
+  'hotspot-biceps-left-front': { x: 33, y: 31 }, 'hotspot-biceps-right-front': { x: 67, y: 31 },
+  'hotspot-forearm-left-front': { x: 28, y: 41 }, 'hotspot-forearm-right-front': { x: 72, y: 41 },
+  'hotspot-hand-left-front': { x: 24, y: 52 }, 'hotspot-hand-right-front': { x: 76, y: 52 },
+  'hotspot-quad-left-front': { x: 41, y: 56 }, 'hotspot-quad-right-front': { x: 59, y: 56 },
+  'hotspot-knee-left-front': { x: 42, y: 69 }, 'hotspot-knee-right-front': { x: 58, y: 69 },
+  'hotspot-calf-left-front': { x: 41, y: 79 }, 'hotspot-calf-right-front': { x: 59, y: 79 },
+  'hotspot-shoulder-left-front': { x: 38, y: 22 }, 'hotspot-shoulder-right-front': { x: 62, y: 22 },
+  'hotspot-oblique-left-front': { x: 32, y: 40 }, 'hotspot-oblique-right-front': { x: 68, y: 40 },
+};
+const femaleOrganAdjustments: Record<string, { x: number; y: number }> = {
+  'organ-thyroid': { x: 50, y: 19 }, 'organ-lungs': { x: 50, y: 28 }, 'organ-heart': { x: 51, y: 28 },
+  'organ-liver': { x: 45, y: 35 }, 'organ-stomach': { x: 53, y: 36 }, 'organ-uterus': { x: 50, y: 48 },
+  'organ-ovaries': { x: 44, y: 48 },
+};
 const groupLabels = Object.fromEntries(Object.entries((rawAnatomyData as { groups: Record<string, { labelAr: string }> }).groups).map(([key, group]) => [key, group.labelAr])) as GroupLabelOverrides;
 type Selection =
   | { kind: 'muscle'; label: string; muscle: Muscle }
@@ -42,13 +62,14 @@ type BodyPickerScreenProps = {
 };
 
 const quickGuides = ['neck', 'upper-back', 'lower-back', 'forearm'] as const;
+const SELECTED_GENDER_KEY = '@bodymap_selected_anatomy_gender';
 const translatedGroups: Record<'en' | 'fr', Record<string, string>> = {
   en: { abs: 'Abdomen', adductors: 'Inner thigh', ankles: 'Ankles', biceps: 'Biceps', calves: 'Calves', chest: 'Chest', deltoids: 'Shoulders', feet: 'Feet', forearm: 'Forearm', gluteal: 'Glutes', hair: 'Scalp', hamstring: 'Hamstrings', hands: 'Hands', head: 'Head', knees: 'Knees', 'lower-back': 'Lower back', neck: 'Neck', obliques: 'Side abdomen', quadriceps: 'Front thigh', tibialis: 'Shin', trapezius: 'Upper shoulder', triceps: 'Triceps', 'upper-back': 'Upper back' },
   fr: { abs: 'Abdomen', adductors: 'Adducteurs', ankles: 'Chevilles', biceps: 'Biceps', calves: 'Mollets', chest: 'Poitrine', deltoids: 'Épaules', feet: 'Pieds', forearm: 'Avant-bras', gluteal: 'Fessiers', hair: 'Cuir chevelu', hamstring: 'Ischio-jambiers', hands: 'Mains', head: 'Tête', knees: 'Genoux', 'lower-back': 'Bas du dos', neck: 'Cou', obliques: 'Côtés de l’abdomen', quadriceps: 'Avant de la cuisse', tibialis: 'Tibia', trapezius: 'Trapèze', triceps: 'Triceps', 'upper-back': 'Haut du dos' },
 };
 const localizedOrganNames: Record<'en' | 'fr', Record<string, string>> = {
-  en: { heart: 'Heart', lungs: 'Lungs', stomach: 'Stomach', liver: 'Liver', kidneys: 'Kidneys', thyroid: 'Thyroid' },
-  fr: { heart: 'Cœur', lungs: 'Poumons', stomach: 'Estomac', liver: 'Foie', kidneys: 'Reins', thyroid: 'Thyroïde' },
+  en: { heart: 'Heart', lungs: 'Lungs', stomach: 'Stomach', liver: 'Liver', kidneys: 'Kidneys', thyroid: 'Thyroid', uterus: 'Uterus', ovaries: 'Ovaries' },
+  fr: { heart: 'Cœur', lungs: 'Poumons', stomach: 'Estomac', liver: 'Foie', kidneys: 'Reins', thyroid: 'Thyroïde', uterus: 'Utérus', ovaries: 'Ovaires' },
 };
 
 export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
@@ -61,6 +82,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const [activeView, setActiveView] = useState<Exclude<BodyView, 'organs'>>('front');
   const [gender, setGender] = useState<Gender>('male');
+  const [genderLoaded, setGenderLoaded] = useState(false);
   const [selectedMuscleId, setSelectedMuscleId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [selectedItem, setSelectedItem] = useState<Selection | null>(null);
@@ -71,9 +93,20 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   const [bodyViewMode, setBodyViewMode] = useState<'illustration' | 'detailed'>('illustration');
   const [quickGuide, setQuickGuide] = useState<(typeof quickGuides)[number]>('neck');
 
+  useEffect(() => {
+    let active = true;
+    AsyncStorage.getItem(SELECTED_GENDER_KEY).then((saved) => {
+      if (active && (saved === 'male' || saved === 'female')) setGender(saved);
+    }).catch(() => undefined).finally(() => { if (active) setGenderLoaded(true); });
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    if (genderLoaded) AsyncStorage.setItem(SELECTED_GENDER_KEY, gender).catch(() => undefined);
+  }, [gender, genderLoaded]);
+
   const visibleHotspots = useMemo(
-    () => hotspots.filter((hotspot) => hotspot.view === activeView && hotspot.type === 'organ'),
-    [activeView],
+    () => hotspots.filter((hotspot) => hotspot.view === activeView && hotspot.type === 'organ' && (!hotspot.gender || hotspot.gender === gender)),
+    [activeView, gender],
   );
   const visibleMuscleHotspots = useMemo(() => hotspots.filter((spot) => spot.view === activeView && spot.type === 'muscle').flatMap((spot) => {
     const groupKey = spot.muscleId?.split('-')[0];
@@ -157,7 +190,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
             <Pressable style={[styles.toggleButton, bodyViewMode === 'detailed' && styles.activeToggle]} onPress={() => setBodyViewMode('detailed')} accessibilityRole="button" accessibilityState={{ selected: bodyViewMode === 'detailed' }}><Text style={[styles.toggleText, bodyViewMode === 'detailed' && styles.activeToggleText]}>{t('bodyPicker.detailMap')}</Text></Pressable>
           </View>}
 
-          {!showAcupressureMode && !showNaturalReliefMode && !showOrganMode && bodyViewMode === 'detailed' && <View style={styles.toggleRow}>
+          {!showAcupressureMode && !showNaturalReliefMode && <View style={styles.toggleRow}>
             <Pressable
               style={[styles.toggleButton, gender === 'male' && styles.activeToggle]}
               onPress={() => setGender('male')}
@@ -192,20 +225,25 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
               <Text style={styles.helper}>{t('bodyPicker.organHint')}</Text>
               <Text style={styles.organNotice}>{t('bodyPicker.organPainNotice')}</Text>
               <IllustratedBodyMap
-                source={activeView === 'front' ? require('../assets/anatomy/internal-organs-atlas.png') : require('../assets/anatomy/muscle-back-atlas.png')}
-                markers={visibleHotspots.map((spot) => ({ id: spot.id, x: spot.x, y: spot.y, label: language === 'ar' ? spot.label : localizedOrganNames[language][spot.organId ?? ''] ?? spot.label }))}
+                source={activeView === 'front' ? (gender === 'female' ? require('../assets/anatomy/internal-organs-atlas-female.png') : require('../assets/anatomy/internal-organs-atlas.png')) : (gender === 'female' ? require('../assets/anatomy/muscle-back-atlas-female.png') : require('../assets/anatomy/muscle-back-atlas.png'))}
+                markers={visibleHotspots.flatMap((spot) => {
+                  const point = gender === 'female' ? femaleOrganAdjustments[spot.id] : undefined;
+                  const label = language === 'ar' ? spot.label : localizedOrganNames[language][spot.organId ?? ''] ?? spot.label;
+                  const base = { id: spot.id, x: point?.x ?? spot.x, y: point?.y ?? spot.y, label };
+                  return gender === 'female' && spot.id === 'organ-ovaries' ? [base, { ...base, id: 'organ-ovaries-right', x: 56, y: 48 }] : [base];
+                })}
                 language={language}
                 title={t('bodyPicker.organs')}
                 hint={t('bodyPicker.organImageHint')}
-                onSelect={(marker) => { const spot = visibleHotspots.find((item) => item.id === marker.id); if (spot) handleHotspotPress(spot); }}
+                onSelect={(marker) => { const markerId = marker.id === 'organ-ovaries-right' ? 'organ-ovaries' : marker.id; const spot = visibleHotspots.find((item) => item.id === markerId); if (spot) handleHotspotPress(spot); }}
               />
             </>
           ) : (
             <>
               <Text style={styles.helper}>{t('bodyPicker.anatomyMapHint')}</Text>
               {bodyViewMode === 'illustration' ? <IllustratedBodyMap
-                source={activeView === 'front' ? require('../assets/anatomy/muscle-front-atlas.png') : require('../assets/anatomy/muscle-back-atlas.png')}
-                markers={visibleMuscleHotspots.map((spot) => ({ id: spot.id, x: spot.x, y: spot.y, label: spot.label }))}
+                source={activeView === 'front' ? (gender === 'female' ? require('../assets/anatomy/muscle-front-atlas-female.png') : require('../assets/anatomy/muscle-front-atlas.png')) : (gender === 'female' ? require('../assets/anatomy/muscle-back-atlas-female.png') : require('../assets/anatomy/muscle-back-atlas.png'))}
+                markers={visibleMuscleHotspots.map((spot) => { const point = gender === 'female' && activeView === 'front' ? femaleFrontAdjustments[spot.id] : undefined; return { id: spot.id, x: point?.x ?? spot.x, y: point?.y ?? spot.y, label: spot.label }; })}
                 language={language}
                 title={t('bodyPicker.title')}
                 hint={t('bodyPicker.visualHintText')}

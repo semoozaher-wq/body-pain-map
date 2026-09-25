@@ -47,7 +47,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
         السجل محفوظ على الجهاز. استخدم التصدير لمشاركة نسخة بنفسك؛ لا نرفع بياناتك تلقائيًا.
       </Text>
       <PainDashboard history={history} language={language} />
-      <DoctorReport records={history} />
+      <DoctorReport records={history} language={language} />
       <LocalDataTools records={history} onImport={onImport} />
 
       {/* Stats */}
@@ -96,10 +96,13 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
             {item.note ? <Text style={[styles.note, { color: colors.textSecondary }]}>{item.note}</Text> : null}
             {item.medication ? <Text style={[styles.note, { color: colors.textSecondary }]}>دواء مسجّل: {item.medication}</Text> : null}
             {item.triggers ? <Text style={[styles.note, { color: colors.textSecondary }]}>محفزات ملاحظة: {item.triggers}</Text> : null}
+            {item.symptoms?.length ? <Text style={[styles.note, { color: colors.textSecondary }]}>الأعراض المسجلة: {item.symptoms.join(' • ')}</Text> : null}
+            {item.redFlags?.length ? <Text accessibilityRole="alert" style={[styles.urgentText, { color: colors.danger }]}>علامات إنذار: {item.redFlags.join(' • ')}</Text> : null}
             {item.sleepHours !== undefined ? <Text style={[styles.note, { color: colors.textSecondary }]}>النوم المسجل: {item.sleepHours} ساعة</Text> : null}
             {item.activity ? <Text style={[styles.note, { color: colors.textSecondary }]}>النشاط المسجل: {item.activity}</Text> : null}
             {item.afterIntensity !== undefined && <Text style={[styles.note, { color: colors.primary }]}>قبل {item.intensity}/10 ← بعد {item.afterIntensity}/10</Text>}
-            {item.urgent && <Text style={[styles.urgentText, { color: colors.danger }]}>يتطلب انتباهًا طبيًا</Text>}
+            {item.triageStatus === 'high_reported_intensity' && <Text style={[styles.note, { color: colors.warning }]}>شدة مرتفعة مُبلّغ عنها؛ الرقم وحده لا يحدد سبب الألم أو خطورته.</Text>}
+            {item.urgent && <Text accessibilityRole="alert" style={[styles.urgentText, { color: colors.danger }]}>علامة إنذار مُسجّلة — اتبع إرشادات الطوارئ المحلية؛ التطبيق لا يشخّص الحالة.</Text>}
           </Card>
         ))
       )}

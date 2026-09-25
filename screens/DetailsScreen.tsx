@@ -29,6 +29,10 @@ interface DetailsScreenProps {
   setActivity: (v: string) => void;
   redFlags: string[];
   setRedFlags: (v: string[]) => void;
+  symptoms: string[];
+  setSymptoms: (v: string[]) => void;
+  afterIntensity: string;
+  setAfterIntensity: (v: string) => void;
   onBack: () => void;
   onNext: () => void;
   language: Parameters<typeof translate>[0];
@@ -39,7 +43,7 @@ interface DetailsScreenProps {
 export const DetailsScreen: React.FC<DetailsScreenProps> = ({
   intensity, setIntensity, painType, setPainType, duration, setDuration,
   note, setNote, medication, setMedication, triggers, setTriggers, sleepHours, setSleepHours, activity, setActivity,
-  redFlags, setRedFlags, onBack, onNext, language, contextWarning
+  redFlags, setRedFlags, symptoms, setSymptoms, afterIntensity, setAfterIntensity, onBack, onNext, language, contextWarning
 }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
@@ -55,6 +59,8 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
   const toggleFlag = (flag: string) => {
     setRedFlags(redFlags.includes(flag) ? redFlags.filter((f) => f !== flag) : [...redFlags, flag]);
   };
+  const symptomLabels = language === 'en' ? ['Nausea', 'Fatigue', 'Stiffness', 'Swelling', 'Numbness', 'Weakness', 'Fever'] : language === 'fr' ? ['Nausée', 'Fatigue', 'Raideur', 'Gonflement', 'Engourdissement', 'Faiblesse', 'Fièvre'] : ['غثيان', 'إرهاق', 'تيبّس', 'تورّم', 'تنميل', 'ضعف', 'حمّى'];
+  const toggleSymptom = (symptom: string) => setSymptoms(symptoms.includes(symptom) ? symptoms.filter((item) => item !== symptom) : [...symptoms, symptom]);
 
   return (
     <View style={styles.container}>
@@ -81,6 +87,12 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
           ))}
         </View>
       </Accordion>
+      <Accordion title={language === 'ar' ? 'الأعراض المصاحبة' : language === 'fr' ? 'Symptômes associés' : 'Associated symptoms'} icon="＋">
+        <View style={styles.chips}>
+          {symptomLabels.map((symptom) => <Pressable key={symptom} onPress={() => toggleSymptom(symptom)} accessibilityRole="checkbox" accessibilityState={{ checked: symptoms.includes(symptom) }} style={[styles.chip, { backgroundColor: symptoms.includes(symptom) ? colors.primaryLight : colors.surface, borderColor: symptoms.includes(symptom) ? colors.primary : colors.border }]}><Text style={[styles.chipText, { color: symptoms.includes(symptom) ? colors.primaryDark : colors.textSecondary }]}>{symptom}</Text></Pressable>)}
+        </View>
+      </Accordion>
+
       <Accordion title={t('details.intensityTitle')} icon="📊" defaultOpen>
         <Text style={[styles.question, { color: colors.textPrimary }]}>{t('details.intensityQuestion')}</Text>
         <View style={styles.scale}>
@@ -126,8 +138,10 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
         <Text style={[styles.charHint, { color: colors.textLight }]}>{note.length}/500</Text>
       </Accordion>
 
-      <Accordion title={t('details.contextTitle')} icon="🧩">
-        <Text style={[styles.hint, { color: colors.textSecondary }]}>{t('details.contextHint')}</Text>
+      <Accordion title={language === 'ar' ? 'التحسّن بعد رعاية أو دواء' : language === 'fr' ? 'Après soin ou traitement' : 'Change after care or medication'} icon="↗">
+        <Text style={[styles.hint, { color: colors.textSecondary }]}>{language === 'ar' ? 'اختياري: سجّل شدة الألم بعد الرعاية/الدواء للمقارنة لاحقًا (0–10).' : language === 'fr' ? 'Facultatif : notez l’intensité après un soin/traitement (0–10).' : 'Optional: record pain intensity after care/medication for later comparison (0–10).'}</Text>
+        <TextInput value={afterIntensity} onChangeText={(v) => { const n = Number(v.replace(/[^0-9]/g, '').slice(0, 2)); setAfterIntensity(v === '' ? '' : String(Math.min(10, n))); }} placeholder={language === 'ar' ? 'الشدة بعد الرعاية، 0–10' : language === 'fr' ? 'Intensité après soin, 0–10' : 'Intensity after care, 0–10'} keyboardType="number-pad" maxLength={2} style={[styles.contextInput, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} textAlign="right" />
+        <Text style={[styles.hint, { color: colors.textSecondary, marginTop: Spacing.md }]}>{t('details.contextHint')}</Text>
         <TextInput value={medication} onChangeText={setMedication} placeholder={t('details.medicationPlaceholder')} maxLength={180} style={[styles.contextInput, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} textAlign="right" />
         <TextInput value={triggers} onChangeText={setTriggers} placeholder={t('details.triggersPlaceholder')} maxLength={180} style={[styles.contextInput, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} textAlign="right" />
         <TextInput value={sleepHours} onChangeText={(v) => setSleepHours(v.replace(/[^0-9.]/g, '').slice(0, 4))} placeholder={t('details.sleepPlaceholder')} keyboardType="decimal-pad" maxLength={4} style={[styles.contextInput, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} textAlign="right" />
