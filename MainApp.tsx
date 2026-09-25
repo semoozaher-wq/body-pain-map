@@ -54,7 +54,7 @@ export default function App() {
   }, [history]);
 
   // الانتقال إلى شاشة التفاصيل مع الاحتفاظ ببيانات العضلة المختارة
-  const handleNavigateToDetails = (muscleData: any) => {
+  const handleNavigateToDetails = (muscleData: Muscle) => {
     setSelectedMuscleData(muscleData);
     setSelectedId(muscleData.id);
     setScreen('details');
@@ -170,7 +170,6 @@ export default function App() {
           <BodyPickerScreen
             onNavigateToDetails={handleNavigateToDetails}
             onSaveSelfCare={saveSelfCareResult}
-            onBack={() => setScreen('welcome')}
             language={language}
             direction={direction}
             quickRelief={quickRelief}
