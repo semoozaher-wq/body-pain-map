@@ -1,12 +1,14 @@
 // screens/AssistantScreen.tsx
 // ============================================================================
 // شاشة المساعد الذكي — دردشة تفهم كلام المستخدم وتردّ بإرشاد تعليمي.
-// يعمل بالكامل دون إنترنت (محرّك محلي) — لا يُرسل أي بيانات لأي خادم.
+// تدعم: الكتابة، الإدخال الصوتي (🎤)، نطق الردود (🔊)، وإرفاق صورة (📷).
+// المحرّك النصّي يعمل بالكامل دون إنترنت (محلّي) — لا يُرسل أي بيانات لخادم.
 // ============================================================================
 
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,6 +18,9 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import * as Speech from 'expo-speech';
+import * as ImagePicker from 'expo-image-picker';
+import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
 import { Palette, Gradients, Radii, Elevation, Type } from '../constants/design';
@@ -32,7 +37,7 @@ import {
 } from '../services/aiAssistant';
 
 type ChatMessage =
-  | { id: string; role: 'user'; text: string }
+  | { id: string; role: 'user'; text: string; imageUri?: string }
   | { id: string; role: 'assistant'; reply: AssistantReply };
 
 interface AssistantScreenProps {
@@ -53,6 +58,26 @@ const TRIAGE_COLORS: Record<TriageLevel, { bg: string; fg: string; accent: strin
 let msgCounter = 0;
 const nextId = () => `m${Date.now()}-${msgCounter++}`;
 
+/** لغة التعرّف على الكلام حسب لغة الواجهة. */
+const speechLang = (language: string): string =>
+  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
+
+/** لغة النطق (Text-to-Speech) حسب لغة الواجهة. */
+const ttsLang = (language: string): string =>
+  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-SA';
+
+/** يبني نصًّا مختصرًا قابلًا للنطق من رد المساعد. */
+function replyToSpeech(reply: AssistantReply): string {
+  const L = reply.__lang ?? 'ar';
+  const parts: string[] = [reply.intro[L]];
+  if (reply.clarifyingQuestion) parts.push(reply.clarifyingQuestion[L]);
+  parts.push(reply.triage.title[L], reply.triage.advice[L]);
+  reply.redFlags.forEach((f) => parts.push(f.label[L]));
+  reply.selfCare.slice(0, 4).forEach((s) => parts.push(s));
+  parts.push(reply.whenToSeeDoctor[L]);
+  return parts.filter(Boolean).join('. ');
+}
+
 export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, direction, onOpenRegion, onOpenOrgan }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
@@ -63,7 +88,97 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [interim, setInterim] = useState('');
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
+
+  // ------------------------------------------------------------------
+  // التعرّف على الكلام (إدخال صوتي)
+  // ------------------------------------------------------------------
+  useSpeechRecognitionEvent('start', () => setListening(true));
+  useSpeechRecognitionEvent('end', () => {
+    setListening(false);
+    setInterim('');
+  });
+  useSpeechRecognitionEvent('error', () => {
+    setListening(false);
+    setInterim('');
+  });
+  useSpeechRecognitionEvent('result', (event: any) => {
+    const transcript: string = event?.results?.[0]?.transcript ?? '';
+    if (!transcript) return;
+    if (event?.isFinal) {
+      setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      setInterim('');
+    } else {
+      setInterim(transcript);
+    }
+  });
+
+  const toggleMic = useCallback(async () => {
+    try {
+      if (listening) {
+        ExpoSpeechRecognitionModule.stop();
+        return;
+      }
+      const perm = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      if (!perm?.granted) return;
+      setInterim('');
+      ExpoSpeechRecognitionModule.start({
+        lang: speechLang(language),
+        interimResults: true,
+        continuous: false,
+      });
+    } catch {
+      setListening(false);
+    }
+  }, [listening, language]);
+
+  // ------------------------------------------------------------------
+  // نطق الردود (إخراج صوتي)
+  // ------------------------------------------------------------------
+  const speak = useCallback(
+    (text: string, id?: string) => {
+      try {
+        Speech.stop();
+        if (id) setSpeakingId(id);
+        Speech.speak(text, {
+          language: ttsLang(language),
+          onDone: () => setSpeakingId(null),
+          onStopped: () => setSpeakingId(null),
+          onError: () => setSpeakingId(null),
+        });
+      } catch {
+        setSpeakingId(null);
+      }
+    },
+    [language],
+  );
+
+  useEffect(() => () => {
+    try {
+      Speech.stop();
+      ExpoSpeechRecognitionModule.abort?.();
+    } catch {}
+  }, []);
+
+  // ------------------------------------------------------------------
+  // إرفاق صورة
+  // ------------------------------------------------------------------
+  const pickImage = useCallback(async () => {
+    try {
+      const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!perm.granted) return;
+      const res = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.6,
+      });
+      if (!res.canceled && res.assets?.[0]?.uri) setPendingImage(res.assets[0].uri);
+    } catch {}
+  }, []);
 
   const quickPrompts = useMemo(
     () => QUICK_PROMPTS.map((p) => p[language as Lang] ?? p.ar),
@@ -71,25 +186,34 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   );
 
   const send = useCallback(
-    (raw: string) => {
+    (raw: string, imageUri?: string | null) => {
       const text = raw.trim();
-      if (!text || thinking) return;
-      setMessages((prev) => [...prev, { id: nextId(), role: 'user', text }]);
+      const hasImg = !!imageUri;
+      if ((!text && !hasImg) || thinking) return;
+      setMessages((prev) => [
+        ...prev,
+        { id: nextId(), role: 'user', text: text || t('assistant.photoMessage'), imageUri: imageUri ?? undefined },
+      ]);
       setInput('');
+      setPendingImage(null);
       setThinking(true);
       // محاكاة زمن التفكير البشري القصير لإحساس طبيعي بالدردشة.
       setTimeout(() => {
-        const reply = analyzeMessage(text, language as Lang);
-        setMessages((prev) => [...prev, { id: nextId(), role: 'assistant', reply }]);
+        const reply = analyzeMessage(text, language as Lang, hasImg);
+        const id = nextId();
+        setMessages((prev) => [...prev, { id, role: 'assistant', reply }]);
         setThinking(false);
+        if (autoSpeak) speak(replyToSpeech(reply), id);
       }, 650);
     },
-    [language, thinking],
+    [language, thinking, autoSpeak, speak, t],
   );
 
   const scrollToEnd = useCallback(() => {
     requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
   }, []);
+
+  const canSend = (!!input.trim() || !!pendingImage) && !thinking;
 
   return (
     <KeyboardAvoidingView
@@ -110,6 +234,21 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             <Text style={[styles.statusText, { color: colors.textSecondary }]}>{t('assistant.status')}</Text>
           </View>
         </View>
+        <Pressable
+          onPress={() => {
+            const next = !autoSpeak;
+            setAutoSpeak(next);
+            if (!next) {
+              try { Speech.stop(); } catch {}
+              setSpeakingId(null);
+            }
+          }}
+          accessibilityRole="button"
+          accessibilityLabel={t('assistant.autoSpeak')}
+          style={[styles.speakToggle, { borderColor: colors.border, backgroundColor: autoSpeak ? Palette.teal100 : colors.backgroundAlt }]}
+        >
+          <Text style={styles.speakToggleGlyph}>{autoSpeak ? '🔊' : '🔇'}</Text>
+        </Pressable>
       </View>
 
       <ScrollView
@@ -158,11 +297,25 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             <View key={message.id} style={[styles.userRow, { justifyContent: rtl ? 'flex-start' : 'flex-end' }]}>
               <View style={styles.userBubble}>
                 <Gradient colors={Gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+                {message.imageUri && (
+                  <Image source={{ uri: message.imageUri }} style={styles.userImage} resizeMode="cover" />
+                )}
                 <Text style={[styles.userText, { textAlign: align }]}>{message.text}</Text>
               </View>
             </View>
           ) : (
-            <AssistantBubble key={message.id} reply={message.reply} align={align} row={row} onOpenRegion={onOpenRegion} onOpenOrgan={onOpenOrgan} colors={colors} t={t} />
+            <AssistantBubble
+              key={message.id}
+              reply={message.reply}
+              align={align}
+              row={row}
+              onOpenRegion={onOpenRegion}
+              onOpenOrgan={onOpenOrgan}
+              onSpeak={() => speak(replyToSpeech(message.reply), message.id)}
+              speaking={speakingId === message.id}
+              colors={colors}
+              t={t}
+            />
           ),
         )}
 
@@ -177,27 +330,67 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       </ScrollView>
 
       {/* شريط الإدخال */}
-      <View style={[styles.inputBar, { backgroundColor: colors.surface, borderColor: colors.border, flexDirection: row }]}>
-        <TextInput
-          value={input}
-          onChangeText={setInput}
-          placeholder={t('assistant.placeholder')}
-          placeholderTextColor={colors.textLight}
-          style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, textAlign: align }]}
-          multiline
-          onSubmitEditing={() => send(input)}
-          blurOnSubmit={false}
-        />
-        <Pressable
-          onPress={() => send(input)}
-          disabled={!input.trim() || thinking}
-          style={[styles.sendButton, (!input.trim() || thinking) && styles.sendDisabled]}
-          accessibilityRole="button"
-          accessibilityLabel={t('assistant.send')}
-        >
-          <Gradient colors={Gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-          <Text style={styles.sendGlyph}>{rtl ? '◀' : '▶'}</Text>
-        </Pressable>
+      <View style={[styles.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        {(pendingImage || listening) && (
+          <View style={[styles.pendingRow, { flexDirection: row }]}>
+            {pendingImage && (
+              <View style={styles.pendingImageWrap}>
+                <Image source={{ uri: pendingImage }} style={styles.pendingImage} resizeMode="cover" />
+                <Pressable onPress={() => setPendingImage(null)} style={styles.pendingRemove} accessibilityRole="button" accessibilityLabel={t('assistant.removeImage')}>
+                  <Text style={styles.pendingRemoveGlyph}>✕</Text>
+                </Pressable>
+              </View>
+            )}
+            {listening && (
+              <View style={styles.listeningPill}>
+                <View style={styles.listeningDot} />
+                <Text style={styles.listeningText}>{interim || t('assistant.listening')}</Text>
+              </View>
+            )}
+          </View>
+        )}
+
+        <View style={[styles.inputBar, { flexDirection: row }]}>
+          <Pressable
+            onPress={pickImage}
+            style={[styles.iconButton, { borderColor: colors.border, backgroundColor: colors.backgroundAlt }]}
+            accessibilityRole="button"
+            accessibilityLabel={t('assistant.attachImage')}
+          >
+            <Text style={styles.iconGlyph}>📷</Text>
+          </Pressable>
+
+          <TextInput
+            value={input}
+            onChangeText={setInput}
+            placeholder={listening ? t('assistant.listening') : t('assistant.placeholder')}
+            placeholderTextColor={colors.textLight}
+            style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, textAlign: align }]}
+            multiline
+            onSubmitEditing={() => send(input, pendingImage)}
+            blurOnSubmit={false}
+          />
+
+          <Pressable
+            onPress={toggleMic}
+            style={[styles.iconButton, listening ? styles.micActive : { borderColor: colors.border, backgroundColor: colors.backgroundAlt }]}
+            accessibilityRole="button"
+            accessibilityLabel={listening ? t('assistant.voiceStop') : t('assistant.voiceInput')}
+          >
+            <Text style={styles.iconGlyph}>{listening ? '⏹' : '🎤'}</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => send(input, pendingImage)}
+            disabled={!canSend}
+            style={[styles.sendButton, !canSend && styles.sendDisabled]}
+            accessibilityRole="button"
+            accessibilityLabel={t('assistant.send')}
+          >
+            <Gradient colors={Gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+            <Text style={styles.sendGlyph}>{rtl ? '◀' : '▶'}</Text>
+          </Pressable>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -212,11 +405,13 @@ interface BubbleProps {
   row: 'row' | 'row-reverse';
   onOpenRegion: (regionId: string) => void;
   onOpenOrgan: (organId: string) => void;
+  onSpeak: () => void;
+  speaking: boolean;
   colors: typeof Colors;
   t: (key: Parameters<typeof translate>[1]) => string;
 }
 
-const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegion, onOpenOrgan, colors, t }) => {
+const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegion, onOpenOrgan, onSpeak, speaking, colors, t }) => {
   const triage = TRIAGE_COLORS[reply.triage.level];
   const hasRedFlag = reply.redFlags.length > 0;
 
@@ -228,7 +423,19 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
       </View>
 
       <View style={[styles.bubble, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <Text style={[styles.intro, { color: colors.textPrimary, textAlign: align }]}>{reply.intro.ar && reply.intro[replyIntroLang(reply)]}</Text>
+        <View style={[styles.bubbleTop, { flexDirection: row }]}>
+          <Text style={[styles.intro, { color: colors.textPrimary, textAlign: align, flex: 1 }]}>
+            {reply.intro.ar && reply.intro[replyIntroLang(reply)]}
+          </Text>
+          <Pressable
+            onPress={onSpeak}
+            style={[styles.speakButton, { borderColor: colors.border, backgroundColor: speaking ? Palette.teal100 : colors.backgroundAlt }]}
+            accessibilityRole="button"
+            accessibilityLabel={t('assistant.speakReply')}
+          >
+            <Text style={styles.speakButtonGlyph}>{speaking ? '⏸' : '🔊'}</Text>
+          </Pressable>
+        </View>
 
         {reply.clarifyingQuestion && (
           <Text style={[styles.clarify, { color: colors.textSecondary, textAlign: align }]}>
@@ -391,8 +598,6 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
  * (الرد يحمل النصوص بثلاث لغات؛ نعرض اللغة المطلوبة.)
  */
 function replyIntroLang(reply: AssistantReply): Lang {
-  // نستنتج اللغة من النص المعروض في الواجهة عبر أول عنصر متاح.
-  // الرد يُبنى أصلًا بلغة الواجهة، لذا نعرض العربية افتراضيًا ثم نطابق.
   return reply.__lang ?? 'ar';
 }
 
@@ -423,6 +628,8 @@ const styles = StyleSheet.create({
   statusRow: { alignItems: 'center', gap: 6 },
   statusDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: Palette.mint },
   statusText: { fontFamily: Fonts.arabic.regular, fontSize: Type.micro },
+  speakToggle: { width: 40, height: 40, borderRadius: Radii.pill, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  speakToggleGlyph: { fontSize: 17 },
   chatContent: { padding: 16, paddingBottom: 22, gap: 14 },
   welcomeCard: {
     borderRadius: Radii.xl,
@@ -441,13 +648,17 @@ const styles = StyleSheet.create({
   quickChipGlyph: { color: Palette.teal500, fontSize: 18, fontWeight: '900' },
   quickChipText: { flex: 1, fontFamily: Fonts.arabic.medium, fontSize: Type.bodySm, lineHeight: 20 },
   userRow: { flexDirection: 'row' },
-  userBubble: { maxWidth: '86%', borderRadius: Radii.lg, borderTopRightRadius: 6, paddingHorizontal: 14, paddingVertical: 11, overflow: 'hidden', ...Elevation.glowTeal },
+  userBubble: { maxWidth: '86%', borderRadius: Radii.lg, borderTopRightRadius: 6, paddingHorizontal: 14, paddingVertical: 11, overflow: 'hidden', gap: 8, ...Elevation.glowTeal },
+  userImage: { width: 200, height: 200, borderRadius: Radii.md, alignSelf: 'flex-end' },
   userText: { color: Palette.white, fontFamily: Fonts.arabic.medium, fontSize: Type.body, lineHeight: 22 },
   agentRow: { alignItems: 'flex-start', gap: 9 },
   agentMini: { width: 30, height: 30, borderRadius: Radii.pill, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', marginTop: 2 },
   agentMiniGlyph: { color: Palette.white, fontSize: 14, fontWeight: '900' },
   bubble: { flex: 1, borderRadius: Radii.lg, borderTopLeftRadius: 6, borderWidth: 1, padding: 14, gap: 10, ...Elevation.sm },
+  bubbleTop: { alignItems: 'flex-start', gap: 8 },
   intro: { fontFamily: Fonts.arabic.bold, fontSize: Type.body, lineHeight: 23, fontWeight: Type.weight.bold },
+  speakButton: { width: 34, height: 34, borderRadius: Radii.pill, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  speakButtonGlyph: { fontSize: 15 },
   clarify: { fontFamily: Fonts.arabic.regular, fontSize: Type.bodySm, lineHeight: 21 },
   understandBox: { gap: 4 },
   sectionLabel: { fontFamily: Fonts.arabic.bold, fontSize: Type.micro, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 3 },
@@ -487,11 +698,22 @@ const styles = StyleSheet.create({
   openOrganGlyph: { fontSize: 15 },
   openOrganText: { color: Palette.white, fontFamily: Fonts.arabic.bold, fontSize: Type.bodySm, fontWeight: Type.weight.black },
   disclaimer: { fontFamily: Fonts.arabic.regular, fontSize: Type.micro, lineHeight: 16, marginTop: 2 },
-  agentRow2: {},
   thinkingBubble: { flexDirection: 'row', alignItems: 'center', gap: 9, borderWidth: 1, borderRadius: Radii.lg, paddingHorizontal: 14, paddingVertical: 11 },
   thinkingText: { fontFamily: Fonts.arabic.medium, fontSize: Type.bodySm },
-  inputBar: { alignItems: 'flex-end', gap: 9, paddingHorizontal: 12, paddingTop: 10, paddingBottom: Platform.OS === 'ios' ? 22 : 12, borderTopWidth: 1 },
-  input: { flex: 1, minHeight: 44, maxHeight: 120, borderRadius: Radii.md, paddingHorizontal: 14, paddingVertical: 11, fontFamily: Fonts.arabic.regular, fontSize: Type.body },
+  inputWrap: { paddingHorizontal: 12, paddingTop: 8, paddingBottom: Platform.OS === 'ios' ? 22 : 12, borderTopWidth: 1, gap: 8 },
+  pendingRow: { alignItems: 'center', gap: 10 },
+  pendingImageWrap: { position: 'relative' },
+  pendingImage: { width: 56, height: 56, borderRadius: Radii.md },
+  pendingRemove: { position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: Palette.rose, alignItems: 'center', justifyContent: 'center' },
+  pendingRemoveGlyph: { color: Palette.white, fontSize: 12, fontWeight: '900' },
+  listeningPill: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Palette.teal100, borderRadius: Radii.pill, paddingHorizontal: 12, paddingVertical: 8 },
+  listeningDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Palette.rose },
+  listeningText: { flex: 1, color: Palette.teal700, fontFamily: Fonts.arabic.medium, fontSize: Type.caption },
+  inputBar: { alignItems: 'flex-end', gap: 9 },
+  iconButton: { width: 46, height: 46, borderRadius: Radii.md, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
+  iconGlyph: { fontSize: 19 },
+  micActive: { backgroundColor: Palette.rose, borderWidth: 1, borderColor: Palette.rose },
+  input: { flex: 1, minHeight: 46, maxHeight: 120, borderRadius: Radii.md, paddingHorizontal: 14, paddingVertical: 11, fontFamily: Fonts.arabic.regular, fontSize: Type.body },
   sendButton: { width: 46, height: 46, borderRadius: Radii.pill, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', ...Elevation.glowTeal },
   sendDisabled: { opacity: 0.4 },
   sendGlyph: { color: Palette.white, fontSize: 16, fontWeight: '900' },
