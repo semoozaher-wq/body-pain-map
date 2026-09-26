@@ -1,0 +1,632 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedFrom": [
+    "Human Phenotype Ontology (HPO) — open, https://hpo.jax.org/"
+  ],
+  "notice": "أعراض مرجعية عامة للتعليم فقط، وأكواد HPO للمطابقة المرجعية مع المصطلحات الطبية المعيارية، وليست تشخيصًا ولا بديلاً عن الطبيب المؤهل.",
+  "symptoms": [
+    {
+      "id": "hpo:0003326",
+      "hpo": "HP:0003326",
+      "name": {
+        "ar": "ألم عضلي",
+        "en": "Myalgia",
+        "fr": "Myalgie"
+      },
+      "description": {
+        "ar": "ألم أو وجع في العضلات، شائع بعد المجهود أو الشد العضلي.",
+        "en": "Muscle pain or aching, common after exertion or strain.",
+        "fr": "Douleur ou courbature musculaire, fréquente après un effort."
+      },
+      "regions": [
+        "back",
+        "upper_limb",
+        "lower_limb",
+        "torso_front",
+        "head_neck"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0003418",
+      "hpo": "HP:0003418",
+      "name": {
+        "ar": "ألم الظهر",
+        "en": "Back pain",
+        "fr": "Rachialgie"
+      },
+      "description": {
+        "ar": "ألم في منطقة الظهر، قد يكون عضليًا أو مرتبطًا بالفقرات.",
+        "en": "Pain in the back, which may be muscular or spinal.",
+        "fr": "Douleur du dos, d'origine musculaire ou vertébrale."
+      },
+      "regions": [
+        "back",
+        "torso_front"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0002829",
+      "hpo": "HP:0002829",
+      "name": {
+        "ar": "ألم مفصلي",
+        "en": "Arthralgia",
+        "fr": "Arthralgie"
+      },
+      "description": {
+        "ar": "ألم في المفاصل بدون انتفاخ واضح بالضرورة.",
+        "en": "Joint pain, not necessarily with visible swelling.",
+        "fr": "Douleur articulaire, sans gonflement nécessairement visible."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "back"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0001369",
+      "hpo": "HP:0001369",
+      "name": {
+        "ar": "التهاب مفصلي",
+        "en": "Arthritis",
+        "fr": "Arthrite"
+      },
+      "description": {
+        "ar": "التهاب في المفصل مع تورّم أو احمرار أو حرارة.",
+        "en": "Joint inflammation with swelling, redness, or warmth.",
+        "fr": "Inflammation articulaire avec gonflement, rougeur ou chaleur."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0003401",
+      "hpo": "HP:0003401",
+      "name": {
+        "ar": "تنميل",
+        "en": "Paresthesia",
+        "fr": "Paresthésie"
+      },
+      "description": {
+        "ar": "إحساس بالوخز أو التنميل أو النمنمة في طرف.",
+        "en": "Tingling, prickling, or numbness sensation in a limb.",
+        "fr": "Sensation de picotement ou d'engourdissement d'un membre."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "head_neck"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0002315",
+      "hpo": "HP:0002315",
+      "name": {
+        "ar": "صداع",
+        "en": "Headache",
+        "fr": "Céphalée"
+      },
+      "description": {
+        "ar": "ألم في الرأس قد يكون توتريًا أو نصفيًا أو ثانويًا.",
+        "en": "Head pain, which may be tension-type, migraine, or secondary.",
+        "fr": "Douleur de la tête, de type tension, migraine ou secondaire."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0002076",
+      "hpo": "HP:0002076",
+      "name": {
+        "ar": "شقيقة (صداع نصفي)",
+        "en": "Migraine",
+        "fr": "Migraine"
+      },
+      "description": {
+        "ar": "صداع نابض غالبًا في جانب واحد، قد يصحبه غثيان أو حساسية للضوء.",
+        "en": "Often unilateral throbbing headache, sometimes with nausea or light sensitivity.",
+        "fr": "Céphalée pulsatile souvent unilatérale, parfois avec nausée ou photophobie."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0003474",
+      "hpo": "HP:0003474",
+      "name": {
+        "ar": "خلل الإحساس الجسدي",
+        "en": "Somatic sensory dysfunction",
+        "fr": "Trouble sensitif somatique"
+      },
+      "description": {
+        "ar": "اضطراب في الإحساس باللمس أو الألم أو الحرارة.",
+        "en": "Altered perception of touch, pain, or temperature.",
+        "fr": "Perception altérée du toucher, de la douleur ou de la température."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "back"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0009830",
+      "hpo": "HP:0009830",
+      "name": {
+        "ar": "اعتلال الأعصاب الطرفية",
+        "en": "Peripheral neuropathy",
+        "fr": "Neuropathie périphérique"
+      },
+      "description": {
+        "ar": "تلف في الأعصاب الطرفية يسبب ألمًا أو تنميلًا أو ضعفًا.",
+        "en": "Peripheral nerve damage causing pain, numbness, or weakness.",
+        "fr": "Atteinte des nerfs périphériques causant douleur, engourdissement ou faiblesse."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0001324",
+      "hpo": "HP:0001324",
+      "name": {
+        "ar": "ضعف عضلي",
+        "en": "Muscle weakness",
+        "fr": "Faiblesse musculaire"
+      },
+      "description": {
+        "ar": "نقص في قوة العضلة، قد يكون موضعيًا أو معممًا.",
+        "en": "Reduced muscle strength, which may be focal or generalized.",
+        "fr": "Diminution de la force musculaire, focale ou généralisée."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "back"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0001276",
+      "hpo": "HP:0001276",
+      "name": {
+        "ar": "توتّر عضلي (زيادة التوتر)",
+        "en": "Hypertonia",
+        "fr": "Hypertonie"
+      },
+      "description": {
+        "ar": "زيادة في توتر العضلة أو تصلّبها.",
+        "en": "Increased muscle tone or stiffness.",
+        "fr": "Augmentation du tonus ou raideur musculaire."
+      },
+      "regions": [
+        "back",
+        "head_neck",
+        "upper_limb"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0002653",
+      "hpo": "HP:0002653",
+      "name": {
+        "ar": "ألم العظام",
+        "en": "Bone pain",
+        "fr": "Douleur osseuse"
+      },
+      "description": {
+        "ar": "ألم عميق من العظم نفسه، مختلف عن الألم العضلي.",
+        "en": "Deep pain arising from bone itself, distinct from muscle pain.",
+        "fr": "Douleur profonde d'origine osseuse, distincte de la douleur musculaire."
+      },
+      "regions": [
+        "back",
+        "lower_limb",
+        "upper_limb"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0012531",
+      "hpo": "HP:0012531",
+      "name": {
+        "ar": "ألم",
+        "en": "Pain",
+        "fr": "Douleur"
+      },
+      "description": {
+        "ar": "إحساس مزعج عام يشير إلى تنبيه أو ضرر محتمل في الأنسجة.",
+        "en": "A general unpleasant sensation signaling potential tissue irritation or harm.",
+        "fr": "Sensation désagréable générale signalant une irritation ou une atteinte potentielle."
+      },
+      "regions": [
+        "back",
+        "upper_limb",
+        "lower_limb",
+        "torso_front",
+        "head_neck"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0012532",
+      "hpo": "HP:0012532",
+      "name": {
+        "ar": "ألم مزمن",
+        "en": "Chronic pain",
+        "fr": "Douleur chronique"
+      },
+      "description": {
+        "ar": "ألم يستمر أو يتكرر عادة أكثر من ثلاثة أشهر.",
+        "en": "Pain that persists or recurs, usually beyond three months.",
+        "fr": "Douleur qui persiste ou récidive, généralement au-delà de trois mois."
+      },
+      "regions": [
+        "back",
+        "upper_limb",
+        "lower_limb",
+        "head_neck"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0001288",
+      "hpo": "HP:0001288",
+      "name": {
+        "ar": "اضطراب المشي",
+        "en": "Gait disturbance",
+        "fr": "Trouble de la marche"
+      },
+      "description": {
+        "ar": "صعوبة أو تغيّر في نمط المشي.",
+        "en": "Difficulty or change in walking pattern.",
+        "fr": "Difficulté ou modification de la marche."
+      },
+      "regions": [
+        "lower_limb",
+        "back"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0002360",
+      "hpo": "HP:0002360",
+      "name": {
+        "ar": "اضطراب النوم",
+        "en": "Sleep disturbance",
+        "fr": "Trouble du sommeil"
+      },
+      "description": {
+        "ar": "صعوبة في النوم أو استمراره، وقد تزيد الألم سوءًا.",
+        "en": "Difficulty falling or staying asleep, which can worsen pain.",
+        "fr": "Difficulté à s'endormir ou à rester endormi, pouvant aggraver la douleur."
+      },
+      "regions": [
+        "back",
+        "head_neck"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0000739",
+      "hpo": "HP:0000739",
+      "name": {
+        "ar": "قلق",
+        "en": "Anxiety",
+        "fr": "Anxiété"
+      },
+      "description": {
+        "ar": "شعور بالتوتر أو الخوف قد يرافق الألم المزمن.",
+        "en": "Feeling of tension or fear that may accompany chronic pain.",
+        "fr": "Sentiment de tension ou de peur pouvant accompagner la douleur chronique."
+      },
+      "regions": [
+        "head_neck",
+        "back"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0000716",
+      "hpo": "HP:0000716",
+      "name": {
+        "ar": "اكتئاب",
+        "en": "Depression",
+        "fr": "Dépression"
+      },
+      "description": {
+        "ar": "انخفاض المزاج وفقدان الاهتمام، وقد يترافق مع الألم المزمن.",
+        "en": "Low mood and loss of interest, sometimes with chronic pain.",
+        "fr": "Humeur basse et perte d'intérêt, parfois avec douleur chronique."
+      },
+      "regions": [
+        "head_neck",
+        "back"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0001945",
+      "hpo": "HP:0001945",
+      "name": {
+        "ar": "حمّى",
+        "en": "Fever",
+        "fr": "Fièvre"
+      },
+      "description": {
+        "ar": "ارتفاع حرارة الجسم، وقد يشير مع الألم إلى عدوى.",
+        "en": "Elevated body temperature, which with pain may indicate infection.",
+        "fr": "Température corporelle élevée, pouvant indiquer une infection avec douleur."
+      },
+      "regions": [
+        "back",
+        "torso_front",
+        "lower_limb",
+        "upper_limb"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0002017",
+      "hpo": "HP:0002017",
+      "name": {
+        "ar": "غثيان وقيء",
+        "en": "Nausea and vomiting",
+        "fr": "Nausées et vomissements"
+      },
+      "description": {
+        "ar": "إحساس بالغثيان أو التقيؤ، قد يرافق الصداع النصفي أو أمراض أخرى.",
+        "en": "Feeling of nausea or vomiting, may accompany migraine or other conditions.",
+        "fr": "Sensation de nausée ou vomissement, peut accompagner la migraine."
+      },
+      "regions": [
+        "head_neck",
+        "torso_front"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0002020",
+      "hpo": "HP:0002020",
+      "name": {
+        "ar": "ارتجاع معدي مريئي",
+        "en": "Gastroesophageal reflux",
+        "fr": "Reflux gastro-œsophagien"
+      },
+      "description": {
+        "ar": "صعود حمض المعدة للمريء مسببًا حرقة أو ألمًا في الصدر.",
+        "en": "Stomach acid rising into the esophagus causing burning or chest pain.",
+        "fr": "Remontée d'acide gastrique dans l'œsophage causant brûlure ou douleur."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0000988",
+      "hpo": "HP:0000988",
+      "name": {
+        "ar": "طفح جلدي",
+        "en": "Skin rash",
+        "fr": "Éruption cutanée"
+      },
+      "description": {
+        "ar": "تغيّر في الجلد مع احمرار أو بقع أو حكة.",
+        "en": "Skin change with redness, spots, or itching.",
+        "fr": "Modification cutanée avec rougeur, taches ou démangeaison."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "torso_front",
+        "back"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0001252",
+      "hpo": "HP:0001252",
+      "name": {
+        "ar": "ارتخاء عضلي (نقص التوتر)",
+        "en": "Hypotonia",
+        "fr": "Hypotonie"
+      },
+      "description": {
+        "ar": "نقص في توتر العضلة مع ارتخاء.",
+        "en": "Reduced muscle tone with flaccidity.",
+        "fr": "Diminution du tonus musculaire avec flaccidité."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "back"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0003325",
+      "hpo": "HP:0003325",
+      "name": {
+        "ar": "ضعف عضلات الأطراف",
+        "en": "Limb muscle weakness",
+        "fr": "Faiblesse des muscles des membres"
+      },
+      "description": {
+        "ar": "ضعف في عضلات الذراعين أو الساقين.",
+        "en": "Weakness in the muscles of the arms or legs.",
+        "fr": "Faiblesse des muscles des bras ou des jambes."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0003549",
+      "hpo": "HP:0003549",
+      "name": {
+        "ar": "خلل في النسيج الضام",
+        "en": "Connective tissue abnormality",
+        "fr": "Anomalie du tissu conjonctif"
+      },
+      "description": {
+        "ar": "تغيّر في الأربطة أو الأوتار أو الأنسجة الداعمة.",
+        "en": "Change in ligaments, tendons, or supporting tissue.",
+        "fr": "Modification des ligaments, tendons ou tissus de soutien."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "back"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0001596",
+      "hpo": "HP:0001596",
+      "name": {
+        "ar": "تساقط الشعر",
+        "en": "Alopecia",
+        "fr": "Alopécie"
+      },
+      "description": {
+        "ar": "فقدان الشعر جزئيًا أو كليًا، قد يرتبط بأمراض مناعية.",
+        "en": "Partial or complete hair loss, sometimes linked to immune conditions.",
+        "fr": "Perte partielle ou totale des cheveux, parfois liée à des maladies immunitaires."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0001265",
+      "hpo": "HP:0001265",
+      "name": {
+        "ar": "نقص المنعكسات",
+        "en": "Hyporeflexia",
+        "fr": "Hyporéflexie"
+      },
+      "description": {
+        "ar": "انخفاض استجابة المنعكسات العصبية.",
+        "en": "Reduced reflex responses.",
+        "fr": "Diminution des réflexes."
+      },
+      "regions": [
+        "lower_limb",
+        "upper_limb"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0002014",
+      "hpo": "HP:0002014",
+      "name": {
+        "ar": "إسهال",
+        "en": "Diarrhea",
+        "fr": "Diarrhée"
+      },
+      "description": {
+        "ar": "تبرّز رخو أو متكرر، قد يرافق عدوى أو أمراض معوية.",
+        "en": "Loose or frequent stools, may accompany infection or bowel disease.",
+        "fr": "Selles molles ou fréquentes, pouvant accompagner une infection."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0000822",
+      "hpo": "HP:0000822",
+      "name": {
+        "ar": "ارتفاع ضغط الدم",
+        "en": "Hypertension",
+        "fr": "Hypertension artérielle"
+      },
+      "description": {
+        "ar": "ارتفاع مزمن في ضغط الدم قد يسبب صداعًا أو دوارًا أو بلا أعراض.",
+        "en": "Chronically elevated blood pressure, which may cause headache, dizziness, or no symptoms.",
+        "fr": "Pression artérielle élevée chronique, parfois asymptomatique ou avec céphalées/vertiges."
+      },
+      "regions": [
+        "torso_front",
+        "head_neck"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0001386",
+      "hpo": "HP:0001386",
+      "name": {
+        "ar": "تورم المفصل",
+        "en": "Joint swelling",
+        "fr": "Gonflement articulaire"
+      },
+      "description": {
+        "ar": "انتفاخ في المفصل قد يرافق الالتهاب أو الإصابة.",
+        "en": "Swelling of a joint, which may accompany inflammation or injury.",
+        "fr": "Gonflement articulaire, pouvant accompagner une inflammation ou une blessure."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": true
+    },
+    {
+      "id": "hpo:0012378",
+      "hpo": "HP:0012378",
+      "name": {
+        "ar": "إجهاد",
+        "en": "Fatigue",
+        "fr": "Fatigue"
+      },
+      "description": {
+        "ar": "إحساس بالتعب والإرهاق قد يرافق الألم المزمن أو الالتهاب.",
+        "en": "Feeling of tiredness or exhaustion, may accompany chronic pain or inflammation.",
+        "fr": "Sensation de fatigue, pouvant accompagner douleur chronique ou inflammation."
+      },
+      "regions": [
+        "back",
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": false
+    },
+    {
+      "id": "hpo:0002321",
+      "hpo": "HP:0002321",
+      "name": {
+        "ar": "دوار",
+        "en": "Vertigo",
+        "fr": "Vertige"
+      },
+      "description": {
+        "ar": "إحساس بالدوران أو فقدان التوازن، قد يرافق الصداع النصفي.",
+        "en": "Sensation of spinning or loss of balance, may accompany migraine.",
+        "fr": "Sensation de rotation ou perte d’équilibre, pouvant accompagner la migraine."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": true
+    }
+  ]
+}

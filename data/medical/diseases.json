@@ -1,1 +1,981 @@
-
+{
+  "schemaVersion": "1.0.0",
+  "generatedFrom": [
+    "Disease Ontology (DOID) — CC0",
+    "Human Phenotype Ontology (HPO) — open",
+    "ICD-10-CM (WHO/CDC)",
+    "MedlinePlus (NLM)"
+  ],
+  "notice": "محتوى تعليمي عام فقط، لا يقدّم تشخيصًا أو علاجًا ولا يُغني عن الطبيب المؤهل. الأكواد (DOID/ICD-10/HPO) للمطابقة المرجعية فقط.",
+  "conditions": [
+    {
+      "id": "doid:4536",
+      "doid": "DOID:4536",
+      "icd10": "M54.5",
+      "name": {
+        "ar": "ألم أسفل الظهر الميكانيكي",
+        "en": "Mechanical low back pain",
+        "fr": "Lombalgie mécanique"
+      },
+      "summary": {
+        "ar": "ألم في أسفل الظهر غالبًا بسبب شد عضلي أو وضعية خاطئة أو حمل زائد، ويتحسن بالراحة النسبية والحركة اللطيفة.",
+        "en": "Lower back pain usually from muscle strain, posture, or overload; improves with relative rest and gentle movement.",
+        "fr": "Lombalgie souvent liée à un effort, une posture ou une surcharge ; s'améliore avec du repos relatif et un mouvement doux."
+      },
+      "muscleGroups": [
+        "lower-back",
+        "gluteal",
+        "obliques"
+      ],
+      "regions": [
+        "back",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0003418",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "فقدان التحكم في البول/البراز، خدر منطقة السرج، ضعف متزايد في الساقين، حرارة مع الألم.",
+        "en": "Loss of bladder/bowel control, saddle numbness, progressive leg weakness, fever with pain.",
+        "fr": "Perte du contrôle vésical/anal, anesthésie en selle, faiblesse progressive des jambes, fièvre avec douleur."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/backpain.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Back Pain",
+          "url": "https://medlineplus.gov/backpain.html"
+        },
+        {
+          "title": "Disease Ontology",
+          "url": "https://disease-ontology.org/"
+        }
+      ]
+    },
+    {
+      "id": "doid:1167",
+      "doid": "DOID:1167",
+      "icd10": "M54.2",
+      "name": {
+        "ar": "ألم الرقبة (رقبة ميكانيكية)",
+        "en": "Neck pain (mechanical)",
+        "fr": "Cervicalgie mécanique"
+      },
+      "summary": {
+        "ar": "شد أو ألم في الرقبة شائع مع الجلوس الطويل أو الشاشات أو الوضعيات الخاطئة، وغالبًا يتحسن بالتمدد والوضعية السليمة.",
+        "en": "Neck strain common with prolonged sitting, screens, or poor posture; often improves with stretching and ergonomics.",
+        "fr": "Tension cervicale fréquente avec la position assise prolongée ou une mauvaise posture ; s'améliore par des étirements."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "upper-back"
+      ],
+      "regions": [
+        "head_neck",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829",
+        "hpo:0003401"
+      ],
+      "redFlags": {
+        "ar": "ألم ينتشر للذراع مع ضعف، صعوبة في المشي، حرارة، أو بعد إصابة/حادث.",
+        "en": "Pain radiating to arm with weakness, difficulty walking, fever, or after trauma/accident.",
+        "fr": "Douleur irradiant au bras avec faiblesse, difficulté à marcher, fièvre, ou après un traumatisme."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/neckinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Neck Injuries and Disorders",
+          "url": "https://medlineplus.gov/neckinjuriesanddisorders.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:3059",
+      "doid": "DOID:3059",
+      "icd10": "M75.1",
+      "name": {
+        "ar": "متلازمة الكفة المدورة (الكتف)",
+        "en": "Rotator cuff syndrome",
+        "fr": "Syndrome de la coiffe des rotateurs"
+      },
+      "summary": {
+        "ar": "ألم في الكتف يزداد مع رفع الذراع، شائع بعد الحركات المتكررة فوق الرأس أو مع تقدم العمر.",
+        "en": "Shoulder pain worsening with arm elevation, common after repetitive overhead motion or with age.",
+        "fr": "Douleur de l'épaule aggravée par l'élévation du bras, fréquente après des mouvements répétés."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "trapezius"
+      ],
+      "regions": [
+        "upper_limb",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326",
+        "hpo:0001324"
+      ],
+      "redFlags": {
+        "ar": "عدم القدرة على رفع الذراع إطلاقًا بعد إصابة، تشوه واضح، أو خدر مستمر.",
+        "en": "Inability to lift the arm at all after injury, visible deformity, or persistent numbness.",
+        "fr": "Incapacité totale à lever le bras après une blessure, déformation visible, ou engourdissement persistant."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/shoulderinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Shoulder Injuries and Disorders",
+          "url": "https://medlineplus.gov/shoulderinjuriesanddisorders.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:8398",
+      "doid": "DOID:8398",
+      "icd10": "M17",
+      "name": {
+        "ar": "خشونة الركبة (الفصال العظمي)",
+        "en": "Knee osteoarthritis",
+        "fr": "Gonarthrose"
+      },
+      "summary": {
+        "ar": "تآكل تدريجي في غضروف الركبة يسبب ألمًا وتيبسًا يزداد مع الحركة ويقل بالراحة، شائع مع التقدم في العمر.",
+        "en": "Gradual knee cartilage wear causing pain and stiffness that worsens with activity and eases with rest.",
+        "fr": "Usure progressive du cartilage du genou causant douleur et raideur, aggravée par l'activité."
+      },
+      "muscleGroups": [
+        "knees",
+        "quadriceps",
+        "hamstring"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326",
+        "hpo:0003401",
+        "hpo:0001386"
+      ],
+      "redFlags": {
+        "ar": "تورم مفاجئ شديد، عدم القدرة على تحمل الوزن، قفل الركبة، أو حرارة واحمرار.",
+        "en": "Sudden severe swelling, inability to bear weight, knee locking, or heat and redness.",
+        "fr": "Gonflement soudain sévère, impossibilité de porter le poids, blocage du genou, ou chaleur."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/kneeinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Knee Injuries and Disorders",
+          "url": "https://medlineplus.gov/kneeinjuriesanddisorders.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:1490",
+      "doid": "DOID:1490",
+      "icd10": "M79.67",
+      "name": {
+        "ar": "ألم عضلي ليفي (الفيبروميالجيا)",
+        "en": "Fibromyalgia",
+        "fr": "Fibromyalgie"
+      },
+      "summary": {
+        "ar": "ألم عضلي منتشر ومزمن مع إجهاد واضطراب في النوم، يشمل مناطق متعددة من الجسم دون سبب التهابي واضح.",
+        "en": "Widespread chronic muscle pain with fatigue and sleep disturbance across multiple body regions.",
+        "fr": "Douleur musculaire diffuse chronique avec fatigue et troubles du sommeil."
+      },
+      "muscleGroups": [
+        "trapezius",
+        "upper-back",
+        "lower-back",
+        "deltoids",
+        "quadriceps"
+      ],
+      "regions": [
+        "back",
+        "upper_limb",
+        "lower_limb",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0012378",
+        "hpo:0002829",
+        "hpo:0002360"
+      ],
+      "redFlags": {
+        "ar": "ألم جديد غير معتاد، فقدان وزن، حرارة، أو ضعف عضلي حقيقي.",
+        "en": "New unusual pain, weight loss, fever, or true muscle weakness.",
+        "fr": "Douleur nouvelle inhabituelle, perte de poids, fièvre, ou faiblesse musculaire réelle."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/fibromyalgia.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Fibromyalgia",
+          "url": "https://medlineplus.gov/fibromyalgia.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:3311",
+      "doid": "DOID:3311",
+      "icd10": "G43",
+      "name": {
+        "ar": "الصداع النصفي (الشقيقة)",
+        "en": "Migraine",
+        "fr": "Migraine"
+      },
+      "summary": {
+        "ar": "صداع نابض غالبًا في جانب واحد، قد يصحبه غثيان وحساسية للضوء والصوت، ويزداد بالحركة.",
+        "en": "Throbbing headache often on one side, may include nausea and light/sound sensitivity, worse with movement.",
+        "fr": "Céphalée pulsatile souvent unilatérale, avec nausées et sensibilité à la lumière et au bruit."
+      },
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002076",
+        "hpo:0002017",
+        "hpo:0002321",
+        "hpo:0000988"
+      ],
+      "redFlags": {
+        "ar": "صداع مفاجئ شديد جدًا (كالصاعقة)، ضعف أو تنميل في جانب الجسم، تشوش كلام، أو حرارة مع تيبس رقبة.",
+        "en": "Sudden thunderclap headache, one-sided weakness or numbness, speech disturbance, or fever with neck stiffness.",
+        "fr": "Céphalée en coup de tonnerre, faiblesse ou engourdissement unilatéral, troubles de la parole, ou fièvre."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/migraine.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Migraine",
+          "url": "https://medlineplus.gov/migraine.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:11476-th",
+      "doid": "DOID:11476",
+      "icd10": "G44.2",
+      "name": {
+        "ar": "الصداع التوتري",
+        "en": "Tension-type headache",
+        "fr": "Céphalée de tension"
+      },
+      "summary": {
+        "ar": "صداع ضاغط كأن حول الرأس حزام، غالبًا بسبب التوتر والإجهاد وشد عضلات الرقبة والكتف.",
+        "en": "Pressure-like headache as if a band around the head, often from stress and neck/shoulder tension.",
+        "fr": "Céphalée en étau autour de la tête, souvent liée au stress et à la tension cervicale."
+      },
+      "muscleGroups": [
+        "head",
+        "neck",
+        "trapezius"
+      ],
+      "regions": [
+        "head_neck",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0002076",
+        "hpo:0003401"
+      ],
+      "redFlags": {
+        "ar": "صداع جديد بعد سن 50، تغير في نمط الصداع المعتاد، أو أعراض عصبية.",
+        "en": "New headache after age 50, change in usual pattern, or neurological symptoms.",
+        "fr": "Céphalée nouvelle après 50 ans, changement du schéma habituel, ou symptômes neurologiques."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/headache.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Headache",
+          "url": "https://medlineplus.gov/headache.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:8505",
+      "doid": "DOID:8505",
+      "icd10": "M79.1",
+      "name": {
+        "ar": "ألم العضلات (المايالجيا)",
+        "en": "Myalgia (muscle pain)",
+        "fr": "Myalgie"
+      },
+      "summary": {
+        "ar": "ألم في العضلات قد ينتج عن إجهاد أو عدوى فيروسية أو أدوية، ويشمل مناطق متعددة.",
+        "en": "Muscle pain from strain, viral infection, or medications, affecting multiple regions.",
+        "fr": "Douleur musculaire due à un effort, une infection virale ou des médicaments."
+      },
+      "muscleGroups": [
+        "biceps",
+        "triceps",
+        "forearm",
+        "calves",
+        "quadriceps",
+        "hamstring",
+        "abs"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "ألم شديد مع بول داكن (لون الشاي)، ضعف، أو بعد أدوية الستاتين.",
+        "en": "Severe pain with dark (tea-colored) urine, weakness, or after statin drugs.",
+        "fr": "Douleur sévère avec urines foncées, faiblesse, ou après statines."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/muscledisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Muscle Disorders",
+          "url": "https://medlineplus.gov/muscledisorders.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:10629",
+      "doid": "DOID:10629",
+      "icd10": "S93.4",
+      "name": {
+        "ar": "التواء الكاحل",
+        "en": "Ankle sprain",
+        "fr": "Entorse de la cheville"
+      },
+      "summary": {
+        "ar": "تمزق أو شد في أربطة الكاحل بعد التواء المفصل، يسبب ألمًا وتورمًا وصعوبة في المشي.",
+        "en": "Ligament stretch or tear after ankle twisting, causing pain, swelling, and difficulty walking.",
+        "fr": "Étirement ou déchirure des ligaments après une torsion, avec douleur et gonflement."
+      },
+      "muscleGroups": [
+        "ankles",
+        "calves",
+        "feet",
+        "tibialis"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0001386",
+        "hpo:0003326"
+      ],
+      "redFlags": {
+        "ar": "عدم القدرة على تحمل الوزن 4 خطوات، تشوه، أو خدر في القدم.",
+        "en": "Inability to bear weight 4 steps, deformity, or foot numbness.",
+        "fr": "Impossibilité de porter le poids 4 pas, déformation, ou engourdissement."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/ankleinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Ankle Injuries and Disorders",
+          "url": "https://medlineplus.gov/ankleinjuriesanddisorders.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:4248",
+      "doid": "DOID:4248",
+      "icd10": "M72.2",
+      "name": {
+        "ar": "التهاب اللفافة الأخمصية",
+        "en": "Plantar fasciitis",
+        "fr": "Fasciite plantaire"
+      },
+      "summary": {
+        "ar": "ألم في أسفل القدم (الكعب) يزداد صباحًا مع أول خطوات أو بعد الراحة، شائع مع الوقوف الطويل.",
+        "en": "Heel/foot pain worse with first morning steps or after rest, common with prolonged standing.",
+        "fr": "Douleur du talon aggravée aux premiers pas du matin ou après le repos."
+      },
+      "muscleGroups": [
+        "feet",
+        "calves",
+        "tibialis"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326"
+      ],
+      "redFlags": {
+        "ar": "خدر أو حرقان مستمر، فقدان إحساس، أو ألم ليلي شديد.",
+        "en": "Persistent numbness or burning, loss of sensation, or severe night pain.",
+        "fr": "Engourdissement ou brûlure persistante, perte de sensation, ou douleur nocturne sévère."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/footinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Foot Injuries and Disorders",
+          "url": "https://medlineplus.gov/footinjuriesanddisorders.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:7148",
+      "doid": "DOID:7148",
+      "icd10": "M79.64",
+      "name": {
+        "ar": "ألم اليد والرسغ (إجهاد متكرر)",
+        "en": "Hand/wrist pain (repetitive strain)",
+        "fr": "Douleur main/poignet (effort répétitif)"
+      },
+      "summary": {
+        "ar": "ألم في اليد أو الرسغ بسبب حركات متكررة أو وضعية خاطئة، قد يصحبه تنميل خفيف.",
+        "en": "Hand or wrist pain from repetitive motion or poor posture, may include mild numbness.",
+        "fr": "Douleur de la main ou du poignet due à des mouvements répétitifs."
+      },
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003401",
+        "hpo:0003326"
+      ],
+      "redFlags": {
+        "ar": "خدر وضعف مستمر في اليد، تورم مفصل، أو ألم ليلي يوقظك.",
+        "en": "Persistent hand numbness and weakness, joint swelling, or night pain waking you.",
+        "fr": "Engourdissement et faiblesse persistants, gonflement articulaire, ou douleur nocturne."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/arminjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Arm Injuries and Disorders",
+          "url": "https://medlineplus.gov/arminjuriesanddisorders.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:6713",
+      "doid": "DOID:6713",
+      "icd10": "M62.838",
+      "name": {
+        "ar": "شد عضلي (تشنج)",
+        "en": "Muscle strain/spasm",
+        "fr": "Contracture musculaire"
+      },
+      "summary": {
+        "ar": "شد مفاجئ أو تشنج في العضلة بعد مجهود أو حركة خاطئة، يسبب ألمًا موضعيًا وتحسسًا باللمس.",
+        "en": "Sudden muscle strain or spasm after effort or wrong movement, causing localized pain.",
+        "fr": "Contracture ou spasme musculaire soudain après un effort ou un mauvais mouvement."
+      },
+      "muscleGroups": [
+        "trapezius",
+        "upper-back",
+        "lower-back",
+        "hamstring",
+        "quadriceps",
+        "calves",
+        "biceps",
+        "triceps"
+      ],
+      "regions": [
+        "back",
+        "lower_limb",
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "تشنج مستمر مع ضعف، ألم لا يتحسن، أو تورم واضح.",
+        "en": "Persistent spasm with weakness, non-improving pain, or obvious swelling.",
+        "fr": "Spasme persistant avec faiblesse, douleur non améliorée, ou gonflement."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/sprainsandstrains.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Sprains and Strains",
+          "url": "https://medlineplus.gov/sprainsandstrains.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:11067",
+      "doid": "DOID:11067",
+      "icd10": "M79.7",
+      "name": {
+        "ar": "التهاب الأوتار",
+        "en": "Tendinitis",
+        "fr": "Tendinite"
+      },
+      "summary": {
+        "ar": "التهاب في الوتر يسبب ألمًا موضعيًا يزداد بالحركة، شائع مع الاستخدام المتكرر.",
+        "en": "Tendon inflammation causing localized pain worse with movement, common with overuse.",
+        "fr": "Inflammation du tendon causant une douleur locale aggravée par le mouvement."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "forearm",
+        "hands",
+        "ankles",
+        "feet",
+        "knees"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326",
+        "hpo:0001386"
+      ],
+      "redFlags": {
+        "ar": "سماع صوت طقطقة مع ألم مفاجئ (احتمال تمزق)، أو عدم قدرة على الحركة.",
+        "en": "A pop sound with sudden pain (possible tear), or inability to move.",
+        "fr": "Un craquement avec douleur soudaine (déchirure possible), ou impossibilité de bouger."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/tendinitis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Tendinitis",
+          "url": "https://medlineplus.gov/tendinitis.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:8398-oa",
+      "doid": "DOID:8398",
+      "icd10": "M19.9",
+      "name": {
+        "ar": "الفصال العظمي (خشونة المفاصل)",
+        "en": "Osteoarthritis",
+        "fr": "Arthrose"
+      },
+      "summary": {
+        "ar": "تآكل تدريجي في غضروف المفاصل يسبب ألمًا وتيبسًا يزداد مع النشاط، شائع مع التقدم في العمر.",
+        "en": "Gradual joint cartilage wear causing pain and stiffness worse with activity.",
+        "fr": "Usure progressive du cartilage articulaire causant douleur et raideur."
+      },
+      "muscleGroups": [
+        "knees",
+        "hands",
+        "ankles",
+        "lower-back",
+        "neck"
+      ],
+      "regions": [
+        "lower_limb",
+        "upper_limb",
+        "back",
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326",
+        "hpo:0003401"
+      ],
+      "redFlags": {
+        "ar": "تورم مفاجئ، احمرار وحرارة، أو عدم قدرة على تحريك المفصل.",
+        "en": "Sudden swelling, redness and heat, or inability to move the joint.",
+        "fr": "Gonflement soudain, rougeur et chaleur, ou impossibilité de bouger l'articulation."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/osteoarthritis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Osteoarthritis",
+          "url": "https://medlineplus.gov/osteoarthritis.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:8483",
+      "doid": "DOID:8483",
+      "icd10": "M05",
+      "name": {
+        "ar": "التهاب المفاصل الروماتويدي",
+        "en": "Rheumatoid arthritis",
+        "fr": "Polyarthrite rhumatoïde"
+      },
+      "summary": {
+        "ar": "مرض مناعي مزمن يسبب التهابًا في المفاصل (غالبًا اليدين والقدمين) مع تيبس صباحي وتورم متماثل.",
+        "en": "Chronic immune disease causing joint inflammation (often hands/feet) with morning stiffness and symmetric swelling.",
+        "fr": "Maladie immunitaire chronique avec inflammation articulaire, raideur matinale et gonflement symétrique."
+      },
+      "muscleGroups": [
+        "hands",
+        "feet",
+        "knees",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0001386",
+        "hpo:0012378"
+      ],
+      "redFlags": {
+        "ar": "تورم مفاصل متعدد ومتماثل، حرارة، أو أعراض عامة مستمرة.",
+        "en": "Multiple symmetric joint swelling, fever, or persistent systemic symptoms.",
+        "fr": "Gonflement articulaire multiple symétrique, fièvre, ou symptômes généraux."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/rheumatoidarthritis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Rheumatoid Arthritis",
+          "url": "https://medlineplus.gov/rheumatoidarthritis.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:13241",
+      "doid": "DOID:13241",
+      "icd10": "G56.0",
+      "name": {
+        "ar": "متلازمة النفق الرسغي",
+        "en": "Carpal tunnel syndrome",
+        "fr": "Syndrome du canal carpien"
+      },
+      "summary": {
+        "ar": "ضغط على عصب الرسغ يسبب تنميلًا ووخزًا في اليد خاصة الإبهام والسبابة، ويزداد ليلًا.",
+        "en": "Wrist nerve compression causing tingling in the hand (thumb/index), worse at night.",
+        "fr": "Compression nerveuse au poignet causant picotements dans la main, pire la nuit."
+      },
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "ضعف مستمر في الإبهام، ضمور عضلي، أو فقدان إحساس دائم.",
+        "en": "Persistent thumb weakness, muscle wasting, or permanent loss of sensation.",
+        "fr": "Faiblesse persistante du pouce, fonte musculaire, ou perte de sensation."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/carpaltunnelsyndrome.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Carpal Tunnel Syndrome",
+          "url": "https://medlineplus.gov/carpaltunnelsyndrome.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:10202",
+      "doid": "DOID:10202",
+      "icd10": "M50.1",
+      "name": {
+        "ar": "الانزلاق الغضروفي العنقي",
+        "en": "Cervical disc herniation",
+        "fr": "Hernie discale cervicale"
+      },
+      "summary": {
+        "ar": "انزلاق في غضروف الرقبة قد يضغط على العصب فيسبب ألمًا ينتشر للذراع مع تنميل.",
+        "en": "Neck disc herniation that may compress a nerve, causing arm pain with tingling.",
+        "fr": "Hernie discale cervicale pouvant comprimer un nerf, causant douleur et picotements au bras."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "deltoids",
+        "biceps",
+        "triceps",
+        "forearm"
+      ],
+      "regions": [
+        "head_neck",
+        "upper_limb",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0002829",
+        "hpo:0003326"
+      ],
+      "redFlags": {
+        "ar": "ضعف في الذراع أو اليد، صعوبة المشي، أو فقدان التحكم في المثانة.",
+        "en": "Arm/hand weakness, difficulty walking, or loss of bladder control.",
+        "fr": "Faiblesse du bras/main, difficulté à marcher, ou perte de contrôle vésical."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/herniateddisk.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Herniated Disk",
+          "url": "https://medlineplus.gov/herniateddisk.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:10202-ls",
+      "doid": "DOID:10202",
+      "icd10": "M51.16",
+      "name": {
+        "ar": "الانزلاق الغضروفي القطني",
+        "en": "Lumbar disc herniation",
+        "fr": "Hernie discale lombaire"
+      },
+      "summary": {
+        "ar": "انزلاق في غضروف أسفل الظهر قد يضغط على العصب فيسبب ألمًا ينتشر للساق (عرق النسا).",
+        "en": "Lower back disc herniation that may compress a nerve, causing leg pain (sciatica).",
+        "fr": "Hernie discale lombaire pouvant comprimer un nerf, causant une douleur à la jambe (sciatique)."
+      },
+      "muscleGroups": [
+        "lower-back",
+        "gluteal",
+        "hamstring",
+        "calves",
+        "quadriceps"
+      ],
+      "regions": [
+        "back",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0002829",
+        "hpo:0003326"
+      ],
+      "redFlags": {
+        "ar": "خدر منطقة السرج، فقدان التحكم في البول/البراز، ضعف متزايد في الساق.",
+        "en": "Saddle numbness, loss of bladder/bowel control, progressive leg weakness.",
+        "fr": "Anesthésie en selle, perte de contrôle vésical/anal, faiblesse progressive de la jambe."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/sciatica.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Sciatica",
+          "url": "https://medlineplus.gov/sciatica.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:9350",
+      "doid": "DOID:9350",
+      "icd10": "G62.9",
+      "name": {
+        "ar": "اعتلال الأعصاب المحيطية",
+        "en": "Peripheral neuropathy",
+        "fr": "Neuropathie périphérique"
+      },
+      "summary": {
+        "ar": "تلف في الأعصاب الطرفية يسبب تنميلًا وحرقانًا ووخزًا في اليدين والقدمين، شائع مع السكري.",
+        "en": "Peripheral nerve damage causing numbness, burning, and tingling in hands and feet, common with diabetes.",
+        "fr": "Atteinte des nerfs périphériques causant engourdissement et brûlure des mains et pieds."
+      },
+      "muscleGroups": [
+        "feet",
+        "hands",
+        "calves",
+        "forearm",
+        "tibialis"
+      ],
+      "regions": [
+        "lower_limb",
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "ضعف متزايد، فقدان إحساس، أو تقرحات في القدم لا تلتئم.",
+        "en": "Progressive weakness, loss of sensation, or non-healing foot ulcers.",
+        "fr": "Faiblesse progressive, perte de sensation, ou ulcères du pied non cicatrisants."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/peripheralnervedisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Peripheral Nerve Disorders",
+          "url": "https://medlineplus.gov/peripheralnervedisorders.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:10763",
+      "doid": "DOID:10763",
+      "icd10": "I10",
+      "name": {
+        "ar": "ارتفاع ضغط الدم",
+        "en": "Hypertension",
+        "fr": "Hypertension artérielle"
+      },
+      "summary": {
+        "ar": "ارتفاع مزمن في ضغط الدم قد يسبب صداعًا وألمًا في الرقبة، ويزيد خطر مشاكل القلب.",
+        "en": "Chronic high blood pressure may cause headache and neck pain, and raises heart risk.",
+        "fr": "Hypertension chronique pouvant causer céphalée et cervicalgie."
+      },
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002076",
+        "hpo:0000822"
+      ],
+      "redFlags": {
+        "ar": "صداع شديد مفاجئ، ألم صدر، ضيق نفس، أو اضطراب رؤية.",
+        "en": "Severe sudden headache, chest pain, shortness of breath, or vision changes.",
+        "fr": "Céphalée sévère soudaine, douleur thoracique, essoufflement, ou troubles visuels."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/highbloodpressure.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — High Blood Pressure",
+          "url": "https://medlineplus.gov/highbloodpressure.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:12353",
+      "doid": "DOID:12353",
+      "icd10": "K21.9",
+      "name": {
+        "ar": "الارتجاع المريئي (الحموضة)",
+        "en": "Gastroesophageal reflux (GERD)",
+        "fr": "Reflux gastro-œsophagien"
+      },
+      "summary": {
+        "ar": "صعود حمض المعدة للمريء يسبب حرقة في الصدر وألمًا قد يشبه ألم القلب، ويزداد بعد الأكل.",
+        "en": "Stomach acid reflux causing chest burning and pain that may mimic heart pain, worse after meals.",
+        "fr": "Reflux acide causant brûlure et douleur thoracique, pire après les repas."
+      },
+      "muscleGroups": [
+        "chest",
+        "abs"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0002020",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "ألم صدر ضاغط ينتشر للذراع/الفك، ضيق نفس، أو تعرق (اشتباه قلب — إسعاف فوري).",
+        "en": "Pressing chest pain radiating to arm/jaw, shortness of breath, or sweating (possible heart — emergency).",
+        "fr": "Douleur thoracique irradiant au bras/mâchoire, essoufflement, ou sueurs (urgence)."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/gerd.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — GERD",
+          "url": "https://medlineplus.gov/gerd.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:8505-doms",
+      "doid": "DOID:8505",
+      "icd10": "M79.1",
+      "name": {
+        "ar": "ألم عضلي بعد المجهود (تأخر الظهور)",
+        "en": "Delayed-onset muscle soreness (DOMS)",
+        "fr": "Courbatures d'effort"
+      },
+      "summary": {
+        "ar": "ألم عضلي يظهر بعد 24–72 ساعة من مجهود غير معتاد، يتحسن تدريجيًا بالحركة اللطيفة.",
+        "en": "Muscle pain 24–72 hours after unaccustomed exercise, gradually improving with gentle movement.",
+        "fr": "Douleur musculaire 24–72 h après un effort inhabituel, s'améliore par un mouvement doux."
+      },
+      "muscleGroups": [
+        "biceps",
+        "triceps",
+        "quadriceps",
+        "hamstring",
+        "calves",
+        "abs",
+        "obliques",
+        "adductors"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "بول داكن، ألم شديد متزايد، تورم، أو ضعف حقيقي.",
+        "en": "Dark urine, severe worsening pain, swelling, or true weakness.",
+        "fr": "Urines foncées, douleur sévère croissante, gonflement, ou faiblesse réelle."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/exerciseandphysicalfitness.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Exercise and Physical Fitness",
+          "url": "https://medlineplus.gov/exerciseandphysicalfitness.html"
+        }
+      ]
+    },
+    {
+      "id": "doid:0050896",
+      "doid": "DOID:0050896",
+      "icd10": "M25.50",
+      "name": {
+        "ar": "ألم المفاصل (أرثالجا)",
+        "en": "Joint pain (arthralgia)",
+        "fr": "Arthralgie"
+      },
+      "summary": {
+        "ar": "ألم في المفاصل دون تورم واضح، قد ينتج عن إجهاد أو عدوى أو حالة مناعية.",
+        "en": "Joint pain without obvious swelling, may result from strain, infection, or immune conditions.",
+        "fr": "Douleur articulaire sans gonflement évident, due à un effort, une infection ou une maladie immunitaire."
+      },
+      "muscleGroups": [
+        "knees",
+        "ankles",
+        "hands",
+        "feet",
+        "lower-back",
+        "neck"
+      ],
+      "regions": [
+        "lower_limb",
+        "upper_limb",
+        "back",
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326"
+      ],
+      "redFlags": {
+        "ar": "مفصل أحمر ساخن متورم، حرارة، أو عدم قدرة على الحركة.",
+        "en": "A red, hot, swollen joint, fever, or inability to move.",
+        "fr": "Articulation rouge, chaude et gonflée, fièvre, ou impossibilité de bouger."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/jointdisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus — Joint Disorders",
+          "url": "https://medlineplus.gov/jointdisorders.html"
+        }
+      ]
+    }
+  ]
+}

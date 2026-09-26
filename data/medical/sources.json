@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "1.0.0",
+  "notice": "سجل المصادر الطبية المفتوحة المستخدمة في تطبيق BodyMap Pain، مع حالة الترخيص لكل مصدر. الروابط للمراجعة والتوثيق.",
+  "sources": [
+    {
+      "id": "doid",
+      "name": "Disease Ontology (DOID)",
+      "url": "https://disease-ontology.org/",
+      "type": "ontology",
+      "license": "CC0 1.0 (ملكية عامة)",
+      "usage": "أكواد الأمراض المرجعية (DOID) للمطابقة مع مجموعات العضلات.",
+      "attributionRequired": false
+    },
+    {
+      "id": "hpo",
+      "name": "Human Phenotype Ontology (HPO)",
+      "url": "https://hpo.jax.org/",
+      "type": "ontology",
+      "license": "مفتوح (CC BY 4.0 للمصطلحات)",
+      "usage": "أكواد الأعراض (HP) والعلاقات بين الأمراض والصفات السريرية.",
+      "attributionRequired": true
+    },
+    {
+      "id": "icd10",
+      "name": "ICD-10-CM (WHO / CDC)",
+      "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm",
+      "type": "classification",
+      "license": "ملكية عامة (WHO/CDC)",
+      "usage": "أكواد تصنيف الأمراض للربط المرجعي.",
+      "attributionRequired": false
+    },
+    {
+      "id": "medlineplus",
+      "name": "MedlinePlus (U.S. National Library of Medicine)",
+      "url": "https://medlineplus.gov/",
+      "type": "consumer-health",
+      "license": "محتوى حكومي أمريكي؛ يُسمح بالربط والعرض، لا يُسمح بنسخ الصفحات كاملة.",
+      "usage": "محتوى تثقيفي للمرضى + روابط خارجية موثوقة.",
+      "attributionRequired": true
+    },
+    {
+      "id": "medlineplus-connect",
+      "name": "MedlinePlus Connect (NLM Web Service)",
+      "url": "https://medlineplus.gov/connect/",
+      "type": "api",
+      "license": "خدمة عامة بدون مفتاح (حد ~100 طلب/دقيقة).",
+      "usage": "ربط أكواد ICD-10/SNOMED بمحتوى MedlinePlus تلقائيًا.",
+      "attributionRequired": true
+    },
+    {
+      "id": "rxnorm",
+      "name": "RxNorm / RxNav (NLM)",
+      "url": "https://rxnav.nlm.nih.gov/",
+      "type": "api",
+      "license": "خدمة عامة بدون مفتاح.",
+      "usage": "توحيد أسماء الأدوية، الجرعات، والتفاعلات الدوائية.",
+      "attributionRequired": true
+    },
+    {
+      "id": "openfda",
+      "name": "openFDA (U.S. FDA)",
+      "url": "https://open.fda.gov/",
+      "type": "api",
+      "license": "خدمة عامة بدون مفتاح (حدود استخدام).",
+      "usage": "ملصقات الأدوية، الأحداث الجانبية، والتحذيرات.",
+      "attributionRequired": true
+    },
+    {
+      "id": "icd11",
+      "name": "ICD-11 API (WHO)",
+      "url": "https://icd.who.int/icdapi",
+      "type": "api",
+      "license": "يتطلب تسجيل للحصول على مفتاح (مجاني).",
+      "usage": "تصنيف دولي حديث للأمراض (اختياري، غير مُفعّل افتراضيًا).",
+      "attributionRequired": true
+    },
+    {
+      "id": "opentargets",
+      "name": "Open Targets Platform",
+      "url": "https://platform.opentargets.org/",
+      "type": "api",
+      "license": "بيانات مفتوحة (CC BY 4.0).",
+      "usage": "الربط بين الأمراض والجينات والأهداف الدوائية (بحث متقدم).",
+      "attributionRequired": true
+    },
+    {
+      "id": "z-anatomy",
+      "name": "Z-Anatomy (Open Source 3D Atlas)",
+      "url": "https://www.z-anatomy.com/",
+      "type": "3d-model",
+      "license": "مفتوح المصدر (CC BY-SA لمعظم النماذج).",
+      "usage": "أطلس تشريحي ثلاثي الأبعاد مفتوح (خطة مستقبلية).",
+      "attributionRequired": true
+    },
+    {
+      "id": "bodyparts3d",
+      "name": "BodyParts3D",
+      "url": "https://lifesciencedb.jp/bp3d/",
+      "type": "3d-model",
+      "license": "CC BY-SA 2.1 JP.",
+      "usage": "نماذج تشريحية ثلاثية الأبعاد (خطة مستقبلية).",
+      "attributionRequired": true
+    },
+    {
+      "id": "snomedct",
+      "name": "SNOMED CT",
+      "url": "https://www.snomed.org/",
+      "type": "ontology",
+      "license": "يتطلب ترخيصًا خارج الدول الأعضاء (غير مُضمّن).",
+      "usage": "تصنيف سريري شامل (تحذير ترخيص — غير مُفعّل).",
+      "attributionRequired": true
+    },
+    {
+      "id": "loinc",
+      "name": "LOINC",
+      "url": "https://loinc.org/",
+      "type": "terminology",
+      "license": "مجاني مع الإسناد.",
+      "usage": "أكواد التحاليل والملاحظات الطبية.",
+      "attributionRequired": true
+    },
+    {
+      "id": "cpt",
+      "name": "CPT (AMA)",
+      "url": "https://www.ama-assn.org/practice-management/cpt",
+      "type": "terminology",
+      "license": "مدفوع/مرخّص (غير مُضمّن).",
+      "usage": "أكواد الإجراءات الطبية (تحذير ترخيص — غير مُفعّل).",
+      "attributionRequired": true
+    }
+  ]
+}
