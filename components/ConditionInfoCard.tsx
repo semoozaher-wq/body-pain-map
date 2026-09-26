@@ -43,7 +43,7 @@ export function ConditionInfoCard({ condition, language }: Props) {
 
       <View style={styles.codesRow}>
         <Text style={styles.codeChip}>ICD-10: {condition.icd10}</Text>
-        <Text style={styles.codeChip}>{condition.doid}</Text>
+        {condition.doid ? <Text style={styles.codeChip}>{condition.doid}</Text> : null}
       </View>
 
       {symptoms.length > 0 && (
