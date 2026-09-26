@@ -5,6 +5,7 @@ export * from './diseaseLibrary';
 export * from './rxNorm';
 export * from './openFda';
 export * from './medlinePlusConnect';
+export * from './regionTaxonomy';
 
 /**
  * إعدادات الطبقة الطبية.

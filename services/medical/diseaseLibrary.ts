@@ -23,6 +23,8 @@ export interface MedicalCondition {
   summary: LocalizedText;
   muscleGroups: string[];
   regions: string[];
+  /** ربط تشريحي دقيق: المنطقة الفرعية + البنى المحددة (من regionTaxonomy.json). */
+  taxonomy?: { subRegion: string; structures: string[] };
   symptoms: string[];
   /** أعضاء داخلية مرتبطة بالحالة (ids مطابقة لـ ORGAN_TERMS / organDetails.json). */
   organs?: string[];
@@ -64,6 +66,16 @@ const SYMPTOMS = (symptomsData as { symptoms: MedicalSymptom[] }).symptoms;
 /** ترجمة نص ثلاثي اللغة مع الرجوع للعربية. */
 export function localize(value: LocalizedText, language: Language): string {
   return value[language] ?? value.ar;
+}
+
+/** الحالات المرضية المرتبطة بمنطقة فرعية تشريحية (مثل: الرقبة، الكتف، الفخذ). */
+export function getConditionsBySubRegion(subRegionId: string): MedicalCondition[] {
+  return CONDITIONS.filter((condition) => condition.taxonomy?.subRegion === subRegionId);
+}
+
+/** الحالات المرضية المرتبطة ببنية تشريحية محددة (مثل: نفق الرسغ، وتر أخيل). */
+export function getConditionsByStructure(structureId: string): MedicalCondition[] {
+  return CONDITIONS.filter((condition) => condition.taxonomy?.structures?.includes(structureId));
 }
 
 /** الحالات الإقليمية المُضافة في دفعة التوسّع (A/B/C). */
