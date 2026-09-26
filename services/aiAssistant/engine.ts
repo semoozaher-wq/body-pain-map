@@ -348,6 +348,7 @@ export function scoreConditions(
   const symptomBases = new Set(specificSymptoms.map((s) => symBase(s.id)));
   const organWeights = buildOrganWeights(organs, locations);
   const localized = organs.length > 0 || locations.length > 0;
+  const hasSpecificEvidence = specificSymptoms.length > 0 || organs.length > 0 || locations.length > 0;
   const scored: ConditionMatch[] = [];
 
   getAllConditions().forEach((condition: MedicalCondition) => {
@@ -356,7 +357,9 @@ export function scoreConditions(
     if (organs.length > 0 && !condition.organs?.some((id) => organWeights.has(id))) return;
     let score = 0;
     regions.forEach((region) => {
-      if (condition.regions.includes(region.region)) score += 2;
+      // A broad region alone is not enough to claim a disease. Prefer an
+      // exact muscle-group match, or require a symptom/organ/location clue.
+      if (condition.regions.includes(region.region) && hasSpecificEvidence) score += 2;
       if (condition.muscleGroups.includes(region.id)) score += 2;
     });
     organs.forEach((organ) => {
@@ -581,6 +584,27 @@ const SELF_CARE_BY_REGION: Record<string, LocalizedText[]> = {
   feet: [
     { ar: 'قلّل الوقوف والمشي مؤقتًا، وارفع القدم عند وجود تورّم، واستخدم حذاءً مريحًا وداعمًا.', en: 'Reduce standing and walking temporarily, elevate the foot if swollen, and wear supportive comfortable shoes.', fr: 'Réduisez temporairement la marche et la station debout, surélevez le pied s’il est gonflé et portez des chaussures adaptées.' },
     { ar: 'لو الألم في الكعب أسوأ مع أول خطوات الصباح، جرّب تمارين إطالة لطيفة لباطن القدم والساق بدون ألم.', en: 'If heel pain is worse with the first morning steps, try gentle pain-free stretches for the sole and calf.', fr: 'Si la douleur du talon est pire aux premiers pas, essayez des étirements doux et indolores de la plante et du mollet.' },
+  ],
+  legs: [
+    { ar: 'حدّد هل الألم في الفخذ أو الساق أو خلف الركبة، وهل يمتد من الظهر أو يصاحبه تورم في ساق واحدة؛ تجنّب المجهود حتى تتضح الصورة.', en: 'Note whether the pain is in the thigh, calf, or behind the knee, and whether it radiates from the back or causes one-sided swelling; avoid exertion until clearer.', fr: 'Précisez si la douleur est dans la cuisse, le mollet ou derrière le genou, et si elle vient du dos ou s’accompagne d’un gonflement unilatéral ; évitez l’effort.' },
+  ],
+  eyes: [
+    { ar: 'تجنّب فرك العين أو وضع قطرات علاجية من نفسك، واطلب تقييمًا عاجلًا عند تغيّر النظر أو إصابة أو ألم شديد.', en: 'Avoid rubbing the eye or using medicated drops without advice; seek urgent assessment for vision change, injury, or severe pain.', fr: 'Évitez de frotter l’œil ou d’utiliser des gouttes médicamenteuses sans avis ; consultez vite en cas de baisse de vision, blessure ou douleur intense.' },
+  ],
+  ears: [
+    { ar: 'لا تدخل أعوادًا أو أدوات داخل الأذن، وراقب الحرارة أو الإفرازات أو ضعف السمع.', en: 'Do not put cotton buds or objects into the ear; watch for fever, discharge, or hearing loss.', fr: 'N’introduisez pas d’objet dans l’oreille ; surveillez fièvre, écoulement ou baisse de l’audition.' },
+  ],
+  teeth: [
+    { ar: 'نظّف المنطقة بلطف وتجنّب شديد السخونة أو البرودة، واحجز موعدًا مع طبيب أسنان إذا استمر الألم أو ظهر تورّم.', en: 'Clean gently, avoid very hot or cold foods, and arrange a dental visit if pain persists or swelling appears.', fr: 'Nettoyez doucement, évitez le très chaud ou très froid, et consultez un dentiste si la douleur persiste ou si un gonflement apparaît.' },
+  ],
+  throat: [
+    { ar: 'اشرب سوائل وراقب الحرارة والقدرة على البلع والتنفس؛ صعوبة التنفس أو بلع اللعاب تستدعي الطوارئ.', en: 'Drink fluids and monitor fever and your ability to swallow and breathe; breathing difficulty or inability to swallow saliva is an emergency.', fr: 'Buvez et surveillez la fièvre ainsi que la déglutition et la respiration ; difficulté à respirer ou à avaler la salive = urgence.' },
+  ],
+  breast: [
+    { ar: 'لاحظ وجود كتلة أو احمرار أو إفرازات أو تغيّر جديد، واحجز تقييمًا طبيًا بدل الاعتماد على موضع الألم وحده.', en: 'Watch for a lump, redness, discharge, or new change, and arrange a clinical assessment rather than relying on pain location alone.', fr: 'Surveillez masse, rougeur, écoulement ou changement nouveau et demandez un examen clinique plutôt que de vous fier au seul emplacement.' },
+  ],
+  groin: [
+    { ar: 'تجنّب حمل الأوزان مؤقتًا ولا تضغط على أي انتفاخ؛ الألم الشديد أو الانتفاخ الذي لا يرجع أو القيء يحتاج تقييمًا عاجلًا.', en: 'Avoid heavy lifting and do not press a bulge; severe pain, a non-reducible bulge, or vomiting needs urgent assessment.', fr: 'Évitez de porter lourd et n’appuyez pas sur une bosse ; douleur intense, bosse irréductible ou vomissements nécessitent une évaluation urgente.' },
   ],
 };
 

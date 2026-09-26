@@ -238,13 +238,93 @@ export const BODY_REGIONS: RegionTerm[] = [
     },
   },
   {
+    id: 'legs',
+    region: 'lower_limb',
+    label: { ar: 'الرجل والساق', en: 'Leg', fr: 'Jambe' },
+    keywords: {
+      ar: ['رجلي', 'رجليا', 'الرجل', 'رجلين', 'الرجلين', 'رجلي من تحت', 'الرجل من تحت'],
+      en: ['leg', 'legs'],
+      fr: ['jambe', 'jambes'],
+    },
+  },
+  {
     id: 'feet',
     region: 'lower_limb',
     label: { ar: 'القدم', en: 'Foot', fr: 'Pied' },
     keywords: {
-      ar: ['قدمي', 'القدم', 'قدم', 'بقدم', 'رجلي', 'رجليا', 'أقدامي', 'الرجل', 'رجلين', 'صوابع رجلي', 'مشط القدم', 'القدم الشمال', 'القدم الشماليه', 'القدم اليسرى', 'القدم اليمين', 'القدم اليمنى'],
+      ar: ['قدمي', 'القدم', 'قدم', 'بقدم', 'أقدامي', 'صوابع رجلي', 'مشط القدم', 'القدم الشمال', 'القدم الشماليه', 'القدم اليسرى', 'القدم اليمين', 'القدم اليمنى'],
       en: ['foot', 'feet', 'toe', 'toes'],
       fr: ['pied', 'orteil', 'orteils'],
+    },
+  },
+  {
+    id: 'eyes',
+    region: 'head_neck',
+    label: { ar: 'العين', en: 'Eye', fr: 'Œil' },
+    keywords: {
+      ar: ['عيني', 'عينيي', 'عينيه', 'العين', 'عينيا', 'عيوني'],
+      en: ['eye', 'eyes'],
+      fr: ['œil', 'oeil', 'yeux'],
+    },
+  },
+  {
+    id: 'ears',
+    region: 'head_neck',
+    label: { ar: 'الأذن', en: 'Ear', fr: 'Oreille' },
+    keywords: {
+      ar: ['ودني', 'وداني', 'الأذن', 'الاذن', 'أذني', 'أذني'],
+      en: ['ear', 'ears'],
+      fr: ['oreille', 'oreilles'],
+    },
+  },
+  {
+    id: 'jaw',
+    region: 'head_neck',
+    label: { ar: 'الفك', en: 'Jaw', fr: 'Mâchoire' },
+    keywords: {
+      ar: ['فكي', 'الفك', 'فكّي', 'فك', 'المضغ'],
+      en: ['jaw', 'jawline'],
+      fr: ['mâchoire', 'machoire'],
+    },
+  },
+  {
+    id: 'teeth',
+    region: 'head_neck',
+    label: { ar: 'الأسنان', en: 'Teeth', fr: 'Dents' },
+    keywords: {
+      ar: ['سني', 'سنيي', 'سناني', 'السن', 'الأسنان', 'الاسنان', 'ضرس', 'ضرسي'],
+      en: ['tooth', 'teeth', 'molar'],
+      fr: ['dent', 'dents', 'molaire'],
+    },
+  },
+  {
+    id: 'throat',
+    region: 'head_neck',
+    label: { ar: 'الحلق', en: 'Throat', fr: 'Gorge' },
+    keywords: {
+      ar: ['حلقي', 'الحلق', 'زورى', 'زوري', 'البلعوم'],
+      en: ['throat', 'pharynx'],
+      fr: ['gorge', 'pharynx'],
+    },
+  },
+  {
+    id: 'breast',
+    region: 'torso_front',
+    label: { ar: 'الثدي', en: 'Breast', fr: 'Sein' },
+    keywords: {
+      ar: ['الثدي', 'ثديي', 'ثدي', 'النهود'],
+      en: ['breast'],
+      fr: ['sein'],
+    },
+  },
+  {
+    id: 'groin',
+    region: 'lower_limb',
+    label: { ar: 'الأربية', en: 'Groin', fr: 'Aine' },
+    keywords: {
+      ar: ['المغبن', 'الأربية', 'الاريبة', 'أربيتي', 'بين الفخذين', 'منطقة العانة'],
+      en: ['groin', 'inguinal', 'pubic area'],
+      fr: ['aine', 'inguinal'],
     },
   },
 ];
