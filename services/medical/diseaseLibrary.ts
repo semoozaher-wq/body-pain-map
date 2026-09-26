@@ -4,6 +4,7 @@
 
 import diseasesData from '../../data/medical/diseases.json';
 import organConditionsData from '../../data/medical/organConditions.json';
+import regionalConditionsData from '../../data/medical/regionalConditions.json';
 import symptomsData from '../../data/medical/symptoms.json';
 
 export type Language = 'ar' | 'en' | 'fr';
@@ -11,7 +12,12 @@ export type LocalizedText = { ar: string; en: string; fr: string };
 
 export interface MedicalCondition {
   id: string;
-  doid: string;
+  /** كود DOID القياسي، أو null إذا لم تُربط الحالة بعد بكود مُتحقَّق منه. */
+  doid: string | null;
+  /** 'not-mapped' تعني: لا يوجد كود DOID مُتحقَّق منه، ولم يُختَرع كود. */
+  doidStatus?: 'mapped' | 'not-mapped';
+  /** الدفعة التي أُضيفت فيها الحالة (A/B/C للدفعة الإقليمية). */
+  batch?: string;
   icd10: string;
   name: LocalizedText;
   summary: LocalizedText;
@@ -41,6 +47,8 @@ export interface MedicalSymptom {
 
 const BASE_CONDITIONS = (diseasesData as { conditions: MedicalCondition[] }).conditions;
 const ORGAN_CONDITIONS = (organConditionsData as { conditions: MedicalCondition[] }).conditions;
+/** الحالات الإقليمية (قدم/ركبة/يد، أسنان/أذن/حلق، بطن/حوض/خصية) — الدفعة 1. */
+const REGIONAL_CONDITIONS = (regionalConditionsData as { conditions: MedicalCondition[] }).conditions;
 
 /**
  * المكتبة الكاملة = الأمراض العضلية/الهيكلية الأساسية + الحالات المرتبطة بالأعضاء.
@@ -48,7 +56,7 @@ const ORGAN_CONDITIONS = (organConditionsData as { conditions: MedicalCondition[
  * بـ diffuse حتى لا تطغى على الأسباب الموضعية.
  */
 const DIFFUSE_IDS = new Set(['doid:1490', 'doid:8505', 'doid:8505-doms']);
-const CONDITIONS: MedicalCondition[] = [...BASE_CONDITIONS, ...ORGAN_CONDITIONS].map((c) =>
+const CONDITIONS: MedicalCondition[] = [...BASE_CONDITIONS, ...ORGAN_CONDITIONS, ...REGIONAL_CONDITIONS].map((c) =>
   DIFFUSE_IDS.has(c.id) ? { ...c, diffuse: true } : c,
 );
 const SYMPTOMS = (symptomsData as { symptoms: MedicalSymptom[] }).symptoms;
@@ -56,6 +64,16 @@ const SYMPTOMS = (symptomsData as { symptoms: MedicalSymptom[] }).symptoms;
 /** ترجمة نص ثلاثي اللغة مع الرجوع للعربية. */
 export function localize(value: LocalizedText, language: Language): string {
   return value[language] ?? value.ar;
+}
+
+/** الحالات الإقليمية المُضافة في دفعة التوسّع (A/B/C). */
+export function getRegionalConditions(): MedicalCondition[] {
+  return REGIONAL_CONDITIONS;
+}
+
+/** الحالات المُضافة في دفعة إقليمية محددة (A: قدم/ركبة/يد، B: أسنان/أذن/حلق، C: بطن/حوض). */
+export function getConditionsByBatch(batch: string): MedicalCondition[] {
+  return CONDITIONS.filter((condition) => condition.batch === batch);
 }
 
 /** كل الأمراض المتاحة (offline). */
@@ -133,7 +151,7 @@ export function searchMedicalLibrary(query: string): {
       (c) =>
         match(c.name) ||
         match(c.summary) ||
-        c.doid.toLowerCase().includes(q) ||
+        (c.doid ?? '').toLowerCase().includes(q) ||
         c.icd10.toLowerCase().includes(q)
     ),
     symptoms: SYMPTOMS.filter(
@@ -153,8 +171,14 @@ export function getLibraryStats() {
     c.muscleGroups.forEach((g) => groups.add(g));
     c.regions.forEach((r) => regions.add(r));
   });
+  const batches = new Set<string>();
+  CONDITIONS.forEach((c) => {
+    if (c.batch) batches.add(c.batch);
+  });
   return {
     conditions: CONDITIONS.length,
+    regionalConditions: REGIONAL_CONDITIONS.length,
+    batches: batches.size,
     symptoms: SYMPTOMS.length,
     muscleGroups: groups.size,
     regions: regions.size,
