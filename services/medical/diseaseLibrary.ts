@@ -3,6 +3,7 @@
 // لا تعتمد على أي شبكة: كل البيانات موجودة داخل التطبيق.
 
 import diseasesData from '../../data/medical/diseases.json';
+import organConditionsData from '../../data/medical/organConditions.json';
 import symptomsData from '../../data/medical/symptoms.json';
 
 export type Language = 'ar' | 'en' | 'fr';
@@ -17,6 +18,13 @@ export interface MedicalCondition {
   muscleGroups: string[];
   regions: string[];
   symptoms: string[];
+  /** أعضاء داخلية مرتبطة بالحالة (ids مطابقة لـ ORGAN_TERMS / organDetails.json). */
+  organs?: string[];
+  /**
+   * حالة «منتشرة» (مثل الفيبروميالجيا أو ألم العضلات العام) — تُخفَّض درجتها
+   * عند وجود شكوى موضعية واحدة أو عضو محدّد، حتى لا تطغى على الأسباب الموضعية.
+   */
+  diffuse?: boolean;
   redFlags: LocalizedText;
   medlinePlusUrl: string;
   sources: { title: string; url: string }[];
@@ -31,7 +39,18 @@ export interface MedicalSymptom {
   redFlag: boolean;
 }
 
-const CONDITIONS = (diseasesData as { conditions: MedicalCondition[] }).conditions;
+const BASE_CONDITIONS = (diseasesData as { conditions: MedicalCondition[] }).conditions;
+const ORGAN_CONDITIONS = (organConditionsData as { conditions: MedicalCondition[] }).conditions;
+
+/**
+ * المكتبة الكاملة = الأمراض العضلية/الهيكلية الأساسية + الحالات المرتبطة بالأعضاء.
+ * نوسم الحالات المنتشرة (الفيبروميالجيا، ألم العضلات العام، تأخّر ظهور العضلات)
+ * بـ diffuse حتى لا تطغى على الأسباب الموضعية.
+ */
+const DIFFUSE_IDS = new Set(['doid:1490', 'doid:8505', 'doid:8505-doms']);
+const CONDITIONS: MedicalCondition[] = [...BASE_CONDITIONS, ...ORGAN_CONDITIONS].map((c) =>
+  DIFFUSE_IDS.has(c.id) ? { ...c, diffuse: true } : c,
+);
 const SYMPTOMS = (symptomsData as { symptoms: MedicalSymptom[] }).symptoms;
 
 /** ترجمة نص ثلاثي اللغة مع الرجوع للعربية. */
