@@ -351,6 +351,9 @@ export function scoreConditions(
   const scored: ConditionMatch[] = [];
 
   getAllConditions().forEach((condition: MedicalCondition) => {
+    // Once an internal organ is explicitly identified, do not leak unrelated
+    // conditions that merely share a broad region such as lower_limb.
+    if (organs.length > 0 && !condition.organs?.some((id) => organWeights.has(id))) return;
     let score = 0;
     regions.forEach((region) => {
       if (condition.regions.includes(region.region)) score += 2;
@@ -405,6 +408,9 @@ const ORGAN_TRIAGE_FLOOR: Partial<Record<string, TriageLevel>> = {
   appendix: 'soon',
   pancreas: 'soon',
   gallbladder: 'routine',
+  // Testicular pain needs prompt assessment because torsion can be time-critical,
+  // while the explicit sudden/severe/swelling terms above still raise emergency.
+  testicles: 'urgent',
 };
 
 /** عنوان ونصيحة كل مستوى فرز. */
@@ -572,6 +578,10 @@ const SELF_CARE_BY_REGION: Record<string, LocalizedText[]> = {
   'upper-back': [
     { ar: 'حسّن وضعية الجلوس وتجنّب الانحناء الطويل على الموبايل أو اللابتوب.', en: 'Improve posture; avoid long hunching over phone or laptop.', fr: 'Améliorez la posture ; évitez de rester courbé longtemps.' },
   ],
+  feet: [
+    { ar: 'قلّل الوقوف والمشي مؤقتًا، وارفع القدم عند وجود تورّم، واستخدم حذاءً مريحًا وداعمًا.', en: 'Reduce standing and walking temporarily, elevate the foot if swollen, and wear supportive comfortable shoes.', fr: 'Réduisez temporairement la marche et la station debout, surélevez le pied s’il est gonflé et portez des chaussures adaptées.' },
+    { ar: 'لو الألم في الكعب أسوأ مع أول خطوات الصباح، جرّب تمارين إطالة لطيفة لباطن القدم والساق بدون ألم.', en: 'If heel pain is worse with the first morning steps, try gentle pain-free stretches for the sole and calf.', fr: 'Si la douleur du talon est pire aux premiers pas, essayez des étirements doux et indolores de la plante et du mollet.' },
+  ],
 };
 
 const SELF_CARE_BY_ORGAN: Record<string, LocalizedText[]> = {
@@ -671,6 +681,13 @@ const SELF_CARE_BY_ORGAN: Record<string, LocalizedText[]> = {
       ar: 'تجنّب الأكل قبل النوم بساعتين، وارفع رأس السرير، وقلّل الكافيين والدهون والبهارات.',
       en: 'Avoid eating within two hours of bedtime, raise the head of the bed, and reduce caffeine, fat, and spices.',
       fr: 'Évitez de manger deux heures avant le coucher, surélevez la tête du lit, réduisez caféine, graisses et épices.',
+    },
+  ],
+  testicles: [
+    {
+      ar: 'ألم الخصية يحتاج معرفة هل بدأ فجأة وهل يوجد تورّم أو احمرار أو غثيان؛ لا تضغط على المكان ولا تمارس مجهودًا، واطلب تقييمًا عاجلًا اليوم.',
+      en: 'Testicular pain needs prompt assessment for sudden onset, swelling, redness, or nausea; do not press the area or exert yourself, and seek same-day care.',
+      fr: 'Une douleur testiculaire doit être évaluée rapidement selon son début, le gonflement, la rougeur ou les nausées ; évitez la pression et l’effort, consultez aujourd’hui.',
     },
   ],
 };

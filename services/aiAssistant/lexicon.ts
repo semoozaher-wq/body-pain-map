@@ -242,7 +242,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'lower_limb',
     label: { ar: 'القدم', en: 'Foot', fr: 'Pied' },
     keywords: {
-      ar: ['قدمي', 'القدم', 'رجلي', 'رجليا', 'أقدامي', 'الرجل', 'رجلين', 'صوابع رجلي', 'مشط القدم'],
+      ar: ['قدمي', 'القدم', 'قدم', 'بقدم', 'رجلي', 'رجليا', 'أقدامي', 'الرجل', 'رجلين', 'صوابع رجلي', 'مشط القدم', 'القدم الشمال', 'القدم الشماليه', 'القدم اليسرى', 'القدم اليمين', 'القدم اليمنى'],
       en: ['foot', 'feet', 'toe', 'toes'],
       fr: ['pied', 'orteil', 'orteils'],
     },
@@ -593,6 +593,22 @@ export const ORGAN_TERMS: OrganTerm[] = [
       ar: ['البروستاتا', 'البروستات', 'بروستاتتي', 'تضخم البروستاتا'],
       en: ['prostate'],
       fr: ['prostate'],
+    },
+  },
+  {
+    id: 'testicles',
+    region: 'lower_limb',
+    onMap: false,
+    label: { ar: 'الخصيتان', en: 'Testicles', fr: 'Testicules' },
+    blurb: {
+      ar: 'داخل كيس الصفن أسفل الحوض (للرجال).',
+      en: 'Inside the scrotum below the pelvis (male anatomy).',
+      fr: 'Dans le scrotum sous le bassin (anatomie masculine).',
+    },
+    keywords: {
+      ar: ['الخصية', 'الخصيتين', 'الخصيتان', 'خصيتي', 'خصيتي اليمين', 'خصيتي الشمال', 'خصية اليمين', 'خصية الشمال', 'كيس الصفن', 'الصفن'],
+      en: ['testicle', 'testicles', 'testis', 'scrotum'],
+      fr: ['testicule', 'testicules', 'scrotum'],
     },
   },
   {
@@ -970,6 +986,16 @@ export const RED_FLAG_TERMS: RedFlagTerm[] = [
       ar: ['ألم مفاجئ شديد', 'وجع فاجئ شديد', 'ألم رهيب', 'ألم لا يحتمل', 'شديد جداً فجأة', 'ألم قاتل'],
       en: ['sudden severe pain', 'worst pain', 'unbearable pain'],
       fr: ['douleur soudaine intense', 'douleur insupportable'],
+    },
+  },
+  {
+    id: 'rf:testicular_torsion',
+    level: 'emergency',
+    label: { ar: 'ألم مفاجئ أو تورّم شديد في الخصية', en: 'Sudden severe testicular pain or swelling', fr: 'Douleur ou gonflement testiculaire soudain et intense' },
+    keywords: {
+      ar: ['الم مفاجئ في الخصية', 'ألم مفاجئ في الخصية', 'ألم مفاجئ شديد في الخصية', 'ألم شديد مفاجئ في الخصية', 'وجع مفاجئ في الخصية', 'الخصية متورمة', 'الخصية وارمة', 'تورم الخصية', 'مع تورم في الخصية', 'الخصية طالعة لفوق', 'قيء مع ألم الخصية', 'خصية متورمة فجأة'],
+      en: ['sudden testicle pain', 'sudden testicular pain', 'swollen testicle', 'testicle swelling', 'testicle pulled up', 'vomiting with testicle pain'],
+      fr: ['douleur testiculaire soudaine', 'testicule gonflé', 'torsion testiculaire'],
     },
   },
   {
