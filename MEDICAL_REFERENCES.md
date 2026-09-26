@@ -34,3 +34,9 @@ This file lists the sources used for the educational acupressure, self-care, and
 ## Internal-organ map
 
 The internal-organ diagram in `components/InternalOrgansMap.tsx` is original, simplified vector art. It shows approximate surface projection markers for the six already-present organ hotspots, then joins each hotspot to existing data using `relatedGroupSlugs` and `relatedPartIds` in `data/anatomyHotspots.json`. The graphic is explicitly labeled as illustrative and not to scale. Organ pain text is not presented as a localization diagnosis; pain location alone cannot identify the organ or cause. Urgent chest-pain guidance links to NHS: https://www.nhs.uk/conditions/heart-attack/
+
+## دفعة التوسّع الإقليمي (2026-09-26)
+- MedlinePlus (NLM): مرجع كل حالة جديدة، مع رابط الصفحة المعنية ووسم عدم التشخيص.
+- WHO / ICD-10 و ICD-10-CM (CDC/WHO): التحقق من أكواد التصنيف لكل حالة إقليمية.
+- CDC: مرجع عام لعلامات الخطر والتوصيات الوقائية.
+- ملاحظة صريحة: الأعراض المحلية (ontologyStatus=local) لم تُربط بعد بكود HPO/SNOMED مُتحقَّق منه، ولم يُختَرع أي كود.

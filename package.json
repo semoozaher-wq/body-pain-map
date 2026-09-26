@@ -49,7 +49,8 @@
     "test": "node --test",
     "test:e2e": "node scripts/e2e-smoke.cjs",
     "build:ios:bundle": "expo export --platform ios --output-dir build/ios",
-    "build:android:bundle": "expo export --platform android --output-dir build/android"
+    "build:android:bundle": "expo export --platform android --output-dir build/android",
+    "validate:medical-library": "node scripts/validate-medical-library.js"
   },
   "private": true,
   "engines": {
