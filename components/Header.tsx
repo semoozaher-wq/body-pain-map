@@ -1,10 +1,11 @@
 // components/Header.tsx
+// هيدر عصري متوافق مع الثيم الفاتح/الداكن، بزر رجوع دائري ناعم.
 
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
-import { Spacing } from '../constants/spacing';
+import { Palette, Radii, Elevation, Type } from '../constants/design';
+import { useTheme } from '../hooks/useTheme';
 
 interface HeaderProps {
   title: string;
@@ -14,17 +15,23 @@ interface HeaderProps {
 }
 
 export function Header({ title, subtitle, onBack, rightAction }: HeaderProps) {
+  const { colors, isDark } = useTheme();
+
   return (
     <View style={styles.container}>
       <View style={styles.left}>
         {onBack && (
-          <TouchableOpacity onPress={onBack} style={styles.backButton}>
-            <Text style={styles.backIcon}>←</Text>
+          <TouchableOpacity
+            onPress={onBack}
+            accessibilityRole="button"
+            style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          >
+            <Text style={[styles.backIcon, { color: colors.primary }]}>←</Text>
           </TouchableOpacity>
         )}
-        <View>
-          <Text style={styles.title}>{title}</Text>
-          {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        <View style={styles.titleBlock}>
+          <Text style={[styles.title, { color: colors.textPrimary }]} numberOfLines={1}>{title}</Text>
+          {subtitle && <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={1}>{subtitle}</Text>}
         </View>
       </View>
       {rightAction && <View>{rightAction}</View>}
@@ -39,31 +46,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
-    backgroundColor: Colors.background,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    gap: 12,
   },
   left: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    gap: 12,
   },
   backButton: {
-    marginRight: Spacing.md,
-    padding: Spacing.sm,
+    width: 42,
+    height: 42,
+    borderRadius: Radii.md,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Elevation.xs,
   },
   backIcon: {
-    fontSize: 24,
-    color: Colors.textPrimary,
+    fontSize: 20,
+    fontWeight: '900',
+    lineHeight: 22,
   },
+  titleBlock: { flex: 1 },
   title: {
     fontFamily: Fonts.arabic.bold,
-    fontSize: Fonts.sizes.xl,
-    color: Colors.textPrimary,
+    fontSize: Type.h3,
+    fontWeight: Type.weight.black,
+    letterSpacing: Type.tracking.tight,
   },
   subtitle: {
     fontFamily: Fonts.arabic.regular,
-    fontSize: Fonts.sizes.sm,
-    color: Colors.textSecondary,
+    fontSize: Type.caption,
     marginTop: 2,
   },
 });
