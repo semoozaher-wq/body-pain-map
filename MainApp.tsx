@@ -21,6 +21,7 @@ import { BodyPickerScreen } from './screens/BodyPickerScreen';
 import { DetailsScreen } from './screens/DetailsScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
+import { AssistantScreen } from './screens/AssistantScreen';
 import { BrandLogo } from './components/BrandLogo';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -85,6 +86,17 @@ export default function App() {
     setSelectedMuscleData(muscleData);
     setSelectedId(muscleData.id);
     setScreen('details');
+  };
+
+  // يفتح المنطقة التي اقترحها المساعد الذكي على خريطة الجسم (يعيد استخدام تدفّق التفاصيل).
+  const openRegionFromAssistant = (regionId: string) => {
+    const muscle = Object.values(data.muscles).find((entry) => entry.group === regionId);
+    if (muscle) {
+      handleNavigateToDetails(muscle);
+      return;
+    }
+    setQuickRelief(false);
+    setScreen('body');
   };
 
   const saveResults = () => {
@@ -176,9 +188,10 @@ export default function App() {
     const titles: Record<Screen, string> = {
       welcome: t('appName'),
       body: t('body'),
-      details: t('details'),
-      results: t('results'),
+      details: t('screenTitles.details'),
+      results: t('screenTitles.results'),
       history: t('historyTitle'),
+      assistant: t('assistant.name'),
     };
     return titles[screen];
   };
@@ -200,7 +213,7 @@ export default function App() {
       {screen !== 'welcome' && (
         <Header
           title={getTitle()}
-          onBack={() => setScreen(screen === 'history' ? 'welcome' : 'body')}
+          onBack={() => setScreen(screen === 'history' || screen === 'assistant' ? 'welcome' : 'body')}
           rightAction={(
             <View style={styles.headerActions}>
               <LanguageSwitcher language={language} onChange={setLanguage} />
@@ -210,6 +223,13 @@ export default function App() {
         />
       )}
 
+      {screen === 'assistant' ? (
+        <AssistantScreen
+          language={language}
+          direction={direction}
+          onOpenRegion={openRegionFromAssistant}
+        />
+      ) : (
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -222,6 +242,7 @@ export default function App() {
             direction={direction}
             history={history}
             onOpenHistory={() => setScreen('history')}
+            onOpenAssistant={() => setScreen('assistant')}
             quickAreas={quickLogAreas}
             onQuickSave={saveQuickLog}
           />
@@ -295,9 +316,11 @@ export default function App() {
           />
         )}
       </ScrollView>
+      )}
       <View style={[styles.bottomNav, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <NavItem icon="⌂" title={t('nav.home')} active={screen === 'welcome'} onPress={() => setScreen('welcome')} colors={colors} />
         <NavItem icon="◎" title={t('nav.map')} active={screen === 'body' || screen === 'details' || screen === 'results'} onPress={() => { setQuickRelief(false); setScreen('body'); }} colors={colors} />
+        <NavItem icon="✦" title={t('nav.assistant')} active={screen === 'assistant'} onPress={() => setScreen('assistant')} colors={colors} />
         <NavItem icon="◷" title={t('nav.history')} active={screen === 'history'} onPress={() => setScreen('history')} colors={colors} />
       </View>
     </SafeAreaView>
