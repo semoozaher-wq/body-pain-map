@@ -138,6 +138,13 @@
     "possibleConditions": "Possible conditions (for reference only)",
     "selfCare": "Initial self-care",
     "whenToSee": "When to see a doctor",
-    "openOnMap": "Open on the map"
+    "openOnMap": "Open on the map",
+    "openOrganOnMap": "Open the organ on the body map",
+    "organsDetected": "Internal organs you mentioned",
+    "internalOrgan": "Internal organ",
+    "organLocation": "Location",
+    "organSymptoms": "Common symptoms",
+    "organCauses": "Possible causes",
+    "organRecommendation": "Recommendation"
   }
 }

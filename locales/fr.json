@@ -138,6 +138,13 @@
     "possibleConditions": "Affections possibles (à titre indicatif)",
     "selfCare": "Auto-soins initiaux",
     "whenToSee": "Quand consulter un médecin",
-    "openOnMap": "Ouvrir sur la carte"
+    "openOnMap": "Ouvrir sur la carte",
+    "openOrganOnMap": "Ouvrir l'organe sur la carte du corps",
+    "organsDetected": "Organes internes mentionnés",
+    "internalOrgan": "Organe interne",
+    "organLocation": "Emplacement",
+    "organSymptoms": "Symptômes fréquents",
+    "organCauses": "Causes possibles",
+    "organRecommendation": "Recommandation"
   }
 }

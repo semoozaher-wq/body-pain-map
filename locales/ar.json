@@ -138,6 +138,13 @@
     "possibleConditions": "حالات محتملة (للاطلاع فقط)",
     "selfCare": "رعاية ذاتية أولية",
     "whenToSee": "متى تراجع الطبيب",
-    "openOnMap": "افتح على الخريطة"
+    "openOnMap": "افتح على الخريطة",
+    "openOrganOnMap": "افتح العضو على خريطة الأعضاء",
+    "organsDetected": "أعضاء داخلية ذكرتها",
+    "internalOrgan": "عضو داخلي",
+    "organLocation": "الموضع",
+    "organSymptoms": "أعراض شائعة",
+    "organCauses": "أسباب محتملة",
+    "organRecommendation": "توصية"
   }
 }
