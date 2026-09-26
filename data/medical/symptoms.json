@@ -1,9 +1,10 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "generatedFrom": [
-    "Human Phenotype Ontology (HPO) — open, https://hpo.jax.org/"
+    "Human Phenotype Ontology (HPO) - open, https://hpo.jax.org/",
+    "BodyMap Pain local clinical terms (ontology mapping pending)"
   ],
-  "notice": "أعراض مرجعية عامة للتعليم فقط، وأكواد HPO للمطابقة المرجعية مع المصطلحات الطبية المعيارية، وليست تشخيصًا ولا بديلاً عن الطبيب المؤهل.",
+  "notice": "أعراض مرجعية عامة للتعليم فقط. الأعراض المعنونة بـ hpo تعتمد كودًا معياريًا، والأعراض المصنّفة ontologyStatus=local هي مصطلحات داخل التطبيق بانتظار ربط موثّق بكود HPO/SNOMED ولم يُختَرع لها أي كود. ليست تشخيصًا ولا بديلًا عن الطبيب المؤهل.",
   "symptoms": [
     {
       "id": "hpo:0003326",
@@ -25,7 +26,8 @@
         "torso_front",
         "head_neck"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0003418",
@@ -44,7 +46,8 @@
         "back",
         "torso_front"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002829",
@@ -64,7 +67,8 @@
         "lower_limb",
         "back"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001369",
@@ -83,7 +87,8 @@
         "upper_limb",
         "lower_limb"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0003401",
@@ -103,7 +108,8 @@
         "lower_limb",
         "head_neck"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002315",
@@ -121,7 +127,8 @@
       "regions": [
         "head_neck"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002076",
@@ -139,7 +146,8 @@
       "regions": [
         "head_neck"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0003474",
@@ -159,7 +167,8 @@
         "lower_limb",
         "back"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0009830",
@@ -178,7 +187,8 @@
         "upper_limb",
         "lower_limb"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001324",
@@ -198,7 +208,8 @@
         "lower_limb",
         "back"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001276",
@@ -218,7 +229,8 @@
         "head_neck",
         "upper_limb"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002653",
@@ -238,7 +250,8 @@
         "lower_limb",
         "upper_limb"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0012531",
@@ -260,7 +273,8 @@
         "torso_front",
         "head_neck"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0012532",
@@ -281,7 +295,8 @@
         "lower_limb",
         "head_neck"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001288",
@@ -300,7 +315,8 @@
         "lower_limb",
         "back"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002360",
@@ -319,7 +335,8 @@
         "back",
         "head_neck"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0000739",
@@ -338,7 +355,8 @@
         "head_neck",
         "back"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0000716",
@@ -357,7 +375,8 @@
         "head_neck",
         "back"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001945",
@@ -376,9 +395,11 @@
         "back",
         "torso_front",
         "lower_limb",
-        "upper_limb"
+        "upper_limb",
+        "head_neck"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002017",
@@ -397,7 +418,8 @@
         "head_neck",
         "torso_front"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002020",
@@ -415,7 +437,8 @@
       "regions": [
         "torso_front"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0000988",
@@ -436,7 +459,8 @@
         "torso_front",
         "back"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001252",
@@ -456,7 +480,8 @@
         "lower_limb",
         "back"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0003325",
@@ -475,7 +500,8 @@
         "upper_limb",
         "lower_limb"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0003549",
@@ -495,7 +521,8 @@
         "lower_limb",
         "back"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001596",
@@ -513,7 +540,8 @@
       "regions": [
         "head_neck"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001265",
@@ -532,7 +560,8 @@
         "lower_limb",
         "upper_limb"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002014",
@@ -550,7 +579,8 @@
       "regions": [
         "torso_front"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0000822",
@@ -569,7 +599,8 @@
         "torso_front",
         "head_neck"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0001386",
@@ -588,7 +619,8 @@
         "upper_limb",
         "lower_limb"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0012378",
@@ -608,7 +640,8 @@
         "upper_limb",
         "lower_limb"
       ],
-      "redFlag": false
+      "redFlag": false,
+      "ontologyStatus": "standard"
     },
     {
       "id": "hpo:0002321",
@@ -626,7 +659,792 @@
       "regions": [
         "head_neck"
       ],
-      "redFlag": true
+      "redFlag": true,
+      "ontologyStatus": "standard"
+    },
+    {
+      "id": "local:toothache",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم الأسنان",
+        "en": "Toothache",
+        "fr": "Mal de dents"
+      },
+      "description": {
+        "ar": "ألم في سن أو أكثر يزيد مع المضغ أو الساخن والبارد.",
+        "en": "Pain in one or more teeth, worse with chewing or hot and cold.",
+        "fr": "Douleur d une ou plusieurs dents, aggravée par la mastication ou le chaud et le froid."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:dental-abscess",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "خرّاج الأسنان",
+        "en": "Dental abscess",
+        "fr": "Abcès dentaire"
+      },
+      "description": {
+        "ar": "تجمّع قيح حول جذر السن مع ألم نابض وتورّم.",
+        "en": "Pus collection around a tooth root with throbbing pain and swelling.",
+        "fr": "Collection de pus autour de la racine avec douleur pulsatile et gonflement."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:gum-bleeding",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "نزيف اللثة",
+        "en": "Bleeding gums",
+        "fr": "Saignement des gencives"
+      },
+      "description": {
+        "ar": "نزيف من اللثة عند التنظيف أو تلقائيًا.",
+        "en": "Bleeding from the gums when brushing or spontaneously.",
+        "fr": "Saignement des gencives au brossage ou spontané."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:jaw-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم الفك",
+        "en": "Jaw pain",
+        "fr": "Douleur de la mâchoire"
+      },
+      "description": {
+        "ar": "ألم في عظم الفك أو مفصل الفك يزيد بالمضغ أو فتح الفم.",
+        "en": "Pain in the jaw bone or jaw joint, worse with chewing or opening the mouth.",
+        "fr": "Douleur de l os ou de l articulation de la mâchoire, aggravée par la mastication."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:facial-swelling",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تورّم الوجه",
+        "en": "Facial swelling",
+        "fr": "Gonflement du visage"
+      },
+      "description": {
+        "ar": "تورّم في الوجه أو الخد أو حول الفك.",
+        "en": "Swelling of the face, cheek, or around the jaw.",
+        "fr": "Gonflement du visage, de la joue ou autour de la mâchoire."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:facial-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم الوجه والجيوب",
+        "en": "Facial and sinus pain",
+        "fr": "Douleur faciale et sinusienne"
+      },
+      "description": {
+        "ar": "ألم أو ضغط في الوجه أو الجبهة يزيد مع الانحناء للأمام.",
+        "en": "Facial or forehead pain or pressure, worse when bending forward.",
+        "fr": "Douleur ou pression faciale ou frontale, aggravée en se penchant."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:ear-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم الأذن",
+        "en": "Ear pain (otalgia)",
+        "fr": "Otalgie"
+      },
+      "description": {
+        "ar": "ألم في الأذن أو إحساس بضغط داخلها.",
+        "en": "Ear pain or a feeling of pressure inside the ear.",
+        "fr": "Douleur de l oreille ou sensation de pression interne."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:ear-discharge",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "إفراز من الأذن",
+        "en": "Ear discharge",
+        "fr": "Écoulement de l oreille"
+      },
+      "description": {
+        "ar": "إفراز سائل أو قيح من الأذن.",
+        "en": "Fluid or pus discharge from the ear.",
+        "fr": "Écoulement de liquide ou de pus de l oreille."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:hearing-change",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تغيّر السمع أو طنين",
+        "en": "Hearing change or tinnitus",
+        "fr": "Trouble de l audition ou acouphènes"
+      },
+      "description": {
+        "ar": "نقص أو تغيّر في السمع، أو طنين في الأذن.",
+        "en": "Reduced or altered hearing, or ringing in the ear.",
+        "fr": "Audition diminuée ou modifiée, ou acouphènes."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:sore-throat",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم الحلق",
+        "en": "Sore throat",
+        "fr": "Mal de gorge"
+      },
+      "description": {
+        "ar": "ألم أو حرقان في الحلق يزيد عند البلع.",
+        "en": "Throat pain or burning, worse when swallowing.",
+        "fr": "Douleur ou brûlure de la gorge, aggravée à la déglutition."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:swallowing-difficulty",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "صعوبة البلع",
+        "en": "Difficulty swallowing",
+        "fr": "Difficulté à avaler"
+      },
+      "description": {
+        "ar": "صعوبة أو ألم عند بلع الطعام أو اللعاب.",
+        "en": "Difficulty or pain when swallowing food or saliva.",
+        "fr": "Difficulté ou douleur à avaler les aliments ou la salive."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:hoarseness",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "بحة الصوت",
+        "en": "Hoarseness",
+        "fr": "Enrouement"
+      },
+      "description": {
+        "ar": "تغيّر أو خشونة في الصوت.",
+        "en": "Hoarse or changed voice.",
+        "fr": "Voix enrouée ou modifiée."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:abdominal-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم البطن",
+        "en": "Abdominal pain",
+        "fr": "Douleur abdominale"
+      },
+      "description": {
+        "ar": "ألم أو مغص في البطن، وقد ينتقل إلى الظهر.",
+        "en": "Abdominal pain or cramping, sometimes radiating to the back.",
+        "fr": "Douleur ou crampes abdominales, parfois irradiées au dos."
+      },
+      "regions": [
+        "torso_front",
+        "back"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:testicular-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم الخصية",
+        "en": "Testicular pain",
+        "fr": "Douleur testiculaire"
+      },
+      "description": {
+        "ar": "ألم في الخصية أو كيس الصفن.",
+        "en": "Pain in the testicle or scrotum.",
+        "fr": "Douleur du testicule ou du scrotum."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:scrotal-swelling",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تورّم كيس الصفن",
+        "en": "Scrotal swelling",
+        "fr": "Gonflement scrotal"
+      },
+      "description": {
+        "ar": "تورّم أو تضخّم في كيس الصفن.",
+        "en": "Swelling or enlargement of the scrotum.",
+        "fr": "Gonflement ou augmentation du scrotum."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:groin-lump",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "كتلة في الأربية",
+        "en": "Groin lump or bulge",
+        "fr": "Masse ou saillie inguinale"
+      },
+      "description": {
+        "ar": "كتلة أو انتفاخ في الأربية أو أسفل البطن.",
+        "en": "A lump or bulge in the groin or lower abdomen.",
+        "fr": "Masse ou saillie dans l aine ou le bas-ventre."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:dysuria",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "حرقان عند التبول",
+        "en": "Painful urination",
+        "fr": "Dysurie"
+      },
+      "description": {
+        "ar": "حرقان أو ألم عند التبول.",
+        "en": "Burning or pain when urinating.",
+        "fr": "Brûlure ou douleur en urinant."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:urinary-urgency",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "إلحاح أو احتباس بولي",
+        "en": "Urinary urgency or retention",
+        "fr": "Urgence ou rétention urinaire"
+      },
+      "description": {
+        "ar": "إلحاح متكرر أو تبول متكرر أو صعوبة في بدء التبول.",
+        "en": "Urgency, frequent urination, or difficulty starting urination.",
+        "fr": "Urgence, pollakiurie ou difficulté à initier la miction."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:jaundice",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "اصفرار الجلد أو العين",
+        "en": "Jaundice",
+        "fr": "Ictère"
+      },
+      "description": {
+        "ar": "اصفرار في الجلد أو بياض العين.",
+        "en": "Yellowing of the skin or the whites of the eyes.",
+        "fr": "Jaunissement de la peau ou du blanc des yeux."
+      },
+      "regions": [
+        "torso_front",
+        "head_neck"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:neck-stiffness",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تيبّس الرقبة",
+        "en": "Neck stiffness",
+        "fr": "Raideur de la nuque"
+      },
+      "description": {
+        "ar": "تيبّس أو صعوبة في تحريك الرقبة.",
+        "en": "Stiffness or difficulty moving the neck.",
+        "fr": "Raideur ou difficulté à bouger la nuque."
+      },
+      "regions": [
+        "head_neck",
+        "back"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:ankle-swelling",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تورّم الكاحل أو القدم",
+        "en": "Ankle or foot swelling",
+        "fr": "Gonflement de la cheville ou du pied"
+      },
+      "description": {
+        "ar": "تورّم في الكاحل أو القدم.",
+        "en": "Swelling of the ankle or foot.",
+        "fr": "Gonflement de la cheville ou du pied."
+      },
+      "regions": [
+        "lower_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:wound-not-healing",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "جرح لا يلتئم",
+        "en": "Non-healing wound",
+        "fr": "Plaie qui ne guérit pas"
+      },
+      "description": {
+        "ar": "جرح أو قرحة لا تلتئم أو تزداد سوءًا.",
+        "en": "A wound or ulcer that does not heal or is worsening.",
+        "fr": "Plaie ou ulcère qui ne guérit pas ou s aggrave."
+      },
+      "regions": [
+        "lower_limb",
+        "upper_limb"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:cold-sweat",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تعرّق بارد",
+        "en": "Cold sweat",
+        "fr": "Sueurs froides"
+      },
+      "description": {
+        "ar": "تعرّق بارد أو شحوب مصاحب للألم.",
+        "en": "Cold sweats or pallor accompanying the pain.",
+        "fr": "Sueurs froides ou pâleur accompagnant la douleur."
+      },
+      "regions": [
+        "torso_front",
+        "head_neck",
+        "back"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:chest-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم أو ضغط في الصدر",
+        "en": "Chest pain or pressure",
+        "fr": "Douleur ou oppression thoracique"
+      },
+      "description": {
+        "ar": "ألم أو ضغط أو حرقان في الصدر.",
+        "en": "Chest pain, pressure, or burning.",
+        "fr": "Douleur, oppression ou brûlure thoracique."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:palpitations",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "خفقان القلب",
+        "en": "Palpitations",
+        "fr": "Palpitations"
+      },
+      "description": {
+        "ar": "خفقان أو تسرّع في ضربات القلب.",
+        "en": "Palpitations or a rapid heartbeat.",
+        "fr": "Palpitations ou accélération du rythme cardiaque."
+      },
+      "regions": [
+        "torso_front",
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:leg-swelling",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تورّم الساق",
+        "en": "Leg swelling",
+        "fr": "Gonflement de la jambe"
+      },
+      "description": {
+        "ar": "تورّم في الساق، خاصة في جانب واحد.",
+        "en": "Swelling of the leg, especially on one side.",
+        "fr": "Gonflement de la jambe, surtout unilatéral."
+      },
+      "regions": [
+        "lower_limb"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:joint-locking",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "قفل المفصل",
+        "en": "Joint locking",
+        "fr": "Blocage articulaire"
+      },
+      "description": {
+        "ar": "قفل أو عدم قدرة على فرد أو ثني المفصل كاملًا.",
+        "en": "Locking or inability to fully straighten or bend a joint.",
+        "fr": "Blocage ou impossibilité d étendre ou fléchir une articulation."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:lump",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "كتلة تحت الجلد",
+        "en": "Palpable lump",
+        "fr": "Masse sous-cutanée"
+      },
+      "description": {
+        "ar": "كتلة محسوسة تحت الجلد.",
+        "en": "A palpable lump under the skin.",
+        "fr": "Masse palpable sous la peau."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "torso_front"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:weight-loss",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "نقص وزن غير مبرَّر",
+        "en": "Unexplained weight loss",
+        "fr": "Perte de poids inexpliquée"
+      },
+      "description": {
+        "ar": "نقص في الوزن بدون سبب واضح.",
+        "en": "Unexplained loss of body weight.",
+        "fr": "Perte de poids sans cause évidente."
+      },
+      "regions": [
+        "head_neck",
+        "torso_front",
+        "back",
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:constipation",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "إمساك أو توقّف التبرز",
+        "en": "Constipation or absent bowel movements",
+        "fr": "Constipation ou absence de selles"
+      },
+      "description": {
+        "ar": "إمساك أو صعوبة أو توقّف عن التبرز.",
+        "en": "Constipation, difficulty, or absence of bowel movements.",
+        "fr": "Constipation, difficulté ou absence de selles."
+      },
+      "regions": [
+        "torso_front"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:shoulder-tip-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم طرف الكتف",
+        "en": "Shoulder-tip pain",
+        "fr": "Douleur de l épaule"
+      },
+      "description": {
+        "ar": "ألم في طرف الكتف يزيد عند الاستلقاء (قد يشير لتهيّج الحجاب الحاجز).",
+        "en": "Pain at the tip of the shoulder, worse when lying down (may indicate diaphragmatic irritation).",
+        "fr": "Douleur au sommet de l épaule, aggravée en position couchée."
+      },
+      "regions": [
+        "torso_front",
+        "upper_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
+    },
+    {
+      "id": "local:finger-color-change",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تغيّر لون الأصابع بالبرد",
+        "en": "Finger colour change in cold",
+        "fr": "Changement de couleur des doigts au froid"
+      },
+      "description": {
+        "ar": "تحوّل لون الأصابع إلى الأبيض ثم الأزرق بالبرد أو التوتر.",
+        "en": "Fingers turning white then blue in the cold or with stress.",
+        "fr": "Doigts devenant blancs puis bleus au froid ou au stress."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي داخل التطبيق بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرَع كود.",
+        "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
+        "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
+      }
     }
   ]
 }

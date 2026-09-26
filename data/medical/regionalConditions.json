@@ -1,0 +1,2147 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-26",
+  "batch": "regional-expansion-1",
+  "notice": {
+    "ar": "دفعة توسّع إقليمية: أمراض القدم والركبة واليد، ثم الأسنان والأذن والحلق والجيوب، ثم البطن والحوض والخصية. كل سجل يحتوي أعراضًا مميزة، ومناطق مطابقة، وعلامات خطر ثلاثية اللغة، ومصدرًا طبيًا. محتوى تعليمي عام فقط ولا يقدّم تشخيصًا أو علاجًا.",
+    "en": "Regional expansion batch: foot, knee and hand conditions, then dental, ear, throat and sinus, then abdominal, pelvic and testicular conditions. Each record carries distinctive symptoms, matching regions, trilingual red flags, and a medical source. General education only, not a diagnosis or treatment.",
+    "fr": "Lot d extension régionale : pied, genou et main, puis dents, oreille, gorge et sinus, puis abdomen, pelvis et testicule. Chaque fiche contient des symptômes distinctifs, des régions correspondantes, des signaux d alerte trilingues et une source médicale. Contenu éducatif uniquement."
+  },
+  "conditions": [
+    {
+      "id": "local:achilles-tendinitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M76.6",
+      "batch": "A",
+      "name": {
+        "ar": "التهاب وتر أخيل",
+        "en": "Achilles tendinitis",
+        "fr": "Tendinite du tendon d Achille"
+      },
+      "summary": {
+        "ar": "ألم في مؤخرة الكاحل والوتر فوق الكعب، يزيد مع الجري وصعود الدرج ويخفّ بالراحة.",
+        "en": "Pain at the back of the ankle and above the heel, worse with running and stairs, better with rest.",
+        "fr": "Douleur à l arrière de la cheville et au-dessus du talon, aggravée par la course et les escaliers."
+      },
+      "muscleGroups": [
+        "calves",
+        "ankles",
+        "feet",
+        "tibialis"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "تمزّق مفاجئ مع صوت طقطقة وعدم القدرة على دفع القدم، أو احمرار وحرارة شديدة فوق الوتر.",
+        "en": "Sudden pop with inability to push off the foot, or marked redness and heat over the tendon.",
+        "fr": "Craquement soudain avec impossibilité de pousser le pied, ou rougeur et chaleur marquées."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/heelpain.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - heelpain.html",
+          "url": "https://medlineplus.gov/heelpain.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:metatarsalgia",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M77.4",
+      "batch": "A",
+      "name": {
+        "ar": "ألم مشط القدم",
+        "en": "Metatarsalgia",
+        "fr": "Métatarsalgie"
+      },
+      "summary": {
+        "ar": "وجع في مقدمة القدم يزيد بالوقوف الطويل أو الأحذية الضيقة أو ذات الكعب العالي.",
+        "en": "Pain in the ball of the foot, worse with prolonged standing, tight or high-heeled shoes.",
+        "fr": "Douleur à l avant du pied, aggravée par la station debout prolongée ou des chaussures serrées."
+      },
+      "muscleGroups": [
+        "feet",
+        "tibialis",
+        "ankles"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "خدر أو تنميل دائم بالأصابع، ألم يوقظك ليلًا، أو تقرّح أو تغيّر لون الجلد في القدم.",
+        "en": "Persistent numbness of the toes, night pain, or ulceration or skin colour change.",
+        "fr": "Engourdissement persistant des orteils, douleur nocturne, ou ulcération ou changement de couleur."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/footinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - footinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/footinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:morton-neuroma",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "G57.6",
+      "batch": "A",
+      "name": {
+        "ar": "ورم عصب مورتون",
+        "en": "Morton neuroma",
+        "fr": "Névrome de Morton"
+      },
+      "summary": {
+        "ar": "ألم حارق بين إصبعي القدم الثالث والرابع يزيد بالمشي ويخفّ بخلع الحذاء.",
+        "en": "Burning pain between the third and fourth toes, worse with walking, better after removing the shoe.",
+        "fr": "Douleur brûlante entre le 3e et le 4e orteil, aggravée à la marche, soulagée en retirant la chaussure."
+      },
+      "muscleGroups": [
+        "feet"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0003401"
+      ],
+      "redFlags": {
+        "ar": "تنميل أو خدر مستمر، ضعف في القدم، أو عدم تحسّن بعد أسبوعين من تعديل الحذاء والراحة.",
+        "en": "Persistent numbness, foot weakness, or no improvement after two weeks of footwear change and rest.",
+        "fr": "Engourdissement persistant, faiblesse du pied, ou absence d amélioration après deux semaines."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/footinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - footinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/footinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:hallux-valgus",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M20.1",
+      "batch": "A",
+      "name": {
+        "ar": "إبهام القدم الأروح (الوكعة)",
+        "en": "Hallux valgus (bunion)",
+        "fr": "Hallux valgus (oignon)"
+      },
+      "summary": {
+        "ar": "انحراف إصبع القدم الكبير مع بروز عظمي مؤلم على الجانب يزيد بالأحذية الضيقة.",
+        "en": "Deviation of the big toe with a painful bony prominence, worse with tight shoes.",
+        "fr": "Déviation du gros orteil avec saillie osseuse douloureuse, aggravée par des chaussures serrées."
+      },
+      "muscleGroups": [
+        "feet"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0002829",
+        "hpo:0001386"
+      ],
+      "redFlags": {
+        "ar": "احمرار وحرارة شديدة مع ألم مفاجئ في مفصل الإصبع، أو تقرّح الجلد فوق البروز.",
+        "en": "Marked redness and heat with sudden joint pain, or skin ulceration over the prominence.",
+        "fr": "Rougeur et chaleur marquées avec douleur brutale, ou ulcération cutanée sur la saillie."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/bunions.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - bunions.html",
+          "url": "https://medlineplus.gov/bunions.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:ingrown-toenail",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "L60.0",
+      "batch": "A",
+      "name": {
+        "ar": "الظفر الناشب",
+        "en": "Ingrown toenail",
+        "fr": "Ongle incarné"
+      },
+      "summary": {
+        "ar": "ألم واحمرار وتورّم حول حافة الظفر، خاصة في إصبع القدم الكبير.",
+        "en": "Pain, redness, and swelling around the nail edge, especially on the big toe.",
+        "fr": "Douleur, rougeur et gonflement du bord de l ongle, surtout au gros orteil."
+      },
+      "muscleGroups": [
+        "feet"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0000988",
+        "hpo:0001945"
+      ],
+      "redFlags": {
+        "ar": "خطوط حمراء تمتد في الساق، حرارة عامة، أو قيح متزايد - عدوى نسيجية تحت الجلد تستدعي مراجعة عاجلة.",
+        "en": "Red streaks spreading up the leg, fever, or increasing pus - spreading soft-tissue infection, seek urgent care.",
+        "fr": "Traînées rouges remontant la jambe, fièvre, ou pus croissant - infection des tissus, avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/naildiseases.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - naildiseases.html",
+          "url": "https://medlineplus.gov/naildiseases.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:tarsal-tunnel",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "G57.5",
+      "batch": "A",
+      "name": {
+        "ar": "متلازمة نفق الرُصغ",
+        "en": "Tarsal tunnel syndrome",
+        "fr": "Syndrome du tunnel tarsien"
+      },
+      "summary": {
+        "ar": "تنميل وحرقان في باطن القدم والأصابع بسبب ضغط على عصب خلف الكاحل الداخلي.",
+        "en": "Numbness and burning in the sole and toes from compression of a nerve behind the inner ankle.",
+        "fr": "Engourdissement et brûlure de la plante et des orteils par compression nerveuse."
+      },
+      "muscleGroups": [
+        "ankles",
+        "feet",
+        "tibialis"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0012531",
+        "hpo:0001324"
+      ],
+      "redFlags": {
+        "ar": "خدر مستمر، ضعف أو هزال في عضلات القدم، أو ألم يمنع المشي.",
+        "en": "Persistent numbness, foot muscle weakness or wasting, or pain preventing walking.",
+        "fr": "Engourdissement persistant, faiblesse ou fonte musculaire du pied, ou douleur empêchant la marche."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/footinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - footinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/footinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:gout",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M10.9",
+      "batch": "A",
+      "name": {
+        "ar": "النقرس (نوبة ألم مفصل حاد)",
+        "en": "Gout",
+        "fr": "Goutte"
+      },
+      "summary": {
+        "ar": "ألم مفاجئ شديد مع تورّم واحمرار في مفصل واحد غالبًا إبهام القدم، وقد يصيب الركبة أو اليد.",
+        "en": "Sudden severe pain with swelling and redness of a single joint, often the big toe, sometimes knee or hand.",
+        "fr": "Douleur brutale avec gonflement et rougeur d une seule articulation, souvent le gros orteil."
+      },
+      "muscleGroups": [
+        "feet",
+        "ankles",
+        "knees",
+        "hands"
+      ],
+      "regions": [
+        "lower_limb",
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0001369",
+        "hpo:0001386",
+        "hpo:0001945"
+      ],
+      "redFlags": {
+        "ar": "حرارة عامة مع مفصل متورّم وأحمر وساخن - احتمال التهاب مفصل جرثومي وهو حالة طوارئ.",
+        "en": "Fever with a swollen, red, hot joint - possible septic arthritis, a medical emergency.",
+        "fr": "Fièvre avec articulation gonflée, rouge et chaude - arthrite septique possible, urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/gout.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - gout.html",
+          "url": "https://medlineplus.gov/gout.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:diabetic-foot-ulcer",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "E11.621",
+      "batch": "A",
+      "name": {
+        "ar": "قرحة القدم السكرية",
+        "en": "Diabetic foot ulcer",
+        "fr": "Ulcère du pied diabétique"
+      },
+      "summary": {
+        "ar": "قرحة أو جرح في القدم لدى مريض السكري لا يلتئم، غالبًا مع نقص إحساس في القدم.",
+        "en": "A foot ulcer or wound in a person with diabetes that does not heal, often with reduced foot sensation.",
+        "fr": "Ulcère ou plaie du pied chez un diabétique qui ne guérit pas, souvent avec perte de sensibilité."
+      },
+      "muscleGroups": [
+        "feet",
+        "tibialis",
+        "calves"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "local:wound-not-healing",
+        "hpo:0003401",
+        "hpo:0001945"
+      ],
+      "redFlags": {
+        "ar": "قرحة لا تلتئم، إفراز أو رائحة كريهة، اسوداد الأنسجة، أو حرارة - خطر بتر يستدعي مراجعة عاجلة.",
+        "en": "A non-healing ulcer, discharge or foul smell, blackened tissue, or fever - amputation risk, urgent review.",
+        "fr": "Ulcère non cicatrisé, écoulement ou odeur, tissu noirci, ou fièvre - risque d amputation, avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/diabeticfoot.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - diabeticfoot.html",
+          "url": "https://medlineplus.gov/diabeticfoot.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:metatarsal-stress-fracture",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "S92.3",
+      "batch": "A",
+      "name": {
+        "ar": "كسر إجهادي في مشط القدم",
+        "en": "Metatarsal stress fracture",
+        "fr": "Fracture de fatigue du métatarse"
+      },
+      "summary": {
+        "ar": "ألم دقيق في مشط القدم يزيد بالحمل والمشي ويخفّ بالراحة بعد زيادة مفاجئة في النشاط.",
+        "en": "Pinpoint pain in the metatarsal area, worse with weight-bearing and walking, after a sudden increase in activity.",
+        "fr": "Douleur localisée du métatarse, aggravée à l appui, après une augmentation brutale d activité."
+      },
+      "muscleGroups": [
+        "feet"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002653",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "ألم يوقظك ليلًا، ورم موضعي واضح، أو عدم القدرة على حمل الوزن على القدم.",
+        "en": "Night pain, visible local swelling, or inability to bear weight on the foot.",
+        "fr": "Douleur nocturne, gonflement local visible, ou impossibilité d appui sur le pied."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/fractures.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - fractures.html",
+          "url": "https://medlineplus.gov/fractures.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:patellofemoral-pain",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M22.2",
+      "batch": "A",
+      "name": {
+        "ar": "ألم الرضفة والفخذ (ركبة العدّائين)",
+        "en": "Patellofemoral pain syndrome",
+        "fr": "Syndrome fémoro-patellaire"
+      },
+      "summary": {
+        "ar": "ألم أمام الركبة يزيد بالجلوس الطويل والقرفصاء وصعود أو نزول الدرج.",
+        "en": "Pain at the front of the knee, worse with prolonged sitting, squatting, and stairs.",
+        "fr": "Douleur antérieure du genou, aggravée par la position assise prolongée, l accroupissement et les escaliers."
+      },
+      "muscleGroups": [
+        "knees",
+        "quadriceps",
+        "hamstring"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0002829",
+        "hpo:0001324"
+      ],
+      "redFlags": {
+        "ar": "تورّم في الركبة، قفل أو فرقعة مع عدم ثبات، أو ألم يمنع المشي تمامًا.",
+        "en": "Knee swelling, locking or clicking with instability, or pain preventing walking.",
+        "fr": "Gonflement du genou, blocage ou craquement avec instabilité, ou douleur empêchant la marche."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/kneeinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - kneeinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/kneeinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:meniscal-tear",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M23.2",
+      "batch": "A",
+      "name": {
+        "ar": "تمزّق الغضروف الهلالي",
+        "en": "Meniscal tear",
+        "fr": "Déchirure méniscale"
+      },
+      "summary": {
+        "ar": "ألم في خط مفصل الركبة بعد لفّ مفاجئ، مع تورّم تدريجي وشعور بعدم الثبات.",
+        "en": "Pain along the knee joint line after a sudden twist, with gradual swelling and instability.",
+        "fr": "Douleur de l interligne articulaire après une torsion brutale, avec gonflement et instabilité."
+      },
+      "muscleGroups": [
+        "knees",
+        "quadriceps",
+        "hamstring"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0001386",
+        "hpo:0001288"
+      ],
+      "redFlags": {
+        "ar": "ركبة تقفل ولا تُبسَط، تورّم سريع، أو عدم ثبات متكرر عند المشي.",
+        "en": "A knee that locks and cannot straighten, rapid swelling, or recurrent instability when walking.",
+        "fr": "Genou qui se bloque, gonflement rapide, ou instabilité récurrente à la marche."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/kneeinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - kneeinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/kneeinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:patellar-tendinitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M76.5",
+      "batch": "A",
+      "name": {
+        "ar": "التهاب وتر الرضفة (ركبة القافز)",
+        "en": "Patellar tendinitis",
+        "fr": "Tendinite patellaire"
+      },
+      "summary": {
+        "ar": "ألم أسفل الرضفة يزيد بالقفز والجري والدرج ويخفّ بالراحة.",
+        "en": "Pain below the kneecap, worse with jumping, running, and stairs, better with rest.",
+        "fr": "Douleur sous la rotule, aggravée par le saut, la course et les escaliers, soulagée au repos."
+      },
+      "muscleGroups": [
+        "knees",
+        "quadriceps"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "احمرار وتورّم أسفل الرضفة، أو تمزّق مفاجئ مع فقدان القدرة على فرد الساق.",
+        "en": "Redness and swelling below the kneecap, or a sudden tear with inability to straighten the leg.",
+        "fr": "Rougeur et gonflement sous la rotule, ou rupture brutale avec impossibilité d étendre la jambe."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/kneeinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - kneeinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/kneeinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:prepatellar-bursitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M70.4",
+      "batch": "A",
+      "name": {
+        "ar": "التهاب الجُراب أمام الرضفة",
+        "en": "Prepatellar bursitis",
+        "fr": "Bursite pré-patellaire"
+      },
+      "summary": {
+        "ar": "تورّم في مقدمة الركبة مع ألم عند الضغط أو الركوع، وأحيانًا دفء واحمرار.",
+        "en": "Swelling at the front of the knee with pain on pressure or kneeling, sometimes warmth and redness.",
+        "fr": "Gonflement antérieur du genou avec douleur à la pression ou à genoux, parfois chaleur et rougeur."
+      },
+      "muscleGroups": [
+        "knees"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0001386",
+        "hpo:0012531",
+        "hpo:0000988",
+        "hpo:0001945"
+      ],
+      "redFlags": {
+        "ar": "احمرار وحرارة شديدة مع حرارة عامة - التهاب جرابي جرثومي يستدعي مراجعة عاجلة.",
+        "en": "Marked redness and heat with fever - septic bursitis requiring urgent review.",
+        "fr": "Rougeur et chaleur marquées avec fièvre - bursite septique, avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/bursitis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - bursitis.html",
+          "url": "https://medlineplus.gov/bursitis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:de-quervain",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M65.4",
+      "batch": "A",
+      "name": {
+        "ar": "التهاب أوتار دو كيرفان",
+        "en": "De Quervain tenosynovitis",
+        "fr": "Ténosynovite de De Quervain"
+      },
+      "summary": {
+        "ar": "ألم في جانب الرسغ من جهة الإبهام يزيد بحمل الأشياء أو لفّ الرسغ.",
+        "en": "Pain on the thumb side of the wrist, worse with gripping or twisting the wrist.",
+        "fr": "Douleur du bord radial du poignet, aggravée par la préhension ou la rotation."
+      },
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "خدر مستمر في الأصابع، أو تورّم واحمرار شديد لا يتحسّن بالراحة.",
+        "en": "Persistent finger numbness, or marked swelling and redness not improving with rest.",
+        "fr": "Engourdissement persistant des doigts, ou gonflement et rougeur marqués sans amélioration."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/handinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - handinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/handinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:trigger-finger",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M65.3",
+      "batch": "A",
+      "name": {
+        "ar": "الإصبع الزنادية",
+        "en": "Trigger finger",
+        "fr": "Doigt à ressaut"
+      },
+      "summary": {
+        "ar": "ألم في قاعدة الإصبع مع شعور بقفل أو طقطقة عند ثنيه وفرده.",
+        "en": "Pain at the base of a finger with locking or clicking when bending and straightening it.",
+        "fr": "Douleur à la base du doigt avec blocage ou ressaut à la flexion et à l extension."
+      },
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0012531",
+        "local:joint-locking"
+      ],
+      "redFlags": {
+        "ar": "إصبع يبقى مقفلًا ولا يُفرد، أو احمرار وحرارة في قاعدة الإصبع.",
+        "en": "A finger that stays locked and cannot be straightened, or redness and heat at its base.",
+        "fr": "Doigt bloqué non extensible, ou rougeur et chaleur à sa base."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/handinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - handinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/handinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:ganglion-cyst",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M67.4",
+      "batch": "A",
+      "name": {
+        "ar": "الكيس العُقدي (غانغليون)",
+        "en": "Ganglion cyst",
+        "fr": "Kyste synovial"
+      },
+      "summary": {
+        "ar": "كتلة مستديرة مطاطية غالبًا على ظهر الرسغ أو قاعدة الإصبع، وقد تؤلم بالحركة.",
+        "en": "A round, rubbery lump, most often on the back of the wrist or a finger base, sometimes painful with movement.",
+        "fr": "Masse ronde et élastique, souvent au dos du poignet ou à la base d un doigt, parfois douloureuse."
+      },
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "local:lump",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "نمو سريع، ألم ليلي، أو خدر وضعف في الأصابع.",
+        "en": "Rapid growth, night pain, or numbness and weakness in the fingers.",
+        "fr": "Croissance rapide, douleur nocturne, ou engourdissement et faiblesse des doigts."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/handinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - handinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/handinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:dupuytren",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M72.0",
+      "batch": "A",
+      "name": {
+        "ar": "تقلّص دوبويترن",
+        "en": "Dupuytren contracture",
+        "fr": "Maladie de Dupuytren"
+      },
+      "summary": {
+        "ar": "تسمّك في راحة اليد مع تقلّص تدريجي يمنع فرد الأصابع، غالبًا الرابع والخامس.",
+        "en": "Thickening in the palm with progressive contracture preventing finger extension, usually the 4th and 5th.",
+        "fr": "Épaississement de la paume avec contracture progressive empêchant l extension des doigts."
+      },
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "local:joint-locking",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "تقلّص سريع يمنع استقامة الأصابع أو يعيق استخدام اليد.",
+        "en": "Rapid contracture preventing finger extension or impairing hand use.",
+        "fr": "Contracture rapide empêchant l extension des doigts ou gênant l usage de la main."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/handinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - handinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/handinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:scaphoid-fracture",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "S62.0",
+      "batch": "A",
+      "name": {
+        "ar": "كسر العظم الزورقي في الرسغ",
+        "en": "Scaphoid fracture",
+        "fr": "Fracture du scaphoïde"
+      },
+      "summary": {
+        "ar": "ألم في قاعدة الإبهام بعد السقوط على اليد، يزيد بالضغط على منطقة الزورقي.",
+        "en": "Pain at the base of the thumb after a fall onto the hand, worse with pressure over the scaphoid.",
+        "fr": "Douleur à la base du pouce après une chute sur la main, aggravée à la pression du scaphoïde."
+      },
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0002653",
+        "hpo:0012531",
+        "hpo:0001386"
+      ],
+      "redFlags": {
+        "ar": "ألم شديد في قاعدة الإبهام مع تورّم بعد السقوط - الكسر غير المعالج قد يسبب نخر العظم؛ اطلب تصويرًا.",
+        "en": "Severe pain and swelling at the thumb base after a fall - untreated fracture may cause bone necrosis; request imaging.",
+        "fr": "Douleur marquée et gonflement à la base du pouce après une chute - risque de nécrose ; demandez une imagerie."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/fractures.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - fractures.html",
+          "url": "https://medlineplus.gov/fractures.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:raynaud",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "I73.0",
+      "batch": "A",
+      "name": {
+        "ar": "ظاهرة رينو",
+        "en": "Raynaud phenomenon",
+        "fr": "Phénomène de Raynaud"
+      },
+      "summary": {
+        "ar": "تحوّل لون أطراف الأصابع إلى الأبيض ثم الأزرق بالبرد أو التوتر، مع تنميل مؤقت.",
+        "en": "Fingertips turning white then blue in the cold or with stress, with temporary numbness.",
+        "fr": "Extrémités des doigts devenant blanches puis bleues au froid ou au stress, avec engourdissement."
+      },
+      "muscleGroups": [
+        "hands",
+        "feet"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "local:finger-color-change",
+        "hpo:0003401",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "تغيّر لون دائم أو تقرّح في الأصابع، أو ألم شديد مستمر - قد يرتبط بمرض نسيجي ضام ويستدعي تقييمًا.",
+        "en": "Permanent colour change or fingertip ulceration, severe persistent pain - may relate to connective tissue disease.",
+        "fr": "Changement de couleur permanent ou ulcération, douleur sévère persistante - maladie de système possible."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/raynaudphenomenon.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - raynaudphenomenon.html",
+          "url": "https://medlineplus.gov/raynaudphenomenon.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:dental-caries",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K02.9",
+      "batch": "B",
+      "name": {
+        "ar": "تسوّس الأسنان",
+        "en": "Dental caries (tooth decay)",
+        "fr": "Carie dentaire"
+      },
+      "summary": {
+        "ar": "تآكل في مينا السن مع ألم عند الحلويات والبارد والحار، وقد يظهر ثقب ظاهر.",
+        "en": "Loss of tooth enamel with pain on sweets, cold and hot, sometimes a visible cavity.",
+        "fr": "Atteinte de l émail avec douleur au sucré, au froid et au chaud, parfois cavité visible."
+      },
+      "muscleGroups": [
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:toothache",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "حرارة، تورّم في الوجه أو الفك، أو صعوبة بلع - عدوى سنية منتشرة تستدعي مراجعة عاجلة.",
+        "en": "Fever, facial or jaw swelling, or difficulty swallowing - spreading dental infection needs urgent care.",
+        "fr": "Fièvre, gonflement du visage ou de la mâchoire, ou dysphagie - infection dentaire évolutive, avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/toothdecay.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - toothdecay.html",
+          "url": "https://medlineplus.gov/toothdecay.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:dental-abscess",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K04.7",
+      "batch": "B",
+      "name": {
+        "ar": "خرّاج الأسنان",
+        "en": "Dental abscess",
+        "fr": "Abcès dentaire"
+      },
+      "summary": {
+        "ar": "قيح حول جذر السن مع ألم نابض وتورّم في الوجه أو الفك وحرارة.",
+        "en": "Pus around the tooth root with throbbing pain, facial or jaw swelling, and fever.",
+        "fr": "Pus autour de la racine avec douleur pulsatile, gonflement du visage ou de la mâchoire et fièvre."
+      },
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:toothache",
+        "local:dental-abscess",
+        "local:facial-swelling",
+        "hpo:0001945"
+      ],
+      "redFlags": {
+        "ar": "تورّم يغلق العين أو يضغط على الحلق، صعوبة تنفس أو بلع، أو حرارة عالية - طوارئ فورية.",
+        "en": "Swelling closing the eye or compressing the throat, difficulty breathing or swallowing, or high fever - emergency.",
+        "fr": "Gonflement fermant l oeil ou comprimant la gorge, difficulté respiratoire ou à avaler, fièvre - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/toothdisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - toothdisorders.html",
+          "url": "https://medlineplus.gov/toothdisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:pericoronitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K01.1",
+      "batch": "B",
+      "name": {
+        "ar": "التهاب حول ضرس العقل المطمور",
+        "en": "Pericoronitis (impacted wisdom tooth)",
+        "fr": "Péricoronarite (dent de sagesse incluse)"
+      },
+      "summary": {
+        "ar": "ألم وتورّم في مؤخرة الفك السفلي مع صعوبة فتح الفم أو المضغ.",
+        "en": "Pain and swelling at the back of the lower jaw with difficulty opening the mouth or chewing.",
+        "fr": "Douleur et gonflement postérieurs de la mâchoire avec difficulté à ouvrir la bouche."
+      },
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:jaw-pain",
+        "local:toothache",
+        "local:swallowing-difficulty",
+        "hpo:0001945"
+      ],
+      "redFlags": {
+        "ar": "تورّم يدفع الحلق، صعوبة فتح الفم أو التنفس، أو حرارة - مراجعة عاجلة.",
+        "en": "Swelling pushing into the throat, inability to open the mouth or breathe, or fever - urgent review.",
+        "fr": "Gonflement poussant la gorge, difficulté à ouvrir la bouche ou à respirer, fièvre - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/wisdomteeth.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - wisdomteeth.html",
+          "url": "https://medlineplus.gov/wisdomteeth.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:tmj-disorder",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M26.60",
+      "batch": "B",
+      "name": {
+        "ar": "اضطراب مفصل الفك الصدغي",
+        "en": "Temporomandibular joint disorder",
+        "fr": "Trouble de l articulation temporo-mandibulaire"
+      },
+      "summary": {
+        "ar": "ألم في مفصل الفك وعضلات المضغ مع طقطقة أو إحساس بانغلاق الفم أو ألم ينعكس للأذن.",
+        "en": "Pain in the jaw joint and chewing muscles with clicking, catching, or pain referred to the ear.",
+        "fr": "Douleur de l ATM et des muscles masticateurs avec ressaut ou douleur irradiée à l oreille."
+      },
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:jaw-pain",
+        "hpo:0002315",
+        "local:ear-pain"
+      ],
+      "redFlags": {
+        "ar": "عدم القدرة على إغلاق الفم، انزياح الفك، أو ازدواج رؤية مع ألم - عاجل.",
+        "en": "Inability to close the mouth, jaw displacement, or double vision with pain - urgent.",
+        "fr": "Incapacité de fermer la bouche, déplacement mandibulaire, ou diplopie avec douleur - urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/tmjdisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - tmjdisorders.html",
+          "url": "https://medlineplus.gov/tmjdisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:gingivitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K05.1",
+      "batch": "B",
+      "name": {
+        "ar": "التهاب اللثة",
+        "en": "Gingivitis (gum disease)",
+        "fr": "Gingivite"
+      },
+      "summary": {
+        "ar": "احمرار ونزيف في اللثة عند التنظيف مع رائحة فم كريهة وتورّم بسيط.",
+        "en": "Red, bleeding gums when brushing, with bad breath and mild swelling.",
+        "fr": "Gencives rouges et saignantes au brossage, avec mauvaise haleine et léger gonflement."
+      },
+      "muscleGroups": [
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:gum-bleeding",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "نزيف لثة غزير مستمر، حرارة، أو تخلخل سريع في الأسنان.",
+        "en": "Heavy persistent gum bleeding, fever, or rapid tooth loosening.",
+        "fr": "Saignement gingival abondant persistant, fièvre, ou mobilité dentaire rapide."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/gumdisease.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - gumdisease.html",
+          "url": "https://medlineplus.gov/gumdisease.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:otitis-media",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "H66.0",
+      "batch": "B",
+      "name": {
+        "ar": "التهاب الأذن الوسطى الحاد",
+        "en": "Acute otitis media",
+        "fr": "Otite moyenne aiguë"
+      },
+      "summary": {
+        "ar": "ألم أذن حاد مع إحساس بضغط داخلي ونقص سمع مؤقت، شائع بعد زكام أو لدى الأطفال مع حرارة.",
+        "en": "Acute ear pain with pressure and temporary hearing loss, common after a cold or in children with fever.",
+        "fr": "Otalgie aiguë avec pression et baisse d audition, fréquente après un rhume ou chez l enfant fébrile."
+      },
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:ear-pain",
+        "local:hearing-change",
+        "hpo:0001945"
+      ],
+      "redFlags": {
+        "ar": "إفراز قيحي من الأذن، احمرار وتورّم خلف الأذن، حرارة عالية، أو تشوّش وعي.",
+        "en": "Pus from the ear, redness and swelling behind the ear, high fever, or confusion.",
+        "fr": "Écoulement purulent, rougeur et gonflement rétro-auriculaires, fièvre élevée ou confusion."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/earinfections.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - earinfections.html",
+          "url": "https://medlineplus.gov/earinfections.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:otitis-externa",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "H60.3",
+      "batch": "B",
+      "name": {
+        "ar": "التهاب الأذن الخارجية (أذن السبّاح)",
+        "en": "Otitis externa (swimmer s ear)",
+        "fr": "Otite externe (oreille du nageur)"
+      },
+      "summary": {
+        "ar": "ألم شديد عند لمس الأذن أو سحب الصيوان مع احتقان القناة ورطوبة أو إفراز.",
+        "en": "Severe pain when touching the ear or pulling the auricle, with canal congestion and discharge.",
+        "fr": "Douleur vive au toucher du pavillon, avec congestion du conduit et écoulement."
+      },
+      "muscleGroups": [
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:ear-pain",
+        "local:ear-discharge",
+        "local:hearing-change"
+      ],
+      "redFlags": {
+        "ar": "ألم يمنع النوم، تورّم حول الأذن، أو ألم مع تصلّب رقبة - قد يمتد للقاعدة؛ عاجل.",
+        "en": "Pain preventing sleep, swelling around the ear, or pain with neck stiffness - may spread deeply; urgent.",
+        "fr": "Douleur empêchant le sommeil, gonflement péri-auriculaire, ou raideur de nuque - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/earinfections.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - earinfections.html",
+          "url": "https://medlineplus.gov/earinfections.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:pharyngitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "J02.9",
+      "batch": "B",
+      "name": {
+        "ar": "التهاب البلعوم واللوزتين الحاد",
+        "en": "Acute pharyngitis or tonsillitis",
+        "fr": "Pharyngite ou amygdalite aiguë"
+      },
+      "summary": {
+        "ar": "ألم في الحلق يزيد بالبلع مع احتقان وحرارة، وقد تظهر بقع بيضاء على اللوزتين.",
+        "en": "Throat pain worse on swallowing, with redness and fever; white patches may appear on the tonsils.",
+        "fr": "Mal de gorge aggravé à la déglutition, avec rougeur et fièvre ; dépôts blancs possibles."
+      },
+      "muscleGroups": [
+        "neck",
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:sore-throat",
+        "local:swallowing-difficulty",
+        "hpo:0001945",
+        "hpo:0002017"
+      ],
+      "redFlags": {
+        "ar": "صعوبة تنفس، سيلان لعاب، تورّم من جانب واحد، أو حرارة مع طفح - طوارئ.",
+        "en": "Difficulty breathing, drooling, one-sided swelling, or fever with a rash - emergency.",
+        "fr": "Difficulté respiratoire, hypersialorrhée, gonflement unilatéral, ou fièvre avec éruption - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/sorethroat.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - sorethroat.html",
+          "url": "https://medlineplus.gov/sorethroat.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:strep-throat",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "J03.0",
+      "batch": "B",
+      "name": {
+        "ar": "التهاب الحلق بالمكورات العقدية",
+        "en": "Streptococcal pharyngitis (strep throat)",
+        "fr": "Angine streptococcique"
+      },
+      "summary": {
+        "ar": "ألم حلق مفاجئ مع حرارة وصداع وألم عند البلع، وغالبًا بدون كحّة أو زكام.",
+        "en": "Sudden sore throat with fever, headache, and pain on swallowing, often without cough or runny nose.",
+        "fr": "Mal de gorge brutal avec fièvre, céphalées et douleur à la déglutition, souvent sans toux."
+      },
+      "muscleGroups": [
+        "neck",
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:sore-throat",
+        "hpo:0001945",
+        "hpo:0002315",
+        "hpo:0002017"
+      ],
+      "redFlags": {
+        "ar": "طفح حبيبي (سكارليت)، أو بعد أسبوعين ألم مفاصل أو بول داكن أو تورّم - راجع الطبيب.",
+        "en": "Scarlet-fever rash, or after two weeks joint pain, dark urine, or swelling - seek medical review.",
+        "fr": "Éruption scarlatiniforme, ou après deux semaines arthralgies, urines foncées ou œdèmes - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/streptococcalinfections.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - streptococcalinfections.html",
+          "url": "https://medlineplus.gov/streptococcalinfections.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:laryngitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "J04.0",
+      "batch": "B",
+      "name": {
+        "ar": "التهاب الحنجرة (بحة الصوت)",
+        "en": "Acute laryngitis (hoarseness)",
+        "fr": "Laryngite aiguë (enrouement)"
+      },
+      "summary": {
+        "ar": "بحة أو فقدان جزئي للصوت مع ألم بسيط في الحلق وتهيّج بعد زكام أو إجهاد صوتي.",
+        "en": "Hoarseness or partial voice loss with mild throat pain after a cold or vocal strain.",
+        "fr": "Enrouement ou perte partielle de la voix avec douleur légère après un rhume ou un effort vocal."
+      },
+      "muscleGroups": [
+        "neck",
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:hoarseness",
+        "local:sore-throat"
+      ],
+      "redFlags": {
+        "ar": "صعوبة تنفس أو شهيق صاخب (صرير)، أو بحة مستمرة أكثر من ثلاثة أسابيع - عاجل.",
+        "en": "Difficulty breathing or noisy inspiration (stridor), or hoarseness lasting over three weeks - urgent.",
+        "fr": "Dyspnée ou inspiration bruyante (stridor), ou enrouement de plus de trois semaines - urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/throatdisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - throatdisorders.html",
+          "url": "https://medlineplus.gov/throatdisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:sinusitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "J01.9",
+      "batch": "B",
+      "name": {
+        "ar": "التهاب الجيوب الأنفية الحاد",
+        "en": "Acute sinusitis",
+        "fr": "Sinusite aiguë"
+      },
+      "summary": {
+        "ar": "ألم وضغط في الوجه والجبهة يزيد بالانحناء، مع احتقان أنف وإفراز سميك.",
+        "en": "Facial and forehead pain and pressure worse on bending, with nasal congestion and thick discharge.",
+        "fr": "Douleur et pression faciales et frontales majorées en se penchant, avec congestion et sécrétions épaisses."
+      },
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "local:facial-pain",
+        "hpo:0002315",
+        "hpo:0001945"
+      ],
+      "redFlags": {
+        "ar": "تورّم حول العين، ازدواج رؤية، أو ألم شديد لا يتحسّن - عاجل.",
+        "en": "Swelling around the eye, double vision, or severe pain not improving - urgent.",
+        "fr": "Gonflement péri-orbitaire, diplopie, ou douleur sévère sans amélioration - urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/sinusitis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - sinusitis.html",
+          "url": "https://medlineplus.gov/sinusitis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:inguinal-hernia",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K40.9",
+      "batch": "C",
+      "name": {
+        "ar": "الفتق الأربي",
+        "en": "Inguinal hernia",
+        "fr": "Hernie inguinale"
+      },
+      "summary": {
+        "ar": "انتفاخ أو كتلة في الأربية تظهر بالحمل والسعال وقد تختفي بالاستلقاء، مع ثقل موضعي.",
+        "en": "A bulge in the groin appearing with lifting or coughing, sometimes reducing when lying down, with local heaviness.",
+        "fr": "Saillie de l aine apparaissant à l effort ou à la toux, parfois réductible allongé, avec pesanteur."
+      },
+      "muscleGroups": [
+        "abs",
+        "obliques",
+        "adductors"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:groin-lump",
+        "local:abdominal-pain",
+        "hpo:0002017"
+      ],
+      "organs": [
+        "intestines"
+      ],
+      "redFlags": {
+        "ar": "كتلة صلبة مؤلمة لا تعود للداخل، قيء، توقّف الغازات والبراز، أو احمرار الجلد - انحشار أو خنق الفتق، طوارئ فورية.",
+        "en": "A firm painful lump that will not reduce, vomiting, no gas or stool, or red skin - incarcerated or strangulated hernia, emergency.",
+        "fr": "Masse dure douloureuse non réductible, vomissements, arrêt des gaz et des selles, ou peau rouge - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hernia.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - hernia.html",
+          "url": "https://medlineplus.gov/hernia.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:umbilical-hernia",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K42.9",
+      "batch": "C",
+      "name": {
+        "ar": "الفتق السُرّي",
+        "en": "Umbilical hernia",
+        "fr": "Hernie ombilicale"
+      },
+      "summary": {
+        "ar": "انتفاخ عند السرة يزداد بالحمل أو السعال أو الضغط، وغالبًا غير مؤلم.",
+        "en": "A bulge at the navel increasing with lifting, coughing, or straining, often painless.",
+        "fr": "Saillie ombilicale augmentant à l effort ou à la toux, souvent indolore."
+      },
+      "muscleGroups": [
+        "abs",
+        "obliques"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:lump",
+        "local:abdominal-pain",
+        "hpo:0002017"
+      ],
+      "organs": [
+        "intestines"
+      ],
+      "redFlags": {
+        "ar": "ألم متزايد في السرة مع قيء وتوقّف الغازات والبراز أو احمرار الجلد - عاجل.",
+        "en": "Increasing pain at the navel with vomiting, absent gas and stool, or red skin - urgent.",
+        "fr": "Douleur croissante à l ombilic avec vomissements, arrêt des gaz et des selles, ou peau rouge - urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hernia.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - hernia.html",
+          "url": "https://medlineplus.gov/hernia.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:mesenteric-lymphadenitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "I88.0",
+      "batch": "C",
+      "name": {
+        "ar": "التهاب العُقد اللمفية المساريقية",
+        "en": "Mesenteric lymphadenitis",
+        "fr": "Adénolymphite mésentérique"
+      },
+      "summary": {
+        "ar": "ألم بطني وسط أو يمين مع حرارة وغثيان، غالبًا بعد عدوى تنفسية أو معوية، ويشبه التهاب الزائدة.",
+        "en": "Central or right-sided abdominal pain with fever and nausea, often after a respiratory or gut infection, mimicking appendicitis.",
+        "fr": "Douleur abdominale centrale ou droite avec fièvre et nausées, souvent après une infection, mimant l appendicite."
+      },
+      "muscleGroups": [
+        "abs",
+        "obliques"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:abdominal-pain",
+        "hpo:0001945",
+        "hpo:0002017"
+      ],
+      "organs": [
+        "intestines"
+      ],
+      "redFlags": {
+        "ar": "ألم ينتقل لأسفل يمين البطن ويزداد مع حرارة عالية - قد يحاكي الزائدة؛ راجع عاجلًا.",
+        "en": "Pain migrating to the lower right abdomen with high fever - may mimic appendicitis; urgent review.",
+        "fr": "Douleur migrant en bas à droite avec fièvre élevée - peut mimer une appendicite ; avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/abdominalpain.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - abdominalpain.html",
+          "url": "https://medlineplus.gov/abdominalpain.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:constipation",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K59.0",
+      "batch": "C",
+      "name": {
+        "ar": "الإمساك واحتباس البراز",
+        "en": "Constipation or fecal impaction",
+        "fr": "Constipation ou fécalome"
+      },
+      "summary": {
+        "ar": "صعوبة أو ندرة في التبرّز مع انتفاخ وثقل في أسفل البطن.",
+        "en": "Difficulty or infrequency of bowel movements with bloating and lower abdominal heaviness.",
+        "fr": "Difficulté ou rareté des selles avec ballonnement et pesanteur abdominale basse."
+      },
+      "muscleGroups": [
+        "abs",
+        "obliques",
+        "gluteal"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:constipation",
+        "local:abdominal-pain",
+        "hpo:0002017"
+      ],
+      "organs": [
+        "intestines"
+      ],
+      "redFlags": {
+        "ar": "توقّف كامل عن التبرّز مع قيء وانتفاخ شديد، دم في البراز، أو نقص وزن غير مبرَّر - عاجل.",
+        "en": "Complete absence of bowel movements with vomiting and marked distension, blood in stool, or weight loss - urgent.",
+        "fr": "Arrêt complet des selles avec vomissements et distension, sang dans les selles, ou perte de poids - urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/constipation.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - constipation.html",
+          "url": "https://medlineplus.gov/constipation.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:bowel-obstruction",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K56.60",
+      "batch": "C",
+      "name": {
+        "ar": "انسداد الأمعاء",
+        "en": "Intestinal obstruction",
+        "fr": "Occlusion intestinale"
+      },
+      "summary": {
+        "ar": "ألم بطني مغصي شديد متزايد مع قيء وانتفاخ وتوقّف خروج الغازات والبراز.",
+        "en": "Severe increasing cramping abdominal pain with vomiting, distension, and no passage of gas or stool.",
+        "fr": "Douleur abdominale crampoïde croissante avec vomissements, distension, arrêt des gaz et des selles."
+      },
+      "muscleGroups": [
+        "abs",
+        "obliques",
+        "gluteal"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:abdominal-pain",
+        "hpo:0002017",
+        "local:constipation"
+      ],
+      "organs": [
+        "intestines"
+      ],
+      "redFlags": {
+        "ar": "ألم مغصي شديد مع قيء أخضر أو برازي، بطن منتفخ متصلّب، وتوقّف الغازات والبراز - طوارئ فورية.",
+        "en": "Severe cramping with green or faecal vomiting, a firm distended abdomen, no gas or stool - emergency.",
+        "fr": "Crampes sévères avec vomissements verdâtres ou fécaloïdes, abdomen distendu et rigide - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/abdominalpain.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - abdominalpain.html",
+          "url": "https://medlineplus.gov/abdominalpain.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:cholecystitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K81.0",
+      "batch": "C",
+      "name": {
+        "ar": "التهاب المرارة والمغص الصفراوي",
+        "en": "Acute cholecystitis or biliary colic",
+        "fr": "Cholécystite aiguë ou colique biliaire"
+      },
+      "summary": {
+        "ar": "ألم مستمر في أعلى يمين البطن ينتقل للكتف الأيمن بعد وجبة دسمة، مع غثيان.",
+        "en": "Persistent upper-right abdominal pain radiating to the right shoulder after a fatty meal, with nausea.",
+        "fr": "Douleur persistante de l hypochondre droit irradiant à l épaule droite après un repas gras, avec nausées."
+      },
+      "muscleGroups": [
+        "abs",
+        "obliques",
+        "chest"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:abdominal-pain",
+        "hpo:0002017",
+        "hpo:0001945",
+        "local:jaundice"
+      ],
+      "organs": [
+        "gallbladder",
+        "liver"
+      ],
+      "redFlags": {
+        "ar": "حرارة مع ألم ثابت شديد، اصفرار، أو ألم يزداد عند الشهيق - مراجعة عاجلة.",
+        "en": "Fever with severe constant pain, jaundice, or pain worsening on inspiration - urgent review.",
+        "fr": "Fièvre avec douleur constante, ictère, ou douleur aggravée à l inspiration - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/gallstones.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - gallstones.html",
+          "url": "https://medlineplus.gov/gallstones.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:pancreatitis-acute",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K85.9",
+      "batch": "C",
+      "name": {
+        "ar": "التهاب البنكرياس الحاد",
+        "en": "Acute pancreatitis",
+        "fr": "Pancréatite aiguë"
+      },
+      "summary": {
+        "ar": "ألم شديد في أعلى البطن يخترق إلى الظهر مع قيء متكرر ولا يخفّ بتغيير الوضعية.",
+        "en": "Severe upper abdominal pain boring through to the back with repeated vomiting, not relieved by changing position.",
+        "fr": "Douleur épigastrique sévère transfixiante vers le dos avec vomissements répétés, non soulagée par le changement de position."
+      },
+      "muscleGroups": [
+        "abs",
+        "obliques",
+        "upper-back",
+        "lower-back"
+      ],
+      "regions": [
+        "torso_front",
+        "back"
+      ],
+      "symptoms": [
+        "local:abdominal-pain",
+        "hpo:0002017",
+        "hpo:0001945"
+      ],
+      "organs": [
+        "pancreas"
+      ],
+      "redFlags": {
+        "ar": "ألم معوي علوي يخترق للظهر مع قيء مستمر وحرارة أو اصفرار أو ضيق نفس - طوارئ.",
+        "en": "Upper abdominal pain boring to the back with persistent vomiting and fever, jaundice, or breathlessness - emergency.",
+        "fr": "Douleur épigastrique transfixiante avec vomissements persistants et fièvre, ictère ou dyspnée - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/pancreatitis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - pancreatitis.html",
+          "url": "https://medlineplus.gov/pancreatitis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:testicular-torsion",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N44.00",
+      "batch": "C",
+      "name": {
+        "ar": "التواء الخصية",
+        "en": "Testicular torsion",
+        "fr": "Torsion testiculaire"
+      },
+      "summary": {
+        "ar": "ألم مفاجئ شديد في الخصية مع تورّم واحمرار وارتفاع موضع الخصية مع غثيان.",
+        "en": "Sudden severe testicular pain with swelling, redness, and a high-riding testis, with nausea.",
+        "fr": "Douleur testiculaire brutale avec gonflement, rougeur, testicule ascensionné, et nausées."
+      },
+      "muscleGroups": [
+        "adductors",
+        "gluteal",
+        "abs"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:testicular-pain",
+        "local:scrotal-swelling",
+        "hpo:0002017"
+      ],
+      "organs": [
+        "testis"
+      ],
+      "redFlags": {
+        "ar": "ألم خصية مفاجئ شديد مع تورّم وقيء - نافذة علاجية 6 ساعات؛ توجّه للطوارئ فورًا.",
+        "en": "Sudden severe testicular pain with swelling and vomiting - a 6-hour treatment window; go to the emergency department now.",
+        "fr": "Douleur testiculaire brutale avec gonflement et vomissements - fenêtre thérapeutique de 6 heures ; urgence immédiate."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/testiculardisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - testiculardisorders.html",
+          "url": "https://medlineplus.gov/testiculardisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:epididymitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N45.1",
+      "batch": "C",
+      "name": {
+        "ar": "التهاب البربخ",
+        "en": "Epididymitis",
+        "fr": "Épididymite"
+      },
+      "summary": {
+        "ar": "ألم وتورّم تدريجي في الخصية والبربخ مع حرقان عند التبول وحرارة.",
+        "en": "Gradual pain and swelling of the testis and epididymis with burning on urination and fever.",
+        "fr": "Douleur et gonflement progressifs du testicule et de l épididyme avec brûlure mictionnelle et fièvre."
+      },
+      "muscleGroups": [
+        "adductors",
+        "gluteal"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:testicular-pain",
+        "local:scrotal-swelling",
+        "local:dysuria",
+        "hpo:0001945"
+      ],
+      "organs": [
+        "testis"
+      ],
+      "redFlags": {
+        "ar": "حرارة عالية، إفراز من الإحليل، أو ألم يزداد بسرعة - راجع عاجلًا.",
+        "en": "High fever, urethral discharge, or rapidly worsening pain - urgent review.",
+        "fr": "Fièvre élevée, écoulement urétral, ou douleur rapidement croissante - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/testiculardisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - testiculardisorders.html",
+          "url": "https://medlineplus.gov/testiculardisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:orchitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N45.2",
+      "batch": "C",
+      "name": {
+        "ar": "التهاب الخصية",
+        "en": "Orchitis",
+        "fr": "Orchite"
+      },
+      "summary": {
+        "ar": "ألم وتورّم في الخصية مع حرارة، وغالبًا مع عدوى فيروسية مثل النكاف.",
+        "en": "Testicular pain and swelling with fever, often with a viral infection such as mumps.",
+        "fr": "Douleur et gonflement testiculaires avec fièvre, souvent lors d une infection virale comme les oreillons."
+      },
+      "muscleGroups": [
+        "adductors",
+        "gluteal"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:testicular-pain",
+        "local:scrotal-swelling",
+        "hpo:0001945"
+      ],
+      "organs": [
+        "testis"
+      ],
+      "redFlags": {
+        "ar": "ألم خصية مفاجئ شديد أو حرارة عالية مع قيء (احتمال الالتواء) - طوارئ.",
+        "en": "Sudden severe testicular pain, or high fever with vomiting (possible torsion) - emergency.",
+        "fr": "Douleur testiculaire brutale ou fièvre élevée avec vomissements (torsion possible) - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/testiculardisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - testiculardisorders.html",
+          "url": "https://medlineplus.gov/testiculardisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:hydrocele",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N43.3",
+      "batch": "C",
+      "name": {
+        "ar": "القيلة المائية في كيس الصفن",
+        "en": "Hydrocele",
+        "fr": "Hydrocèle"
+      },
+      "summary": {
+        "ar": "تورّم غالبًا غير مؤلم في كيس الصفن يزداد تدريجيًا وينفذ الضوء من خلاله.",
+        "en": "A usually painless scrotal swelling that grows gradually and transilluminates.",
+        "fr": "Gonflement scrotal généralement indolore, progressif, transilluminant."
+      },
+      "muscleGroups": [
+        "adductors",
+        "gluteal"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:scrotal-swelling",
+        "local:lump",
+        "hpo:0012531"
+      ],
+      "organs": [
+        "testis"
+      ],
+      "redFlags": {
+        "ar": "تورّم مفاجئ مؤلم، كتلة صلبة غير مؤلمة، أو حرارة - راجع الطبيب.",
+        "en": "Sudden painful swelling, a firm painless mass, or fever - seek medical review.",
+        "fr": "Gonflement douloureux brutal, masse dure indolore, ou fièvre - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/testiculardisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - testiculardisorders.html",
+          "url": "https://medlineplus.gov/testiculardisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:varicocele",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "I86.1",
+      "batch": "C",
+      "name": {
+        "ar": "دوالي الخصية",
+        "en": "Varicocele",
+        "fr": "Varicocèle"
+      },
+      "summary": {
+        "ar": "كتلة أو ثقل في جانب كيس الصفن تشبه حزمة الديدان، يزيد بالوقوف الطويل ويخفّ بالاستلقاء.",
+        "en": "A lump or heaviness on one side of the scrotum resembling a bag of worms, worse after long standing, better lying down.",
+        "fr": "Masse ou pesanteur scrotale unilatérale en sac de vers, aggravée par la station debout, soulagée allongé."
+      },
+      "muscleGroups": [
+        "adductors",
+        "gluteal"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:lump",
+        "local:scrotal-swelling",
+        "hpo:0012531"
+      ],
+      "organs": [
+        "testis"
+      ],
+      "redFlags": {
+        "ar": "كتلة صلبة ثابتة، تورّم مفاجئ، أو ألم مستمر - راجع الطبيب.",
+        "en": "A firm fixed mass, sudden swelling, or persistent pain - seek medical review.",
+        "fr": "Masse dure fixe, gonflement brutal, ou douleur persistante - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/testiculardisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - testiculardisorders.html",
+          "url": "https://medlineplus.gov/testiculardisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:testicular-cancer",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "C62.9",
+      "batch": "C",
+      "name": {
+        "ar": "ورم الخصية",
+        "en": "Testicular cancer",
+        "fr": "Cancer du testicule"
+      },
+      "summary": {
+        "ar": "كتلة صلبة غالبًا غير مؤلمة داخل الخصية مع ثقل أو ألم خفيف، وقد تكون أول ما يُلاحظ.",
+        "en": "A firm lump, usually painless, inside the testis with heaviness or mild pain, sometimes the first sign noticed.",
+        "fr": "Masse dure, souvent indolore, dans le testicule avec pesanteur ou douleur légère."
+      },
+      "muscleGroups": [
+        "adductors",
+        "gluteal"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:lump",
+        "local:scrotal-swelling",
+        "hpo:0012531",
+        "local:weight-loss"
+      ],
+      "organs": [
+        "testis"
+      ],
+      "redFlags": {
+        "ar": "كتلة صلبة غير مؤلمة أو تضخّم متدرّج في الخصية، أو ألم أسفل الظهر مع ألم خصية - راجع الطبيب فورًا؛ الكشف المبكر مهم.",
+        "en": "A firm painless lump or progressive testicular enlargement, or low back pain with testicular pain - see a doctor promptly; early detection matters.",
+        "fr": "Masse dure indolore ou augmentation progressive, ou lombalgie avec douleur testiculaire - consultez rapidement."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/testicularcancer.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - testicularcancer.html",
+          "url": "https://medlineplus.gov/testicularcancer.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:prostatitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N41.0",
+      "batch": "C",
+      "name": {
+        "ar": "التهاب البروستاتا",
+        "en": "Prostatitis",
+        "fr": "Prostatite"
+      },
+      "summary": {
+        "ar": "ألم في الحوض أو أسفل الظهر مع حرقان وتبوّل متكرر وصعوبة في بدء التبوّل.",
+        "en": "Pelvic or low back pain with burning, frequent urination, and difficulty starting the stream.",
+        "fr": "Douleur pelvienne ou lombaire avec brûlure, pollakiurie et difficulté à initier la miction."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "adductors",
+        "lower-back"
+      ],
+      "regions": [
+        "torso_front",
+        "back"
+      ],
+      "symptoms": [
+        "local:dysuria",
+        "local:urinary-urgency",
+        "hpo:0001945",
+        "hpo:0003418"
+      ],
+      "organs": [
+        "prostate"
+      ],
+      "redFlags": {
+        "ar": "حرارة عالية، ألم أسفل الظهر مع احتباس بول، أو دم في البول - عاجل.",
+        "en": "High fever, low back pain with urinary retention, or blood in the urine - urgent.",
+        "fr": "Fièvre élevée, lombalgie avec rétention urinaire, ou hématurie - urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/prostatediseases.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - prostatediseases.html",
+          "url": "https://medlineplus.gov/prostatediseases.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:ectopic-pregnancy",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "O00.9",
+      "batch": "C",
+      "name": {
+        "ar": "الحمل خارج الرحم",
+        "en": "Ectopic pregnancy",
+        "fr": "Grossesse extra-utérine"
+      },
+      "summary": {
+        "ar": "ألم بطني مفاجئ لدى امرأة في سن الإنجاب مع غياب الدورة أو نزيف مهبلي بسيط.",
+        "en": "Sudden abdominal pain in a woman of reproductive age with a missed period or light vaginal bleeding.",
+        "fr": "Douleur abdominale brutale chez une femme en âge de procréer avec retard de règles ou saignements légers."
+      },
+      "muscleGroups": [
+        "abs",
+        "obliques"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "local:abdominal-pain",
+        "hpo:0002017",
+        "local:shoulder-tip-pain"
+      ],
+      "organs": [
+        "uterus",
+        "ovaries"
+      ],
+      "redFlags": {
+        "ar": "ألم بطني مع نزيف مهبلي ودوار أو إغماء أو ألم في طرف الكتف - نزيف داخلي محتمل، طوارئ فورية.",
+        "en": "Abdominal pain with vaginal bleeding and dizziness, fainting, or shoulder-tip pain - possible internal bleeding, emergency.",
+        "fr": "Douleur abdominale avec saignements, vertiges, syncope ou douleur de l épaule - hémorragie interne possible, urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/ectopicpregnancy.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - ectopicpregnancy.html",
+          "url": "https://medlineplus.gov/ectopicpregnancy.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    },
+    {
+      "id": "local:pyelonephritis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N10",
+      "batch": "C",
+      "name": {
+        "ar": "التهاب الكلية الجرثومي",
+        "en": "Pyelonephritis (kidney infection)",
+        "fr": "Pyélonéphrite"
+      },
+      "summary": {
+        "ar": "حرارة عالية مع رجفة وألم في الخصر أو الخاصرة مع ألم أو حرقان في التبول.",
+        "en": "High fever with chills and flank or loin pain, with burning or pain on urination.",
+        "fr": "Fièvre élevée avec frissons et douleur lombaire ou du flanc, avec brûlure mictionnelle."
+      },
+      "muscleGroups": [
+        "lower-back",
+        "gluteal",
+        "abs"
+      ],
+      "regions": [
+        "back",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0001945",
+        "local:dysuria",
+        "hpo:0002017",
+        "hpo:0003418"
+      ],
+      "organs": [
+        "kidneys"
+      ],
+      "redFlags": {
+        "ar": "حرارة عالية مع رجفة وتعرّق، ألم خصر، قيء، أو تشوّش ذهني - عاجل.",
+        "en": "High fever with chills and sweating, loin pain, vomiting, or confusion - urgent.",
+        "fr": "Fièvre élevée avec frissons et sueurs, douleur lombaire, vomissements, ou confusion - urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/urinarytractinfections.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - urinarytractinfections.html",
+          "url": "https://medlineplus.gov/urinarytractinfections.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ]
+    }
+  ]
+}

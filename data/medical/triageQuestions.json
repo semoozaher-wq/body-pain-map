@@ -1,0 +1,371 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-26",
+  "notice": {
+    "ar": "أسئلة متابعة للفرز التعليمي حسب منطقة الجسم. ليست تشخيصًا؛ أي سؤال معلَّم بـ redFlag=true يعني أن الإجابة بنعم تستدعي رعاية عاجلة وإيقاف العناية الذاتية.",
+    "en": "Follow-up triage questions per body region. Not a diagnosis; any question marked redFlag=true means a yes answer needs urgent care and stopping self-care.",
+    "fr": "Questions de suivi par région corporelle. Pas un diagnostic ; une réponse oui à une question redFlag=true impose des soins urgents."
+  },
+  "regions": {
+    "head_neck": [
+      {
+        "id": "hn-1",
+        "text": {
+          "ar": "هل يوجد تورّم أو قيح في الأذن أو الحلق، أو صعوبة في التنفس أو البلع؟",
+          "en": "Is there swelling or pus in the ear or throat, or difficulty breathing or swallowing?",
+          "fr": "Gonflement ou pus dans l oreille ou la gorge, ou difficulté à respirer ou avaler ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "توقف عن العناية الذاتية واطلب رعاية عاجلة الآن؛ صعوبة التنفس أو البلع مع تورّم قد تكون حالة مهددة للحياة.",
+          "en": "Stop self-care and seek urgent care now; breathing or swallowing difficulty with swelling can be life-threatening.",
+          "fr": "Arrêtez l automédication et consultez en urgence ; une dyspnée ou dysphagie avec gonflement peut être vitale."
+        }
+      },
+      {
+        "id": "hn-2",
+        "text": {
+          "ar": "هل مع الألم حرارة عالية وتيبّس في الرقبة أو صداع شديد مفاجئ؟",
+          "en": "Is the pain accompanied by high fever with neck stiffness or a sudden severe headache?",
+          "fr": "La douleur s accompagne-t-elle de fièvre élevée avec raideur de nuque ou céphalée brutale ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "حرارة مع تيبّس رقبة أو صداع مفاجئ شديد تستدعي تقييمًا طارئًا فورًا.",
+          "en": "Fever with neck stiffness or a sudden severe headache requires immediate emergency assessment.",
+          "fr": "Fièvre avec raideur de nuque ou céphalée brutale : évaluation en urgence immédiate."
+        }
+      },
+      {
+        "id": "hn-3",
+        "text": {
+          "ar": "هل يوجد تنميل أو ضعف مفاجئ في الوجه أو الذراع أو صعوبة في الكلام؟",
+          "en": "Is there sudden numbness or weakness in the face or arm, or difficulty speaking?",
+          "fr": "Engourdissement ou faiblesse brutale du visage ou du bras, ou difficulté à parler ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "أعراض عصبية مفاجئة قد تعني جلطة دماغية؛ اتصل بخدمات الطوارئ فورًا وسجّل وقت بداية الأعراض.",
+          "en": "Sudden neurological symptoms may indicate a stroke; call emergency services now and note the onset time.",
+          "fr": "Symptômes neurologiques brutaux : AVC possible ; appelez les secours et notez l heure de début."
+        }
+      },
+      {
+        "id": "hn-4",
+        "text": {
+          "ar": "هل التغيّر في السمع أو الطنين ظهر بشكل مفاجئ في أذن واحدة؟",
+          "en": "Did the hearing change or tinnitus appear suddenly in one ear?",
+          "fr": "La baisse d audition ou les acouphènes sont-ils apparus brutalement d un seul côté ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "hn-5",
+        "text": {
+          "ar": "هل الألم موضعي في سن أو فك أو أذن محددة ويزيد بالمضغ أو اللمس؟",
+          "en": "Is the pain localized to one tooth, jaw, or ear and worse with chewing or touch?",
+          "fr": "La douleur est-elle localisée à une dent, une mâchoire ou une oreille et aggravée par la mastication ou le toucher ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "hn-6",
+        "text": {
+          "ar": "هل استمر الألم أكثر من أسبوعين دون تحسّن أو ازداد مع الوقت؟",
+          "en": "Has the pain lasted more than two weeks without improvement or is it worsening?",
+          "fr": "La douleur dure-t-elle plus de deux semaines sans amélioration ou s aggrave-t-elle ?"
+        },
+        "redFlag": false
+      }
+    ],
+    "torso_front": [
+      {
+        "id": "tf-1",
+        "text": {
+          "ar": "هل يوجد ألم ضاغط في الصدر ينتقل للذراع أو الفك أو الظهر، مع تعرّق بارد أو ضيق نفس؟",
+          "en": "Is there chest pressure radiating to the arm, jaw, or back, with cold sweat or breathlessness?",
+          "fr": "Oppression thoracique irradiant au bras, à la mâchoire ou au dos, avec sueurs froides ou dyspnée ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "ألم صدري ضاغط مع تعرّق أو ضيق نفس يستدعي الطوارئ فورًا؛ لا تنتظر ولا تقد السيارة بنفسك.",
+          "en": "Crushing chest pain with sweating or breathlessness needs emergency care now; do not wait or drive yourself.",
+          "fr": "Douleur thoracique avec sueurs ou dyspnée : urgence immédiate ; ne conduisez pas vous-même."
+        }
+      },
+      {
+        "id": "tf-2",
+        "text": {
+          "ar": "هل يوجد ألم بطني شديد ومفاجئ مع بطن متصلّب أو دم في القيء أو البراز؟",
+          "en": "Is there sudden severe abdominal pain with a rigid abdomen or blood in vomit or stool?",
+          "fr": "Douleur abdominale brutale intense avec abdomen rigide ou sang dans les vomissements ou les selles ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "هذه علامة بطن حاد قد تحتاج تدخلًا جراحيًا عاجلًا؛ توجّه للطوارئ الآن.",
+          "en": "This suggests an acute abdomen that may need surgery; go to the emergency department now.",
+          "fr": "Abdomen aigu possible nécessitant une chirurgie ; rendez-vous aux urgences maintenant."
+        }
+      },
+      {
+        "id": "tf-3",
+        "text": {
+          "ar": "هل يوجد ألم مفاجئ شديد في الخصية مع تورّم أو قيء؟",
+          "en": "Is there sudden severe testicular pain with swelling or vomiting?",
+          "fr": "Douleur testiculaire brutale avec gonflement ou vomissements ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "احتمال التواء الخصية؛ النافذة العلاجية نحو 6 ساعات - توجّه للطوارئ فورًا.",
+          "en": "Possible testicular torsion; the treatment window is about 6 hours - go to the emergency department immediately.",
+          "fr": "Torsion testiculaire possible ; fenêtre d environ 6 heures - urgences immédiatement."
+        }
+      },
+      {
+        "id": "tf-4",
+        "text": {
+          "ar": "هل هناك اصفرار في الجلد أو بياض العين أو بول داكن جدًا؟",
+          "en": "Is there yellowing of the skin or eyes, or very dark urine?",
+          "fr": "Jaunissement de la peau ou des yeux, ou urines très foncées ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "اصفرار مع ألم بطني يستدعي تقييمًا عاجلًا لاحتمال انسداد في القنوات المرارية.",
+          "en": "Jaundice with abdominal pain needs urgent assessment for possible bile duct obstruction.",
+          "fr": "Ictère avec douleur abdominale : évaluation urgente d une obstruction biliaire."
+        }
+      },
+      {
+        "id": "tf-5",
+        "text": {
+          "ar": "هل الألم مرتبط بتناول الطعام أو التبرّز أو التبول؟",
+          "en": "Is the pain related to eating, bowel movements, or urination?",
+          "fr": "La douleur est-elle liée aux repas, aux selles ou à la miction ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "tf-6",
+        "text": {
+          "ar": "هل يوجد انتفاخ أو كتلة في الأربية أو السرة تزداد بالحمل أو السعال؟",
+          "en": "Is there a bulge or lump in the groin or navel that grows with lifting or coughing?",
+          "fr": "Existe-t-il une saillie dans l aine ou à l ombilic augmentant à l effort ou à la toux ?"
+        },
+        "redFlag": false
+      }
+    ],
+    "back": [
+      {
+        "id": "bk-1",
+        "text": {
+          "ar": "هل يوجد فقدان سيطرة على البول أو البراز، أو خدر في منطقة السرج (بين الفخذين)؟",
+          "en": "Is there loss of bladder or bowel control, or numbness in the saddle area?",
+          "fr": "Perte du contrôle vésical ou anal, ou anesthésie en selle ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "هذه علامة ذيل الفرس وتستدعي جراحة عاجلة؛ توجّه للطوارئ فورًا.",
+          "en": "This suggests cauda equina syndrome and needs emergency surgery; go now.",
+          "fr": "Syndrome de la queue de cheval : chirurgie en urgence ; rendez-vous immédiatement."
+        }
+      },
+      {
+        "id": "bk-2",
+        "text": {
+          "ar": "هل يوجد ضعف متزايد في الساقين أو عدم قدرة على المشي أو الوقوف؟",
+          "en": "Is there progressive leg weakness or inability to walk or stand?",
+          "fr": "Faiblesse croissante des jambes ou impossibilité de marcher ou de se lever ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "ضعف متزايد في الساقين يستدعي تقييمًا عصبيًا عاجلًا؛ لا تؤجّله.",
+          "en": "Progressive leg weakness needs urgent neurological assessment; do not delay.",
+          "fr": "Faiblesse progressive des jambes : évaluation neurologique urgente."
+        }
+      },
+      {
+        "id": "bk-3",
+        "text": {
+          "ar": "هل يوجد ألم في الخصر مع حرارة ورجفة أو حرقان في التبول؟",
+          "en": "Is the back pain accompanied by fever and chills, or burning on urination?",
+          "fr": "Douleur lombaire avec fièvre et frissons, ou brûlure mictionnelle ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "قد تكون عدوى كلوية تستدعي علاجًا عاجلًا بالمضادات الحيوية.",
+          "en": "This may be a kidney infection requiring urgent antibiotics.",
+          "fr": "Infection rénale possible nécessitant des antibiotiques en urgence."
+        }
+      },
+      {
+        "id": "bk-4",
+        "text": {
+          "ar": "هل الألم بدأ بعد رفع ثقل أو حركة خاطئة ولكنه يخفّ بالراحة؟",
+          "en": "Did the pain start after lifting or a wrong movement and ease with rest?",
+          "fr": "La douleur a-t-elle débuté après un port de charge et cède-t-elle au repos ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "bk-5",
+        "text": {
+          "ar": "هل يوقظك الألم ليلًا أو يصحبه نقص وزن غير مبرَّر؟",
+          "en": "Does the pain wake you at night or come with unexplained weight loss?",
+          "fr": "La douleur réveille-t-elle la nuit ou s accompagne-t-elle d une perte de poids inexpliquée ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "bk-6",
+        "text": {
+          "ar": "هل يوجد تيبّس صباحي يستمر أكثر من ساعة يوميًا؟",
+          "en": "Is there morning stiffness lasting more than an hour daily?",
+          "fr": "Existe-t-il une raideur matinale de plus d une heure chaque jour ?"
+        },
+        "redFlag": false
+      }
+    ],
+    "upper_limb": [
+      {
+        "id": "ul-1",
+        "text": {
+          "ar": "هل يوجد خدر أو ضعف مستمر، أو تسقط الأشياء من يدك؟",
+          "en": "Is there persistent numbness or weakness, or do you drop things from your hand?",
+          "fr": "Engourdissement ou faiblesse persistants, ou chute d objets de la main ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "خدر أو ضعف مستمر قد يعني ضغطًا عصبيًا يحتاج تقييمًا عاجلًا.",
+          "en": "Persistent numbness or weakness may indicate nerve compression needing urgent assessment.",
+          "fr": "Engourdissement ou faiblesse persistants : compression nerveuse possible, avis urgent."
+        }
+      },
+      {
+        "id": "ul-2",
+        "text": {
+          "ar": "هل يوجد تورّم واحمرار وحرارة في المفصل مع حرارة عامة؟",
+          "en": "Is there joint swelling, redness and heat together with fever?",
+          "fr": "Gonflement, rougeur et chaleur articulaires avec fièvre ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "احتمال التهاب مفصل جرثومي وهو حالة طوارئ تستدعي مراجعة فورية.",
+          "en": "Possible septic arthritis, an emergency needing immediate review.",
+          "fr": "Arthrite septique possible : urgence."
+        }
+      },
+      {
+        "id": "ul-3",
+        "text": {
+          "ar": "هل حدثت إصابة حديثة مع تشوّه واضح أو عدم قدرة على تحريك الطرف؟",
+          "en": "Was there a recent injury with obvious deformity or inability to move the limb?",
+          "fr": "Traumatisme récent avec déformation évidente ou impossibilité de bouger le membre ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "تشوّه بعد إصابة قد يعني كسرًا/خلعًا يحتاج تصويرًا وتثبيتًا عاجلًا.",
+          "en": "Deformity after injury may mean a fracture or dislocation needing urgent imaging.",
+          "fr": "Déformation post-traumatique : fracture ou luxation probable, imagerie urgente."
+        }
+      },
+      {
+        "id": "ul-4",
+        "text": {
+          "ar": "هل تتغيّر ألوان الأصابع إلى الأبيض أو الأزرق عند البرد؟",
+          "en": "Do your fingers turn white or blue in the cold?",
+          "fr": "Vos doigts deviennent-ils blancs ou bleus au froid ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "ul-5",
+        "text": {
+          "ar": "هل الألم موضعي في مفصل الإبهام أو الرسغ ويزيد بحمل الأشياء؟",
+          "en": "Is the pain localized to the thumb base or wrist and worse with gripping?",
+          "fr": "Douleur localisée à la base du pouce ou au poignet, aggravée par la préhension ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "ul-6",
+        "text": {
+          "ar": "هل استمر الألم أكثر من ستة أسابيع دون تحسّن؟",
+          "en": "Has the pain lasted more than six weeks without improvement?",
+          "fr": "La douleur dure-t-elle plus de six semaines sans amélioration ?"
+        },
+        "redFlag": false
+      }
+    ],
+    "lower_limb": [
+      {
+        "id": "ll-1",
+        "text": {
+          "ar": "هل يوجد تورّم في ساق واحدة مع ألم وضيق نفس أو ألم صدر؟",
+          "en": "Is there one-sided leg swelling with pain plus breathlessness or chest pain?",
+          "fr": "Gonflement d une seule jambe avec douleur et dyspnée ou douleur thoracique ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "قد تكون جلطة وريدية عميقة مع انتقال للرئة؛ طوارئ فورية.",
+          "en": "Possible deep vein thrombosis with lung involvement; emergency now.",
+          "fr": "Thrombose veineuse profonde possible avec embolie : urgence immédiate."
+        }
+      },
+      {
+        "id": "ll-2",
+        "text": {
+          "ar": "هل يوجد جرح أو قرحة في القدم لا تلتئم أو اسوداد في الأنسجة؟",
+          "en": "Is there a foot wound or ulcer that will not heal, or blackened tissue?",
+          "fr": "Plaie ou ulcère du pied non cicatrisé, ou tissu noirci ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "قد يعني نقص تروية أو عدوى عميقة وخطر بتر؛ مراجعة عاجلة.",
+          "en": "May indicate poor perfusion or deep infection with amputation risk; urgent review.",
+          "fr": "Ischémie ou infection profonde possible avec risque d amputation ; avis urgent."
+        }
+      },
+      {
+        "id": "ll-3",
+        "text": {
+          "ar": "هل يوجد تورّم واحمرار وحرارة في المفصل مع حرارة عامة؟",
+          "en": "Is there joint swelling, redness and heat with fever?",
+          "fr": "Gonflement, rougeur et chaleur articulaires avec fièvre ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "احتمال التهاب مفصل جرثومي وهو حالة طوارئ.",
+          "en": "Possible septic arthritis, an emergency.",
+          "fr": "Arthrite septique possible : urgence."
+        }
+      },
+      {
+        "id": "ll-4",
+        "text": {
+          "ar": "هل الركبة تقفل أو تشعر بعدم ثبات عند المشي؟",
+          "en": "Does the knee lock or feel unstable when walking?",
+          "fr": "Le genou se bloque-t-il ou semble-t-il instable à la marche ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "ll-5",
+        "text": {
+          "ar": "هل عدم القدرة على حمل الوزن على القدم بعد إصابة حديثة؟",
+          "en": "Are you unable to bear weight on the foot after a recent injury?",
+          "fr": "Impossibilité d appui après un traumatisme récent ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "ll-6",
+        "text": {
+          "ar": "هل يوقظك الألم ليلًا أو يزداد تدريجيًا مع الوقت؟",
+          "en": "Does the pain wake you at night or gradually worsen over time?",
+          "fr": "La douleur vous réveille-t-elle la nuit ou s aggrave-t-elle progressivement ?"
+        },
+        "redFlag": false
+      }
+    ]
+  }
+}

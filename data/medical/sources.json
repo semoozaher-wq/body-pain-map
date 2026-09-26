@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "notice": "سجل المصادر الطبية المفتوحة المستخدمة في تطبيق BodyMap Pain، مع حالة الترخيص لكل مصدر. الروابط للمراجعة والتوثيق.",
+  "notice": "سجل المصادر الطبية المفتوحة المستخدمة في تطبيق BodyMap Pain، مع حالة الترخيص لكل مصدر. الروابط للمراجعة والتوثيق. أُضيفت في دفعة التوسّع الإقليمي مصادر MedlinePlus (NLM) وCDC وWHO للتحقق من الأكواد وعلامات الخطر.",
   "sources": [
     {
       "id": "doid",
@@ -127,6 +127,24 @@
       "license": "مدفوع/مرخّص (غير مُضمّن).",
       "usage": "أكواد الإجراءات الطبية (تحذير ترخيص — غير مُفعّل).",
       "attributionRequired": true
+    },
+    {
+      "id": "cdc",
+      "name": "CDC - Centers for Disease Control and Prevention",
+      "url": "https://www.cdc.gov/",
+      "type": "public-health",
+      "license": "محتوى حكومي أمريكي (ملكية عامة)",
+      "usage": "مصدر مرجعي عام لعلامات الخطر والتوصيات الوقائية.",
+      "attributionRequired": false
+    },
+    {
+      "id": "who-icd10",
+      "name": "WHO - ICD-10",
+      "url": "https://icd.who.int/browse10/2019/en",
+      "type": "classification",
+      "license": "مرجع تصنيفي عام",
+      "usage": "التحقق من أكواد ICD-10 المستخدمة في دفعة التوسّع الإقليمي.",
+      "attributionRequired": false
     }
   ]
 }
