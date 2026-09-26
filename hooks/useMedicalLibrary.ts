@@ -4,10 +4,17 @@
 import { useMemo } from 'react';
 import {
   getAllConditions,
+  getStructure,
+  getSubRegions,
+  getTaxonomy,
+  getTaxonomyNotice,
+  getTaxonomyStats,
   getAllSymptoms,
   getConditionById,
   getConditionsByBatch,
   getConditionsByMuscleGroup,
+  getConditionsByStructure,
+  getConditionsBySubRegion,
   getConditionsByRegion,
   getLibraryStats,
   getSymptomById,
@@ -24,6 +31,41 @@ import {
 /** كل الأمراض المحلية. */
 export function useAllConditions(): MedicalCondition[] {
   return useMemo(() => getAllConditions(), []);
+}
+
+/** التصنيف التشريحي الهرمي (مناطق → مناطق فرعية → بنى). */
+export function useRegionTaxonomy() {
+  return useMemo(() => getTaxonomy(), []);
+}
+
+/** المناطق الفرعية لمنطقة أساسية. */
+export function useSubRegions(regionId: string | null) {
+  return useMemo(() => (regionId ? getSubRegions(regionId) : []), [regionId]);
+}
+
+/** بنية تشريحية واحدة. */
+export function useAnatomicalStructure(structureId: string | null) {
+  return useMemo(() => (structureId ? getStructure(structureId) : null), [structureId]);
+}
+
+/** حالات منطقة فرعية. */
+export function useConditionsBySubRegion(subRegionId: string | null) {
+  return useMemo(() => (subRegionId ? getConditionsBySubRegion(subRegionId) : []), [subRegionId]);
+}
+
+/** حالات بنية تشريحية محددة. */
+export function useConditionsByStructure(structureId: string | null) {
+  return useMemo(() => (structureId ? getConditionsByStructure(structureId) : []), [structureId]);
+}
+
+/** إحصاءات التصنيف التشريحي. */
+export function useTaxonomyStats() {
+  return useMemo(() => getTaxonomyStats(), []);
+}
+
+/** ملاحظة نطاق التصنيف (تقديري وليس قياسًا). */
+export function useTaxonomyNotice(language: Language) {
+  return useMemo(() => getTaxonomyNotice(language), [language]);
 }
 
 /** الحالات الإقليمية المُضافة في دفعة التوسّع. */
