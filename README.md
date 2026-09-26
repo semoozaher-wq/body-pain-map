@@ -1,51 +1,65 @@
-# إصلاح تفاعل خريطة الجسم على الويب — BodyMap Pain
+# BodyMap Pain — إضافة المكتبات الطبية (حزمة الملفات المعدّلة/المضافة)
 
-## المشكلة
-في وضع العرض "التفصيلي" (detailed) داخل شاشة اختيار العضو، كان المكوّن
-`BodySilhouette` القادم من مكتبة `react-native-body-parts-anatomy` يُستخدم
-على كل المنصّات. لكن على الويب يعتمد `react-native-svg` على `onPressIn`
-الذي لا يعمل على المتصفح، فتصبح خريطة الجسم **غير قابلة للنقر** على الويب
-(عرض للقراءة فقط) رغم أن التطبيق منشور على الويب (Vercel).
+هذه الحزمة تحتوي على كل الملفات التي أُضيفت أو عُدّلت لدمج **الطبقة الطبية** في تطبيق BodyMap Pain.
 
-## الحل
-المستودع يحتوي بالفعل على مكوّن جاهز للويب اسمه `WebBodySilhouette`
-(`components/WebBodySilhouette.tsx`) يرسم نفس الأجزاء الـ317 عبر `react-native-svg`
-مع دعم النقر والتحويم والتكبير/التحريك — لكنه كان **غير مستخدم (orphaned)**.
+## كيف تركّب الملفات؟
 
-قمنا بتوصيله داخل `screens/BodyPickerScreen.tsx` عبر شرط المنصّة:
+انسخ محتوى المجلدات فوق مشروعك مباشرة (نفس المسارات):
 
-```tsx
-{bodyViewMode === 'illustration' ? <IllustratedBodyMap ... />
- : Platform.OS === 'web' ? <WebBodySilhouette
-     gender={gender}
-     view={activeView as MuscleMapView}
-     selectedSlugs={selectedMuscleId ? [selectedMuscleId] : []}
-     onFragmentPress={handleFragmentPress}
-     numberForSlug={partNumberForSlug}
-   />
- : <BodySilhouette ... />}
+```
+data/medical/…            → data/medical/
+services/medical/…        → services/medical/
+hooks/…                   → hooks/
+components/…              → components/
+screens/BodyPickerScreen.tsx → screens/   (معدّل — استبدل الملف)
+locales/{ar,en,fr}.json   → locales/      (معدّل — أضيف مفاتيح جديدة فقط)
+docs/…                    → docs/
 ```
 
-مع إضافة:
-- استيراد `Platform` من `react-native`.
-- استيراد `WebBodySilhouette`.
-- دالة `partNumberForSlug` لربط رقم كل جزء بملصقات المكوّن.
-
-## الملفات في هذا الأرشيف
-| الملف | الحالة | الوصف |
-|------|--------|-------|
-| `screens/BodyPickerScreen.tsx` | **معدّل** | توصيل `WebBodySilhouette` عند `Platform.OS === 'web'` |
-| `components/WebBodySilhouette.tsx` | مساند (موجود مسبقًا في المستودع) | عارض الويب التفاعلي للأجزاء الـ317 |
-| `web-body-interaction.patch` | مرجعي | الفرق (git diff) الجاهز للتطبيق |
-
-## التحقق
-- `npm run typecheck` → نجح بدون أخطاء.
-- `npm run build:web` → نجح (941 وحدة، تصدير `dist`).
-
-## طريقة التطبيق
-انسخ المجلدين `screens/` و`components/` فوق مشروعك، أو طبّق الملف
-`web-body-interaction.patch` بالأمر:
+ثم:
 
 ```bash
-git apply web-body-interaction.patch
+npm install      # لا توجد تبعيات جديدة إلزامية
+npm run typecheck
+npm run build:web
 ```
+
+## ما الجديد؟
+
+### 1) مكتبة الأمراض والأعراض (offline بالكامل — بدون إنترنت)
+- `data/medical/diseases.json` — **23 حالة** (ألم أسفل الظهر، الرقبة، الكتف، الركبة، الشقيقة، الفيبروميالجيا، الالتهابات...) مع أسماء وملخصات و**علامات خطر** بثلاث لغات، وأكواد **DOID** و**ICD-10**، وروابط MedlinePlus.
+- `data/medical/symptoms.json` — **32 عرضًا** بأكواد **HPO**.
+- `data/medical/sources.json` — سجل المصادر والتراخيص.
+- `services/medical/diseaseLibrary.ts` — محرّك البحث المحلي (حسب مجموعة العضلات/المنطقة/العرض/نص حر).
+- `hooks/useMedicalLibrary.ts` — خطّافات React.
+
+### 2) مكتبة الأدوية (RxNorm + openFDA)
+- `services/medical/rxNorm.ts` — توحيد أسماء الأدوية + التفاعلات.
+- `services/medical/openFda.ts` — ملصقات الأدوية + الأحداث الجانبية.
+- `hooks/useDrugLookup.ts`.
+
+### 3) MedlinePlus Connect
+- `services/medical/medlinePlusConnect.ts` — ربط أكواد ICD-10/SNOMED بمحتوى NLM.
+- `services/medical/index.ts` — تجميع + إعدادات `MEDICAL_SETTINGS`.
+
+### 4) الواجهات (UI)
+- `components/MedicalLibraryPanel.tsx` — تصفّح الأمراض حسب منطقة الجسم + بحث.
+- `components/ConditionInfoCard.tsx` — بطاقة حالة (أعراض + علامات خطر + MedlinePlus).
+- `components/DrugLookupPanel.tsx` — بحث الأدوية وعرض الملصق.
+- **ربط كامل** في `screens/BodyPickerScreen.tsx`: زرّان جديدان **«المكتبة الطبية»** و**«الأدوية»** بجانب الأزرار الموجودة.
+
+### 5) التوثيق
+- `docs/MEDICAL_LIBRARIES.md` — الكتالوج الكامل (أولاً → خامساً) مع التراخيص.
+- `docs/Z_ANATOMY_3D_PLAN.md` — خطة الأطلس ثلاثي الأبعاد (Z-Anatomy + BodyParts3D).
+
+## ملاحظات سلامة وترخيص
+- كل المحتوى **تعليمي عام فقط**، ولا يقدّم تشخيصًا أو علاجًا.
+- الأكواد (DOID/ICD-10/HPO) **للمطابقة المرجعية فقط**.
+- لا نُضمّن محتوى يتطلب ترخيصًا مدفوعًا (CPT، SNOMED خارج النطاق).
+- نداءات الشبكة (RxNorm/openFDA/MedlinePlus) **اختيارية وتفشل بهدوء** إذا لا يوجد اتصال، فتبقى المكتبة المحلية تعمل دائمًا.
+- الخصوصية محفوظة: لا حسابات، لا سحابة، كل شيء محلي.
+
+## التحقق
+- ✅ `npm run typecheck` — نجح بدون أخطاء.
+- ✅ `npm run build:web` — نجح.
+- ✅ كل أكواد HPO المُشار إليها في الأمراض موجودة في `symptoms.json`.
