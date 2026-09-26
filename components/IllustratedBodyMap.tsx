@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   texts: { flex: 1 }, title: { color: '#183D45', fontWeight: '900', fontSize: 16, textAlign: 'right' },
   hint: { color: '#60777C', fontSize: 11, lineHeight: 17, textAlign: 'right', marginTop: 3 },
   badge: { backgroundColor: '#E7F5F2', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 6 }, badgeText: { color: '#0B7774', fontSize: 10, fontWeight: '900' },
-  imageFrame: { width: '100%', aspectRatio: 0.67, maxHeight: 620, backgroundColor: '#F9FBFB', borderRadius: 16, position: 'relative', overflow: 'hidden', borderWidth: 1, borderColor: '#E5ECEC' },
+  imageFrame: { width: '100%', maxWidth: 470, alignSelf: 'center', aspectRatio: 0.67, maxHeight: 760, backgroundColor: '#F9FBFB', borderRadius: 16, position: 'relative', overflow: 'hidden', borderWidth: 1, borderColor: '#E5ECEC' },
   image: { width: '100%', height: '100%' },
   marker: { position: 'absolute', width: 26, height: 26, marginLeft: -13, marginTop: -13, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.78)', borderWidth: 2, borderColor: '#D94F56', alignItems: 'center', justifyContent: 'center', zIndex: 3 },
   markerActive: { zIndex: 10, transform: [{ scale: 1.18 }], backgroundColor: '#D94F56' },

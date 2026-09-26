@@ -22,8 +22,12 @@ type Point = { x: number; y: number };
 /**
  * Detailed web renderer for the 317 anatomical SVG fragments exported by the
  * anatomy package. Every fragment remains an independent, accessible target.
- * The interaction layer adds bounded zoom, drag-to-pan, hover inspection,
- * selection emphasis, and a compact color legend without raster images.
+ *
+ * IMPORTANT: the fragment <Path> must NOT receive `accessibilityRole="button"`.
+ * react-native-web maps that role to a real DOM <button> tag, which cannot draw
+ * SVG path data — the fragment becomes an invisible 0x0 element and the map
+ * "does nothing" when tapped. Keeping it role-less lets react-native-svg emit a
+ * genuine <path> that is both visible and clickable.
  */
 export function WebBodySilhouette({
   gender,
@@ -31,8 +35,8 @@ export function WebBodySilhouette({
   selectedSlugs,
   onFragmentPress,
   selectedFragmentColor = '#0E7C86',
-  unselectedFragmentColor = '#D7E6E8',
-  outlineColor = '#52737A',
+  unselectedFragmentColor = '#C4DBDE',
+  outlineColor = '#4E727A',
   numberForSlug,
 }: Props) {
   const region = BODY_REGIONS[gender][view];
@@ -40,7 +44,6 @@ export function WebBodySilhouette({
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState<Point>({ x: 0, y: 0 });
   const [hovered, setHovered] = useState<string | null>(null);
-  const dragStart = useRef<Point>({ x: 0, y: 0 });
   const panStart = useRef<Point>({ x: 0, y: 0 });
 
   const clampPan = (point: Point, nextZoom: number): Point => {
@@ -57,7 +60,7 @@ export function WebBodySilhouette({
   const responder = useMemo(() => PanResponder.create({
     onStartShouldSetPanResponder: () => zoom > 1,
     onMoveShouldSetPanResponder: (_, gesture) => zoom > 1 && (Math.abs(gesture.dx) > 4 || Math.abs(gesture.dy) > 4),
-    onPanResponderGrant: () => { dragStart.current = pan; panStart.current = pan; },
+    onPanResponderGrant: () => { panStart.current = pan; },
     onPanResponderMove: (_, gesture) => setPan(clampPan({ x: panStart.current.x + gesture.dx, y: panStart.current.y + gesture.dy }, zoom)),
     onPanResponderRelease: () => undefined,
   }), [pan, zoom]);
@@ -71,12 +74,23 @@ export function WebBodySilhouette({
       <Text style={styles.toolbarMeta}>{gender === 'male' ? 'ذكر' : 'أنثى'} · {view === 'front' ? 'أمامي' : 'خلفي'} · {Math.round(zoom * 100)}%</Text>
     </View>
     <View style={styles.viewport} {...responder.panHandlers}>
-      <Svg viewBox={region.viewBox} width="100%" height="100%" style={{ transform }} accessibilityRole="image">
+      <Svg viewBox={region.viewBox} width="100%" height="100%" style={{ transform }}>
         <Path d={region.outlineD} stroke={outlineColor} strokeWidth={2} fill="#F7FBFB" vectorEffect="non-scaling-stroke" pointerEvents="none" />
         {region.fragments.map((fragment) => {
           const isSelected = selected.has(fragment.slug);
           const isHovered = hovered === fragment.slug;
-          return <InteractivePath key={fragment.slug} d={fragment.pathData} fill={isSelected ? selectedFragmentColor : isHovered ? '#57B9B1' : unselectedFragmentColor} stroke={isSelected || isHovered ? '#075B64' : '#FFFFFF'} strokeWidth={isSelected ? 2.4 : isHovered ? 1.8 : 0.85} opacity={isSelected ? 1 : 0.96} onPress={() => onFragmentPress(fragment.slug)} onMouseEnter={() => setHovered(fragment.slug)} onMouseLeave={() => setHovered(null)} accessibilityRole="button" accessibilityLabel={`الجزء رقم ${numberForSlug?.(fragment.slug) ?? ''} — ${fragment.parentSlug}`} />;
+          return <InteractivePath
+            key={fragment.slug}
+            d={fragment.pathData}
+            fill={isSelected ? selectedFragmentColor : isHovered ? '#57B9B1' : unselectedFragmentColor}
+            stroke={isSelected || isHovered ? '#075B64' : '#FFFFFF'}
+            strokeWidth={isSelected ? 2.6 : isHovered ? 2 : 1}
+            opacity={isSelected ? 1 : 0.97}
+            onPress={() => onFragmentPress(fragment.slug)}
+            onMouseEnter={() => setHovered(fragment.slug)}
+            onMouseLeave={() => setHovered(null)}
+            accessibilityLabel={`الجزء رقم ${numberForSlug?.(fragment.slug) ?? ''} — ${fragment.parentSlug}`}
+          />;
         })}
       </Svg>
       {hoveredFragment && <View pointerEvents="none" style={styles.tooltip}><Text style={styles.tooltipTitle}>{hoveredFragment.parentSlug}</Text><Text style={styles.tooltipMeta}>الجزء رقم {numberForSlug?.(hoveredFragment.slug) ?? '—'} · اضغط للاختيار</Text></View>}
@@ -92,11 +106,11 @@ export function WebBodySilhouette({
 }
 
 const styles = StyleSheet.create({
-  container: { width: '100%', alignSelf: 'center', backgroundColor: '#F7FBFB', borderRadius: 20, padding: 10 },
+  container: { width: '100%', maxWidth: 430, alignSelf: 'center', backgroundColor: '#F7FBFB', borderRadius: 20, padding: 10 },
   toolbar: { flexDirection: 'row-reverse', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 7, paddingBottom: 8 },
   toolbarTitle: { color: '#123B42', fontSize: 15, fontWeight: '900', textAlign: 'right' },
   toolbarMeta: { color: '#657781', fontSize: 11, textAlign: 'left' },
-  viewport: { width: '100%', aspectRatio: 724 / 1448, minHeight: 440, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#D7E6E8' },
+  viewport: { width: '100%', aspectRatio: 724 / 1448, minHeight: 460, maxHeight: 720, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', borderRadius: 16, borderWidth: 1, borderColor: '#D7E6E8' },
   tooltip: { position: 'absolute', top: 12, right: 12, backgroundColor: '#123B42', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 9, maxWidth: 210, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 8, shadowOffset: { width: 0, height: 3 } },
   tooltipTitle: { color: '#FFFFFF', fontWeight: '900', fontSize: 13, textAlign: 'right' },
   tooltipMeta: { color: '#B9E5DF', fontSize: 10, marginTop: 3, textAlign: 'right' },
