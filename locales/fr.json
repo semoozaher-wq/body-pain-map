@@ -58,7 +58,8 @@
     "commonCauses": "Causes communes possibles",
     "generalGuidance": "Conseils généraux",
     "shareSummary": "Partager le résumé de l'examen",
-    "newScan": "Nouvel examen"
+    "newScan": "Nouvel examen",
+    "assessmentHint": "Remarque : ceci est une indication générale basée sur la zone et votre description. Elle ne confirme pas une cause et ne remplace pas un médecin."
   },
   "body": "Choisissez la zone douloureuse",
   "historyTitle": "Examens précédents",

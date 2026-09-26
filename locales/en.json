@@ -58,7 +58,8 @@
     "commonCauses": "Possible Common Causes",
     "generalGuidance": "General Guidance",
     "shareSummary": "Share Check Summary",
-    "newScan": "New Check"
+    "newScan": "New Check",
+    "assessmentHint": "Note: this is general guidance based on the area and your description. It does not confirm a cause and is not a substitute for a doctor."
   },
   "body": "Choose pain location",
   "historyTitle": "Previous checks",
