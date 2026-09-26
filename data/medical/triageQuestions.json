@@ -76,6 +76,38 @@
           "fr": "La douleur dure-t-elle plus de deux semaines sans amélioration ou s aggrave-t-elle ?"
         },
         "redFlag": false
+      },
+      {
+        "id": "hn-7",
+        "text": {
+          "ar": "هل يصحب الألم تنميل أو ضعف ينتشر إلى الذراع أو اليد؟",
+          "en": "Is the pain accompanied by numbness or weakness spreading into the arm or hand?",
+          "fr": "La douleur s accompagne-t-elle d engourdissement ou de faiblesse du bras ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "hn-8",
+        "text": {
+          "ar": "هل تجد صعوبة مفاجئة في فك الأزرار أو الكتابة أو المشي المتوازن؟",
+          "en": "Do you find sudden difficulty buttoning, writing, or walking steadily?",
+          "fr": "Difficulté brutale à boutonner, écrire ou marcher de façon stable ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "تراجع المهارات الدقيقة مع عدم ثبات المشي قد يعني ضغطًا على الحبل الشوكي العنقي؛ تقييم عاجل.",
+          "en": "Declining hand dexterity with unsteady walking may indicate cervical cord compression; urgent assessment.",
+          "fr": "Perte de dextérité avec démarche instable : compression médullaire possible ; évaluation urgente."
+        }
+      },
+      {
+        "id": "hn-9",
+        "text": {
+          "ar": "هل يوجد تورّم في الرقبة يتحرك مع البلع أو بحة مستمرة أكثر من ثلاثة أسابيع؟",
+          "en": "Is there a neck lump moving with swallowing, or hoarseness lasting over three weeks?",
+          "fr": "Masse cervicale mobile à la déglutition, ou enrouement de plus de trois semaines ?"
+        },
+        "redFlag": false
       }
     ],
     "torso_front": [
@@ -294,6 +326,38 @@
           "fr": "La douleur dure-t-elle plus de six semaines sans amélioration ?"
         },
         "redFlag": false
+      },
+      {
+        "id": "ul-7",
+        "text": {
+          "ar": "هل تعجز عن رفع الذراع بعد إصابة حادة؟",
+          "en": "Are you unable to raise the arm after an acute injury?",
+          "fr": "Impossibilité de lever le bras après un traumatisme récent ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "العجز عن رفع الذراع بعد إصابة قد يعني تمزّقًا كاملًا في الكفة المدورة أو خلعًا؛ تقييم عاجل بالتصوير.",
+          "en": "Inability to raise the arm after injury may mean a full rotator cuff tear or dislocation; urgent imaging.",
+          "fr": "Impossibilité d élévation après traumatisme : rupture de coiffe ou luxation ; imagerie urgente."
+        }
+      },
+      {
+        "id": "ul-8",
+        "text": {
+          "ar": "هل يوقظك ألم الكتف ليلًا ويزداد بالاستلقاء على الجانب؟",
+          "en": "Does shoulder pain wake you at night and worsen lying on that side?",
+          "fr": "La douleur réveille-t-elle la nuit et s aggrave-t-elle en décubitus latéral ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "ul-9",
+        "text": {
+          "ar": "هل يحدث انحشار أو قفل ملحوظ عند رفع الذراع بين 60 و120 درجة؟",
+          "en": "Is there a noticeable catch or locking when raising the arm between 60 and 120 degrees?",
+          "fr": "Ressaut ou blocage à l élévation entre 60 et 120 degrés ?"
+        },
+        "redFlag": false
       }
     ],
     "lower_limb": [
@@ -363,6 +427,38 @@
           "ar": "هل يوقظك الألم ليلًا أو يزداد تدريجيًا مع الوقت؟",
           "en": "Does the pain wake you at night or gradually worsen over time?",
           "fr": "La douleur vous réveille-t-elle la nuit ou s aggrave-t-elle progressivement ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "ll-7",
+        "text": {
+          "ar": "هل حدث السقوط مع قِصر الساق أو دورانها للخارج وعدم القدرة على حمل الوزن؟",
+          "en": "Was there a fall with a shortened or externally rotated leg and inability to bear weight?",
+          "fr": "Chute avec jambe raccourcie ou en rotation externe et impossibilité d appui ?"
+        },
+        "redFlag": true,
+        "alert": {
+          "ar": "قد يكون كسرًا في عنق الفخذ؛ لا تحاول تحريك المصاب واطلب الطوارئ فورًا.",
+          "en": "Possible femoral neck fracture; do not move the person and call emergency services now.",
+          "fr": "Fracture du col fémoral possible ; ne mobilisez pas et appelez les secours."
+        }
+      },
+      {
+        "id": "ll-8",
+        "text": {
+          "ar": "هل ينزل الألم من أسفل الظهر والألية إلى الفخذ والساق؟",
+          "en": "Does the pain travel from the low back and buttock down the thigh and leg?",
+          "fr": "La douleur descend-elle de la région lombaire et fessière à la cuisse et à la jambe ?"
+        },
+        "redFlag": false
+      },
+      {
+        "id": "ll-9",
+        "text": {
+          "ar": "هل يوجد خدر في الوجه الخارجي للفخذ فقط دون ضعف في الساق؟",
+          "en": "Is there numbness limited to the outer thigh without leg weakness?",
+          "fr": "Engourdissement limité à la face externe de la cuisse sans faiblesse ?"
         },
         "redFlag": false
       }

@@ -1,0 +1,3456 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-26",
+  "granularity": "system-region-subregion-structure",
+  "notice": {
+    "ar": "تصنيف تشريحي هرمي للتعليم فقط: 5 مناطق أساسية → مناطق فرعية → بنية محددة. نطاق الحجم تقديري للتوجيه (ملّيمتري إلى أكثر من 15 سم) وليس قياسًا فعليًا، والتعداد لا يدّعي تغطية كل ملّيمتر من الجسم.",
+    "en": "Hierarchical anatomical taxonomy for education only: 5 base regions to sub-regions to specific structures. Size bands are orientation estimates (millimetre range to over 15 cm), not measured values; the enumeration does not claim to cover every millimetre of the body."
+  },
+  "sizeBands": {
+    "mm": {
+      "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+      "en": "under 1 cm (millimetre range)"
+    },
+    "cm-1-5": {
+      "ar": "من 1 إلى 5 سم",
+      "en": "1 to 5 cm"
+    },
+    "cm-5-15": {
+      "ar": "من 5 إلى 15 سم",
+      "en": "5 to 15 cm"
+    },
+    "cm-15-plus": {
+      "ar": "أكثر من 15 سم",
+      "en": "over 15 cm"
+    }
+  },
+  "structureTypes": [
+    "bone",
+    "joint",
+    "ligament",
+    "muscle",
+    "tendon",
+    "nerve",
+    "vessel",
+    "organ",
+    "gland",
+    "lymph",
+    "membrane",
+    "cartilage",
+    "bursa",
+    "fascia",
+    "space",
+    "soft_tissue"
+  ],
+  "regions": [
+    {
+      "id": "head_neck",
+      "label": {
+        "ar": "الرأس والرقبة",
+        "en": "Head and neck"
+      },
+      "subRegions": [
+        {
+          "id": "cranium_facial",
+          "regionId": "head_neck",
+          "label": {
+            "ar": "الجمجمة والوجه",
+            "en": "Cranium and face"
+          },
+          "icdChapterHint": "K00-K14 (الفم والفكين) · H60-H95 (الأذن) · J32 (الجيوب)",
+          "structures": [
+            {
+              "id": "skull-cranium",
+              "subRegionId": "cranium_facial",
+              "type": "bone",
+              "label": {
+                "ar": "الجمجمة",
+                "en": "Skull cranium"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "facial-bones",
+              "subRegionId": "cranium_facial",
+              "type": "bone",
+              "label": {
+                "ar": "عظام الوجه",
+                "en": "Facial bones"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "mandible",
+              "subRegionId": "cranium_facial",
+              "type": "bone",
+              "label": {
+                "ar": "الفك السفلي",
+                "en": "Mandible"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "tmj",
+              "subRegionId": "cranium_facial",
+              "type": "joint",
+              "label": {
+                "ar": "مفصل الفك الصدغي",
+                "en": "Temporomandibular joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "teeth",
+              "subRegionId": "cranium_facial",
+              "type": "organ",
+              "label": {
+                "ar": "الأسنان",
+                "en": "Teeth"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "parotid-gland",
+              "subRegionId": "cranium_facial",
+              "type": "gland",
+              "label": {
+                "ar": "الغدة النكفية",
+                "en": "Parotid gland"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "maxillary-sinus",
+              "subRegionId": "cranium_facial",
+              "type": "space",
+              "label": {
+                "ar": "الجيب الفكي",
+                "en": "Maxillary sinus"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "frontal-sinus",
+              "subRegionId": "cranium_facial",
+              "type": "space",
+              "label": {
+                "ar": "الجيب الجبهي",
+                "en": "Frontal sinus"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "ethmoid-sinus",
+              "subRegionId": "cranium_facial",
+              "type": "space",
+              "label": {
+                "ar": "الجيب الغربالي",
+                "en": "Ethmoid sinus"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "sphenoid-sinus",
+              "subRegionId": "cranium_facial",
+              "type": "space",
+              "label": {
+                "ar": "الجيب الوتدي",
+                "en": "Sphenoid sinus"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "orbit",
+              "subRegionId": "cranium_facial",
+              "type": "space",
+              "label": {
+                "ar": "الحجاج",
+                "en": "Orbit"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "ocular-globe",
+              "subRegionId": "cranium_facial",
+              "type": "organ",
+              "label": {
+                "ar": "مقلة العين",
+                "en": "Ocular globe"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "external-ear",
+              "subRegionId": "cranium_facial",
+              "type": "organ",
+              "label": {
+                "ar": "الأذن الخارجية",
+                "en": "External ear"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "middle-ear",
+              "subRegionId": "cranium_facial",
+              "type": "organ",
+              "label": {
+                "ar": "الأذن الوسطى",
+                "en": "Middle ear"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "inner-ear",
+              "subRegionId": "cranium_facial",
+              "type": "organ",
+              "label": {
+                "ar": "الأذن الداخلية",
+                "en": "Inner ear"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "temporal-bone",
+              "subRegionId": "cranium_facial",
+              "type": "bone",
+              "label": {
+                "ar": "العظم الصدغي",
+                "en": "Temporal bone"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            }
+          ]
+        },
+        {
+          "id": "cervical_spine",
+          "regionId": "head_neck",
+          "label": {
+            "ar": "العمود الفقري العنقي",
+            "en": "Cervical spine"
+          },
+          "icdChapterHint": "M40-M54 (الظهر) · G54 (الجذور والضفائر)",
+          "structures": [
+            {
+              "id": "c1-atlas",
+              "subRegionId": "cervical_spine",
+              "type": "bone",
+              "label": {
+                "ar": "الفقرة الأولى (الأطلس)",
+                "en": "Atlas C1"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "c2-axis",
+              "subRegionId": "cervical_spine",
+              "type": "bone",
+              "label": {
+                "ar": "الفقرة الثانية (المحور)",
+                "en": "Axis C2"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "c3-c7",
+              "subRegionId": "cervical_spine",
+              "type": "bone",
+              "label": {
+                "ar": "الفقرات العنقية 3-7",
+                "en": "Cervical vertebrae C3-C7"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "atlanto-occipital-joint",
+              "subRegionId": "cervical_spine",
+              "type": "joint",
+              "label": {
+                "ar": "المفصل الفهقي القذالي",
+                "en": "Atlanto-occipital joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "atlanto-axial-joint",
+              "subRegionId": "cervical_spine",
+              "type": "joint",
+              "label": {
+                "ar": "المفصل الفهقي المحوري",
+                "en": "Atlanto-axial joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "cervical-facet-joints",
+              "subRegionId": "cervical_spine",
+              "type": "joint",
+              "label": {
+                "ar": "المفاصل الوجيهية العنقية",
+                "en": "Cervical facet joints"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "cervical-discs",
+              "subRegionId": "cervical_spine",
+              "type": "cartilage",
+              "label": {
+                "ar": "الأقراص العنقية",
+                "en": "Cervical discs"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "cervical-cord",
+              "subRegionId": "cervical_spine",
+              "type": "nerve",
+              "label": {
+                "ar": "الحبل الشوكي العنقي",
+                "en": "Cervical spinal cord"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "cervical-roots",
+              "subRegionId": "cervical_spine",
+              "type": "nerve",
+              "label": {
+                "ar": "الجذور العصبية العنقية C1-C8",
+                "en": "Cervical nerve roots C1-C8"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "vertebral-artery",
+              "subRegionId": "cervical_spine",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان الفقري",
+                "en": "Vertebral artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "neck_soft_tissue",
+          "regionId": "head_neck",
+          "label": {
+            "ar": "الأنسجة الرخوة في الرقبة",
+            "en": "Neck soft tissue"
+          },
+          "icdChapterHint": "M40-M54 · E00-E07 (الدرقية) · J38 (الحنجرة)",
+          "structures": [
+            {
+              "id": "scm-muscle",
+              "subRegionId": "neck_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة القصية الترقوية الحلمية",
+                "en": "Sternocleidomastoid"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "upper-trapezius",
+              "subRegionId": "neck_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة شبه المنحرفة العلوية",
+                "en": "Upper trapezius"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "scalenes",
+              "subRegionId": "neck_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلات الأخمعية",
+                "en": "Scalene muscles"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "deep-cervical-flexors",
+              "subRegionId": "neck_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "عضلات الرقبة العميقة القابضة",
+                "en": "Deep cervical flexors"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "cervical-fascia",
+              "subRegionId": "neck_soft_tissue",
+              "type": "fascia",
+              "label": {
+                "ar": "اللفافة العنقية",
+                "en": "Cervical fascia"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "carotid-artery",
+              "subRegionId": "neck_soft_tissue",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان السباتي",
+                "en": "Carotid artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "jugular-vein",
+              "subRegionId": "neck_soft_tissue",
+              "type": "vessel",
+              "label": {
+                "ar": "الوريد الوداجي",
+                "en": "Jugular vein"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "cervical-lymph-nodes",
+              "subRegionId": "neck_soft_tissue",
+              "type": "lymph",
+              "label": {
+                "ar": "العقد اللمفية العنقية",
+                "en": "Cervical lymph nodes"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "thyroid-gland",
+              "subRegionId": "neck_soft_tissue",
+              "type": "gland",
+              "label": {
+                "ar": "الغدة الدرقية",
+                "en": "Thyroid gland"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "parathyroid-glands",
+              "subRegionId": "neck_soft_tissue",
+              "type": "gland",
+              "label": {
+                "ar": "الغدد جارات الدرقية",
+                "en": "Parathyroid glands"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "larynx",
+              "subRegionId": "neck_soft_tissue",
+              "type": "organ",
+              "label": {
+                "ar": "الحنجرة",
+                "en": "Larynx"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "pharynx",
+              "subRegionId": "neck_soft_tissue",
+              "type": "organ",
+              "label": {
+                "ar": "البلعوم",
+                "en": "Pharynx"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "cervical-esophagus",
+              "subRegionId": "neck_soft_tissue",
+              "type": "organ",
+              "label": {
+                "ar": "المريء العنقي",
+                "en": "Cervical esophagus"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "torso_front",
+      "label": {
+        "ar": "الجذع الأمامي",
+        "en": "Torso front"
+      },
+      "subRegions": [
+        {
+          "id": "chest_wall",
+          "regionId": "torso_front",
+          "label": {
+            "ar": "جدار الصدر",
+            "en": "Chest wall"
+          },
+          "icdChapterHint": "M00-M99 · S20-S29 (إصابات الصدر)",
+          "structures": [
+            {
+              "id": "sternum",
+              "subRegionId": "chest_wall",
+              "type": "bone",
+              "label": {
+                "ar": "القص",
+                "en": "Sternum"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "ribs",
+              "subRegionId": "chest_wall",
+              "type": "bone",
+              "label": {
+                "ar": "الأضلاع 1-12",
+                "en": "Ribs 1-12"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "costal-cartilage",
+              "subRegionId": "chest_wall",
+              "type": "cartilage",
+              "label": {
+                "ar": "الغضاريف الضلعية",
+                "en": "Costal cartilages"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "intercostal-muscles",
+              "subRegionId": "chest_wall",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلات بين الضلوع",
+                "en": "Intercostal muscles"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "pectoralis-major",
+              "subRegionId": "chest_wall",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الصدرية الكبرى",
+                "en": "Pectoralis major"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "pectoralis-minor",
+              "subRegionId": "chest_wall",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الصدرية الصغرى",
+                "en": "Pectoralis minor"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "serratus-anterior",
+              "subRegionId": "chest_wall",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة المنشارية الأمامية",
+                "en": "Serratus anterior"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            }
+          ]
+        },
+        {
+          "id": "thoracic_cavity",
+          "regionId": "torso_front",
+          "label": {
+            "ar": "التجويف الصدري",
+            "en": "Thoracic cavity"
+          },
+          "icdChapterHint": "I00-I99 (الدوران) · J00-J99 (التنفس)",
+          "structures": [
+            {
+              "id": "heart",
+              "subRegionId": "thoracic_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "القلب",
+                "en": "Heart"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "pericardium",
+              "subRegionId": "thoracic_cavity",
+              "type": "membrane",
+              "label": {
+                "ar": "التامور",
+                "en": "Pericardium"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "aorta",
+              "subRegionId": "thoracic_cavity",
+              "type": "vessel",
+              "label": {
+                "ar": "الأبهر",
+                "en": "Aorta"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "pulmonary-artery",
+              "subRegionId": "thoracic_cavity",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان الرئوي",
+                "en": "Pulmonary artery"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "lungs",
+              "subRegionId": "thoracic_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "الرئتان",
+                "en": "Lungs"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "pleura",
+              "subRegionId": "thoracic_cavity",
+              "type": "membrane",
+              "label": {
+                "ar": "غشاء الجنبة",
+                "en": "Pleura"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "mediastinum",
+              "subRegionId": "thoracic_cavity",
+              "type": "space",
+              "label": {
+                "ar": "المنصف",
+                "en": "Mediastinum"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "thoracic-esophagus",
+              "subRegionId": "thoracic_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "المريء الصدري",
+                "en": "Thoracic esophagus"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            }
+          ]
+        },
+        {
+          "id": "abdomen_wall",
+          "regionId": "torso_front",
+          "label": {
+            "ar": "جدار البطن",
+            "en": "Abdominal wall"
+          },
+          "icdChapterHint": "K00-K93 · S30-S39 (إصابات البطن)",
+          "structures": [
+            {
+              "id": "rectus-abdominis",
+              "subRegionId": "abdomen_wall",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة المستقيمة البطنية",
+                "en": "Rectus abdominis"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "obliques",
+              "subRegionId": "abdomen_wall",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلات المائلة",
+                "en": "Oblique muscles"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "transversus-abdominis",
+              "subRegionId": "abdomen_wall",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة المستعرضة البطنية",
+                "en": "Transversus abdominis"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "linea-alba",
+              "subRegionId": "abdomen_wall",
+              "type": "fascia",
+              "label": {
+                "ar": "الخط الأبيض",
+                "en": "Linea alba"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "inguinal-canal",
+              "subRegionId": "abdomen_wall",
+              "type": "space",
+              "label": {
+                "ar": "القناة الأربية",
+                "en": "Inguinal canal"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "umbilicus",
+              "subRegionId": "abdomen_wall",
+              "type": "soft_tissue",
+              "label": {
+                "ar": "السرة",
+                "en": "Umbilicus"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "abdominal_cavity",
+          "regionId": "torso_front",
+          "label": {
+            "ar": "التجويف البطني",
+            "en": "Abdominal cavity"
+          },
+          "icdChapterHint": "K00-K93 (الهضمي) · N00-N39 (البولية)",
+          "structures": [
+            {
+              "id": "stomach",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "المعدة",
+                "en": "Stomach"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "duodenum",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "الاثنا عشر",
+                "en": "Duodenum"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "small-intestine",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "الأمعاء الدقيقة",
+                "en": "Small intestine"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "colon",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "القولون",
+                "en": "Colon"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "appendix",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "الزائدة الدودية",
+                "en": "Appendix"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "liver",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "الكبد",
+                "en": "Liver"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "gallbladder",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "المرارة",
+                "en": "Gallbladder"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "biliary-ducts",
+              "subRegionId": "abdominal_cavity",
+              "type": "space",
+              "label": {
+                "ar": "القنوات المرارية",
+                "en": "Biliary ducts"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "pancreas",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "البنكرياس",
+                "en": "Pancreas"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "spleen",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "الطحال",
+                "en": "Spleen"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "kidneys",
+              "subRegionId": "abdominal_cavity",
+              "type": "organ",
+              "label": {
+                "ar": "الكليتان",
+                "en": "Kidneys"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "ureters",
+              "subRegionId": "abdominal_cavity",
+              "type": "space",
+              "label": {
+                "ar": "الحالبان",
+                "en": "Ureters"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "adrenal-glands",
+              "subRegionId": "abdominal_cavity",
+              "type": "gland",
+              "label": {
+                "ar": "الغدتان الكظريتان",
+                "en": "Adrenal glands"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "peritoneum",
+              "subRegionId": "abdominal_cavity",
+              "type": "membrane",
+              "label": {
+                "ar": "الصفاق",
+                "en": "Peritoneum"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "mesentery",
+              "subRegionId": "abdominal_cavity",
+              "type": "membrane",
+              "label": {
+                "ar": "المساريق",
+                "en": "Mesentery"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "abdominal-aorta",
+              "subRegionId": "abdominal_cavity",
+              "type": "vessel",
+              "label": {
+                "ar": "الأبهر البطني",
+                "en": "Abdominal aorta"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            }
+          ]
+        },
+        {
+          "id": "pelvis",
+          "regionId": "torso_front",
+          "label": {
+            "ar": "الحوض",
+            "en": "Pelvis"
+          },
+          "icdChapterHint": "N00-N99 · O00-O99 (الحمل) · C50-C62",
+          "structures": [
+            {
+              "id": "bladder",
+              "subRegionId": "pelvis",
+              "type": "organ",
+              "label": {
+                "ar": "المثانة",
+                "en": "Bladder"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "urethra",
+              "subRegionId": "pelvis",
+              "type": "space",
+              "label": {
+                "ar": "الإحليل",
+                "en": "Urethra"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "prostate",
+              "subRegionId": "pelvis",
+              "type": "gland",
+              "label": {
+                "ar": "البروستاتا",
+                "en": "Prostate"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "uterus",
+              "subRegionId": "pelvis",
+              "type": "organ",
+              "label": {
+                "ar": "الرحم",
+                "en": "Uterus"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "ovaries",
+              "subRegionId": "pelvis",
+              "type": "organ",
+              "label": {
+                "ar": "المبيضان",
+                "en": "Ovaries"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "fallopian-tubes",
+              "subRegionId": "pelvis",
+              "type": "space",
+              "label": {
+                "ar": "البوقان الرحميان",
+                "en": "Fallopian tubes"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "testis",
+              "subRegionId": "pelvis",
+              "type": "organ",
+              "label": {
+                "ar": "الخصية",
+                "en": "Testis"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "epididymis",
+              "subRegionId": "pelvis",
+              "type": "organ",
+              "label": {
+                "ar": "البربخ",
+                "en": "Epididymis"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "scrotum",
+              "subRegionId": "pelvis",
+              "type": "soft_tissue",
+              "label": {
+                "ar": "كيس الصفن",
+                "en": "Scrotum"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "spermatic-cord",
+              "subRegionId": "pelvis",
+              "type": "space",
+              "label": {
+                "ar": "الحبل المنوي",
+                "en": "Spermatic cord"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "rectum",
+              "subRegionId": "pelvis",
+              "type": "organ",
+              "label": {
+                "ar": "المستقيم",
+                "en": "Rectum"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "sigmoid-colon",
+              "subRegionId": "pelvis",
+              "type": "organ",
+              "label": {
+                "ar": "القولون السيني",
+                "en": "Sigmoid colon"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "sacrum",
+              "subRegionId": "pelvis",
+              "type": "bone",
+              "label": {
+                "ar": "العجز",
+                "en": "Sacrum"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "coccyx",
+              "subRegionId": "pelvis",
+              "type": "bone",
+              "label": {
+                "ar": "العصعص",
+                "en": "Coccyx"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "si-joints",
+              "subRegionId": "pelvis",
+              "type": "joint",
+              "label": {
+                "ar": "المفاصل العجزية الحرقفية",
+                "en": "Sacroiliac joints"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "pelvic-floor",
+              "subRegionId": "pelvis",
+              "type": "muscle",
+              "label": {
+                "ar": "عضلات قاع الحوض",
+                "en": "Pelvic floor muscles"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "iliac-vessels",
+              "subRegionId": "pelvis",
+              "type": "vessel",
+              "label": {
+                "ar": "الأوعية الحرقفية",
+                "en": "Iliac vessels"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "back",
+      "label": {
+        "ar": "الظهر",
+        "en": "Back"
+      },
+      "subRegions": [
+        {
+          "id": "thoracic_spine",
+          "regionId": "back",
+          "label": {
+            "ar": "العمود الفقري الصدري",
+            "en": "Thoracic spine"
+          },
+          "icdChapterHint": "M40-M54 · G54-G58",
+          "structures": [
+            {
+              "id": "t1-t12",
+              "subRegionId": "thoracic_spine",
+              "type": "bone",
+              "label": {
+                "ar": "الفقرات الصدرية 1-12",
+                "en": "Thoracic vertebrae T1-T12"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "thoracic-discs",
+              "subRegionId": "thoracic_spine",
+              "type": "cartilage",
+              "label": {
+                "ar": "الأقراص الصدرية",
+                "en": "Thoracic discs"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "thoracic-facet-joints",
+              "subRegionId": "thoracic_spine",
+              "type": "joint",
+              "label": {
+                "ar": "المفاصل الوجيهية الصدرية",
+                "en": "Thoracic facet joints"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "thoracic-cord",
+              "subRegionId": "thoracic_spine",
+              "type": "nerve",
+              "label": {
+                "ar": "الحبل الشوكي الصدري",
+                "en": "Thoracic spinal cord"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "thoracic-roots",
+              "subRegionId": "thoracic_spine",
+              "type": "nerve",
+              "label": {
+                "ar": "الجذور العصبية الصدرية",
+                "en": "Thoracic nerve roots"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "lumbar_spine",
+          "regionId": "back",
+          "label": {
+            "ar": "العمود الفقري القطني",
+            "en": "Lumbar spine"
+          },
+          "icdChapterHint": "M40-M54 · G54-G58",
+          "structures": [
+            {
+              "id": "l1-l5",
+              "subRegionId": "lumbar_spine",
+              "type": "bone",
+              "label": {
+                "ar": "الفقرات القطنية 1-5",
+                "en": "Lumbar vertebrae L1-L5"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "lumbar-discs",
+              "subRegionId": "lumbar_spine",
+              "type": "cartilage",
+              "label": {
+                "ar": "الأقراص القطنية",
+                "en": "Lumbar discs"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "lumbar-facet-joints",
+              "subRegionId": "lumbar_spine",
+              "type": "joint",
+              "label": {
+                "ar": "المفاصل الوجيهية القطنية",
+                "en": "Lumbar facet joints"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "spinal-canal",
+              "subRegionId": "lumbar_spine",
+              "type": "space",
+              "label": {
+                "ar": "القناة الشوكية",
+                "en": "Spinal canal"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "cauda-equina",
+              "subRegionId": "lumbar_spine",
+              "type": "nerve",
+              "label": {
+                "ar": "ذيل الفرس",
+                "en": "Cauda equina"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "lumbar-roots",
+              "subRegionId": "lumbar_spine",
+              "type": "nerve",
+              "label": {
+                "ar": "الجذور العصبية القطنية",
+                "en": "Lumbar nerve roots"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "paraspinal_soft_tissue",
+          "regionId": "back",
+          "label": {
+            "ar": "الأنسجة الرخوة المجاورة للعمود",
+            "en": "Paraspinal soft tissue"
+          },
+          "icdChapterHint": "M40-M54 · S39",
+          "structures": [
+            {
+              "id": "erector-spinae",
+              "subRegionId": "paraspinal_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الناصبة للفقرات",
+                "en": "Erector spinae"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "multifidus",
+              "subRegionId": "paraspinal_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة متعددة الفلق",
+                "en": "Multifidus"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "latissimus-dorsi",
+              "subRegionId": "paraspinal_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الظهرية العريضة",
+                "en": "Latissimus dorsi"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "rhomboids",
+              "subRegionId": "paraspinal_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلتان المعينيتان",
+                "en": "Rhomboids"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "quadratus-lumborum",
+              "subRegionId": "paraspinal_soft_tissue",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة المربعة القطنية",
+                "en": "Quadratus lumborum"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "thoracolumbar-fascia",
+              "subRegionId": "paraspinal_soft_tissue",
+              "type": "fascia",
+              "label": {
+                "ar": "اللفافة الصدرية القطنية",
+                "en": "Thoracolumbar fascia"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            }
+          ]
+        },
+        {
+          "id": "sacral_region",
+          "regionId": "back",
+          "label": {
+            "ar": "المنطقة العجزية",
+            "en": "Sacral region"
+          },
+          "icdChapterHint": "M40-M54 · G54-G58",
+          "structures": [
+            {
+              "id": "sacral-plexus",
+              "subRegionId": "sacral_region",
+              "type": "nerve",
+              "label": {
+                "ar": "الضفيرة العجزية",
+                "en": "Sacral plexus"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "coccygeal-joint",
+              "subRegionId": "sacral_region",
+              "type": "joint",
+              "label": {
+                "ar": "المفصل العصعصي",
+                "en": "Coccygeal joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "upper_limb",
+      "label": {
+        "ar": "الطرف العلوي",
+        "en": "Upper limb"
+      },
+      "subRegions": [
+        {
+          "id": "shoulder",
+          "regionId": "upper_limb",
+          "label": {
+            "ar": "الكتف",
+            "en": "Shoulder"
+          },
+          "icdChapterHint": "M75 (أمراض الكتف) · S40-S49",
+          "structures": [
+            {
+              "id": "clavicle",
+              "subRegionId": "shoulder",
+              "type": "bone",
+              "label": {
+                "ar": "الترقوة",
+                "en": "Clavicle"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "scapula",
+              "subRegionId": "shoulder",
+              "type": "bone",
+              "label": {
+                "ar": "لوح الكتف",
+                "en": "Scapula"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "humerus-head",
+              "subRegionId": "shoulder",
+              "type": "bone",
+              "label": {
+                "ar": "رأس العضد",
+                "en": "Humeral head"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "glenohumeral-joint",
+              "subRegionId": "shoulder",
+              "type": "joint",
+              "label": {
+                "ar": "مفصل الكتف",
+                "en": "Glenohumeral joint"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "ac-joint",
+              "subRegionId": "shoulder",
+              "type": "joint",
+              "label": {
+                "ar": "المفصل الأخرمي الترقوي",
+                "en": "Acromioclavicular joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "sc-joint",
+              "subRegionId": "shoulder",
+              "type": "joint",
+              "label": {
+                "ar": "المفصل القصي الترقوي",
+                "en": "Sternoclavicular joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "glenoid-labrum",
+              "subRegionId": "shoulder",
+              "type": "cartilage",
+              "label": {
+                "ar": "شفة الحق التجويفي",
+                "en": "Glenoid labrum"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "rotator-cuff",
+              "subRegionId": "shoulder",
+              "type": "tendon",
+              "label": {
+                "ar": "الكفة المدورة",
+                "en": "Rotator cuff"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "subacromial-bursa",
+              "subRegionId": "shoulder",
+              "type": "bursa",
+              "label": {
+                "ar": "الجراب تحت الأخرم",
+                "en": "Subacromial bursa"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "biceps-long-head",
+              "subRegionId": "shoulder",
+              "type": "tendon",
+              "label": {
+                "ar": "الوتر الطويل للعضلة ذات الرأسين",
+                "en": "Long head of biceps tendon"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "deltoid",
+              "subRegionId": "shoulder",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الدالية",
+                "en": "Deltoid"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "levator-scapulae",
+              "subRegionId": "shoulder",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الرافعة للكتف",
+                "en": "Levator scapulae"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "axillary-nerve",
+              "subRegionId": "shoulder",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب الإبطي",
+                "en": "Axillary nerve"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "brachial-plexus",
+              "subRegionId": "shoulder",
+              "type": "nerve",
+              "label": {
+                "ar": "الضفيرة العضدية",
+                "en": "Brachial plexus"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "axillary-artery",
+              "subRegionId": "shoulder",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان الإبطي",
+                "en": "Axillary artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "upper_arm",
+          "regionId": "upper_limb",
+          "label": {
+            "ar": "العضد",
+            "en": "Upper arm"
+          },
+          "icdChapterHint": "S40-S69 · G56",
+          "structures": [
+            {
+              "id": "humerus-shaft",
+              "subRegionId": "upper_arm",
+              "type": "bone",
+              "label": {
+                "ar": "جسم العضد",
+                "en": "Humeral shaft"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "biceps",
+              "subRegionId": "upper_arm",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة ذات الرأسين",
+                "en": "Biceps brachii"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "triceps",
+              "subRegionId": "upper_arm",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة ثلاثية الرؤوس",
+                "en": "Triceps brachii"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "brachialis",
+              "subRegionId": "upper_arm",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة العضدية",
+                "en": "Brachialis"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "radial-nerve",
+              "subRegionId": "upper_arm",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب الكعبري",
+                "en": "Radial nerve"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "ulnar-nerve",
+              "subRegionId": "upper_arm",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب الزندي",
+                "en": "Ulnar nerve"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "median-nerve",
+              "subRegionId": "upper_arm",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب المتوسط",
+                "en": "Median nerve"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "brachial-artery",
+              "subRegionId": "upper_arm",
+              "type": "vessel",
+              "label": {
+                "ar": "شريان العضد",
+                "en": "Brachial artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "elbow",
+          "regionId": "upper_limb",
+          "label": {
+            "ar": "المرفق",
+            "en": "Elbow"
+          },
+          "icdChapterHint": "M70-M79 · S50-S59",
+          "structures": [
+            {
+              "id": "olecranon",
+              "subRegionId": "elbow",
+              "type": "bone",
+              "label": {
+                "ar": "الزُّج",
+                "en": "Olecranon"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "radial-head",
+              "subRegionId": "elbow",
+              "type": "bone",
+              "label": {
+                "ar": "رأس الكعبرة",
+                "en": "Radial head"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "elbow-joint",
+              "subRegionId": "elbow",
+              "type": "joint",
+              "label": {
+                "ar": "مفصل المرفق",
+                "en": "Elbow joint"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "ulnar-collateral-ligament",
+              "subRegionId": "elbow",
+              "type": "ligament",
+              "label": {
+                "ar": "الرباط الجانبي الزندي",
+                "en": "Ulnar collateral ligament"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "radial-collateral-ligament",
+              "subRegionId": "elbow",
+              "type": "ligament",
+              "label": {
+                "ar": "الرباط الجانبي الكعبري",
+                "en": "Radial collateral ligament"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "cubital-tunnel",
+              "subRegionId": "elbow",
+              "type": "space",
+              "label": {
+                "ar": "النفق المرفقي",
+                "en": "Cubital tunnel"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "forearm",
+          "regionId": "upper_limb",
+          "label": {
+            "ar": "الساعد",
+            "en": "Forearm"
+          },
+          "icdChapterHint": "S50-S69 · G56",
+          "structures": [
+            {
+              "id": "radius",
+              "subRegionId": "forearm",
+              "type": "bone",
+              "label": {
+                "ar": "الكعبرة",
+                "en": "Radius"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "ulna",
+              "subRegionId": "forearm",
+              "type": "bone",
+              "label": {
+                "ar": "الزند",
+                "en": "Ulna"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "interosseous-membrane",
+              "subRegionId": "forearm",
+              "type": "membrane",
+              "label": {
+                "ar": "الغشاء بين العظمين",
+                "en": "Interosseous membrane"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "forearm-flexors",
+              "subRegionId": "forearm",
+              "type": "muscle",
+              "label": {
+                "ar": "قابضات الساعد",
+                "en": "Forearm flexors"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "forearm-extensors",
+              "subRegionId": "forearm",
+              "type": "muscle",
+              "label": {
+                "ar": "باسطات الساعد",
+                "en": "Forearm extensors"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "pronator-teres",
+              "subRegionId": "forearm",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الكابة المدورة",
+                "en": "Pronator teres"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "radial-artery",
+              "subRegionId": "forearm",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان الكعبري",
+                "en": "Radial artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "ulnar-artery",
+              "subRegionId": "forearm",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان الزندي",
+                "en": "Ulnar artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "wrist_hand",
+          "regionId": "upper_limb",
+          "label": {
+            "ar": "الرسغ واليد",
+            "en": "Wrist and hand"
+          },
+          "icdChapterHint": "M65-M67 · S60-S69 · G56",
+          "structures": [
+            {
+              "id": "carpal-bones",
+              "subRegionId": "wrist_hand",
+              "type": "bone",
+              "label": {
+                "ar": "عظام الرسغ (8)",
+                "en": "Carpal bones (8)"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "metacarpals",
+              "subRegionId": "wrist_hand",
+              "type": "bone",
+              "label": {
+                "ar": "عظام المشط (5)",
+                "en": "Metacarpals (5)"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "phalanges-hand",
+              "subRegionId": "wrist_hand",
+              "type": "bone",
+              "label": {
+                "ar": "سلاميات اليد (14)",
+                "en": "Hand phalanges (14)"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "radiocarpal-joint",
+              "subRegionId": "wrist_hand",
+              "type": "joint",
+              "label": {
+                "ar": "مفصل الرسغ",
+                "en": "Radiocarpal joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "tfc",
+              "subRegionId": "wrist_hand",
+              "type": "cartilage",
+              "label": {
+                "ar": "الغضروف المثلثي الليفي",
+                "en": "Triangular fibrocartilage"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "carpal-tunnel",
+              "subRegionId": "wrist_hand",
+              "type": "space",
+              "label": {
+                "ar": "نفق الرسغ",
+                "en": "Carpal tunnel"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "flexor-tendons",
+              "subRegionId": "wrist_hand",
+              "type": "tendon",
+              "label": {
+                "ar": "أوتار القابضات",
+                "en": "Flexor tendons"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "thenar-muscles",
+              "subRegionId": "wrist_hand",
+              "type": "muscle",
+              "label": {
+                "ar": "عضلات الإبهام (الأصلة)",
+                "en": "Thenar muscles"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "hypothenar-muscles",
+              "subRegionId": "wrist_hand",
+              "type": "muscle",
+              "label": {
+                "ar": "عضلات الضريرة",
+                "en": "Hypothenar muscles"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "digital-nerves",
+              "subRegionId": "wrist_hand",
+              "type": "nerve",
+              "label": {
+                "ar": "الأعصاب الإصبعية",
+                "en": "Digital nerves"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lower_limb",
+      "label": {
+        "ar": "الطرف السفلي",
+        "en": "Lower limb"
+      },
+      "subRegions": [
+        {
+          "id": "hip",
+          "regionId": "lower_limb",
+          "label": {
+            "ar": "الورك",
+            "en": "Hip"
+          },
+          "icdChapterHint": "M16 (الفصال) · M70-M76 · S72 · G57",
+          "structures": [
+            {
+              "id": "femoral-head",
+              "subRegionId": "hip",
+              "type": "bone",
+              "label": {
+                "ar": "رأس الفخذ",
+                "en": "Femoral head"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "femoral-neck",
+              "subRegionId": "hip",
+              "type": "bone",
+              "label": {
+                "ar": "عنق الفخذ",
+                "en": "Femoral neck"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "acetabulum",
+              "subRegionId": "hip",
+              "type": "bone",
+              "label": {
+                "ar": "الحق",
+                "en": "Acetabulum"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "hip-joint",
+              "subRegionId": "hip",
+              "type": "joint",
+              "label": {
+                "ar": "مفصل الورك",
+                "en": "Hip joint"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "hip-labrum",
+              "subRegionId": "hip",
+              "type": "cartilage",
+              "label": {
+                "ar": "شفة الحق",
+                "en": "Acetabular labrum"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "greater-trochanter",
+              "subRegionId": "hip",
+              "type": "bone",
+              "label": {
+                "ar": "المدور الكبير",
+                "en": "Greater trochanter"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "gluteus-maximus",
+              "subRegionId": "hip",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الألوية الكبرى",
+                "en": "Gluteus maximus"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "gluteus-medius",
+              "subRegionId": "hip",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الألوية المتوسطة",
+                "en": "Gluteus medius"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "iliopsoas",
+              "subRegionId": "hip",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الحرقفية القطنية",
+                "en": "Iliopsoas"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "hip-bursae",
+              "subRegionId": "hip",
+              "type": "bursa",
+              "label": {
+                "ar": "جرابات الورك",
+                "en": "Hip bursae"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "sciatic-nerve",
+              "subRegionId": "hip",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب الوركي",
+                "en": "Sciatic nerve"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "femoral-nerve",
+              "subRegionId": "hip",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب الفخذي",
+                "en": "Femoral nerve"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "lateral-cutaneous-thigh-nerve",
+              "subRegionId": "hip",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب الجلدي الوحشي للفخذ",
+                "en": "Lateral cutaneous nerve of thigh"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "femoral-artery",
+              "subRegionId": "hip",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان الفخذي",
+                "en": "Femoral artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "thigh",
+          "regionId": "lower_limb",
+          "label": {
+            "ar": "الفخذ",
+            "en": "Thigh"
+          },
+          "icdChapterHint": "S70-S79 · M60-M79 · I80",
+          "structures": [
+            {
+              "id": "femur-shaft",
+              "subRegionId": "thigh",
+              "type": "bone",
+              "label": {
+                "ar": "جسم عظم الفخذ",
+                "en": "Femoral shaft"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "quadriceps",
+              "subRegionId": "thigh",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة رباعية الرؤوس",
+                "en": "Quadriceps"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "hamstrings",
+              "subRegionId": "thigh",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلات المأبضية",
+                "en": "Hamstrings"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "adductors",
+              "subRegionId": "thigh",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلات المقربة",
+                "en": "Adductor muscles"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "sartorius",
+              "subRegionId": "thigh",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الخياطية",
+                "en": "Sartorius"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "tfl",
+              "subRegionId": "thigh",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الموترة للفافة العريضة",
+                "en": "Tensor fasciae latae"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "it-band",
+              "subRegionId": "thigh",
+              "type": "fascia",
+              "label": {
+                "ar": "الشريط الظنبوبي",
+                "en": "Iliotibial band"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "femoral-triangle",
+              "subRegionId": "thigh",
+              "type": "space",
+              "label": {
+                "ar": "المثلث الفخذي",
+                "en": "Femoral triangle"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "adductor-canal",
+              "subRegionId": "thigh",
+              "type": "space",
+              "label": {
+                "ar": "القناة المقربة",
+                "en": "Adductor canal"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "profunda-femoris-artery",
+              "subRegionId": "thigh",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان الفخذي العميق",
+                "en": "Profunda femoris artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "sciatic-nerve-thigh",
+              "subRegionId": "thigh",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب الوركي في الفخذ",
+                "en": "Sciatic nerve (thigh)"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "knee",
+          "regionId": "lower_limb",
+          "label": {
+            "ar": "الركبة",
+            "en": "Knee"
+          },
+          "icdChapterHint": "M17 · M22 · M23 · S80-S89",
+          "structures": [
+            {
+              "id": "distal-femur",
+              "subRegionId": "knee",
+              "type": "bone",
+              "label": {
+                "ar": "نهاية عظم الفخذ",
+                "en": "Distal femur"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "proximal-tibia",
+              "subRegionId": "knee",
+              "type": "bone",
+              "label": {
+                "ar": "نهاية الظنبوب",
+                "en": "Proximal tibia"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "patella",
+              "subRegionId": "knee",
+              "type": "bone",
+              "label": {
+                "ar": "الرضفة",
+                "en": "Patella"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "tibiofemoral-joint",
+              "subRegionId": "knee",
+              "type": "joint",
+              "label": {
+                "ar": "المفصل الظنبوبي الفخذي",
+                "en": "Tibiofemoral joint"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "patellofemoral-joint",
+              "subRegionId": "knee",
+              "type": "joint",
+              "label": {
+                "ar": "المفصل الرضفي الفخذي",
+                "en": "Patellofemoral joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "menisci",
+              "subRegionId": "knee",
+              "type": "cartilage",
+              "label": {
+                "ar": "الغضاريف الهلالية",
+                "en": "Menisci"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "acl",
+              "subRegionId": "knee",
+              "type": "ligament",
+              "label": {
+                "ar": "الرباط الصليبي الأمامي",
+                "en": "Anterior cruciate ligament"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "pcl",
+              "subRegionId": "knee",
+              "type": "ligament",
+              "label": {
+                "ar": "الرباط الصليبي الخلفي",
+                "en": "Posterior cruciate ligament"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "mcl",
+              "subRegionId": "knee",
+              "type": "ligament",
+              "label": {
+                "ar": "الرباط الجانبي الإنسي",
+                "en": "Medial collateral ligament"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "lcl",
+              "subRegionId": "knee",
+              "type": "ligament",
+              "label": {
+                "ar": "الرباط الجانبي الوحشي",
+                "en": "Lateral collateral ligament"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "patellar-tendon",
+              "subRegionId": "knee",
+              "type": "tendon",
+              "label": {
+                "ar": "الوتر الرضفي",
+                "en": "Patellar tendon"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "popliteal-fossa",
+              "subRegionId": "knee",
+              "type": "space",
+              "label": {
+                "ar": "الحفرة المأبضية",
+                "en": "Popliteal fossa"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "popliteal-artery",
+              "subRegionId": "knee",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان المأبضي",
+                "en": "Popliteal artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "lower_leg",
+          "regionId": "lower_limb",
+          "label": {
+            "ar": "الساق",
+            "en": "Lower leg"
+          },
+          "icdChapterHint": "M76 · S80-S89",
+          "structures": [
+            {
+              "id": "tibia",
+              "subRegionId": "lower_leg",
+              "type": "bone",
+              "label": {
+                "ar": "الظنبوب",
+                "en": "Tibia"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "fibula",
+              "subRegionId": "lower_leg",
+              "type": "bone",
+              "label": {
+                "ar": "الشظية",
+                "en": "Fibula"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "gastrocnemius",
+              "subRegionId": "lower_leg",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة التوأمية",
+                "en": "Gastrocnemius"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "soleus",
+              "subRegionId": "lower_leg",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة النعلية",
+                "en": "Soleus"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "tibialis-anterior",
+              "subRegionId": "lower_leg",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الظنبوبية الأمامية",
+                "en": "Tibialis anterior"
+              },
+              "sizeBand": "cm-15-plus",
+              "sizeBandLabel": {
+                "ar": "أكثر من 15 سم",
+                "en": "over 15 cm"
+              }
+            },
+            {
+              "id": "tibialis-posterior",
+              "subRegionId": "lower_leg",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلة الظنبوبية الخلفية",
+                "en": "Tibialis posterior"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "peroneal-muscles",
+              "subRegionId": "lower_leg",
+              "type": "muscle",
+              "label": {
+                "ar": "العضلات الشظوية",
+                "en": "Peroneal muscles"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "achilles-tendon",
+              "subRegionId": "lower_leg",
+              "type": "tendon",
+              "label": {
+                "ar": "وتر أخيل",
+                "en": "Achilles tendon"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "anterior-compartment",
+              "subRegionId": "lower_leg",
+              "type": "space",
+              "label": {
+                "ar": "الحيز الأمامي للساق",
+                "en": "Anterior compartment"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "posterior-tibial-artery",
+              "subRegionId": "lower_leg",
+              "type": "vessel",
+              "label": {
+                "ar": "الشريان الظنبوبي الخلفي",
+                "en": "Posterior tibial artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "sural-nerve",
+              "subRegionId": "lower_leg",
+              "type": "nerve",
+              "label": {
+                "ar": "العصب الربلي",
+                "en": "Sural nerve"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        },
+        {
+          "id": "ankle_foot",
+          "regionId": "lower_limb",
+          "label": {
+            "ar": "الكاحل والقدم",
+            "en": "Ankle and foot"
+          },
+          "icdChapterHint": "M20-M25 · M77 · S90-S99",
+          "structures": [
+            {
+              "id": "talus",
+              "subRegionId": "ankle_foot",
+              "type": "bone",
+              "label": {
+                "ar": "العظم الكاحلي",
+                "en": "Talus"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "calcaneus",
+              "subRegionId": "ankle_foot",
+              "type": "bone",
+              "label": {
+                "ar": "العظم العقبي",
+                "en": "Calcaneus"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "navicular",
+              "subRegionId": "ankle_foot",
+              "type": "bone",
+              "label": {
+                "ar": "العظم الزورقي",
+                "en": "Navicular"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "cuboid",
+              "subRegionId": "ankle_foot",
+              "type": "bone",
+              "label": {
+                "ar": "العظم النردي",
+                "en": "Cuboid"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "cuneiforms",
+              "subRegionId": "ankle_foot",
+              "type": "bone",
+              "label": {
+                "ar": "العظام الإسفينية (3)",
+                "en": "Cuneiforms (3)"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "metatarsals-foot",
+              "subRegionId": "ankle_foot",
+              "type": "bone",
+              "label": {
+                "ar": "عظام مشط القدم (5)",
+                "en": "Metatarsals (5)"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "phalanges-foot",
+              "subRegionId": "ankle_foot",
+              "type": "bone",
+              "label": {
+                "ar": "سلاميات القدم (14)",
+                "en": "Foot phalanges (14)"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "ankle-joint",
+              "subRegionId": "ankle_foot",
+              "type": "joint",
+              "label": {
+                "ar": "مفصل الكاحل",
+                "en": "Ankle joint"
+              },
+              "sizeBand": "cm-1-5",
+              "sizeBandLabel": {
+                "ar": "من 1 إلى 5 سم",
+                "en": "1 to 5 cm"
+              }
+            },
+            {
+              "id": "subtalar-joint",
+              "subRegionId": "ankle_foot",
+              "type": "joint",
+              "label": {
+                "ar": "المفصل تحت الكاحلي",
+                "en": "Subtalar joint"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "plantar-fascia",
+              "subRegionId": "ankle_foot",
+              "type": "fascia",
+              "label": {
+                "ar": "اللفافة الأخمصية",
+                "en": "Plantar fascia"
+              },
+              "sizeBand": "cm-5-15",
+              "sizeBandLabel": {
+                "ar": "من 5 إلى 15 سم",
+                "en": "5 to 15 cm"
+              }
+            },
+            {
+              "id": "deltoid-ligament",
+              "subRegionId": "ankle_foot",
+              "type": "ligament",
+              "label": {
+                "ar": "الرباط الدالي",
+                "en": "Deltoid ligament"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "lateral-ankle-ligaments",
+              "subRegionId": "ankle_foot",
+              "type": "ligament",
+              "label": {
+                "ar": "الأربطة الجانبية للكاحل",
+                "en": "Lateral ankle ligaments"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "tarsal-tunnel",
+              "subRegionId": "ankle_foot",
+              "type": "space",
+              "label": {
+                "ar": "نفق الرصغ",
+                "en": "Tarsal tunnel"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "plantar-nerves",
+              "subRegionId": "ankle_foot",
+              "type": "nerve",
+              "label": {
+                "ar": "الأعصاب الأخمصية",
+                "en": "Plantar nerves"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            },
+            {
+              "id": "dorsalis-pedis-artery",
+              "subRegionId": "ankle_foot",
+              "type": "vessel",
+              "label": {
+                "ar": "شريان ظهر القدم",
+                "en": "Dorsalis pedis artery"
+              },
+              "sizeBand": "mm",
+              "sizeBandLabel": {
+                "ar": "أقل من 1 سم (نطاق ملّيمتري)",
+                "en": "under 1 cm (millimetre range)"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

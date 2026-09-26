@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0.0",
   "generatedAt": "2026-09-26",
-  "batch": "regional-expansion-1",
+  "batch": "regional-expansion-1+2",
   "notice": {
-    "ar": "دفعة توسّع إقليمية: أمراض القدم والركبة واليد، ثم الأسنان والأذن والحلق والجيوب، ثم البطن والحوض والخصية. كل سجل يحتوي أعراضًا مميزة، ومناطق مطابقة، وعلامات خطر ثلاثية اللغة، ومصدرًا طبيًا. محتوى تعليمي عام فقط ولا يقدّم تشخيصًا أو علاجًا.",
-    "en": "Regional expansion batch: foot, knee and hand conditions, then dental, ear, throat and sinus, then abdominal, pelvic and testicular conditions. Each record carries distinctive symptoms, matching regions, trilingual red flags, and a medical source. General education only, not a diagnosis or treatment.",
-    "fr": "Lot d extension régionale : pied, genou et main, puis dents, oreille, gorge et sinus, puis abdomen, pelvis et testicule. Chaque fiche contient des symptômes distinctifs, des régions correspondantes, des signaux d alerte trilingues et une source médicale. Contenu éducatif uniquement."
+    "ar": "دفعة توسّع إقليمية: أمراض القدم والركبة واليد، ثم الأسنان والأذن والحلق والجيوب، ثم البطن والحوض والخصية. كل سجل يحتوي أعراضًا مميزة، ومناطق مطابقة، وعلامات خطر ثلاثية اللغة، ومصدرًا طبيًا. محتوى تعليمي عام فقط ولا يقدّم تشخيصًا أو علاجًا. الدفعة الثانية: الرقبة (D) والكتف (E) والفخذ والورك (F)، وكل حالة مربوطة ببنى تشريحية محددة من regionTaxonomy.json.",
+    "en": "Regional expansion batch: foot, knee and hand conditions, then dental, ear, throat and sinus, then abdominal, pelvic and testicular conditions. Each record carries distinctive symptoms, matching regions, trilingual red flags, and a medical source. General education only, not a diagnosis or treatment. Batch 2: neck, shoulder, and thigh or hip; every record is linked to specific anatomical structures from regionTaxonomy.json.",
+    "fr": "Lot d extension régionale : pied, genou et main, puis dents, oreille, gorge et sinus, puis abdomen, pelvis et testicule. Chaque fiche contient des symptômes distinctifs, des régions correspondantes, des signaux d alerte trilingues et une source médicale. Contenu éducatif uniquement. Lot 2 : cou, épaule et cuisse ou hanche ; chaque fiche est liée à des structures anatomiques précises."
   },
   "conditions": [
     {
@@ -53,7 +53,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:metatarsalgia",
@@ -98,7 +99,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:morton-neuroma",
@@ -141,7 +143,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:hallux-valgus",
@@ -185,7 +188,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:ingrown-toenail",
@@ -229,7 +233,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:tarsal-tunnel",
@@ -275,7 +280,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:gout",
@@ -324,7 +330,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:diabetic-foot-ulcer",
@@ -370,7 +377,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:metatarsal-stress-fracture",
@@ -413,7 +421,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:patellofemoral-pain",
@@ -459,7 +468,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:meniscal-tear",
@@ -505,7 +515,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:patellar-tendinitis",
@@ -549,7 +560,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:prepatellar-bursitis",
@@ -594,7 +606,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:de-quervain",
@@ -638,7 +651,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:trigger-finger",
@@ -682,7 +696,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:ganglion-cyst",
@@ -726,7 +741,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:dupuytren",
@@ -770,7 +786,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:scaphoid-fracture",
@@ -815,7 +832,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:raynaud",
@@ -861,7 +879,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:dental-caries",
@@ -904,7 +923,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:dental-abscess",
@@ -950,13 +970,14 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:pericoronitis",
       "doid": null,
       "doidStatus": "not-mapped",
-      "icd10": "K01.1",
+      "icd10": "K05.20",
       "batch": "B",
       "name": {
         "ar": "التهاب حول ضرس العقل المطمور",
@@ -996,7 +1017,9 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified",
+      "icd10Note": "K05.20 (التهاب ما حول التاج الحاد) وفق ICD-10-CM؛ الرمز K01.1 يعني «أسنان منطمرة» ولا يمثّل هذه الحالة."
     },
     {
       "id": "local:tmj-disorder",
@@ -1041,7 +1064,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:gingivitis",
@@ -1084,7 +1108,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:otitis-media",
@@ -1129,7 +1154,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:otitis-externa",
@@ -1173,7 +1199,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:pharyngitis",
@@ -1219,7 +1246,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:strep-throat",
@@ -1265,7 +1293,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:laryngitis",
@@ -1309,7 +1338,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:sinusitis",
@@ -1354,7 +1384,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:inguinal-hernia",
@@ -1403,7 +1434,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:umbilical-hernia",
@@ -1451,7 +1483,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:mesenteric-lymphadenitis",
@@ -1499,7 +1532,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:constipation",
@@ -1548,7 +1582,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:bowel-obstruction",
@@ -1597,7 +1632,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:cholecystitis",
@@ -1648,7 +1684,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:pancreatitis-acute",
@@ -1699,7 +1736,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:testicular-torsion",
@@ -1748,7 +1786,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:epididymitis",
@@ -1797,7 +1836,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:orchitis",
@@ -1845,7 +1885,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:hydrocele",
@@ -1893,7 +1934,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:varicocele",
@@ -1941,7 +1983,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:testicular-cancer",
@@ -1990,7 +2033,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:prostatitis",
@@ -2041,7 +2085,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:ectopic-pregnancy",
@@ -2090,7 +2135,8 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
     },
     {
       "id": "local:pyelonephritis",
@@ -2141,7 +2187,1858 @@
           "title": "ICD-10-CM (WHO/CDC)",
           "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
         }
-      ]
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:cervical-radiculopathy",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M54.12",
+      "batch": "D",
+      "name": {
+        "ar": "اعتلال الجذور العنقية (عرق النسا في الذراع)",
+        "en": "Cervical radiculopathy",
+        "fr": "Radiculopathie cervicale"
+      },
+      "summary": {
+        "ar": "ألم ينتشر من الرقبة إلى الذراع واليد مع تنميل أو ضعف في مسار جذر عصبي واحد، ويزيد بمد الرقبة.",
+        "en": "Pain radiating from the neck into the arm and hand with numbness or weakness in one nerve-root pattern, worse with neck extension.",
+        "fr": "Douleur de la nuque irradiant au bras avec engourdissement ou faiblesse dans un territoire radiculaire, aggravée à l extension."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "deltoids",
+        "upper-back"
+      ],
+      "regions": [
+        "head_neck",
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "cervical_spine",
+        "structures": [
+          "cervical-roots",
+          "cervical-discs",
+          "c3-c7"
+        ]
+      },
+      "symptoms": [
+        "hpo:0003401",
+        "local:arm-radiating-pain",
+        "hpo:0001324",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "ضعف متزايد في الذراع أو اليد، صعوبة في المشي أو فك الأزرار، أو فقدان سيطرة على البول أو البراز - راجع عاجلًا.",
+        "en": "Progressive arm or hand weakness, difficulty walking or buttoning, or loss of bladder or bowel control - seek urgent care.",
+        "fr": "Faiblesse croissante du bras ou de la main, difficulté à marcher ou à boutonner, ou perte du contrôle vésical ou anal - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/neckpain.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - neckpain.html",
+          "url": "https://medlineplus.gov/neckpain.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:cervical-myelopathy",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M47.12",
+      "batch": "D",
+      "name": {
+        "ar": "اعتلال النخاع العنقي (ضغط على الحبل الشوكي)",
+        "en": "Cervical myelopathy",
+        "fr": "Myélopathie cervicale"
+      },
+      "summary": {
+        "ar": "ضغط تدريجي على الحبل الشوكي من تآكل الفقرات: تراجع مهارات اليد، تعثّر في المشي، وتيبّس.",
+        "en": "Gradual spinal-cord compression from spondylosis: deteriorating hand dexterity, tripping, and stiffness.",
+        "fr": "Compression médullaire progressive : perte de dextérité, trébuchements et raideur."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "upper-back"
+      ],
+      "regions": [
+        "head_neck",
+        "upper_limb",
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "cervical_spine",
+        "structures": [
+          "cervical-cord",
+          "cervical-discs",
+          "c3-c7"
+        ]
+      },
+      "symptoms": [
+        "local:hand-clumsiness",
+        "local:gait-unsteadiness",
+        "hpo:0001324",
+        "hpo:0003401"
+      ],
+      "redFlags": {
+        "ar": "تراجع سريع في المشي أو اليدين، أو فقدان سيطرة على البول أو البراز - تقييم عاجل وقد يحتاج جراحة؛ لا تؤجّل.",
+        "en": "Rapid decline in walking or hand function, or loss of bladder or bowel control - urgent assessment, possibly surgery; do not delay.",
+        "fr": "Dégradation rapide de la marche ou des mains, ou perte de contrôle sphinctérien - évaluation urgente."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/cervicalmyelopathy.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - cervicalmyelopathy.html",
+          "url": "https://medlineplus.gov/cervicalmyelopathy.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:cervical-stenosis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M48.02",
+      "batch": "D",
+      "name": {
+        "ar": "ضيق القناة الشوكية العنقية",
+        "en": "Cervical spinal stenosis",
+        "fr": "Sténose canalaire cervicale"
+      },
+      "summary": {
+        "ar": "ضيق في القناة الشوكية العنقية يضغط على الحبل أو الجذور مع ألم وتنميل في الرقبة والذراعين، يزداد مع المشي.",
+        "en": "Narrowing of the cervical canal compressing the cord or roots, with neck and arm pain and numbness, worse with walking.",
+        "fr": "Rétrécissement du canal cervical comprimant le cordon ou les racines, avec douleur et paresthésies, aggravées à la marche."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "upper-back"
+      ],
+      "regions": [
+        "head_neck",
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "cervical_spine",
+        "structures": [
+          "spinal-canal",
+          "cervical-cord",
+          "cervical-roots"
+        ]
+      },
+      "symptoms": [
+        "hpo:0003401",
+        "local:arm-radiating-pain",
+        "local:restricted-motion",
+        "hpo:0001324"
+      ],
+      "redFlags": {
+        "ar": "صعوبة في المشي أو التوازن، أو ضعف متزايد في اليدين - تقييم عاجل.",
+        "en": "Difficulty walking or balancing, or progressive hand weakness - urgent assessment.",
+        "fr": "Difficulté à marcher ou à équilibrer, ou faiblesse croissante des mains - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/spinalstenosis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - spinalstenosis.html",
+          "url": "https://medlineplus.gov/spinalstenosis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:cervical-disc-herniation",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M50.10",
+      "batch": "D",
+      "name": {
+        "ar": "انزلاق الغضروف العنقي",
+        "en": "Cervical disc disorder with radiculopathy",
+        "fr": "Hernie discale cervicale"
+      },
+      "summary": {
+        "ar": "انزلاق نواة الغضروف العنقي يضغط على الجذر العصبي فيسبب ألمًا حارقًا في الذراع مع تنميل في أصابع محددة.",
+        "en": "Herniation of a cervical disc compressing a nerve root, causing burning arm pain with numbness in specific fingers.",
+        "fr": "Hernie discale cervicale comprimant une racine nerveuse : douleur du bras avec paresthésies digitales."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "deltoids"
+      ],
+      "regions": [
+        "head_neck",
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "cervical_spine",
+        "structures": [
+          "cervical-discs",
+          "cervical-roots",
+          "cervical-cord"
+        ]
+      },
+      "symptoms": [
+        "local:arm-radiating-pain",
+        "hpo:0003401",
+        "hpo:0001324"
+      ],
+      "redFlags": {
+        "ar": "ضعف مفاجئ في الذراع أو الساقين، أو صعوبة في المشي أو التبول - طوارئ.",
+        "en": "Sudden arm or leg weakness, or difficulty walking or urinating - emergency.",
+        "fr": "Faiblesse brutale brachiale ou des jambes, ou difficulté à marcher ou uriner - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/herniateddisk.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - herniateddisk.html",
+          "url": "https://medlineplus.gov/herniateddisk.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:torticollis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M43.6",
+      "batch": "D",
+      "name": {
+        "ar": "التواء الرقبة (الصعر)",
+        "en": "Torticollis (wry neck)",
+        "fr": "Torticolis"
+      },
+      "summary": {
+        "ar": "تشنج مؤلم في عضلات الرقبة يجعل الرأس مائلًا ومدارًا إلى جهة واحدة مع محدودية الحركة.",
+        "en": "A painful spasm of the neck muscles holding the head tilted and rotated to one side with restricted movement.",
+        "fr": "Spasme douloureux des muscles du cou : tête inclinée et tournée, mobilité limitée."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "taxonomy": {
+        "subRegion": "neck_soft_tissue",
+        "structures": [
+          "scm-muscle",
+          "upper-trapezius",
+          "cervical-fascia"
+        ]
+      },
+      "symptoms": [
+        "hpo:0001276",
+        "local:restricted-motion",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "التواء الرقبة مع حرارة أو تيبّس شديد أو صداع مفاجئ - قد يشير إلى التهاب سحائي؛ راجع عاجلًا.",
+        "en": "Torticollis with fever, severe stiffness, or sudden headache - may indicate meningitis; seek urgent care.",
+        "fr": "Torticolis avec fièvre, raideur marquée ou céphalée brutale - méningite possible ; avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/torticollis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - torticollis.html",
+          "url": "https://medlineplus.gov/torticollis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:cervicobrachial-syndrome",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M53.1",
+      "batch": "D",
+      "name": {
+        "ar": "متلازمة الرقبة والذراع",
+        "en": "Cervicobrachial syndrome",
+        "fr": "Syndrome cervico-brachial"
+      },
+      "summary": {
+        "ar": "ألم وتنميل يشمل الرقبة والكتف والذراع دون انزلاق غضروفي مُثبت، غالبًا مع تشنج عضلي ووضعية سيئة.",
+        "en": "Pain and numbness involving the neck, shoulder, and arm without a proven disc herniation, often with muscle spasm and poor posture.",
+        "fr": "Douleur et paresthésies cervico-brachiales sans hernie prouvée, souvent avec spasme et mauvaise posture."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "deltoids",
+        "upper-back"
+      ],
+      "regions": [
+        "head_neck",
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "neck_soft_tissue",
+        "structures": [
+          "scalenes",
+          "upper-trapezius",
+          "deep-cervical-flexors"
+        ]
+      },
+      "symptoms": [
+        "local:arm-radiating-pain",
+        "hpo:0003326",
+        "local:restricted-motion",
+        "hpo:0003401"
+      ],
+      "redFlags": {
+        "ar": "ضعف أو هزال في اليد، أو تنميل مستمر لا يتحسّن - راجع الطبيب.",
+        "en": "Hand weakness or wasting, or persistent numbness without improvement - seek medical review.",
+        "fr": "Faiblesse ou fonte musculaire de la main, ou engourdissement persistant - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/neckpain.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - neckpain.html",
+          "url": "https://medlineplus.gov/neckpain.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:cervical-whiplash",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "S13.4",
+      "batch": "D",
+      "name": {
+        "ar": "إصابة الرقبة بالجلد (الويربلاش)",
+        "en": "Whiplash injury of the cervical spine",
+        "fr": "Coup du lapin"
+      },
+      "summary": {
+        "ar": "شد في أربطة الرقبة ومفاصلها بعد تسارع أو تباطؤ مفاجئ، مع ألم وتيبّس يزيد بالحركة.",
+        "en": "Sprain of the cervical ligaments and joints after sudden acceleration or deceleration, with pain and stiffness worse with movement.",
+        "fr": "Entorse des ligaments cervicaux après accélération ou décélération brutale, douleur et raideur au mouvement."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "upper-back"
+      ],
+      "regions": [
+        "head_neck",
+        "back"
+      ],
+      "taxonomy": {
+        "subRegion": "cervical_spine",
+        "structures": [
+          "cervical-facet-joints",
+          "cervical-discs",
+          "cervical-roots"
+        ]
+      },
+      "symptoms": [
+        "hpo:0001276",
+        "hpo:0002315",
+        "local:restricted-motion",
+        "hpo:0003401"
+      ],
+      "redFlags": {
+        "ar": "تنميل أو ضعف في الذراعين، صعوبة في المشي، أو ألم يزداد بشدة بعد الحادث - راجع عاجلًا.",
+        "en": "Arm numbness or weakness, difficulty walking, or sharply worsening pain after the accident - urgent review.",
+        "fr": "Engourdissement ou faiblesse des bras, difficulté à marcher, ou douleur croissante - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/whiplash.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - whiplash.html",
+          "url": "https://medlineplus.gov/whiplash.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:tension-headache",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "G44.2",
+      "batch": "D",
+      "name": {
+        "ar": "الصداع التوتري",
+        "en": "Tension-type headache",
+        "fr": "Céphalée de tension"
+      },
+      "summary": {
+        "ar": "صداع ضاغط على شكل شريط حول الرأس مع شد في عضلات الرقبة والكتف، غالبًا في نهاية اليوم.",
+        "en": "A band-like pressing headache with neck and shoulder muscle tightness, usually at the end of the day.",
+        "fr": "Céphalée compressive en casque avec tension cervicale, souvent en fin de journée."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "taxonomy": {
+        "subRegion": "neck_soft_tissue",
+        "structures": [
+          "upper-trapezius",
+          "scm-muscle",
+          "deep-cervical-flexors"
+        ]
+      },
+      "symptoms": [
+        "hpo:0002315",
+        "hpo:0001276",
+        "hpo:0002360"
+      ],
+      "redFlags": {
+        "ar": "صداع مفاجئ شديد كالرعد، أو مع تيبّس رقبة أو حرارة أو ضعف مفاجئ - طوارئ فورية.",
+        "en": "Sudden thunderclap headache, or headache with neck stiffness, fever, or sudden weakness - emergency.",
+        "fr": "Céphalée brutale en coup de tonnerre, ou avec raideur de nuque, fièvre ou faiblesse - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/tensionheadache.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - tensionheadache.html",
+          "url": "https://medlineplus.gov/tensionheadache.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:cervical-zoster",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "B02.9",
+      "batch": "D",
+      "name": {
+        "ar": "الهربس النطاقي العنقي (الحزام الناري)",
+        "en": "Cervical herpes zoster",
+        "fr": "Zona cervical"
+      },
+      "summary": {
+        "ar": "طفح حويصلي مؤلم على شريط جانبي في الرقبة أو الكتف ناتج عن إعادة تنشيط فيروس جدري الماء.",
+        "en": "A painful blistering rash in a band on one side of the neck or shoulder from reactivation of the chickenpox virus.",
+        "fr": "Éruption vésiculeuse douloureuse en bande unilatérale du cou ou de l épaule."
+      },
+      "muscleGroups": [
+        "neck",
+        "trapezius"
+      ],
+      "regions": [
+        "head_neck",
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "neck_soft_tissue",
+        "structures": [
+          "cervical-fascia",
+          "cervical-lymph-nodes",
+          "brachial-plexus"
+        ]
+      },
+      "symptoms": [
+        "local:zoster-rash",
+        "hpo:0000988",
+        "hpo:0003401",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "إصابة حول العين أو الأنف، أو ضعف في الذراع، أو ألم يستمر بعد زوال الطفح - راجع عاجلًا.",
+        "en": "Involvement around the eye or nose, arm weakness, or pain persisting after the rash clears - urgent review.",
+        "fr": "Atteinte péri-oculaire ou nasale, faiblesse du bras, ou douleur persistant après l éruption - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/shingles.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - shingles.html",
+          "url": "https://medlineplus.gov/shingles.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:thyroid-goiter",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "E04.9",
+      "batch": "D",
+      "name": {
+        "ar": "تضخّم الغدة الدرقية (السلعة)",
+        "en": "Nontoxic goiter",
+        "fr": "Goitre non toxique"
+      },
+      "summary": {
+        "ar": "تضخّم في الغدة الدرقية أمام الرقبة، غالبًا غير مؤلم، وقد يسبب إحساسًا بالضغط أو صعوبة في البلع.",
+        "en": "Enlargement of the thyroid gland at the front of the neck, usually painless, sometimes causing pressure or difficulty swallowing.",
+        "fr": "Augmentation de la thyroïde en avant du cou, souvent indolore, parfois compressive."
+      },
+      "muscleGroups": [
+        "neck",
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "taxonomy": {
+        "subRegion": "neck_soft_tissue",
+        "structures": [
+          "thyroid-gland",
+          "parathyroid-glands",
+          "cervical-lymph-nodes",
+          "cervical-esophagus"
+        ]
+      },
+      "symptoms": [
+        "local:thyroid-neck-lump",
+        "local:swallowing-difficulty",
+        "local:hoarseness"
+      ],
+      "redFlags": {
+        "ar": "نمو سريع في الكتلة، بحة مستمرة، صعوبة في التنفس أو البلع، أو نقص وزن - راجع عاجلًا.",
+        "en": "Rapid growth of the lump, persistent hoarseness, difficulty breathing or swallowing, or weight loss - urgent review.",
+        "fr": "Croissance rapide, enrouement persistant, dyspnée ou dysphagie, ou perte de poids - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/goiter.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - goiter.html",
+          "url": "https://medlineplus.gov/goiter.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:rotator-cuff-syndrome",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M75.1",
+      "batch": "E",
+      "name": {
+        "ar": "إصابة الكفة المدورة",
+        "en": "Rotator cuff syndrome",
+        "fr": "Syndrome de la coiffe des rotateurs"
+      },
+      "summary": {
+        "ar": "ألم في الكتف يزيد برفع الذراع وبالاستلقاء على الجانب المصاب، مع ضعف في الحركة.",
+        "en": "Shoulder pain worse with raising the arm and lying on the affected side, with weakness in movement.",
+        "fr": "Douleur de l épaule aggravée à l élévation et en décubitus latéral, avec faiblesse."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "trapezius",
+        "chest",
+        "upper-back"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "rotator-cuff",
+          "subacromial-bursa",
+          "glenohumeral-joint"
+        ]
+      },
+      "symptoms": [
+        "local:shoulder-weakness",
+        "local:night-pain-shoulder",
+        "local:restricted-motion",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "عدم القدرة على رفع الذراع بعد إصابة حادة، أو تنميل مستمر، أو ألم يمنع النوم - راجع الطبيب.",
+        "en": "Inability to lift the arm after acute injury, persistent numbness, or pain preventing sleep - seek medical review.",
+        "fr": "Incapacité à lever le bras après un traumatisme, engourdissement persistant, ou douleur empêchant le sommeil - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/rotatorcuffinjuries.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - rotatorcuffinjuries.html",
+          "url": "https://medlineplus.gov/rotatorcuffinjuries.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:shoulder-impingement",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M75.4",
+      "batch": "E",
+      "name": {
+        "ar": "انحشار الكتف (متلازمة الانحشار)",
+        "en": "Shoulder impingement syndrome",
+        "fr": "Conflit sous-acromial"
+      },
+      "summary": {
+        "ar": "ألم في مقدمة الكتف والجانب يظهر عند رفع الذراع بين 60 و120 درجة، أو عند الوصول للخلف.",
+        "en": "Pain at the front and side of the shoulder appearing when raising the arm between 60 and 120 degrees, or reaching behind.",
+        "fr": "Douleur antéro-latérale de l épaule à l élévation entre 60 et 120 degrés, ou en rotation interne."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "trapezius",
+        "chest"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "subacromial-bursa",
+          "rotator-cuff",
+          "ac-joint"
+        ]
+      },
+      "symptoms": [
+        "local:shoulder-weakness",
+        "local:restricted-motion",
+        "local:night-pain-shoulder"
+      ],
+      "redFlags": {
+        "ar": "ضعف مفاجئ أو عدم قدرة على رفع الذراع، أو تورّم بعد إصابة - راجع عاجلًا.",
+        "en": "Sudden weakness or inability to raise the arm, or swelling after injury - urgent review.",
+        "fr": "Faiblesse brutale ou impossibilité d élévation, ou gonflement post-traumatique - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/shoulderimpingement.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - shoulderimpingement.html",
+          "url": "https://medlineplus.gov/shoulderimpingement.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:bicipital-tendinitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M75.2",
+      "batch": "E",
+      "name": {
+        "ar": "التهاب وتر العضلة ذات الرأسين",
+        "en": "Bicipital tendinitis",
+        "fr": "Tendinite du biceps"
+      },
+      "summary": {
+        "ar": "ألم في مقدمة الكتف وعلى طول الوتر الطويل للعضلة ذات الرأسين، يزيد بحمل الأثقال أو رفع الذراع للأمام.",
+        "en": "Pain at the front of the shoulder and along the long head of the biceps tendon, worse with lifting or forward arm elevation.",
+        "fr": "Douleur antérieure de l épaule le long du tendon du biceps, aggravée à l effort."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "biceps",
+        "chest"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "biceps-long-head",
+          "glenohumeral-joint",
+          "rotator-cuff"
+        ]
+      },
+      "symptoms": [
+        "hpo:0012531",
+        "local:shoulder-weakness",
+        "hpo:0003326"
+      ],
+      "redFlags": {
+        "ar": "تمزّق مفاجئ مع صوت طقطقة وانتفاخ عضلي غير طبيعي (تشوّه العضلة) - راجع عاجلًا.",
+        "en": "Sudden tear with a pop and an abnormal muscle bulge (deformity) - urgent review.",
+        "fr": "Rupture brutale avec claquement et déformation musculaire - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/bicipitaltendinitis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - bicipitaltendinitis.html",
+          "url": "https://medlineplus.gov/bicipitaltendinitis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:subacromial-bursitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M75.5",
+      "batch": "E",
+      "name": {
+        "ar": "التهاب الجراب تحت الأخرم",
+        "en": "Subacromial bursitis",
+        "fr": "Bursite sous-acromiale"
+      },
+      "summary": {
+        "ar": "ألم حاد في الكتف يزيد بحركات القوس المتوسط وبالضغط المباشر، مع محدودية في الرفع.",
+        "en": "Sharp shoulder pain worse with mid-arc movements and direct pressure, with limited elevation.",
+        "fr": "Douleur aiguë de l épaule au mouvement d arc moyen et à la pression, élévation limitée."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "trapezius"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "subacromial-bursa",
+          "rotator-cuff",
+          "ac-joint"
+        ]
+      },
+      "symptoms": [
+        "local:night-pain-shoulder",
+        "hpo:0001386",
+        "local:restricted-motion",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "احمرار وحرارة شديدة مع حرارة عامة - التهاب جرابي جرثومي يستدعي مراجعة عاجلة.",
+        "en": "Marked redness and heat with fever - septic bursitis requiring urgent review.",
+        "fr": "Rougeur et chaleur marquées avec fièvre - bursite septique, avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/bursitis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - bursitis.html",
+          "url": "https://medlineplus.gov/bursitis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:adhesive-capsulitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M75.0",
+      "batch": "E",
+      "name": {
+        "ar": "الكتف المتجمّد (التصاق المحفظة)",
+        "en": "Adhesive capsulitis (frozen shoulder)",
+        "fr": "Capsulite rétractile"
+      },
+      "summary": {
+        "ar": "تصلّب تدريجي في الكتف مع فقدان الحركة في كل الاتجاهات، ويظهر أكثر لدى مرضى السكري.",
+        "en": "Gradual shoulder stiffening with loss of movement in all directions, more common in people with diabetes.",
+        "fr": "Enraidissement progressif de l épaule dans tous les secteurs, plus fréquent chez les diabétiques."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "trapezius",
+        "chest"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "glenohumeral-joint",
+          "glenoid-labrum",
+          "rotator-cuff"
+        ]
+      },
+      "symptoms": [
+        "local:restricted-motion",
+        "local:night-pain-shoulder",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "فقدان حركة كامل بشكل مفاجئ بعد إصابة، أو حرارة وتورّم - راجع الطبيب.",
+        "en": "Sudden complete loss of movement after injury, or fever and swelling - seek medical review.",
+        "fr": "Perte complète et brutale de mobilité après traumatisme, ou fièvre et gonflement - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/frozenshoulder.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - frozenshoulder.html",
+          "url": "https://medlineplus.gov/frozenshoulder.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:shoulder-osteoarthritis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M19.01",
+      "batch": "E",
+      "name": {
+        "ar": "الفصال العظمي في الكتف",
+        "en": "Primary osteoarthritis of the shoulder",
+        "fr": "Arthrose gléno-humérale"
+      },
+      "summary": {
+        "ar": "ألم وتصلّب تدريجي في الكتف يزداد بالحركة مع طقطقة وتراجع مدى الحركة على مدى سنوات.",
+        "en": "Gradual shoulder pain and stiffness increasing with use, with crepitus and progressive loss of range over years.",
+        "fr": "Douleur et raideur gléno-humérales progressives avec craquements et perte d amplitude."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "triceps",
+        "trapezius"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "glenohumeral-joint",
+          "humerus-head",
+          "glenoid-labrum"
+        ]
+      },
+      "symptoms": [
+        "hpo:0002829",
+        "local:restricted-motion",
+        "hpo:0012532"
+      ],
+      "redFlags": {
+        "ar": "ألم ليلي شديد مستمر أو فقدان مفاجئ للحركة - راجع الطبيب.",
+        "en": "Severe persistent night pain or sudden loss of movement - seek medical review.",
+        "fr": "Douleur nocturne sévère ou perte brutale de mobilité - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/shoulderosteoarthritis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - shoulderosteoarthritis.html",
+          "url": "https://medlineplus.gov/shoulderosteoarthritis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:clavicle-fracture",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "S42.0",
+      "batch": "E",
+      "name": {
+        "ar": "كسر الترقوة",
+        "en": "Fracture of the clavicle",
+        "fr": "Fracture de la clavicule"
+      },
+      "summary": {
+        "ar": "ألم وتورّم وتشوّه في منتصف الترقوة بعد السقوط على الكتف أو على اليد الممدودة.",
+        "en": "Pain, swelling, and deformity over the middle of the clavicle after a fall onto the shoulder or outstretched hand.",
+        "fr": "Douleur, œdème et déformation de la clavicule après chute sur l épaule ou sur la main."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "chest",
+        "trapezius"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "clavicle",
+          "sc-joint",
+          "ac-joint"
+        ]
+      },
+      "symptoms": [
+        "hpo:0002653",
+        "hpo:0001386",
+        "hpo:0012531",
+        "local:restricted-motion"
+      ],
+      "redFlags": {
+        "ar": "خدر أو ضعف أو شحوب في الذراع (قد يكون إصابة وعائية أو عصبية)، أو بروز جلد تحت الكسر - طوارئ.",
+        "en": "Numbness, weakness, or pallor of the arm (possible vascular or nerve injury), or skin tenting - emergency.",
+        "fr": "Engourdissement, faiblesse ou pâleur du bras (atteinte vasculo-nerveuse), ou peau tendue - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/claviclefracture.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - claviclefracture.html",
+          "url": "https://medlineplus.gov/claviclefracture.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:ac-joint-dislocation",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "S43.1",
+      "batch": "E",
+      "name": {
+        "ar": "انخلاع المفصل الأخرمي الترقوي",
+        "en": "Subluxation and dislocation of the acromioclavicular joint",
+        "fr": "Luxation acromio-claviculaire"
+      },
+      "summary": {
+        "ar": "ألم مباشر أعلى الكتف مع بروز عظمي واضح بعد السقوط على الكتف، ويزيد بتحريك الذراع عبر الجسم.",
+        "en": "Direct pain on top of the shoulder with a visible bony step after a fall onto the shoulder, worse moving the arm across the body.",
+        "fr": "Douleur au sommet de l épaule avec saillie osseuse après une chute, aggravée par l adduction."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "trapezius",
+        "chest"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "ac-joint",
+          "clavicle",
+          "scapula"
+        ]
+      },
+      "symptoms": [
+        "hpo:0001386",
+        "hpo:0012531",
+        "local:restricted-motion"
+      ],
+      "redFlags": {
+        "ar": "بروز عظمي واضح مع ألم شديد أو خدر في الذراع - راجع عاجلًا.",
+        "en": "Marked bony deformity with severe pain or arm numbness - urgent review.",
+        "fr": "Déformation osseuse marquée avec douleur sévère ou engourdissement - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/shoulderdislocation.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - shoulderdislocation.html",
+          "url": "https://medlineplus.gov/shoulderdislocation.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:brachial-plexus-injury",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "G54.0",
+      "batch": "E",
+      "name": {
+        "ar": "إصابة الضفيرة العضدية",
+        "en": "Brachial plexus disorders",
+        "fr": "Atteinte du plexus brachial"
+      },
+      "summary": {
+        "ar": "ضعف وتنميل في الذراع واليد بعد شدّ عنيف للكتف أو إصابة، بحسب جذور الضفيرة المصابة.",
+        "en": "Weakness and numbness of the arm and hand after forceful traction on the shoulder or trauma, depending on the affected roots.",
+        "fr": "Faiblesse et paresthésies du bras après traction violente de l épaule ou traumatisme."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "triceps",
+        "biceps",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "brachial-plexus",
+          "axillary-nerve",
+          "axillary-artery"
+        ]
+      },
+      "symptoms": [
+        "hpo:0001324",
+        "hpo:0003401",
+        "local:hand-clumsiness"
+      ],
+      "redFlags": {
+        "ar": "ضعف مفاجئ أو شلل بعد إصابة، أو ضعف في التنفس مع إصابة الرقبة - طوارئ.",
+        "en": "Sudden weakness or paralysis after injury, or breathing difficulty with a neck injury - emergency.",
+        "fr": "Faiblesse brutale ou paralysie après traumatisme, ou dyspnée - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/brachialplexusinjuries.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - brachialplexusinjuries.html",
+          "url": "https://medlineplus.gov/brachialplexusinjuries.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:polymyalgia-rheumatica",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M35.3",
+      "batch": "E",
+      "name": {
+        "ar": "الروماتيزم العضلي الالتهابي",
+        "en": "Polymyalgia rheumatica",
+        "fr": "Pseudo-polyarthrite rhizomélique"
+      },
+      "summary": {
+        "ar": "ألم وتيبّس صباحي في الكتفين والوركين لدى من تجاوز الخمسين، مع تعب عام وارتفاع مؤشرات الالتهاب.",
+        "en": "Morning pain and stiffness of the shoulders and hips in people over 50, with fatigue and raised inflammatory markers.",
+        "fr": "Douleur et raideur matinales des épaules et des hanches après 50 ans, avec fatigue et inflammation biologique."
+      },
+      "muscleGroups": [
+        "deltoids",
+        "gluteal",
+        "trapezius",
+        "quadriceps"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "back"
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": [
+          "glenohumeral-joint",
+          "rotator-cuff",
+          "hip-joint"
+        ]
+      },
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829",
+        "local:restricted-motion",
+        "hpo:0012532"
+      ],
+      "redFlags": {
+        "ar": "صداع جديد مع ألم في الفك أو تشوّش رؤية أو ألم عند مضغ الطعام - احتمال التهاب الشريان الصدغي، طوارئ (خطر فقدان البصر).",
+        "en": "New headache with jaw pain, visual disturbance, or pain when chewing - possible giant cell arteritis, an emergency (risk of vision loss).",
+        "fr": "Céphalée nouvelle avec douleur mandibulaire, trouble visuel ou claudication masticatoire - artérite à cellules géantes, urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/polymyalgiarheumatica.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - polymyalgiarheumatica.html",
+          "url": "https://medlineplus.gov/polymyalgiarheumatica.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "diffuse": true,
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:greater-trochanteric-pain",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M70.6",
+      "batch": "F",
+      "name": {
+        "ar": "ألم المدور الكبير (التهاب الجراب المدوري)",
+        "en": "Trochanteric bursitis",
+        "fr": "Bursite trochantérienne"
+      },
+      "summary": {
+        "ar": "ألم على الجانب الخارجي للورك يزيد بالاستلقاء على الجانب وبصعود الدرج والمشي الطويل.",
+        "en": "Pain on the outer side of the hip, worse lying on that side, climbing stairs, and walking long distances.",
+        "fr": "Douleur latérale de la hanche, aggravée en décubitus latéral et dans les escaliers."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "quadriceps",
+        "lower-back"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "hip",
+        "structures": [
+          "greater-trochanter",
+          "hip-bursae",
+          "gluteus-medius"
+        ]
+      },
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0002829",
+        "hpo:0001288"
+      ],
+      "redFlags": {
+        "ar": "ألم مع حرارة واحمرار، أو عجز عن حمل الوزن، أو ألم ليلي مستمر - راجع الطبيب.",
+        "en": "Pain with fever and redness, inability to bear weight, or persistent night pain - seek medical review.",
+        "fr": "Douleur avec fièvre et rougeur, impossibilité d appui, ou douleur nocturne - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/bursitis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - bursitis.html",
+          "url": "https://medlineplus.gov/bursitis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:gluteal-tendinopathy",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M76.0",
+      "batch": "F",
+      "name": {
+        "ar": "اعتلال أوتار الألوية",
+        "en": "Gluteal tendinopathy",
+        "fr": "Tendinopathie fessière"
+      },
+      "summary": {
+        "ar": "ألم على الجانب الخارجي للورك مع ضعف في تثبيت الحوض عند الوقوف على قدم واحدة.",
+        "en": "Pain on the outer hip with weak pelvic stabilisation when standing on one leg.",
+        "fr": "Douleur latérale de hanche avec faiblesse de stabilisation pelvienne en appui unipodal."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "quadriceps",
+        "adductors"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "hip",
+        "structures": [
+          "gluteus-medius",
+          "greater-trochanter",
+          "hip-bursae"
+        ]
+      },
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0001324",
+        "hpo:0002829"
+      ],
+      "redFlags": {
+        "ar": "ألم مع حرارة واحمرار، أو عجز كامل عن حمل الوزن - راجع الطبيب.",
+        "en": "Pain with fever and redness, or complete inability to bear weight - seek medical review.",
+        "fr": "Douleur avec fièvre et rougeur, ou impossibilité totale d appui - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hipinjuriesanddisorders.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - hipinjuriesanddisorders.html",
+          "url": "https://medlineplus.gov/hipinjuriesanddisorders.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:hip-osteoarthritis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M16.9",
+      "batch": "F",
+      "name": {
+        "ar": "الفصال العظمي في الورك",
+        "en": "Osteoarthritis of the hip",
+        "fr": "Coxarthrose"
+      },
+      "summary": {
+        "ar": "ألم في الأربية وطرف الفخذ يزيد بالمشي ويصحبه تصلّب صباحي قصير ومحدودية في الدوران الداخلي.",
+        "en": "Groin and thigh pain worse with walking, with brief morning stiffness and limited internal rotation.",
+        "fr": "Douleur de l aine et de la cuisse à la marche, avec raideur matinale brève et rotation interne limitée."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "quadriceps",
+        "hamstring",
+        "adductors"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "hip",
+        "structures": [
+          "hip-joint",
+          "acetabulum",
+          "femoral-head",
+          "hip-labrum"
+        ]
+      },
+      "symptoms": [
+        "local:groin-hip-pain",
+        "hpo:0002829",
+        "local:restricted-motion",
+        "hpo:0001288"
+      ],
+      "redFlags": {
+        "ar": "ألم ليلي شديد أو عجز كامل عن حمل الوزن أو فقدان مفاجئ للحركة - راجع الطبيب.",
+        "en": "Severe night pain, complete inability to bear weight, or sudden loss of movement - seek medical review.",
+        "fr": "Douleur nocturne sévère, impossibilité d appui, ou perte brutale de mobilité - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hiposteoarthritis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - hiposteoarthritis.html",
+          "url": "https://medlineplus.gov/hiposteoarthritis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:sciatica",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M54.3",
+      "batch": "F",
+      "name": {
+        "ar": "عرق النسا (ألم العصب الوركي)",
+        "en": "Sciatica",
+        "fr": "Sciatique"
+      },
+      "summary": {
+        "ar": "ألم ينتشر من أسفل الظهر عبر الألية والفخذ إلى الساق والقدم بحسب الجذر المصاب، غالبًا مع تنميل.",
+        "en": "Pain radiating from the low back through the buttock and thigh into the leg and foot along an affected root, often with numbness.",
+        "fr": "Douleur lombo-fessière irradiant à la jambe selon le territoire radiculaire, avec paresthésies."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "hamstring",
+        "lower-back",
+        "calves"
+      ],
+      "regions": [
+        "lower_limb",
+        "back"
+      ],
+      "taxonomy": {
+        "subRegion": "hip",
+        "structures": [
+          "sciatic-nerve",
+          "sciatic-nerve-thigh",
+          "lumbar-roots"
+        ]
+      },
+      "symptoms": [
+        "local:arm-radiating-pain",
+        "hpo:0003401",
+        "hpo:0003418",
+        "hpo:0001324"
+      ],
+      "redFlags": {
+        "ar": "فقدان سيطرة على البول أو البراز، خدر منطقة السرج، أو ضعف متزايد في الساق - طوارئ فورية.",
+        "en": "Loss of bladder or bowel control, saddle numbness, or progressive leg weakness - emergency.",
+        "fr": "Perte du contrôle sphinctérien, anesthésie en selle, ou faiblesse croissante - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/sciatica.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - sciatica.html",
+          "url": "https://medlineplus.gov/sciatica.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:avascular-necrosis-hip",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M87.0",
+      "batch": "F",
+      "name": {
+        "ar": "تَنخّر رأس الفخذ (الموت العظمي الإسفنجي)",
+        "en": "Avascular necrosis of the femoral head",
+        "fr": "Nécrose aseptique de la tête fémorale"
+      },
+      "summary": {
+        "ar": "ألم تدريجي في الأربية وعمق الورك يزداد بحمل الوزن، ويظهر بلا إصابة واضحة أو بعد علاج بالكورتيزون.",
+        "en": "Gradual groin and deep hip pain worsening with weight-bearing, appearing without clear injury or after steroid therapy.",
+        "fr": "Douleur progressive de l aine et de la hanche à l appui, sans traumatisme évident ou après corticoïdes."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "quadriceps",
+        "adductors"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "hip",
+        "structures": [
+          "femoral-head",
+          "femoral-neck",
+          "hip-joint"
+        ]
+      },
+      "symptoms": [
+        "local:groin-hip-pain",
+        "hpo:0002653",
+        "hpo:0012531",
+        "local:limp"
+      ],
+      "redFlags": {
+        "ar": "ألم متزايد مع عجز عن حمل الوزن أو تدهور سريع في المشي - تقييم عاجل بالتصوير؛ التأخير يزيد خطر الانهيار.",
+        "en": "Increasing pain with inability to bear weight or rapid decline in walking - urgent imaging; delay increases collapse risk.",
+        "fr": "Douleur croissante avec impossibilité d appui ou dégradation rapide - imagerie urgente."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/avascularnecrosis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - avascularnecrosis.html",
+          "url": "https://medlineplus.gov/avascularnecrosis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:femoral-neck-fracture",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "S72.0",
+      "batch": "F",
+      "name": {
+        "ar": "كسر عنق الفخذ",
+        "en": "Fracture of the neck of the femur",
+        "fr": "Fracture du col fémoral"
+      },
+      "summary": {
+        "ar": "ألم في الأربية بعد السقوط، مع قِصر الساق ودورانها للخارج وعدم القدرة على حمل الوزن.",
+        "en": "Groin pain after a fall with a shortened, externally rotated leg and inability to bear weight.",
+        "fr": "Douleur de l aine après chute, jambe raccourcie et en rotation externe, impossibilité d appui."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "quadriceps",
+        "hamstring",
+        "adductors"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "hip",
+        "structures": [
+          "femoral-neck",
+          "femoral-head",
+          "acetabulum",
+          "hip-joint"
+        ]
+      },
+      "symptoms": [
+        "local:limp",
+        "local:groin-hip-pain",
+        "hpo:0002653",
+        "local:restricted-motion"
+      ],
+      "redFlags": {
+        "ar": "عدم القدرة على حمل الوزن بعد السقوط مع قِصر الساق أو دورانها للخارج - طوارئ؛ لا تحاول تحريك المصاب فورًا.",
+        "en": "Inability to bear weight after a fall with a shortened or externally rotated leg - emergency; do not force movement.",
+        "fr": "Impossibilité d appui après chute avec jambe raccourcie ou en rotation externe - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hipfracture.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - hipfracture.html",
+          "url": "https://medlineplus.gov/hipfracture.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:it-band-syndrome",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M76.3",
+      "batch": "F",
+      "name": {
+        "ar": "متلازمة الشريط الظنبوبي",
+        "en": "Iliotibial band syndrome",
+        "fr": "Syndrome de la bandelette ilio-tibiale"
+      },
+      "summary": {
+        "ar": "ألم حارق على الجانب الخارجي للفخذ وينزل إلى ما فوق الركبة، يزيد بالجري أو ركوب الدراجة.",
+        "en": "Burning pain on the outer thigh extending to just above the knee, worse with running or cycling.",
+        "fr": "Douleur brûlante latérale de la cuisse jusqu en sus-condylien, aggravée à la course ou au vélo."
+      },
+      "muscleGroups": [
+        "quadriceps",
+        "gluteal",
+        "hamstring"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "thigh",
+        "structures": [
+          "it-band",
+          "tfl",
+          "distal-femur"
+        ]
+      },
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0002829",
+        "hpo:0001288"
+      ],
+      "redFlags": {
+        "ar": "تورّم مع احمرار وحرارة أو عجز عن حمل الوزن - راجع الطبيب.",
+        "en": "Swelling with redness and heat, or inability to bear weight - seek medical review.",
+        "fr": "Gonflement avec rougeur et chaleur, ou impossibilité d appui - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/iliotibialbandsyndrome.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - iliotibialbandsyndrome.html",
+          "url": "https://medlineplus.gov/iliotibialbandsyndrome.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:thigh-contusion",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "S70.1",
+      "batch": "F",
+      "name": {
+        "ar": "رضّ (كدمة) الفخذ",
+        "en": "Contusion of the thigh",
+        "fr": "Contusion de la cuisse"
+      },
+      "summary": {
+        "ar": "ألم موضعي وتورّم وتغيّر لون الجلد في الفخذ بعد ارتطام مباشر، يزيد بالحركة والضغط.",
+        "en": "Localized thigh pain, swelling, and bruising after a direct blow, worse with movement and pressure.",
+        "fr": "Douleur localisée, œdème et ecchymose de la cuisse après un choc direct."
+      },
+      "muscleGroups": [
+        "quadriceps",
+        "hamstring"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "thigh",
+        "structures": [
+          "quadriceps",
+          "femur-shaft",
+          "it-band"
+        ]
+      },
+      "symptoms": [
+        "hpo:0012531",
+        "hpo:0001386",
+        "hpo:0000988"
+      ],
+      "redFlags": {
+        "ar": "تورّم متزايد مع ألم شديد متصلّب في الفخذ (قد يعني متلازمة الحيز) أو عجز عن تحريك القدم - طوارئ.",
+        "en": "Rapidly increasing swelling with severe taut thigh pain (possible compartment syndrome) or inability to move the foot - emergency.",
+        "fr": "Œdème croissant avec douleur tendue (syndrome de loge possible) ou impossibilité de bouger le pied - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/thighinjuries.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - thighinjuries.html",
+          "url": "https://medlineplus.gov/thighinjuries.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:hip-labral-tear",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M24.15",
+      "batch": "F",
+      "name": {
+        "ar": "تمزّق شفة الحق (تمزّق غضروف الورك)",
+        "en": "Acetabular labral tear of the hip",
+        "fr": "Déchirure du labrum acétabulaire"
+      },
+      "summary": {
+        "ar": "ألم معمّق في الأربية مع طقطقة أو احتكاك أو إحساس بعدم ثبات الورك عند اللف.",
+        "en": "Deep groin pain with clicking, catching, or a feeling of instability of the hip when twisting.",
+        "fr": "Douleur profonde de l aine avec ressaut ou instabilité à la rotation."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "quadriceps",
+        "adductors"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "hip",
+        "structures": [
+          "hip-labrum",
+          "acetabulum",
+          "femoral-head",
+          "hip-joint"
+        ]
+      },
+      "symptoms": [
+        "local:groin-hip-pain",
+        "hpo:0012531",
+        "local:restricted-motion"
+      ],
+      "redFlags": {
+        "ar": "قفل أو عدم ثبات شديد، أو ألم يمنع حمل الوزن - راجع الطبيب.",
+        "en": "Locking or marked instability, or pain preventing weight-bearing - seek medical review.",
+        "fr": "Blocage ou instabilité marquée, ou douleur empêchant l appui - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hiplabraltear.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - hiplabraltear.html",
+          "url": "https://medlineplus.gov/hiplabraltear.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:recurrent-hip-dislocation",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M24.45",
+      "batch": "F",
+      "name": {
+        "ar": "الانخلاع المتكرر لمفصل الورك",
+        "en": "Recurrent dislocation of the hip joint",
+        "fr": "Luxation récidivante de la hanche"
+      },
+      "summary": {
+        "ar": "خروج متكرر لرأس الفخذ من الحق مع ألم حاد وفقدان مؤقت للحركة، غالبًا بعد خلع سابق أو إصابة.",
+        "en": "Repeated displacement of the femoral head from the socket with acute pain and temporary loss of movement, usually after a prior dislocation or injury.",
+        "fr": "Luxation répétée de la tête fémorale avec douleur aiguë et perte temporaire de mobilité."
+      },
+      "muscleGroups": [
+        "gluteal",
+        "quadriceps",
+        "hamstring"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "hip",
+        "structures": [
+          "hip-joint",
+          "femoral-head",
+          "acetabulum",
+          "hip-labrum"
+        ]
+      },
+      "symptoms": [
+        "local:restricted-motion",
+        "hpo:0012531",
+        "local:limp"
+      ],
+      "redFlags": {
+        "ar": "خلع مؤكد مع تشوّه واضح أو عدم قدرة على تحريك الورك، أو خدر في القدم - طوارئ (قد يتضرر العصب الوركي).",
+        "en": "Confirmed dislocation with visible deformity or inability to move the hip, or foot numbness - emergency (risk of sciatic nerve injury).",
+        "fr": "Luxation confirmée avec déformation ou impossibilité de mobiliser, ou engourdissement du pied - urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hipdislocation.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - hipdislocation.html",
+          "url": "https://medlineplus.gov/hipdislocation.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Note": "M24.45 هو التصنيف الأبوي للانخلاع المتكرر في الورك؛ الكود الفرعي المُتحقَّق منه هو M24.451 (الورك الأيمن).",
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:meralgia-paresthetica",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "G57.1",
+      "batch": "F",
+      "name": {
+        "ar": "التنميل الجلدي الفخذي (ألم ميرالجيا)",
+        "en": "Meralgia paresthetica",
+        "fr": "Méralgie paresthésique"
+      },
+      "summary": {
+        "ar": "خدر وحرقان ولسعة في الجانب الخارجي للفخذ بسبب انضغاط العصب الجلدي الوحشي عند الرباط الأربي.",
+        "en": "Numbness, burning, and stinging on the outer thigh from compression of the lateral cutaneous nerve at the inguinal ligament.",
+        "fr": "Engourdissement et brûlure de la face externe de la cuisse par compression du nerf cutané latéral."
+      },
+      "muscleGroups": [
+        "quadriceps",
+        "gluteal",
+        "adductors"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "thigh",
+        "structures": [
+          "lateral-cutaneous-thigh-nerve",
+          "tfl",
+          "femoral-triangle"
+        ]
+      },
+      "symptoms": [
+        "local:lateral-thigh-numbness",
+        "hpo:0003401",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "ضعف في الساق، أو ضعف في الجهة الأخرى، أو ألم لا يتحسّن - راجع الطبيب.",
+        "en": "Leg weakness, involvement of the other side, or pain that does not improve - seek medical review.",
+        "fr": "Faiblesse de la jambe, atteinte controlatérale, ou douleur persistante - consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/meralgiaparesthetica.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - meralgiaparesthetica.html",
+          "url": "https://medlineplus.gov/meralgiaparesthetica.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:deep-vein-thrombosis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "I80.2",
+      "batch": "F",
+      "name": {
+        "ar": "الجلطة الوريدية العميقة في الفخذ",
+        "en": "Deep vein thrombosis of the lower extremity",
+        "fr": "Thrombose veineuse profonde"
+      },
+      "summary": {
+        "ar": "تورّم في ساق واحدة أو الفخذ مع ألم ودفء واحمرار، يزيد بالوقوف ويخفّ بالرفع.",
+        "en": "One-sided leg or thigh swelling with pain, warmth, and redness, worse on standing and better when elevated.",
+        "fr": "Gonflement unilatéral de la jambe ou de la cuisse avec douleur, chaleur et rougeur."
+      },
+      "muscleGroups": [
+        "quadriceps",
+        "hamstring",
+        "calves"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "thigh",
+        "structures": [
+          "femoral-triangle",
+          "adductor-canal",
+          "profunda-femoris-artery"
+        ]
+      },
+      "symptoms": [
+        "local:limb-swelling-warmth",
+        "hpo:0012531",
+        "hpo:0001386"
+      ],
+      "redFlags": {
+        "ar": "ضيق نفس أو ألم صدر أو سعال دموي مع تورّم الساق - جلطة انتقلت للرئة، طوارئ فورية.",
+        "en": "Breathlessness, chest pain, or blood-streaked cough with leg swelling - clot in the lung, emergency.",
+        "fr": "Dyspnée, douleur thoracique ou hémoptysie avec œdème - embolie pulmonaire, urgence."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/deepveinthrombosis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - deepveinthrombosis.html",
+          "url": "https://medlineplus.gov/deepveinthrombosis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
+    },
+    {
+      "id": "local:thigh-cellulitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "L03.90",
+      "batch": "F",
+      "name": {
+        "ar": "التهاب النسيج الخلوي في الفخذ",
+        "en": "Cellulitis of the thigh",
+        "fr": "Cellulite infectieuse de la cuisse"
+      },
+      "summary": {
+        "ar": "منطقة حمراء ساخنة ومتورّمة ومؤلمة في الفخذ تتوسّع تدريجيًا مع حرارة وإرهاق.",
+        "en": "A red, hot, swollen, painful area on the thigh that spreads gradually with fever and malaise.",
+        "fr": "Zone rouge, chaude, œdémateuse et douloureuse de la cuisse s étendant avec fièvre."
+      },
+      "muscleGroups": [
+        "quadriceps",
+        "hamstring",
+        "gluteal"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "taxonomy": {
+        "subRegion": "thigh",
+        "structures": [
+          "quadriceps",
+          "femur-shaft"
+        ]
+      },
+      "symptoms": [
+        "hpo:0000988",
+        "local:limb-swelling-warmth",
+        "hpo:0001945",
+        "hpo:0012531"
+      ],
+      "redFlags": {
+        "ar": "خطوط حمراء تمتد في الطرف، حرارة عالية، أو ألم شديد مع اسمرار الجلد - مراجعة عاجلة (عدوى نسيجية منتشرة).",
+        "en": "Red streaks spreading along the limb, high fever, or severe pain with duskiness - urgent review (spreading soft-tissue infection).",
+        "fr": "Traînées rouges, fièvre élevée, ou douleur sévère avec aspect livide - avis urgent."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/cellulitis.html",
+      "sources": [
+        {
+          "title": "MedlinePlus (NLM) - cellulitis.html",
+          "url": "https://medlineplus.gov/cellulitis.html"
+        },
+        {
+          "title": "ICD-10-CM (WHO/CDC)",
+          "url": "https://www.cdc.gov/nchs/icd/icd-10-cm.htm"
+        }
+      ],
+      "icd10Status": "verified"
     }
   ]
 }

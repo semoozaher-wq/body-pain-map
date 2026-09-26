@@ -1445,6 +1445,308 @@
         "en": "Local in-app term, pending verified HPO/SNOMED mapping; no code was invented.",
         "fr": "Terme local de l application, en attente d une correspondance HPO/SNOMED vérifiée."
       }
+    },
+    {
+      "id": "local:arm-radiating-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم ينتشر من الرقبة إلى الذراع",
+        "en": "Neck pain radiating into the arm",
+        "fr": "Douleur cervicale irradiant au bras"
+      },
+      "description": {
+        "ar": "ألم يبدأ في الرقبة أو الكتف ويمتد إلى الذراع أو اليد.",
+        "en": "Pain starting in the neck or shoulder and extending into the arm or hand.",
+        "fr": "Douleur partant de la nuque ou de l épaule et descendant dans le bras."
+      },
+      "regions": [
+        "head_neck",
+        "upper_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:hand-clumsiness",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تراجع المهارات الدقيقة في اليد",
+        "en": "Loss of fine hand dexterity",
+        "fr": "Perte de dextérité fine"
+      },
+      "description": {
+        "ar": "صعوبة في الأزرار أو الكتابة أو إسقاط الأشياء من اليد.",
+        "en": "Difficulty with buttons or writing, or dropping objects from the hand.",
+        "fr": "Difficulté avec les boutons ou l écriture, ou chute d objets."
+      },
+      "regions": [
+        "head_neck",
+        "upper_limb"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:gait-unsteadiness",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "عدم ثبات في المشي",
+        "en": "Unsteady gait",
+        "fr": "Démarche instable"
+      },
+      "description": {
+        "ar": "إحساس بعدم التوازن أو تعثّر متكرر أثناء المشي.",
+        "en": "A sense of imbalance or frequent tripping while walking.",
+        "fr": "Sensation de déséquilibre ou trébuchements fréquents."
+      },
+      "regions": [
+        "head_neck",
+        "lower_limb",
+        "back"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:shoulder-weakness",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ضعف في رفع الذراع",
+        "en": "Arm elevation weakness",
+        "fr": "Faiblesse d élévation du bras"
+      },
+      "description": {
+        "ar": "ضعف في رفع الذراع فوق مستوى الكتف.",
+        "en": "Weakness lifting the arm above shoulder level.",
+        "fr": "Faiblesse pour lever le bras au-dessus de l épaule."
+      },
+      "regions": [
+        "upper_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:night-pain-shoulder",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم كتف يوقظك ليلًا",
+        "en": "Night pain in the shoulder",
+        "fr": "Douleur nocturne de l épaule"
+      },
+      "description": {
+        "ar": "ألم في الكتف يزداد بالاستلقاء ويوقظك من النوم.",
+        "en": "Shoulder pain that worsens when lying down and wakes you at night.",
+        "fr": "Douleur de l épaule aggravée en position couchée, réveillant la nuit."
+      },
+      "regions": [
+        "upper_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:restricted-motion",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "محدودية في مدى حركة المفصل",
+        "en": "Restricted joint movement",
+        "fr": "Limitation de mobilité articulaire"
+      },
+      "description": {
+        "ar": "انخفاض مدى الحركة الطبيعية للمفصل.",
+        "en": "Reduced range of motion of the joint.",
+        "fr": "Réduction de l amplitude articulaire."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "head_neck"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:lateral-thigh-numbness",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "خدر وحرقان في الجانب الوحشي للفخذ",
+        "en": "Lateral thigh numbness and burning",
+        "fr": "Engourdissement de la face latérale de la cuisse"
+      },
+      "description": {
+        "ar": "خدر أو حرقان أو لسعة في الوجه الخارجي للفخذ.",
+        "en": "Numbness, burning, or stinging on the outer thigh.",
+        "fr": "Engourdissement ou brûlure de la face externe de la cuisse."
+      },
+      "regions": [
+        "lower_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:groin-hip-pain",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "ألم في الأربية أو الورك",
+        "en": "Groin or hip pain",
+        "fr": "Douleur de l aine ou de la hanche"
+      },
+      "description": {
+        "ar": "ألم في الأربية أو عمق الورك، وقد يمتد للفخذ.",
+        "en": "Pain in the groin or deep hip, sometimes radiating to the thigh.",
+        "fr": "Douleur de l aine ou profonde de la hanche, parfois irradiée."
+      },
+      "regions": [
+        "lower_limb",
+        "torso_front"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:limp",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "عرج أو عدم القدرة على حمل الوزن",
+        "en": "Limp or inability to bear weight",
+        "fr": "Boiterie ou impossibilité d appui"
+      },
+      "description": {
+        "ar": "عرج أو رفض حمل الوزن على الساق.",
+        "en": "Limping or refusal to bear weight on the leg.",
+        "fr": "Boiterie ou refus d appui sur la jambe."
+      },
+      "regions": [
+        "lower_limb"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:limb-swelling-warmth",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "تورّم ودفء في الطرف",
+        "en": "Limb swelling with warmth",
+        "fr": "Gonflement du membre avec chaleur"
+      },
+      "description": {
+        "ar": "تورّم في الطرف مع دفء أو احمرار أو ألم عند اللمس.",
+        "en": "Swelling of the limb with warmth, redness, or tenderness.",
+        "fr": "Gonflement du membre avec chaleur, rougeur ou douleur."
+      },
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": true,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:thyroid-neck-lump",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "كتلة في الرقبة تتحرك مع البلع",
+        "en": "Neck lump moving with swallowing",
+        "fr": "Masse cervicale mobilisée à la déglutition"
+      },
+      "description": {
+        "ar": "كتلة في مقدمة الرقبة تتحرك مع البلع، قد تصحبها بحة أو ضغط.",
+        "en": "A lump at the front of the neck that moves with swallowing, sometimes with hoarseness or pressure.",
+        "fr": "Masse antérieure du cou mobilisée à la déglutition, parfois avec enrouement."
+      },
+      "regions": [
+        "head_neck"
+      ],
+      "redFlag": [
+        "head_neck"
+      ],
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
+    },
+    {
+      "id": "local:zoster-rash",
+      "hpo": null,
+      "ontologyStatus": "local",
+      "name": {
+        "ar": "طفح حويصلي مؤلم على مسار عصبي",
+        "en": "Painful blistering rash along a nerve",
+        "fr": "Éruption vésiculeuse douloureuse"
+      },
+      "description": {
+        "ar": "طفح حويصلي مؤلم يظهر على شريط جانبي واحد من الجسم.",
+        "en": "A painful blistering rash on one side of the body.",
+        "fr": "Éruption vésiculeuse douloureuse unilatérale."
+      },
+      "regions": [
+        "head_neck",
+        "torso_front",
+        "back",
+        "upper_limb",
+        "lower_limb"
+      ],
+      "redFlag": false,
+      "ontologyNote": {
+        "ar": "مصطلح محلي بانتظار الربط بكود HPO/SNOMED مُتحقَّق منه؛ لم يُختَرع كود.",
+        "en": "Local term pending verified HPO/SNOMED mapping; no code invented.",
+        "fr": "Terme local en attente de correspondance vérifiée."
+      }
     }
   ]
 }
