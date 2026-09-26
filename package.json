@@ -50,7 +50,9 @@
     "test:e2e": "node scripts/e2e-smoke.cjs",
     "build:ios:bundle": "expo export --platform ios --output-dir build/ios",
     "build:android:bundle": "expo export --platform android --output-dir build/android",
-    "validate:medical-library": "node scripts/validate-medical-library.js"
+    "validate:medical-library": "node scripts/validate-medical-library.js",
+    "generate:taxonomy": "node scripts/generate-region-taxonomy.js",
+    "generate:regional-library": "node scripts/generate-regional-library.js && node scripts/generate-regional-library-2.js"
   },
   "private": true,
   "engines": {

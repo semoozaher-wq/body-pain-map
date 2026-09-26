@@ -1,17 +1,28 @@
-BodyMap Pain - Regional Medical Library Batch 1 (2026-09-26)
-packaged_files=13
+bodymap-anatomy-taxonomy-update — 2026-09-26
+الملفات المتغيّرة/المضافة فقط
 
-path                                                      bytes  sha256
-data/medical/regionalConditions.json                      80741  7ef1a9e8c48db6c2
-data/medical/triageQuestions.json                         18881  56ab4e2138748993
-data/medical/symptoms.json                                51516  bb113b35c058ccea
-data/medical/sources.json                                  6198  170844f1bf85dad5
-services/medical/diseaseLibrary.ts                         7441  1a537313ae3aa6b6
-hooks/useMedicalLibrary.ts                                 3494  0bc5c6a212770d60
-components/ConditionInfoCard.tsx                           4621  841dc84136f4370f
-scripts/validate-medical-library.js                        7478  093e9f8b7dd52264
-scripts/generate-regional-library.js                      73306  1f320a99ccc57f0f
-docs/REGIONAL_LIBRARY_AR.md                                4174  d43d64149f578180
-BATCH_REGIONAL_LIBRARY_README.md                           1965  09094551a056a158
-MEDICAL_REFERENCES.md                                      6603  1f2e61643899e833
-package.json                                               2189  eeac320a552d0839
+MEDICAL_REFERENCES.md  6603 bytes  sha256:1f2e61643899e833
+components/ConditionInfoCard.tsx  4621 bytes  sha256:841dc84136f4370f
+data/medical/diseases.json  41081 bytes  sha256:3946eeef883a3a58
+data/medical/organConditions.json  26193 bytes  sha256:0a31e5644a4384d1
+data/medical/sources.json  6198 bytes  sha256:170844f1bf85dad5
+data/medical/symptoms.json  63368 bytes  sha256:7a9bd7c7f2b8efd8
+hooks/useMedicalLibrary.ts  5023 bytes  sha256:03bcbf0055d2fbaa
+package.json  2383 bytes  sha256:001d09838f7eae23
+screens/BodyPickerScreen.tsx  29015 bytes  sha256:1b608d5ea8c6e773
+services/medical/diseaseLibrary.ts  8267 bytes  sha256:5f80946a856555e1
+services/medical/index.ts  1019 bytes  sha256:1e48d42341c49a42
+BATCH_REGIONAL_LIBRARY_README.md  1965 bytes  sha256:09094551a056a158
+components/AnatomyExplorerPanel.tsx  9023 bytes  sha256:969891eb8f785dd1
+components/MedicalLibraryTabsPanel.tsx  2248 bytes  sha256:f1c77fc31991dc8b
+data/medical/regionTaxonomy.json  110586 bytes  sha256:8982381b7ab88622
+data/medical/regionalConditions.json  150833 bytes  sha256:38416208e35a25d2
+data/medical/triageQuestions.json  23846 bytes  sha256:1a60a48d825b0484
+docs/ANATOMY_GRANULARITY_AR.md  3867 bytes  sha256:03590a103121f94d
+docs/REGIONAL_LIBRARY_AR.md  4174 bytes  sha256:d43d64149f578180
+scripts/fix-and-package.js  16667 bytes  sha256:e92dc2351b6fe52c
+scripts/generate-region-taxonomy.js  24935 bytes  sha256:37c2a8032c79d70f
+scripts/generate-regional-library-2.js  50162 bytes  sha256:489e174f2bf6c5fe
+scripts/generate-regional-library.js  73306 bytes  sha256:1f320a99ccc57f0f
+scripts/validate-medical-library.js  10536 bytes  sha256:7b8c8b27d4da5559
+services/medical/regionTaxonomy.ts  4696 bytes  sha256:756e3b261cfac3b7
