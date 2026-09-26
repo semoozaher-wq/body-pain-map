@@ -10,6 +10,8 @@ import { AcupressurePanel } from '../components/AcupressurePanel';
 import { IllustratedBodyMap } from '../components/IllustratedBodyMap';
 import { WebBodySilhouette } from '../components/WebBodySilhouette';
 import { NaturalReliefPanel } from '../components/NaturalReliefPanel';
+import { MedicalLibraryPanel } from '../components/MedicalLibraryPanel';
+import { DrugLookupPanel } from '../components/DrugLookupPanel';
 import type { BodyView, Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
 import cleanData from '../data/cleanData';
@@ -93,6 +95,8 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   const [showOrganMode, setShowOrganMode] = useState(false);
   const [showAcupressureMode, setShowAcupressureMode] = useState(false);
   const [showNaturalReliefMode, setShowNaturalReliefMode] = useState(false);
+  const [showMedicalLibraryMode, setShowMedicalLibraryMode] = useState(false);
+  const [showDrugLookupMode, setShowDrugLookupMode] = useState(false);
   const [bodyViewMode, setBodyViewMode] = useState<'illustration' | 'detailed'>('illustration');
   const [quickGuide, setQuickGuide] = useState<(typeof quickGuides)[number]>('neck');
 
@@ -182,18 +186,20 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
       ) : (
         <>
           <View style={styles.modeToggle}>
-            <ModeButton title={t('bodyPicker.muscles')} selected={!showOrganMode && !showAcupressureMode && !showNaturalReliefMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(false); }} />
-            <ModeButton title={t('bodyPicker.organs')} selected={showOrganMode} onPress={() => { setShowOrganMode(true); setShowAcupressureMode(false); setShowNaturalReliefMode(false); }} />
-            <ModeButton title={t('bodyPicker.acupressure')} selected={showAcupressureMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(true); setShowNaturalReliefMode(false); }} />
-            <ModeButton title={t('bodyPicker.naturalRelief')} selected={showNaturalReliefMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(true); }} />
+            <ModeButton title={t('bodyPicker.muscles')} selected={!showOrganMode && !showAcupressureMode && !showNaturalReliefMode && !showMedicalLibraryMode && !showDrugLookupMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(false); setShowDrugLookupMode(false); }} />
+            <ModeButton title={t('bodyPicker.organs')} selected={showOrganMode} onPress={() => { setShowOrganMode(true); setShowAcupressureMode(false); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(false); setShowDrugLookupMode(false); }} />
+            <ModeButton title={t('bodyPicker.acupressure')} selected={showAcupressureMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(true); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(false); setShowDrugLookupMode(false); }} />
+            <ModeButton title={t('bodyPicker.naturalRelief')} selected={showNaturalReliefMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(true); setShowMedicalLibraryMode(false); setShowDrugLookupMode(false); }} />
+            <ModeButton title={t('bodyPicker.medicalLibrary')} selected={showMedicalLibraryMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(true); setShowDrugLookupMode(false); }} />
+            <ModeButton title={t('bodyPicker.drugLookup')} selected={showDrugLookupMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(false); setShowDrugLookupMode(true); }} />
           </View>
 
-          {!showAcupressureMode && !showNaturalReliefMode && !showOrganMode && <View style={styles.toggleRow}>
+          {!showAcupressureMode && !showNaturalReliefMode && !showOrganMode && !showMedicalLibraryMode && !showDrugLookupMode && <View style={styles.toggleRow}>
             <Pressable style={[styles.toggleButton, bodyViewMode === 'illustration' && styles.activeToggle]} onPress={() => setBodyViewMode('illustration')} accessibilityRole="button" accessibilityState={{ selected: bodyViewMode === 'illustration' }}><Text style={[styles.toggleText, bodyViewMode === 'illustration' && styles.activeToggleText]}>{t('bodyPicker.visualImage')}</Text></Pressable>
             <Pressable style={[styles.toggleButton, bodyViewMode === 'detailed' && styles.activeToggle]} onPress={() => setBodyViewMode('detailed')} accessibilityRole="button" accessibilityState={{ selected: bodyViewMode === 'detailed' }}><Text style={[styles.toggleText, bodyViewMode === 'detailed' && styles.activeToggleText]}>{t('bodyPicker.detailMap')}</Text></Pressable>
           </View>}
 
-          {!showAcupressureMode && !showNaturalReliefMode && <View style={styles.toggleRow}>
+          {!showAcupressureMode && !showNaturalReliefMode && !showMedicalLibraryMode && !showDrugLookupMode && <View style={styles.toggleRow}>
             <Pressable
               style={[styles.toggleButton, gender === 'male' && styles.activeToggle]}
               onPress={() => setGender('male')}
@@ -208,7 +214,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
             ><Text style={[styles.toggleText, gender === 'female' && styles.activeToggleText]}>{t('bodyPicker.female')}</Text></Pressable>
           </View>}
 
-          {!showAcupressureMode && !showNaturalReliefMode && <View style={styles.toggleRow}>
+          {!showAcupressureMode && !showNaturalReliefMode && !showMedicalLibraryMode && !showDrugLookupMode && <View style={styles.toggleRow}>
             <Pressable
               style={[styles.toggleButton, activeView === 'front' && styles.activeToggle]}
               onPress={() => setActiveView('front')}
@@ -223,7 +229,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
             ><Text style={[styles.toggleText, activeView === 'back' && styles.activeToggleText]}>{t('bodyPicker.backView')}</Text></Pressable>
           </View>}
 
-          {showAcupressureMode ? <AcupressurePanel language={language} /> : showNaturalReliefMode ? <NaturalReliefPanel language={language} /> : showOrganMode ? (
+          {showMedicalLibraryMode ? <MedicalLibraryPanel language={language} /> : showDrugLookupMode ? <DrugLookupPanel language={language} /> : showAcupressureMode ? <AcupressurePanel language={language} /> : showNaturalReliefMode ? <NaturalReliefPanel language={language} /> : showOrganMode ? (
             <>
               <Text style={styles.helper}>{t('bodyPicker.organHint')}</Text>
               <Text style={styles.organNotice}>{t('bodyPicker.organPainNotice')}</Text>
