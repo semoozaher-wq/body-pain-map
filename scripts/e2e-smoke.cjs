@@ -34,6 +34,9 @@ let browser;
     assert.match(await page.locator('body').innerText(), /تم تسجيل المتابعة/);
 
     await page.getByText('افتح خريطة الجسم', { exact: true }).click();
+    // The web app defaults to the interactive 317-part map; switch to the
+    // image atlas before checking gender-specific image assets.
+    await page.getByText('صورة تشريحية', { exact: true }).click();
     await page.getByText('أنثى', { exact: true }).click();
     await page.waitForTimeout(250);
     const muscleSources = await page.locator('img').evaluateAll((images) => images.map((image) => image.getAttribute('src') || ''));
