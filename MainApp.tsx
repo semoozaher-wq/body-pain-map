@@ -31,6 +31,7 @@ const data = anatomyMap as unknown as AnatomyData;
 export default function App() {
   const [screen, setScreen] = useState<Screen>('welcome');
   const [quickRelief, setQuickRelief] = useState(false);
+  const [requestedOrgan, setRequestedOrgan] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedMuscleData, setSelectedMuscleData] = useState<Muscle | null>(null);
   const [intensity, setIntensity] = useState(4);
@@ -95,6 +96,13 @@ export default function App() {
       handleNavigateToDetails(muscle);
       return;
     }
+    setQuickRelief(false);
+    setScreen('body');
+  };
+
+  // يفتح العضو الداخلي الذي ذكره المساعد الذكي على خريطة الأعضاء مباشرة.
+  const openOrganFromAssistant = (organId: string) => {
+    setRequestedOrgan(organId);
     setQuickRelief(false);
     setScreen('body');
   };
@@ -228,6 +236,7 @@ export default function App() {
           language={language}
           direction={direction}
           onOpenRegion={openRegionFromAssistant}
+          onOpenOrgan={openOrganFromAssistant}
         />
       ) : (
       <ScrollView
@@ -236,8 +245,8 @@ export default function App() {
       >
         {screen === 'welcome' && (
           <WelcomeScreen
-            onStart={() => { setQuickRelief(false); setScreen('body'); }}
-            onQuickRelief={() => { setQuickRelief(true); setScreen('body'); }}
+            onStart={() => { setRequestedOrgan(null); setQuickRelief(false); setScreen('body'); }}
+            onQuickRelief={() => { setRequestedOrgan(null); setQuickRelief(true); setScreen('body'); }}
             language={language}
             direction={direction}
             history={history}
@@ -255,6 +264,7 @@ export default function App() {
             language={language}
             direction={direction}
             quickRelief={quickRelief}
+            initialOrgan={requestedOrgan}
           />
         )}
 
@@ -319,7 +329,7 @@ export default function App() {
       )}
       <View style={[styles.bottomNav, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         <NavItem icon="⌂" title={t('nav.home')} active={screen === 'welcome'} onPress={() => setScreen('welcome')} colors={colors} />
-        <NavItem icon="◎" title={t('nav.map')} active={screen === 'body' || screen === 'details' || screen === 'results'} onPress={() => { setQuickRelief(false); setScreen('body'); }} colors={colors} />
+        <NavItem icon="◎" title={t('nav.map')} active={screen === 'body' || screen === 'details' || screen === 'results'} onPress={() => { setRequestedOrgan(null); setQuickRelief(false); setScreen('body'); }} colors={colors} />
         <NavItem icon="✦" title={t('nav.assistant')} active={screen === 'assistant'} onPress={() => setScreen('assistant')} colors={colors} />
         <NavItem icon="◷" title={t('nav.history')} active={screen === 'history'} onPress={() => setScreen('history')} colors={colors} />
       </View>
