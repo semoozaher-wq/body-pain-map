@@ -231,6 +231,316 @@ export const BODY_REGIONS: RegionTerm[] = [
 ];
 
 // ---------------------------------------------------------------------------
+// 1.b) الأعضاء الداخلية (يمكن فتح العضو على خريطة الأعضاء عند توفّر نقطة له)
+// ---------------------------------------------------------------------------
+/** عضو داخلي مكتشف في كلام المستخدم. */
+export interface OrganTerm {
+  /** معرّف العضو (مفتاح organDetails.json / organId في anatomyHotspots.json). */
+  id: string;
+  /** المنطقة التشريحية المرجعية للعضو (تُستخدم لمطابقة الأمراض). */
+  region: BodyRegionKey;
+  /** هل للعضو نقطة على خريطة الأعضاء (يمكن فتحه مباشرة)؟ */
+  onMap: boolean;
+  /** الاسم المعروض بثلاث لغات. */
+  label: LocalizedText;
+  /** وصف موجز لموقع العضو بثلاث لغات. */
+  blurb: LocalizedText;
+  /** كلمات مفتاحية بكل لغة (فصحى + عامية مصرية). */
+  keywords: Record<Lang, string[]>;
+}
+
+export const ORGAN_TERMS: OrganTerm[] = [
+  {
+    id: 'heart',
+    region: 'torso_front',
+    onMap: true,
+    label: { ar: 'القلب', en: 'Heart', fr: 'Cœur' },
+    blurb: {
+      ar: 'في منتصف الصدر مائلاً قليلاً لليسار، خلف عظمة القص.',
+      en: 'In the middle of the chest, slightly to the left, behind the breastbone.',
+      fr: 'Au milieu de la poitrine, légèrement à gauche, derrière le sternum.',
+    },
+    keywords: {
+      ar: ['قلبي', 'القلب', 'قلب', 'منطقة القلب', 'عضلة القلب'],
+      en: ['heart', 'cardiac'],
+      fr: ['cœur', 'coeur', 'cardiaque'],
+    },
+  },
+  {
+    id: 'lungs',
+    region: 'torso_front',
+    onMap: true,
+    label: { ar: 'الرئتان', en: 'Lungs', fr: 'Poumons' },
+    blurb: {
+      ar: 'في الصدر على جانبي القلب، محمية بالقفص الصدري.',
+      en: 'In the chest on both sides of the heart, protected by the rib cage.',
+      fr: 'Dans la poitrine de part et d’autre du cœur, protégés par la cage thoracique.',
+    },
+    keywords: {
+      ar: ['رئتي', 'الرئة', 'الرئتين', 'رئة', 'الرئات', 'الرئه'],
+      en: ['lung', 'lungs', 'pulmonary'],
+      fr: ['poumon', 'poumons', 'pulmonaire'],
+    },
+  },
+  {
+    id: 'esophagus',
+    region: 'torso_front',
+    onMap: false,
+    label: { ar: 'المريء', en: 'Esophagus', fr: 'Œsophage' },
+    blurb: {
+      ar: 'أنبوب عضلي يصل الحلق بالمعدة، خلف القص.',
+      en: 'A muscular tube connecting the throat to the stomach, behind the breastbone.',
+      fr: 'Tube musculaire reliant la gorge à l’estomac, derrière le sternum.',
+    },
+    keywords: {
+      ar: ['المريء', 'مريئي', 'البلعوم'],
+      en: ['esophagus', 'oesophagus', 'gullet'],
+      fr: ['œsophage', 'oesophage'],
+    },
+  },
+  {
+    id: 'stomach',
+    region: 'torso_front',
+    onMap: true,
+    label: { ar: 'المعدة', en: 'Stomach', fr: 'Estomac' },
+    blurb: {
+      ar: 'في أعلى البطن يسارًا، تحت القفص الصدري.',
+      en: 'Upper-left abdomen, below the rib cage.',
+      fr: 'Partie supérieure gauche de l’abdomen, sous les côtes.',
+    },
+    keywords: {
+      ar: ['معدتي', 'المعدة', 'معدة', 'فم المعدة', 'جدار المعدة'],
+      en: ['stomach', 'gastric'],
+      fr: ['estomac', 'gastrique'],
+    },
+  },
+  {
+    id: 'liver',
+    region: 'torso_front',
+    onMap: true,
+    label: { ar: 'الكبد', en: 'Liver', fr: 'Foie' },
+    blurb: {
+      ar: 'في أعلى البطن يمينًا، تحت القفص الصدري.',
+      en: 'Upper-right abdomen, under the rib cage.',
+      fr: 'Partie supérieure droite de l’abdomen, sous les côtes.',
+    },
+    keywords: {
+      ar: ['كبدي', 'الكبد', 'كبد'],
+      en: ['liver', 'hepatic'],
+      fr: ['foie', 'hépatique', 'hepatique'],
+    },
+  },
+  {
+    id: 'gallbladder',
+    region: 'torso_front',
+    onMap: false,
+    label: { ar: 'المرارة', en: 'Gallbladder', fr: 'Vésicule biliaire' },
+    blurb: {
+      ar: 'تحت الكبد في أعلى البطن يمينًا.',
+      en: 'Under the liver in the upper-right abdomen.',
+      fr: 'Sous le foie, en haut à droite de l’abdomen.',
+    },
+    keywords: {
+      ar: ['المرارة', 'مرارتي', 'الحوصلة الصفراوية', 'حصوة مرارية'],
+      en: ['gallbladder', 'gall bladder', 'biliary'],
+      fr: ['vésicule biliaire', 'vesicule biliaire', 'biliaire'],
+    },
+  },
+  {
+    id: 'pancreas',
+    region: 'torso_front',
+    onMap: false,
+    label: { ar: 'البنكرياس', en: 'Pancreas', fr: 'Pancréas' },
+    blurb: {
+      ar: 'خلف المعدة في أعلى البطن، قريبًا من العمود الفقري.',
+      en: 'Behind the stomach in the upper abdomen, near the spine.',
+      fr: 'Derrière l’estomac, en haut de l’abdomen, près de la colonne.',
+    },
+    keywords: {
+      ar: ['البنكرياس', 'بنكرياسي'],
+      en: ['pancreas', 'pancreatic'],
+      fr: ['pancréas', 'pancreas', 'pancreatique'],
+    },
+  },
+  {
+    id: 'kidneys',
+    region: 'back',
+    onMap: true,
+    label: { ar: 'الكلى', en: 'Kidneys', fr: 'Reins' },
+    blurb: {
+      ar: 'في أعلى الظهر على جانبي العمود الفقري، خلف البطن.',
+      en: 'Upper back on both sides of the spine, behind the abdomen.',
+      fr: 'Haut du dos de part et d’autre de la colonne, derrière l’abdomen.',
+    },
+    keywords: {
+      ar: ['كليتي', 'الكلى', 'الكلية', 'كلى', 'كليتين', 'الكليتين', 'حصوة كلوية', 'مغص كلوي'],
+      en: ['kidney', 'kidneys', 'renal'],
+      fr: ['rein', 'reins', 'rénal', 'renal'],
+    },
+  },
+  {
+    id: 'intestines',
+    region: 'torso_front',
+    onMap: false,
+    label: { ar: 'الأمعاء', en: 'Intestines', fr: 'Intestins' },
+    blurb: {
+      ar: 'في وسط وأسفل البطن، حول السرة.',
+      en: 'Middle and lower abdomen, around the navel.',
+      fr: 'Milieu et bas de l’abdomen, autour du nombril.',
+    },
+    keywords: {
+      ar: ['الأمعاء', 'امعائي', 'أمعائي', 'المصران', 'القولون', 'الأمعاء الدقيقة', 'الأمعاء الغليظة'],
+      en: ['intestine', 'intestines', 'bowel', 'colon', 'gut'],
+      fr: ['intestin', 'intestins', 'côlon', 'colon', 'boyau'],
+    },
+  },
+  {
+    id: 'appendix',
+    region: 'torso_front',
+    onMap: false,
+    label: { ar: 'الزائدة الدودية', en: 'Appendix', fr: 'Appendice' },
+    blurb: {
+      ar: 'في أسفل البطن يمينًا، حيث يبدأ القولون.',
+      en: 'Lower-right abdomen, where the colon begins.',
+      fr: 'Bas droit de l’abdomen, au début du côlon.',
+    },
+    keywords: {
+      ar: ['الزائدة الدودية', 'الزائدة', 'زائدتي', 'زائدة دودية'],
+      en: ['appendix', 'appendicitis'],
+      fr: ['appendice', 'appendicite'],
+    },
+  },
+  {
+    id: 'bladder',
+    region: 'lower_limb',
+    onMap: false,
+    label: { ar: 'المثانة', en: 'Bladder', fr: 'Vessie' },
+    blurb: {
+      ar: 'في أسفل الحوض، خلف عظمة العانة.',
+      en: 'Lower pelvis, behind the pubic bone.',
+      fr: 'Bas du bassin, derrière l’os pubien.',
+    },
+    keywords: {
+      ar: ['المثانة', 'مثانتي', 'التهاب المثانة'],
+      en: ['bladder', 'urinary'],
+      fr: ['vessie', 'urinaire'],
+    },
+  },
+  {
+    id: 'uterus',
+    region: 'lower_limb',
+    onMap: true,
+    label: { ar: 'الرحم', en: 'Uterus', fr: 'Utérus' },
+    blurb: {
+      ar: 'في وسط الحوض (للنساء).',
+      en: 'In the centre of the pelvis (female).',
+      fr: 'Au centre du bassin (femme).',
+    },
+    keywords: {
+      ar: ['الرحم', 'رحمي', 'عنق الرحم'],
+      en: ['uterus', 'womb', 'uterine'],
+      fr: ['utérus', 'uterus', 'utérin'],
+    },
+  },
+  {
+    id: 'ovaries',
+    region: 'lower_limb',
+    onMap: true,
+    label: { ar: 'المبيضان', en: 'Ovaries', fr: 'Ovaires' },
+    blurb: {
+      ar: 'على جانبي الرحم في الحوض (للنساء).',
+      en: 'On both sides of the uterus in the pelvis (female).',
+      fr: 'De part et d’autre de l’utérus (femme).',
+    },
+    keywords: {
+      ar: ['المبيض', 'المبيضان', 'مبيضي', 'المبيضين', 'كيس على المبيض'],
+      en: ['ovary', 'ovaries', 'ovarian'],
+      fr: ['ovaire', 'ovaires', 'ovarien'],
+    },
+  },
+  {
+    id: 'prostate',
+    region: 'lower_limb',
+    onMap: false,
+    label: { ar: 'البروستاتا', en: 'Prostate', fr: 'Prostate' },
+    blurb: {
+      ar: 'أسفل المثانة في الحوض (للرجال).',
+      en: 'Below the bladder in the pelvis (male).',
+      fr: 'Sous la vessie, dans le bassin (homme).',
+    },
+    keywords: {
+      ar: ['البروستاتا', 'البروستات', 'بروستاتتي', 'تضخم البروستاتا'],
+      en: ['prostate'],
+      fr: ['prostate'],
+    },
+  },
+  {
+    id: 'thyroid',
+    region: 'head_neck',
+    onMap: true,
+    label: { ar: 'الغدة الدرقية', en: 'Thyroid', fr: 'Thyroïde' },
+    blurb: {
+      ar: 'في مقدمة الرقبة، أسفل تفاحة آدم.',
+      en: 'Front of the neck, below the Adam’s apple.',
+      fr: 'Avant du cou, sous la pomme d’Adam.',
+    },
+    keywords: {
+      ar: ['الغدة الدرقية', 'الدرقية', 'الغده الدرقيه', 'الغدة الدرقيه'],
+      en: ['thyroid'],
+      fr: ['thyroïde', 'thyroide'],
+    },
+  },
+  {
+    id: 'tonsils',
+    region: 'head_neck',
+    onMap: false,
+    label: { ar: 'اللوزتان', en: 'Tonsils', fr: 'Amygdales' },
+    blurb: {
+      ar: 'في مؤخرة الحلق على الجانبين.',
+      en: 'At the back of the throat on both sides.',
+      fr: 'À l’arrière de la gorge, sur les côtés.',
+    },
+    keywords: {
+      ar: ['اللوزتان', 'اللوزتين', 'اللوزة', 'لوزتي', 'التهاب اللوزتين'],
+      en: ['tonsil', 'tonsils'],
+      fr: ['amygdale', 'amygdales'],
+    },
+  },
+  {
+    id: 'lymph-nodes',
+    region: 'head_neck',
+    onMap: false,
+    label: { ar: 'الغدد الليمفاوية', en: 'Lymph nodes', fr: 'Ganglions lymphatiques' },
+    blurb: {
+      ar: 'منتشرة في الرقبة والإبطين وأعلى الفخذ.',
+      en: 'Scattered in the neck, armpits, and groin.',
+      fr: 'Répartis dans le cou, les aisselles et l’aine.',
+    },
+    keywords: {
+      ar: ['الغدد الليمفاوية', 'الغدد اللمفاوية', 'العقد الليمفاوية', 'غدة لمفاوية', 'غدد لمفاوية'],
+      en: ['lymph node', 'lymph nodes', 'lymphatic'],
+      fr: ['ganglion lymphatique', 'ganglions', 'lymphatique'],
+    },
+  },
+  {
+    id: 'salivary-glands',
+    region: 'head_neck',
+    onMap: false,
+    label: { ar: 'الغدد اللعابية', en: 'Salivary glands', fr: 'Glandes salivaires' },
+    blurb: {
+      ar: 'حول الفم والخدين وتحت الفك.',
+      en: 'Around the mouth, cheeks, and under the jaw.',
+      fr: 'Autour de la bouche, des joues et sous la mâchoire.',
+    },
+    keywords: {
+      ar: ['الغدد اللعابية', 'الغدة اللعابية', 'اللعابية', 'غدة لعابية'],
+      en: ['salivary gland', 'salivary glands'],
+      fr: ['glande salivaire', 'glandes salivaires'],
+    },
+  },
+];
+
+// ---------------------------------------------------------------------------
 // 2) الأعراض المرجعية (مربوطة بأكواد HPO الموجودة في المكتبة الطبية)
 // ---------------------------------------------------------------------------
 export const SYMPTOM_TERMS: SymptomTerm[] = [

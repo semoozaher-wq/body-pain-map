@@ -14,19 +14,34 @@
 // ============================================================================
 
 import { getAllConditions, localize, type MedicalCondition } from '../medical/diseaseLibrary';
+import organDetailsData from '../../data/organDetails.json';
 import {
   BODY_REGIONS,
   DURATION_WORDS,
   NEGATION_WORDS,
+  ORGAN_TERMS,
   RED_FLAG_TERMS,
   SEVERITY_WORDS,
   SYMPTOM_TERMS,
   type BodyRegionKey,
   type Lang,
   type LocalizedText,
+  type OrganTerm,
   type RegionTerm,
   type SymptomTerm,
 } from './lexicon';
+
+/** تفاصيل عضو داخلي غنية (من organDetails.json) — المحتوى عربي كما في التطبيق. */
+interface OrganDetailRaw {
+  name: string;
+  location?: string;
+  visualHint?: string;
+  symptoms?: string[];
+  causes?: string[];
+  warning?: string;
+  recommendation?: string;
+}
+const ORGAN_DETAILS = organDetailsData as unknown as Record<string, OrganDetailRaw>;
 
 export type TriageLevel = 'self_care' | 'routine' | 'soon' | 'urgent' | 'emergency';
 
@@ -34,6 +49,26 @@ export interface DetectedRegion {
   id: string;
   region: BodyRegionKey;
   label: LocalizedText;
+}
+
+export interface DetectedOrgan {
+  id: string;
+  region: BodyRegionKey;
+  /** هل للعضو نقطة على خريطة الأعضاء (يمكن فتحه)؟ */
+  onMap: boolean;
+  label: LocalizedText;
+  blurb: LocalizedText;
+}
+
+export interface DetectedOrganDetail {
+  id: string;
+  label: LocalizedText;
+  blurb: LocalizedText;
+  location?: string;
+  symptoms?: string[];
+  causes?: string[];
+  warning?: string;
+  recommendation?: string;
 }
 
 export interface DetectedSymptom {
@@ -76,11 +111,18 @@ export interface AssistantReply {
   redFlags: DetectedRedFlag[];
   regions: DetectedRegion[];
   symptoms: DetectedSymptom[];
+  /** الأعضاء الداخلية التي ذكرها المستخدم. */
+  organs: DetectedOrgan[];
+  /** تفاصيل غنية للأعضاء المتوفّرة في organDetails.json. */
+  organDetails: DetectedOrganDetail[];
   conditions: ConditionMatch[];
   selfCare: string[];
   whenToSeeDoctor: LocalizedText;
   suggestedRegionId: string | null;
   suggestedRegionLabel: LocalizedText | null;
+  /** العضو المقترح لفتحه على خريطة الأعضاء (إن وُجدت نقطة له). */
+  suggestedOrganId: string | null;
+  suggestedOrganLabel: LocalizedText | null;
   disclaimer: LocalizedText;
   /** اللغة التي طُلبت بها الإجابة (لتُعرض الحقول متعددة اللغات). */
   __lang: Lang;
@@ -114,15 +156,16 @@ function matchAny(text: string, keywords: Record<Lang, string[]>): boolean {
   return [...keywords.ar, ...keywords.en, ...keywords.fr].some((k) => containsKeyword(text, k));
 }
 
-/** هل الكلمة مسبوقة بنفي؟ (نافذة 14 حرفًا قبلها). */
+/** هل الكلمة مسبوقة بنفي؟ (نافذة 16 حرفًا قبلها، مع مطابقة حدود الكلمات لتجنّب أخطاء مثل «مش» داخل «مشكلة»). */
 function isNegated(text: string, keyword: string): boolean {
   const needle = normalize(keyword);
   const idx = text.indexOf(needle);
   if (idx <= 0) return false;
-  const before = text.slice(Math.max(0, idx - 14), idx);
-  return [...NEGATION_WORDS.ar, ...NEGATION_WORDS.en, ...NEGATION_WORDS.fr].some((n) =>
-    before.includes(normalize(n)),
-  );
+  const before = ` ${text.slice(Math.max(0, idx - 16), idx)} `;
+  return [...NEGATION_WORDS.ar, ...NEGATION_WORDS.en, ...NEGATION_WORDS.fr].some((n) => {
+    const neg = normalize(n);
+    return before.includes(` ${neg} `);
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -136,6 +179,25 @@ export function detectRegions(text: string): DetectedRegion[] {
     );
     if (hit && !isNegated(text, hit)) {
       found.set(region.id, { id: region.id, region: region.region, label: region.label });
+    }
+  });
+  return [...found.values()];
+}
+
+export function detectOrgans(text: string): DetectedOrgan[] {
+  const found = new Map<string, DetectedOrgan>();
+  ORGAN_TERMS.forEach((organ: OrganTerm) => {
+    const hit = [...organ.keywords.ar, ...organ.keywords.en, ...organ.keywords.fr].find((k) =>
+      containsKeyword(text, k),
+    );
+    if (hit && !isNegated(text, hit)) {
+      found.set(organ.id, {
+        id: organ.id,
+        region: organ.region,
+        onMap: organ.onMap,
+        label: organ.label,
+        blurb: organ.blurb,
+      });
     }
   });
   return [...found.values()];
@@ -207,6 +269,7 @@ const symBase = (id: string) => id.replace(/[^0-9]+$/, '');
 export function scoreConditions(
   regions: DetectedRegion[],
   symptoms: DetectedSymptom[],
+  organs: DetectedOrgan[] = [],
 ): ConditionMatch[] {
   const symptomBases = new Set(symptoms.map((s) => symBase(s.id)));
   const scored: ConditionMatch[] = [];
@@ -216,6 +279,9 @@ export function scoreConditions(
     regions.forEach((region) => {
       if (condition.regions.includes(region.region)) score += 2;
       if (condition.muscleGroups.includes(region.id)) score += 2;
+    });
+    organs.forEach((organ) => {
+      if (condition.regions.includes(organ.region)) score += 1;
     });
     condition.symptoms.forEach((sid) => {
       if (symptomBases.has(symBase(sid))) score += 3;
@@ -238,7 +304,62 @@ export function scoreConditions(
 // ---------------------------------------------------------------------------
 // الفرز الإرشادي
 // ---------------------------------------------------------------------------
-function assessTriage(
+// ترتيب مستويات الفرز من الأخفّ إلى الأشدّ (لرفع الدرجة عند الحاجة).
+const TRIAGE_ORDER: TriageLevel[] = ['self_care', 'routine', 'soon', 'urgent', 'emergency'];
+
+// الحدّ الأدنى لدرجة الفرز حسب العضو (أعضاء حرجة تستدعي انتباهًا أكبر).
+const ORGAN_TRIAGE_FLOOR: Partial<Record<string, TriageLevel>> = {
+  heart: 'soon',
+  lungs: 'routine',
+  kidneys: 'routine',
+};
+
+/** عنوان ونصيحة كل مستوى فرز. */
+const TRIAGE_META: Record<TriageLevel, { title: LocalizedText; advice: LocalizedText }> = {
+  self_care: {
+    title: { ar: 'رعاية ذاتية ومتابعة', en: 'Self-care and monitoring', fr: 'Auto-soins et surveillance' },
+    advice: {
+      ar: 'غالبًا يمكن التعامل معه بالرعاية الذاتية، مع مراقبة الأعراض وطلب المساعدة لو تغيّرت.',
+      en: 'Likely manageable with self-care, while monitoring symptoms and seeking help if they change.',
+      fr: 'Généralement gérable par l’auto-soin, en surveillant et en consultant si ça change.',
+    },
+  },
+  routine: {
+    title: { ar: 'متابعة روتينية', en: 'Routine follow-up', fr: 'Suivi de routine' },
+    advice: {
+      ar: 'لو الألم مستمر أو متكرر، يفضّل استشارة طبيب لتقييم السبب ووضع خطة مناسبة.',
+      en: 'If the pain persists or recurs, consider seeing a doctor to assess the cause and plan.',
+      fr: 'Si la douleur persiste ou revient, consultez un médecin pour évaluer la cause.',
+    },
+  },
+  soon: {
+    title: { ar: 'يُستحسن مراجعة طبيب قريبًا', en: 'See a doctor soon', fr: 'Consultez bientôt' },
+    advice: {
+      ar: 'الشدّة عالية نسبيًا. رتّب موعدًا مع طبيب خلال يوم أو يومين، وتابع تطوّر الألم.',
+      en: 'The intensity is fairly high. Arrange a doctor visit within a day or two and track the pain.',
+      fr: 'L’intensité est assez élevée. Prenez rendez-vous sous un ou deux jours et suivez l’évolution.',
+    },
+  },
+  urgent: {
+    title: { ar: 'تقييم عاجل خلال ساعات', en: 'Urgent — evaluate within hours', fr: 'Urgent — évaluation dans les heures' },
+    advice: {
+      ar: 'الأفضل تتواصل مع طبيب أو عيادة عاجلة في أسرع وقت، ولو زادت الأعراض روح الطوارئ.',
+      en: 'Best to contact a doctor or urgent-care clinic soon; if symptoms worsen, go to the ER.',
+      fr: 'Il vaut mieux consulter un médecin ou une clinique sans tarder ; si ça s’aggrave, allez aux urgences.',
+    },
+  },
+  emergency: {
+    title: { ar: 'طوارئ — اطلب المساعدة فورًا', en: 'Emergency — seek help now', fr: 'Urgence — demandez de l’aide maintenant' },
+    advice: {
+      ar: 'العلامات اللي ذكرتها قد تكون خطرة. أوقف أي مجهود واتصل بخدمات الطوارئ المحلية أو روح أقرب مستشفى حالًا.',
+      en: 'The signs you mentioned may be dangerous. Stop any activity and call local emergency services or go to the nearest ER now.',
+      fr: 'Les signes mentionnés peuvent être dangereux. Arrêtez toute activité et appelez les urgences ou allez aux urgences maintenant.',
+    },
+  },
+};
+
+/** الفرز الأساسي قبل تطبيق حدّ العضو. */
+function assessTriageBase(
   redFlags: DetectedRedFlag[],
   severity: number | null,
   duration: keyof typeof DURATION_WORDS | null,
@@ -307,6 +428,28 @@ function assessTriage(
 // ---------------------------------------------------------------------------
 // نصائح الرعاية الذاتية
 // ---------------------------------------------------------------------------
+/** الفرز النهائي مع مراعاة العضو (رفع الحدّ الأدنى للأعضاء الحرجة). */
+function assessTriage(
+  redFlags: DetectedRedFlag[],
+  severity: number | null,
+  duration: keyof typeof DURATION_WORDS | null,
+  regions: DetectedRegion[],
+  symptoms: DetectedSymptom[],
+  organs: DetectedOrgan[] = [],
+): TriageAssessment {
+  const base = assessTriageBase(redFlags, severity, duration, regions, symptoms);
+  let floorIdx = -1;
+  organs.forEach((organ) => {
+    const floor = ORGAN_TRIAGE_FLOOR[organ.id];
+    if (floor) floorIdx = Math.max(floorIdx, TRIAGE_ORDER.indexOf(floor));
+  });
+  if (floorIdx > TRIAGE_ORDER.indexOf(base.level)) {
+    const level = TRIAGE_ORDER[floorIdx];
+    return { level, ...TRIAGE_META[level] };
+  }
+  return base;
+}
+
 const SELF_CARE_GENERAL: LocalizedText[] = [
   { ar: 'ارتاح بشكل نسبي وتجنّب الراحة الطويلة تمامًا — الحركة اللطيفة غالبًا أفضل.', en: 'Rest relatively; avoid total prolonged rest — gentle movement is often better.', fr: 'Reposez-vous relativement ; évitez le repos total prolongé — le mouvement doux aide souvent.' },
   { ar: 'استخدم كمادة دافئة أو باردة حسب ما يريحك (دافئة للشد العضلي، باردة للتورم).', en: 'Use a warm or cold compress as it suits you (warm for muscle strain, cold for swelling).', fr: 'Compresse chaude ou froide selon ce qui soulage (chaude pour la contracture, froide pour le gonflement).' },
@@ -331,8 +474,85 @@ const SELF_CARE_BY_REGION: Record<string, LocalizedText[]> = {
   ],
 };
 
-function buildSelfCare(regions: DetectedRegion[], language: Lang): string[] {
+const SELF_CARE_BY_ORGAN: Record<string, LocalizedText[]> = {
+  heart: [
+    {
+      ar: 'لو ألم الصدر مستمر أو متكرر ما تهملوش — راجع طبيب، واطلب الطوارئ فورًا لو فيه ضيق نفس أو تعرّق أو ألم يمتد للذراع.',
+      en: 'If chest pain is ongoing or recurrent, do not ignore it — see a doctor, and call emergency services if there is shortness of breath, sweating, or pain spreading to the arm.',
+      fr: 'Si la douleur thoracique persiste ou revient, ne l’ignorez pas — consultez, et appelez les urgences en cas d’essoufflement, de sueurs ou de douleur irradiant au bras.',
+    },
+  ],
+  lungs: [
+    {
+      ar: 'تجنّب التدخين والأماكن الملوّثة، وخد فترات راحة لو حسّيت بضيق نفس.',
+      en: 'Avoid smoking and polluted places; rest if you feel short of breath.',
+      fr: 'Évitez le tabac et les lieux pollués ; reposez-vous en cas d’essoufflement.',
+    },
+  ],
+  stomach: [
+    {
+      ar: 'قلّل الأكل الحارّ والدسم والكافيين، وكُل وجبات صغيرة متكرّرة.',
+      en: 'Reduce spicy, fatty food and caffeine; eat small frequent meals.',
+      fr: 'Réduisez les aliments épicés, gras et la caféine ; mangez de petits repas fréquents.',
+    },
+  ],
+  liver: [
+    {
+      ar: 'قلّل الدهون والكحول، واشرب ماء كفاية، وراجع طبيب لو استمر الألم أو ظهر اصفرار.',
+      en: 'Reduce fats and alcohol, stay hydrated, and see a doctor if pain persists or jaundice appears.',
+      fr: 'Réduisez les graisses et l’alcool, hydratez-vous, consultez si la douleur persiste ou en cas de jaunisse.',
+    },
+  ],
+  kidneys: [
+    {
+      ar: 'اشرب ماء كفاية، وقلّل الملح، وراجع طبيب فورًا لو ظهر دم في البول أو حرارة.',
+      en: 'Drink enough water, reduce salt, and see a doctor promptly if there is blood in urine or fever.',
+      fr: 'Buvez assez d’eau, réduisez le sel, consultez vite en cas de sang dans les urines ou de fièvre.',
+    },
+  ],
+  intestines: [
+    {
+      ar: 'اهتم بالألياف والماء، وتجنّب الأكل اللي بيزعّج قولونك، وراقب أي تغيّر في الإخراج.',
+      en: 'Focus on fibre and fluids, avoid foods that upset your bowel, and watch for changes in bowel habits.',
+      fr: 'Privilégiez fibres et eau, évitez les aliments irritants, surveillez les changements de transit.',
+    },
+  ],
+  bladder: [
+    {
+      ar: 'اشرب ماء كفاية، وما تحبسش البول، وراجع طبيب لو فيه حرقان أو دم.',
+      en: 'Drink enough water, do not hold urine, and see a doctor if there is burning or blood.',
+      fr: 'Buvez assez d’eau, ne retenez pas l’urine, consultez en cas de brûlure ou de sang.',
+    },
+  ],
+  uterus: [
+    {
+      ar: 'تابع الألم مع الدورة، واستخدم كمادات دافئة، وراجع طبيب لو الألم شديد أو النزيف غير طبيعي.',
+      en: 'Track pain with your cycle, use warm compresses, and see a doctor if pain is severe or bleeding is abnormal.',
+      fr: 'Suivez la douleur selon le cycle, compresses chaudes, consultez si douleur intense ou saignement anormal.',
+    },
+  ],
+  ovaries: [
+    {
+      ar: 'لو الألم في أسفل البطن مرتبط بالدورة أو مصحوب بأعراض تانية، الأفضل مراجعة طبيب نساء.',
+      en: 'If lower-abdominal pain is tied to your cycle or has other symptoms, consider seeing a gynaecologist.',
+      fr: 'Si la douleur du bas-ventre est liée au cycle ou accompagnée d’autres signes, consultez un gynécologue.',
+    },
+  ],
+  thyroid: [
+    {
+      ar: 'راقب أي تغيّر في الوزن أو النبض أو الحرارة، وراجع طبيب لعمل تحاليل الغدة.',
+      en: 'Watch for changes in weight, heart rate, or temperature, and see a doctor for thyroid tests.',
+      fr: 'Surveillez les changements de poids, de pouls ou de température, consultez pour des tests thyroïdiens.',
+    },
+  ],
+};
+
+function buildSelfCare(regions: DetectedRegion[], organs: DetectedOrgan[], language: Lang): string[] {
   const tips: string[] = [];
+  organs.forEach((organ) => {
+    const extra = SELF_CARE_BY_ORGAN[organ.id];
+    if (extra) extra.forEach((tip) => tips.push(localize(tip, language)));
+  });
   regions.forEach((region) => {
     const extra = SELF_CARE_BY_REGION[region.id];
     if (extra) extra.forEach((tip) => tips.push(localize(tip, language)));
@@ -421,15 +641,17 @@ const CLARIFY: LocalizedText = {  ar: 'قوللي أكتر عن الألم: مك
 export function analyzeMessage(rawText: string, language: Lang): AssistantReply {
   const text = normalize(rawText);
   const regions = detectRegions(text);
+  const organs = detectOrgans(text);
   const symptoms = detectSymptoms(text);
   const redFlags = detectRedFlags(text);
   const severity = detectSeverity(text);
   const duration = detectDuration(text);
 
-  const understood = regions.length > 0 || symptoms.length > 0 || redFlags.length > 0;
+  const understood =
+    regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
 
-  const triage = assessTriage(redFlags, severity, duration, regions, symptoms);
-  const conditions = understood ? scoreConditions(regions, symptoms) : [];
+  const triage = assessTriage(redFlags, severity, duration, regions, symptoms, organs);
+  const conditions = understood ? scoreConditions(regions, symptoms, organs) : [];
 
   const understanding: string[] = [];
   if (regions.length) {
@@ -439,6 +661,18 @@ export function analyzeMessage(rawText: string, language: Lang): AssistantReply 
           ar: `مناطق الجسم اللي ذكرتها: ${regions.map((r) => r.label.ar).join('، ')}.`,
           en: `Body areas you mentioned: ${regions.map((r) => r.label.en).join(', ')}.`,
           fr: `Zones mentionnées : ${regions.map((r) => r.label.fr).join(', ')}.`,
+        },
+        language,
+      ),
+    );
+  }
+  if (organs.length) {
+    understanding.push(
+      localize(
+        {
+          ar: `أعضاء داخلية ذكرتها: ${organs.map((o) => o.label.ar).join('، ')}.`,
+          en: `Internal organs you mentioned: ${organs.map((o) => o.label.en).join(', ')}.`,
+          fr: `Organes internes mentionnés : ${organs.map((o) => o.label.fr).join(', ')}.`,
         },
         language,
       ),
@@ -474,7 +708,22 @@ export function analyzeMessage(rawText: string, language: Lang): AssistantReply 
     understanding.push(localize(durationText[duration], language));
   }
 
+  const organDetails: DetectedOrganDetail[] = organs.map((organ) => {
+    const raw = ORGAN_DETAILS[organ.id];
+    return {
+      id: organ.id,
+      label: organ.label,
+      blurb: organ.blurb,
+      location: raw?.location,
+      symptoms: raw?.symptoms,
+      causes: raw?.causes,
+      warning: raw?.warning,
+      recommendation: raw?.recommendation,
+    };
+  });
+
   const primaryRegion = regions[0] ?? null;
+  const mapOrgan = organs.find((organ) => organ.onMap) ?? null;
 
   return {
     intro: understood ? INTRO[triage.level] : INTRO_UNCLEAR,
@@ -485,11 +734,15 @@ export function analyzeMessage(rawText: string, language: Lang): AssistantReply 
     redFlags,
     regions,
     symptoms,
+    organs,
+    organDetails,
     conditions,
-    selfCare: buildSelfCare(regions, language),
+    selfCare: buildSelfCare(regions, organs, language),
     whenToSeeDoctor: WHEN_TO_SEE[triage.level],
     suggestedRegionId: primaryRegion ? primaryRegion.id : null,
     suggestedRegionLabel: primaryRegion ? primaryRegion.label : null,
+    suggestedOrganId: mapOrgan ? mapOrgan.id : null,
+    suggestedOrganLabel: mapOrgan ? mapOrgan.label : null,
     disclaimer: DISCLAIMER,
     __lang: language,
   };
