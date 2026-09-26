@@ -1,1 +1,384 @@
+{
+  "id": "chest_pain",
+  "titleAr": "ألم الصدر",
+  "version": "0.1.0-draft",
+  "status": "draft_unvalidated",
+  "clinicianReview": {
+    "required": true,
+    "reviewedBy": null,
+    "reviewerLicense": null,
+    "reviewedAt": null,
+    "notesAr": "شجرة عيّنة للتصميم فقط. يُمنع عرضها للمستخدمين قبل مراجعة طبيب بشري مؤهّل، وتوثيق اسمه ورقم ترخيصه وتاريخ المراجعة في هذه الحقول."
+  },
+  "disclaimerAr": "هذا فرز إرشادي تعليمي فقط، وليس تشخيصًا طبيًا ولا بديلًا عن تقييم طبيب. عند وجود أي علامة طوارئ اتصل بخدمات الإسعاف فورًا دون انتظار نتيجة التطبيق.",
+  "start": "red_flag_screen",
+  "sources": [
+    {
+      "id": "nice_cks_chest_pain",
+      "title": "NICE Clinical Knowledge Summaries — Chest pain",
+      "url": "https://cks.nice.org.uk/",
+      "access": "open",
+      "noteAr": "متاح مجانًا، لكن إعادة استخدام المحتوى مقيّدة بشروط ترخيص NICE CKS، فالمصادر تُذكر كمرجع للتصميم لا كنص منسوخ."
+    },
+    {
+      "id": "nhs_heart_attack",
+      "title": "NHS — Heart attack (علامات الطوارئ)",
+      "url": "https://www.nhs.uk/conditions/heart-attack/",
+      "access": "open",
+      "noteAr": "مصدر عام لعلامات الطوارئ القلبية."
+    },
+    {
+      "id": "mts",
+      "title": "Manchester Triage System — مبادئ الفرز",
+      "url": "https://www.triagenet.net/",
+      "access": "reference",
+      "noteAr": "منهجية فرز قائمة على الشكوى لا على التشخيص، وهذه هي البنية المتبعة هنا."
+    },
+    {
+      "id": "opqrst",
+      "title": "OPQRST — بنية أسئلة وصف الألم",
+      "url": "https://www.osmosis.org/answers/opqrst-pain-assessment-mnemonic",
+      "access": "open",
+      "noteAr": "قائمة أسئلة قياسية لوصف الألم (البداية، المُحفّز، النوع، الانتشار، الشدة، التوقيت)."
+    },
+    {
+      "id": "socrates",
+      "title": "SOCRATES — أداة أخذ تاريخ الألم",
+      "url": "https://en.wikipedia.org/wiki/SOCRATES_(pain_assessment)",
+      "access": "open"
+    },
+    {
+      "id": "mdcg_2019_11",
+      "title": "MDCG 2019-11 — تصنيف برمجيات الجهاز الطبي (EU MDR Rule 11)",
+      "url": "https://health.ec.europa.eu/document/download/b45335c5-1679-4c71-a91c-fc7a4d37f12b_en?filename=mdcg_2019_11_en.pdf",
+      "access": "open",
+      "noteAr": "مرجع تنظيمي يحدد متى تُصنَّف البرمجية جهازًا طبيًا بحسب خطورة القرار الذي تقدّمه."
+    }
+  ],
+  "redFlagRules": [
+    {
+      "id": "rf_acs_cluster",
+      "labelAr": "ألم ضاغط مستمر منذ 15 دقيقة أو أكثر، مع انتشار للذراع/الفك وتعرّق أو ضيق نفس",
+      "when": [
+        { "q": "red_flag_screen", "op": "includes", "value": "pressure_15min" },
+        { "q": "red_flag_screen", "op": "includes_any", "value": ["radiating_arm_jaw", "sweating_clammy"] }
+      ],
+      "outcome": {
+        "urgency": "emergency",
+        "titleAr": "اشتباه متلازمة إكليلية حادة",
+        "specialtyKey": "emergency",
+        "reasonsAr": [
+          "ألم ضاغط مستمر لا يهدأ مع انتشار نموذجي",
+          "اجتماع علامتين أو أكثر من علامات الخطر القلبية"
+        ],
+        "actionsAr": [
+          "اتصل بخدمات الإسعاف فورًا واذكر أن الألم بالصدر",
+          "لا تقُد السيارة بنفسك ولا تنتظر لتجربة أدوية",
+          "اجلس وأرح عضلاتك وابقَ مع شخص آخر إن أمكن"
+        ],
+        "sourceIds": ["nice_cks_chest_pain", "nhs_heart_attack", "mts"]
+      }
+    },
+    {
+      "id": "rf_fainting",
+      "labelAr": "إغماء أو اضطراب في الوعي مع ألم الصدر",
+      "when": [{ "q": "red_flag_screen", "op": "includes", "value": "fainting" }],
+      "outcome": {
+        "urgency": "emergency",
+        "titleAr": "ألم صدر مع إغماء — يحتاج تقييمًا إسعافيًا",
+        "specialtyKey": "emergency",
+        "reasonsAr": ["الإغماء مع ألم الصدر يصنّف الحالة في مستوى الفرز الأحمر"],
+        "actionsAr": ["اتصل بالإسعاف فورًا", "لا تترك الشخص المصاب وحده"],
+        "sourceIds": ["mts", "nhs_heart_attack"]
+      }
+    },
+    {
+      "id": "rf_breathlessness_rest",
+      "labelAr": "ضيق نفس شديد أو مفاجئ كعلامة رئيسية",
+      "when": [{ "q": "red_flag_screen", "op": "includes", "value": "breathlessness_rest" }],
+      "outcome": {
+        "urgency": "emergency",
+        "titleAr": "ضيق نفس حاد منفرد أو مصاحب",
+        "specialtyKey": "emergency",
+        "reasonsAr": ["ضيق النفس في الراحة علامة فرز حمراء حتى بدون ألم صدر"],
+        "actionsAr": ["اتصل بالإسعاف فورًا", "الضيق الشديد في التنفس لا يُدار منزليًا"],
+        "sourceIds": ["mts", "opqrst"]
+      }
+    },
+    {
+      "id": "rf_tearing_back",
+      "labelAr": "ألم ممزّق يمتد إلى الظهر بين الكتفين",
+      "when": [{ "q": "red_flag_screen", "op": "includes", "value": "tearing_back" }],
+      "outcome": {
+        "urgency": "emergency",
+        "titleAr": "نمط يثير الشك في تسلّخ الأبهر",
+        "specialtyKey": "emergency",
+        "reasonsAr": ["انتشار الألم إلى الظهر مع طابع ممزّق يستدعي إبعاد طوارئ الأوعية"],
+        "actionsAr": ["اتصل بالإسعاف الآن ولا تنتظر", "تجنّب المسكنات والحركة الزائدة"],
+        "sourceIds": ["nice_cks_chest_pain", "mts"]
+      }
+    },
+    {
+      "id": "rf_fever_productive_cough",
+      "labelAr": "ألم بالصدر مع حرارة وكحة/بلغم",
+      "when": [{ "q": "red_flag_screen", "op": "includes", "value": "fever_productive_cough" }],
+      "outcome": {
+        "urgency": "urgent",
+        "titleAr": "التهاب رئوي محتمل",
+        "specialtyKey": "pulmonology",
+        "reasonsAr": ["اجتماع الحرارة مع الكحة المنتجة يرفع الاحتمال التنفسي"],
+        "actionsAr": ["راجع طبيبًا أو مركز رعاية عاجلة خلال 24 ساعة", "اطلب الإسعاف فورًا لو ظهر ضيق نفس أو ارتباك"],
+        "sourceIds": ["nice_cks_chest_pain"]
+      }
+    }
+  ],
+  "nodes": {
+    "red_flag_screen": {
+      "id": "red_flag_screen",
+      "type": "multi",
+      "questionAr": "اختار كل علامة موجودة معك الآن (لو مفيش حاجة اختار «لا يوجد»):",
+      "options": [
+        { "id": "pressure_15min", "labelAr": "وجع ضاغط زي حجر مستمر 15 دقيقة أو أكثر" },
+        { "id": "radiating_arm_jaw", "labelAr": "منتشر للذراع أو الكتف أو الفك" },
+        { "id": "sweating_clammy", "labelAr": "عرق بارد أو تعرّق شديد مفاجئ" },
+        { "id": "breathlessness_rest", "labelAr": "ضيق نفس شديد وقت الراحة" },
+        { "id": "fainting", "labelAr": "إغماء أو ارتباك أو اضطراب في الوعي" },
+        { "id": "tearing_back", "labelAr": "ألم ممزّق يمتد لظهر كبير بين الكتفين" },
+        { "id": "fever_productive_cough", "labelAr": "حرارة مع كحة وبلغم" },
+        { "id": "none", "labelAr": "لا يوجد" }
+      ],
+      "default": "character"
+    },
+    "character": {
+      "id": "character",
+      "type": "choice",
+      "questionAr": "إيه أوصاف الوجع الأقرب لحالتك؟",
+      "options": [
+        { "id": "crushing_exertional", "labelAr": "ضاغط أو ثقيل، بيزيد بالمجهود أو التوتر" },
+        { "id": "pleuritic_inspiration", "labelAr": "حاد وخز، بيزيد مع الشهيق أو الكحة" },
+        { "id": "positional_forward", "labelAr": "بيخف أو بيزيد مع تغيير الوضع، بيسوء بالاستلقاء" },
+        { "id": "burning_postprandial", "labelAr": "حرقان بعد الأكل أو مع الانحناء" },
+        { "id": "reproducible_palpation", "labelAr": "بيظهر لما أضغط على المكان أو أحرك كتفي" },
+        { "id": "atypical_vague", "labelAr": "وصف غير واضح أو بيتغير باستمرار" }
+      ],
+      "transitions": {
+        "crushing_exertional": "cardiac_risk",
+        "pleuritic_inspiration": "infection_screen",
+        "positional_forward": "O_PERICARDITIS_24H",
+        "burning_postprandial": "O_GERD_SELF_CARE",
+        "reproducible_palpation": "trauma",
+        "atypical_vague": "O_GENERAL_ROUTINE"
+      },
+      "default": "O_GENERAL_ROUTINE"
+    },
+    "cardiac_risk": {
+      "id": "cardiac_risk",
+      "type": "multi",
+      "questionAr": "هل عندك أي من عوامل خطر القلب دي؟ (اختار كل اللي ينطبق)",
+      "options": [
+        { "id": "known_heart_disease", "labelAr": "تشخيص سابق لمشكلة شرايين القلب أو ذبحة" },
+        { "id": "diabetes", "labelAr": "سكري" },
+        { "id": "hypertension", "labelAr": "ضغط مرتفع" },
+        { "id": "smoking", "labelAr": "تدخين أو تدخين سابق" },
+        { "id": "high_cholesterol", "labelAr": "ارتفاع الكوليسترول" },
+        { "id": "family_history", "labelAr": "تاريخ عائلي لأمراض قلب مبكرة" },
+        { "id": "none", "labelAr": "لا يوجد" }
+      ],
+      "branches": [
+        {
+          "when": [{ "q": "cardiac_risk", "op": "includes", "value": "known_heart_disease" }],
+          "to": "duration_cardiac"
+        }
+      ],
+      "default": "duration_cardiac"
+    },
+    "duration_cardiac": {
+      "id": "duration_cardiac",
+      "type": "number",
+      "questionAr": "الألم دلوقتي مستمر بقاله قد إيه؟ اكتب المدة بالأيام (الساعة = 0.04 والنص يوم = 0.5)",
+      "bands": [
+        { "max": 0.014, "to": "O_ACS_EMERGENCY" },
+        { "max": 1, "to": "O_URGENT_24H_CARDIAC" }
+      ],
+      "default": "O_CARDIAC_EVAL_SOON"
+    },
+    "infection_screen": {
+      "id": "infection_screen",
+      "type": "multi",
+      "questionAr": "من الأعراض المصاحبة، اختار اللي موجود:",
+      "options": [
+        { "id": "leg_swelling", "labelAr": "تورّم أو ألم في ساق واحدة" },
+        { "id": "recent_immobility", "labelAr": "فترة ثبات طويلة: سفرة أو جراحة أو راحة بالسرير" },
+        { "id": "fever", "labelAr": "حرارة" },
+        { "id": "cough_sputum", "labelAr": "كحة ببلغم" },
+        { "id": "none", "labelAr": "لا يوجد" }
+      ],
+      "branches": [
+        {
+          "when": [
+            { "q": "infection_screen", "op": "includes", "value": "leg_swelling" },
+            { "q": "infection_screen", "op": "includes_any", "value": ["recent_immobility", "none"] }
+          ],
+          "to": "O_PE_24H"
+        },
+        {
+          "when": [
+            { "q": "infection_screen", "op": "includes", "value": "fever" },
+            { "q": "infection_screen", "op": "includes", "value": "cough_sputum" }
+          ],
+          "to": "O_PNEUMONIA_24H"
+        }
+      ],
+      "default": "O_PLEURITIC_SELF_CARE"
+    },
+    "trauma": {
+      "id": "trauma",
+      "type": "boolean",
+      "questionAr": "الوجع بدأ بعد مجهود أو إصابة في القفص الصدري؟",
+      "transitions": { "yes": "O_CHEST_WALL_SELF_CARE", "no": "O_GENERAL_ROUTINE" },
+      "default": "O_GENERAL_ROUTINE"
+    },
 
+    "O_ACS_EMERGENCY": {
+      "id": "O_ACS_EMERGENCY",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "emergency",
+        "titleAr": "ألم صدري بصفات إكليلية — تعامل كطوارئ",
+        "specialtyKey": "emergency",
+        "reasonsAr": ["ألم ضاغط يزيد بالمجهود ويستمر وقتًا كافيًا لاستبعاد الطوارئ القلبية"],
+        "actionsAr": [
+          "اتصل بالإسعاف فورًا واذكر «ألم في الصدر»",
+          "لا تنتظر ولا تقُد بنفسك",
+          "اترك أي مجهود بدني فورًا"
+        ],
+        "sourceIds": ["nice_cks_chest_pain", "nhs_heart_attack", "mts"]
+      }
+    },
+    "O_URGENT_24H_CARDIAC": {
+      "id": "O_URGENT_24H_CARDIAC",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "urgent",
+        "titleAr": "ألم صدري مع عوامل خطر قلبية",
+        "specialtyKey": "cardiology",
+        "reasonsAr": ["صفات الألم مع وجود عوامل خطر ترفع الحاجة إلى تقييم قلبي سريع"],
+        "actionsAr": [
+          "راجع طوارئ مستشفى أو عيادة قلب خلال 24 ساعة",
+          "لو زاد الألم أو ظهر عرق بارد أو ضيق نفس، اعتبرها طوارئ فورًا"
+        ],
+        "sourceIds": ["nice_cks_chest_pain", "opqrst"]
+      }
+    },
+    "O_CARDIAC_EVAL_SOON": {
+      "id": "O_CARDIAC_EVAL_SOON",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "soon",
+        "titleAr": "ألم صدري يحتاج تقييمًا قلبيًا بموعد قريب",
+        "specialtyKey": "cardiology",
+        "reasonsAr": ["طابع الألم يستدعي فحص القلب لكن بلا علامات طوارئ حالية"],
+        "actionsAr": ["احجز موعد قلب خلال أيام", "دوّن متى يظهر الألم ومتى يختفي لتُريها للطبيب"],
+        "sourceIds": ["nice_cks_chest_pain"]
+      }
+    },
+    "O_PE_24H": {
+      "id": "O_PE_24H",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "urgent",
+        "titleAr": "احتمال انسداد رئوي يحتاج تقييمًا عاجلًا",
+        "specialtyKey": "pulmonology",
+        "reasonsAr": ["ألم حاد مع الشهيق مصحوب بعوامل خطر تجلّط في ساق واحدة"],
+        "actionsAr": ["توجّه لتقييم طبي خلال 24 ساعة واذكر تورّم الساق", "اطلب الإسعاف فورًا عند ضيق نفس شديد أو إغماء"],
+        "sourceIds": ["nice_cks_chest_pain", "mts"]
+      }
+    },
+    "O_PNEUMONIA_24H": {
+      "id": "O_PNEUMONIA_24H",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "urgent",
+        "titleAr": "التهاب رئوي محتمل",
+        "specialtyKey": "pulmonology",
+        "reasonsAr": ["ألم يجي مع الشهيق مع حرارة وكحة منتجة"],
+        "actionsAr": ["راجع طبيبًا خلال 24 ساعة", "اذهب للطوارئ فورًا لو ظهر ضيق نفس أو تشوّش ذهني"],
+        "sourceIds": ["nice_cks_chest_pain"]
+      }
+    },
+    "O_PERICARDITIS_24H": {
+      "id": "O_PERICARDITIS_24H",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "urgent",
+        "titleAr": "ألم يتغير بالوضع — يحتاج استبعاد أسباب قلبية",
+        "specialtyKey": "cardiology",
+        "reasonsAr": ["الألم الذي يسوء بالاستلقاء ويخف بالجلوس يميل للأمام يحتاج تخطيط قلب"],
+        "actionsAr": ["راجع طبيبًا خلال 24 ساعة لعمل تخطيط قلب", "الطوارئ فورًا لو صاحبه ضيق نفس أو إغماء"],
+        "sourceIds": ["nice_cks_chest_pain", "opqrst"]
+      }
+    },
+    "O_GERD_SELF_CARE": {
+      "id": "O_GERD_SELF_CARE",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "self_care",
+        "titleAr": "ألم حرقان بعد الأكل — نمط ارتجاع معدي",
+        "specialtyKey": "gastroenterology",
+        "reasonsAr": ["ارتباط الحرقان بالأكل والانحناء يوافق نمط الارتجاع"],
+        "actionsAr": [
+          "وجبات أصغر وتجنّب النوم خلال ساعتين بعد الأكل",
+          "لو استمر أكثر من أسبوعين أو ظهر بلع مؤلم أو نزول وزن، راجع طبيبًا",
+          "اطلب الطوارئ فورًا لو ظهر ألم ضاغط أو ضيق نفس أو تعرّق"
+        ],
+        "sourceIds": ["nice_cks_chest_pain"]
+      }
+    },
+    "O_PLEURITIC_SELF_CARE": {
+      "id": "O_PLEURITIC_SELF_CARE",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "routine",
+        "titleAr": "ألم صدري حاد بدون أعراض خطر حالية",
+        "specialtyKey": "general",
+        "reasonsAr": ["لا توجد علامات خطر ولا عوامل خطر في الإجابات المسجلة"],
+        "actionsAr": [
+          "راجع طبيب عام أو عيادة خلال أيام للتأكد",
+          "لو ظهرت حرارة أو ضيق نفس أو زاد الألم، ارجع للتصنيف كطوارئ"
+        ],
+        "sourceIds": ["nice_cks_chest_pain", "socrates"]
+      }
+    },
+    "O_CHEST_WALL_SELF_CARE": {
+      "id": "O_CHEST_WALL_SELF_CARE",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "routine",
+        "titleAr": "ألم جدار صدري بعد مجهود أو إصابة",
+        "specialtyKey": "general",
+        "reasonsAr": ["الألم قابل للاستحضار بالضغط أو الحركة، وبدأ بعد مجهود/إصابة"],
+        "actionsAr": [
+          "راحة نسبية وكمادات وتجنّب الحركات المؤلمة",
+          "راجع طبيبًا لو استمر أكثر من أسبوعين أو زاد",
+          "لو الألم صار ضاغطًا أو ظهر ضيق نفس، اعتبره طوارئ"
+        ],
+        "sourceIds": ["nice_cks_chest_pain"]
+      }
+    },
+    "O_GENERAL_ROUTINE": {
+      "id": "O_GENERAL_ROUTINE",
+      "type": "outcome",
+      "outcome": {
+        "urgency": "routine",
+        "titleAr": "ألم صدري غير محدد — يحتاج تقييمًا عامًّا",
+        "specialtyKey": "general",
+        "reasonsAr": ["لا يوجد نمط واضح ولا علامات خطر مسجّلة"],
+        "actionsAr": [
+          "احجز موعد طبيب عام لتقييم أولي",
+          "راقب أي عرض جديد وسجّله في دفتر الألم"
+        ],
+        "sourceIds": ["socrates"]
+      }
+    }
+  }
+}
