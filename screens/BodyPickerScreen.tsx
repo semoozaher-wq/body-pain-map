@@ -10,7 +10,7 @@ import { AcupressurePanel } from '../components/AcupressurePanel';
 import { IllustratedBodyMap } from '../components/IllustratedBodyMap';
 import { WebBodySilhouette } from '../components/WebBodySilhouette';
 import { NaturalReliefPanel } from '../components/NaturalReliefPanel';
-import { MedicalLibraryPanel } from '../components/MedicalLibraryPanel';
+import { MedicalLibraryTabsPanel } from '../components/MedicalLibraryTabsPanel';
 import { DrugLookupPanel } from '../components/DrugLookupPanel';
 import type { BodyView, Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
@@ -254,7 +254,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
             ><Text style={[styles.toggleText, activeView === 'back' && styles.activeToggleText]}>{t('bodyPicker.backView')}</Text></Pressable>
           </View>}
 
-          {showMedicalLibraryMode ? <MedicalLibraryPanel language={language} /> : showDrugLookupMode ? <DrugLookupPanel language={language} /> : showAcupressureMode ? <AcupressurePanel language={language} /> : showNaturalReliefMode ? <NaturalReliefPanel language={language} /> : showOrganMode ? (
+          {showMedicalLibraryMode ? <MedicalLibraryTabsPanel language={language} /> : showDrugLookupMode ? <DrugLookupPanel language={language} /> : showAcupressureMode ? <AcupressurePanel language={language} /> : showNaturalReliefMode ? <NaturalReliefPanel language={language} /> : showOrganMode ? (
             <>
               <Text style={styles.helper}>{t('bodyPicker.organHint')}</Text>
               <Text style={styles.organNotice}>{t('bodyPicker.organPainNotice')}</Text>
