@@ -19,7 +19,7 @@
   "body": "Choisissez la zone douloureuse",
   "historyTitle": "Examens précédents",
   "historyButton": "Historique",
-  "nav": { "home": "Accueil", "map": "Corps", "history": "Historique" },
+  "nav": { "home": "Accueil", "map": "Corps", "history": "Historique", "assistant": "Assistant" },
   "quickLog": { "neck": "Cou", "shoulder": "Épaule", "lowerBack": "Bas du dos", "chest": "Poitrine", "abdomen": "Abdomen" },
   "welcome": {
     "statParts": "Parties",
@@ -121,5 +121,23 @@
     "recommendation": "Conseil général",
     "defaultRecommendation": "Demandez une évaluation médicale si la douleur persiste ou s'aggrave.",
     "describePain": "Continuer pour décrire la douleur"
+  },
+  "screenTitles": { "details": "Détails de la douleur", "results": "Résumé du bilan" },
+  "assistant": {
+    "name": "Assistant IA",
+    "status": "En ligne · fonctionne hors ligne",
+    "welcomeTitle": "Dites-moi exactement ce que vous ressentez",
+    "welcomeText": "Écrivez avec vos mots — familier ou formel — et je comprendrai la zone et les symptômes et vous guiderai vers des étapes pratiques, tout sur votre appareil, rien n'est envoyé.",
+    "privateBadge": "Confidentialité totale · sans internet",
+    "tryThese": "Essayez un exemple",
+    "thinking": "Réflexion…",
+    "placeholder": "ex. J'ai mal au bas du dos…",
+    "send": "Envoyer",
+    "understood": "Ce que j'ai compris",
+    "redFlags": "Signes d'alerte",
+    "possibleConditions": "Affections possibles (à titre indicatif)",
+    "selfCare": "Auto-soins initiaux",
+    "whenToSee": "Quand consulter un médecin",
+    "openOnMap": "Ouvrir sur la carte"
   }
 }

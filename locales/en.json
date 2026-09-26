@@ -19,7 +19,7 @@
   "body": "Choose pain location",
   "historyTitle": "Previous checks",
   "historyButton": "History",
-  "nav": { "home": "Home", "map": "Body", "history": "History" },
+  "nav": { "home": "Home", "map": "Body", "history": "History", "assistant": "Assistant" },
   "quickLog": { "neck": "Neck", "shoulder": "Shoulder", "lowerBack": "Lower back", "chest": "Chest", "abdomen": "Abdomen" },
   "welcome": {
     "statParts": "Parts",
@@ -121,5 +121,23 @@
     "recommendation": "General guidance",
     "defaultRecommendation": "Seek medical evaluation if pain persists or worsens.",
     "describePain": "Continue to describe the pain"
+  },
+  "screenTitles": { "details": "Pain details", "results": "Checkup summary" },
+  "assistant": {
+    "name": "AI Assistant",
+    "status": "Online · works offline",
+    "welcomeTitle": "Tell me exactly how you feel",
+    "welcomeText": "Write in your own words — slang or formal — and I'll understand the area and symptoms and guide you to practical steps, all on your device with nothing sent.",
+    "privateBadge": "Fully private · no internet",
+    "tryThese": "Try an example",
+    "thinking": "Thinking…",
+    "placeholder": "e.g. I have pain in my lower back…",
+    "send": "Send",
+    "understood": "What I understood",
+    "redFlags": "Warning signs",
+    "possibleConditions": "Possible conditions (for reference only)",
+    "selfCare": "Initial self-care",
+    "whenToSee": "When to see a doctor",
+    "openOnMap": "Open on the map"
   }
 }
