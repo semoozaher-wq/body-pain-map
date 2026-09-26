@@ -43,6 +43,25 @@ export interface SymptomTerm {
   label: LocalizedText;
   redFlag: boolean;
   keywords: Record<Lang, string[]>;
+  /**
+   * عرض «عام» (مثل كلمة «وجع» أو «ألم» وحدها) لا يجب أن يرفع ترجيح أي مرض
+   * عضلي/مفصلي محدّد — يُستخدم فقط لفهم أن المستخدم ذكر ألمًا، دون ترجيح.
+   */
+  generic?: boolean;
+}
+
+/**
+ * موضع تشريحي دقيق داخل البطن (ربع/جهة بالنسبة للسرة) — يربط كلام المستخدم
+ * مثل «على شمال السرة» بعضو/أعضاء محتملة، حتى لا تُرجَّح أمراض عضلية عامة.
+ */
+export interface AbdomenLocation {
+  id: string;
+  label: LocalizedText;
+  /** أعضاء مرشّحة لهذا الموضع (مطابقة ids في ORGAN_TERMS). */
+  organs: string[];
+  /** مناطق الجسم المرتبطة (مطابقة ids في BODY_REGIONS). */
+  regions: string[];
+  keywords: Record<Lang, string[]>;
 }
 
 /** علامة إنذار (خطرة). */
@@ -226,6 +245,108 @@ export const BODY_REGIONS: RegionTerm[] = [
       ar: ['قدمي', 'القدم', 'رجلي', 'رجليا', 'أقدامي', 'الرجل', 'رجلين', 'صوابع رجلي', 'مشط القدم'],
       en: ['foot', 'feet', 'toe', 'toes'],
       fr: ['pied', 'orteil', 'orteils'],
+    },
+  },
+];
+
+// ---------------------------------------------------------------------------
+// 1.a) مواضع دقيقة داخل البطن (أرباع/جهات بالنسبة للسرة)
+// ---------------------------------------------------------------------------
+// تسمح بفهم «على شمال السرة» أو «تحت السرة يمين» وربطها بعضو محتمل،
+// بدلًا من إرجاع أمراض عضلية عامة. الترتيب مهم: الأكثر تحديدًا أولًا.
+export const ABDOMEN_LOCATIONS: AbdomenLocation[] = [
+  {
+    id: 'rlq',
+    label: { ar: 'أسفل يمين البطن (يمين أسفل السرة)', en: 'Lower-right abdomen (right of the navel)', fr: 'Bas-droit de l’abdomen (à droite du nombril)' },
+    organs: ['appendix', 'intestines'],
+    regions: ['abs'],
+    keywords: {
+      ar: [
+        'الربع السفلي الايمن', 'الربع السفلى الايمن', 'اسفل البطن يمين', 'اسفل يمين البطن',
+        'تحت السره يمين', 'يمين تحت السره', 'يمين اسفل السره', 'علي يمين السره', 'على يمين السره',
+        'يمين السره', 'مين السره', 'اسفل البطن علي اليمين', 'اسفل البطن على اليمين',
+        'المغبض الايمن',
+      ],
+      en: ['lower right abdomen', 'right lower abdomen', 'right of the navel', 'right of navel', 'right iliac fossa'],
+      fr: ['bas droite de l’abdomen', 'à droite du nombril', 'fosse iliaque droite'],
+    },
+  },
+  {
+    id: 'llq',
+    label: { ar: 'أسفل يسار البطن (شمال/يسار السرة)', en: 'Lower-left abdomen (left of the navel)', fr: 'Bas-gauche de l’abdomen (à gauche du nombril)' },
+    organs: ['intestines', 'ovaries'],
+    regions: ['abs'],
+    keywords: {
+      ar: [
+        'الربع السفلي الايسر', 'الربع السفلى الايسر', 'اسفل البطن شمال', 'اسفل شمال البطن',
+        'تحت السره شمال', 'شمال تحت السره', 'شمال اسفل السره', 'علي شمال السره', 'على شمال السره',
+        'شمال السره', 'يسار السره', 'على يسار السره', 'علي يسار السره', 'اسفل البطن علي الشمال',
+        'اسفل البطن على الشمال', 'اسفل البطن يسار', 'المغبض الايسر',
+      ],
+      en: ['lower left abdomen', 'left lower abdomen', 'left of the navel', 'left of navel', 'left iliac fossa'],
+      fr: ['bas gauche de l’abdomen', 'à gauche du nombril', 'fosse iliaque gauche'],
+    },
+  },
+  {
+    id: 'ruq',
+    label: { ar: 'أعلى يمين البطن (تحت الضلوع يمينًا)', en: 'Upper-right abdomen (below the right ribs)', fr: 'Haut-droit de l’abdomen (sous les côtes droites)' },
+    organs: ['liver', 'gallbladder'],
+    regions: ['abs'],
+    keywords: {
+      ar: [
+        'الربع العلوي الايمن', 'اعلى البطن يمين', 'فوق السره يمين', 'يمين فوق السره',
+        'تحت الضلوع يمين', 'تحت ضلوعي يمين', 'تحت القفص الصدري يمين', 'اعلى يمين البطن',
+      ],
+      en: ['upper right abdomen', 'right upper abdomen', 'right hypochondrium'],
+      fr: ['haut droite de l’abdomen', 'hypochondre droit'],
+    },
+  },
+  {
+    id: 'luq',
+    label: { ar: 'أعلى يسار البطن (تحت الضلوع يسارًا)', en: 'Upper-left abdomen (below the left ribs)', fr: 'Haut-gauche de l’abdomen (sous les côtes gauches)' },
+    organs: ['stomach', 'pancreas'],
+    regions: ['abs'],
+    keywords: {
+      ar: [
+        'الربع العلوي الايسر', 'اعلى البطن شمال', 'فوق السره شمال', 'شمال فوق السره',
+        'تحت الضلوع شمال', 'تحت ضلوعي شمال', 'تحت القفص الصدري شمال', 'اعلى شمال البطن',
+        'فم المعده',
+      ],
+      en: ['upper left abdomen', 'left upper abdomen', 'left hypochondrium', 'epigastric'],
+      fr: ['haut gauche de l’abdomen', 'hypochondre gauche', 'épigastre'],
+    },
+  },
+  {
+    id: 'peri-umbilical',
+    label: { ar: 'حول السرة (وسط البطن)', en: 'Around the navel (mid-abdomen)', fr: 'Autour du nombril (milieu de l’abdomen)' },
+    organs: ['intestines'],
+    regions: ['abs'],
+    keywords: {
+      ar: ['حول السره', 'حوالين السره', 'عند السره', 'عندي في السره', 'وسط البطن', 'في وسط بطني', 'جنب السره', 'على السره'],
+      en: ['around the navel', 'around navel', 'peri-umbilical', 'middle of the abdomen', 'mid abdomen'],
+      fr: ['autour du nombril', 'péri-ombilical', 'milieu de l’abdomen'],
+    },
+  },
+  {
+    id: 'epigastric',
+    label: { ar: 'فوق السرة (أعلى البطن)', en: 'Above the navel (upper abdomen)', fr: 'Au-dessus du nombril (haut de l’abdomen)' },
+    organs: ['stomach', 'pancreas'],
+    regions: ['abs'],
+    keywords: {
+      ar: ['فوق السره', 'اعلى السره', 'اعلى البطن', 'فوق بطني', 'تحت عضم الصدر', 'فوق المعده'],
+      en: ['above the navel', 'above navel', 'upper abdomen', 'epigastrium'],
+      fr: ['au-dessus du nombril', 'haut de l’abdomen', 'épigastre'],
+    },
+  },
+  {
+    id: 'hypogastric',
+    label: { ar: 'تحت السرة (أسفل البطن)', en: 'Below the navel (lower abdomen)', fr: 'Sous le nombril (bas de l’abdomen)' },
+    organs: ['bladder', 'uterus', 'intestines'],
+    regions: ['abs'],
+    keywords: {
+      ar: ['تحت السره', 'اسفل السره', 'اسفل البطن', 'تحت بطني', 'فوق العانه', 'منطقه العانه', 'اسفل الحوض'],
+      en: ['below the navel', 'below navel', 'lower abdomen', 'suprapubic', 'hypogastric'],
+      fr: ['sous le nombril', 'bas de l’abdomen', 'sus-pubien'],
     },
   },
 ];
@@ -665,11 +786,12 @@ export const SYMPTOM_TERMS: SymptomTerm[] = [
     },
   },
   {
-    id: 'hpo:0003326b',
+    id: 'sym:general-pain',
     label: { ar: 'ألم عام', en: 'General pain', fr: 'Douleur générale' },
     redFlag: false,
+    generic: true,
     keywords: {
-      ar: ['وجع', 'ألم', 'الم', 'بيوجعني', 'حاسس بألم', 'بتوجعني', 'مؤلم'],
+      ar: ['وجع', 'ألم', 'الم', 'بيوجعني', 'حاسس بألم', 'بتوجعني', 'مؤلم', 'أوجاع', 'اوجاع'],
       en: ['pain', 'ache', 'hurts', 'sore'],
       fr: ['douleur', 'mal', 'ça fait mal'],
     },
@@ -682,6 +804,66 @@ export const SYMPTOM_TERMS: SymptomTerm[] = [
       ar: ['ألم مزمن', 'من زمان', 'بقالي شهور', 'مستمر من فترة طويلة'],
       en: ['chronic pain', 'long-standing'],
       fr: ['douleur chronique'],
+    },
+  },
+  {
+    id: 'hpo:0002014',
+    label: { ar: 'إسهال', en: 'Diarrhoea', fr: 'Diarrhée' },
+    redFlag: false,
+    keywords: {
+      ar: ['إسهال', 'اسهال', 'بطنى بتطلع', 'البطن بيطلع', 'بطن سايبة', 'بطنى سايبة'],
+      en: ['diarrhoea', 'diarrhea', 'loose stool'],
+      fr: ['diarrhée'],
+    },
+  },
+  {
+    id: 'hpo:0002017',
+    label: { ar: 'غثيان وقيء', en: 'Nausea / vomiting', fr: 'Nausées / vomissements' },
+    redFlag: false,
+    keywords: {
+      ar: ['غثيان', 'قيء', 'استفراغ', 'بستفرغ', 'حاسس بغثيان', 'رغبة في القيء'],
+      en: ['nausea', 'vomiting', 'throwing up'],
+      fr: ['nausée', 'vomissement'],
+    },
+  },
+  {
+    id: 'hpo:0002020',
+    label: { ar: 'حرقان المعدة (ارتجاع)', en: 'Heartburn / reflux', fr: 'Brûlures / reflux' },
+    redFlag: false,
+    keywords: {
+      ar: ['حرقان في المعدة', 'حرقان', 'حموضة', 'ارتجاع', 'بيطلع أكل', 'طعم مر في بقي'],
+      en: ['heartburn', 'reflux', 'acid'],
+      fr: ['brûlures', 'reflux', 'acidité'],
+    },
+  },
+  {
+    id: 'hpo:0001945',
+    label: { ar: 'حمّى', en: 'Fever', fr: 'Fièvre' },
+    redFlag: false,
+    keywords: {
+      ar: ['حمى', 'حرارة', 'سخونة', 'حرارتي عالية', 'حرارة الجسم'],
+      en: ['fever', 'temperature'],
+      fr: ['fièvre'],
+    },
+  },
+  {
+    id: 'hpo:0012378',
+    label: { ar: 'إجهاد', en: 'Fatigue', fr: 'Fatigue' },
+    redFlag: false,
+    keywords: {
+      ar: ['إجهاد', 'اجهاد', 'تعبان', 'تعب', 'إرهاق', 'ارهاق', 'ماليش طاقة'],
+      en: ['fatigue', 'tired', 'exhausted'],
+      fr: ['fatigue', 'épuisé'],
+    },
+  },
+  {
+    id: 'hpo:0002360',
+    label: { ar: 'اضطراب النوم', en: 'Sleep disturbance', fr: 'Trouble du sommeil' },
+    redFlag: false,
+    keywords: {
+      ar: ['اضطراب النوم', 'مش بنام', 'قلة النوم', 'نومي متقطع', 'مش نايم كويس'],
+      en: ['sleep disturbance', 'cannot sleep', 'poor sleep'],
+      fr: ['trouble du sommeil', 'insomnie'],
     },
   },
   {

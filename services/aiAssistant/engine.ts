@@ -16,6 +16,7 @@
 import { getAllConditions, localize, type MedicalCondition } from '../medical/diseaseLibrary';
 import organDetailsData from '../../data/organDetails.json';
 import {
+  ABDOMEN_LOCATIONS,
   BODY_REGIONS,
   DURATION_WORDS,
   NEGATION_WORDS,
@@ -23,6 +24,7 @@ import {
   RED_FLAG_TERMS,
   SEVERITY_WORDS,
   SYMPTOM_TERMS,
+  type AbdomenLocation,
   type BodyRegionKey,
   type Lang,
   type LocalizedText,
@@ -71,10 +73,22 @@ export interface DetectedOrganDetail {
   recommendation?: string;
 }
 
+/** موضع دقيق داخل البطن تمّ التعرّف عليه (مثل «أسفل يسار البطن»). */
+export interface DetectedLocation {
+  id: string;
+  label: LocalizedText;
+  /** أعضاء مرشّحة لهذا الموضع. */
+  organs: string[];
+  /** مناطق الجسم المرتبطة. */
+  regions: string[];
+}
+
 export interface DetectedSymptom {
   id: string;
   label: LocalizedText;
   redFlag: boolean;
+  /** عرض عام (كلمة «وجع» وحدها) لا يرفّح أي مرض محدّد. */
+  generic: boolean;
 }
 
 export interface DetectedRedFlag {
@@ -113,6 +127,8 @@ export interface AssistantReply {
   symptoms: DetectedSymptom[];
   /** الأعضاء الداخلية التي ذكرها المستخدم. */
   organs: DetectedOrgan[];
+  /** المواضع الدقيقة داخل البطن (أرباع/جهات) التي ذُكرت. */
+  locations: DetectedLocation[];
   /** تفاصيل غنية للأعضاء المتوفّرة في organDetails.json. */
   organDetails: DetectedOrganDetail[];
   conditions: ConditionMatch[];
@@ -210,10 +226,51 @@ export function detectSymptoms(text: string): DetectedSymptom[] {
       containsKeyword(text, k),
     );
     if (hit && !isNegated(text, hit)) {
-      found.set(symptom.id, { id: symptom.id, label: symptom.label, redFlag: symptom.redFlag });
+      found.set(symptom.id, {
+        id: symptom.id,
+        label: symptom.label,
+        redFlag: symptom.redFlag,
+        generic: symptom.generic === true,
+      });
     }
   });
   return [...found.values()];
+}
+
+/** مواضع دقيقة داخل البطن (أرباع/جهات بالنسبة للسرة). */
+export function detectLocations(text: string): DetectedLocation[] {
+  const found = new Map<string, DetectedLocation>();
+  ABDOMEN_LOCATIONS.forEach((loc: AbdomenLocation) => {
+    const hit = [...loc.keywords.ar, ...loc.keywords.en, ...loc.keywords.fr].find((k) =>
+      containsKeyword(text, k),
+    );
+    if (hit && !isNegated(text, hit)) {
+      found.set(loc.id, { id: loc.id, label: loc.label, organs: loc.organs, regions: loc.regions });
+    }
+  });
+  return [...found.values()];
+}
+
+/** يدمج الأعضاء المذكورة صراحةً مع الأعضاء المرشّحة من المواضع الدقيقة. */
+function mergeLocationOrgans(organs: DetectedOrgan[], locations: DetectedLocation[]): DetectedOrgan[] {
+  const byId = new Map<string, DetectedOrgan>();
+  organs.forEach((o) => byId.set(o.id, o));
+  locations.forEach((loc) => {
+    loc.organs.forEach((id) => {
+      if (byId.has(id)) return;
+      const term = ORGAN_TERMS.find((t) => t.id === id);
+      if (term) {
+        byId.set(id, {
+          id: term.id,
+          region: term.region,
+          onMap: term.onMap,
+          label: term.label,
+          blurb: term.blurb,
+        });
+      }
+    });
+  });
+  return [...byId.values()];
 }
 
 export function detectRedFlags(text: string): DetectedRedFlag[] {
@@ -266,12 +323,31 @@ export function detectDuration(text: string): keyof typeof DURATION_WORDS | null
 // ---------------------------------------------------------------------------
 const symBase = (id: string) => id.replace(/[^0-9]+$/, '');
 
+/**
+ * أوزان الأعضاء المرشّحة: العضو الأول في الموضع (أو العضو المذكور صراحةً)
+ * يأخذ وزنًا أعلى من الأعضاء الثانوية، حتى يفوز السبب الموضعي الأرجح.
+ */
+function buildOrganWeights(organs: DetectedOrgan[], locations: DetectedLocation[]): Map<string, number> {
+  const weights = new Map<string, number>();
+  const bump = (id: string, w: number) => weights.set(id, Math.max(weights.get(id) ?? 0, w));
+  organs.forEach((o) => bump(o.id, 6)); // ذكر العضو صراحةً = إشارة قوية
+  locations.forEach((loc) => {
+    loc.organs.forEach((id, index) => bump(id, index === 0 ? 6 : 3));
+  });
+  return weights;
+}
+
 export function scoreConditions(
   regions: DetectedRegion[],
   symptoms: DetectedSymptom[],
   organs: DetectedOrgan[] = [],
+  locations: DetectedLocation[] = [],
 ): ConditionMatch[] {
-  const symptomBases = new Set(symptoms.map((s) => symBase(s.id)));
+  // الأعراض العامة (كلمة «وجع» وحدها) لا تُرجّح أي مرض محدّد.
+  const specificSymptoms = symptoms.filter((s) => !s.generic);
+  const symptomBases = new Set(specificSymptoms.map((s) => symBase(s.id)));
+  const organWeights = buildOrganWeights(organs, locations);
+  const localized = organs.length > 0 || locations.length > 0;
   const scored: ConditionMatch[] = [];
 
   getAllConditions().forEach((condition: MedicalCondition) => {
@@ -283,9 +359,23 @@ export function scoreConditions(
     organs.forEach((organ) => {
       if (condition.regions.includes(organ.region)) score += 1;
     });
+    // مطابقة عضو مرشّح = إشارة قوية (الأعضاء الأرجح أولًا).
+    if (condition.organs) {
+      condition.organs.forEach((oid) => {
+        const w = organWeights.get(oid);
+        if (w) score += w;
+      });
+    }
     condition.symptoms.forEach((sid) => {
       if (symptomBases.has(symBase(sid))) score += 3;
     });
+
+    // الحالات المنتشرة (فيبروميالجيا/ألم عضلي عام) لا تُرجّح عند شكوى موضعية واحدة.
+    if (condition.diffuse) {
+      if (localized) score -= 5;
+      if (regions.length <= 1 && organs.length === 0) score -= 3;
+    }
+
     if (score > 0) {
       scored.push({
         id: condition.id,
@@ -312,6 +402,9 @@ const ORGAN_TRIAGE_FLOOR: Partial<Record<string, TriageLevel>> = {
   heart: 'soon',
   lungs: 'routine',
   kidneys: 'routine',
+  appendix: 'soon',
+  pancreas: 'soon',
+  gallbladder: 'routine',
 };
 
 /** عنوان ونصيحة كل مستوى فرز. */
@@ -450,11 +543,18 @@ function assessTriage(
   return base;
 }
 
+/** نصيحة سلامة عامة تُضاف دائمًا (لا تبدأ دواء من عندك). */
+const SELF_CARE_SAFETY: LocalizedText = {
+  ar: 'لا تبدأ أدوية أو جرعات من عندك — استشر صيدلي أو طبيب.',
+  en: 'Do not self-prescribe medicines or doses — ask a pharmacist or doctor.',
+  fr: 'Ne prenez pas de médicaments de vous-même — demandez à un pharmacien ou médecin.',
+};
+
+/** نصائح عامة (تُستخدم كملء فقط بعد النصائح المرتبطة بالعضو/المرض). */
 const SELF_CARE_GENERAL: LocalizedText[] = [
   { ar: 'ارتاح بشكل نسبي وتجنّب الراحة الطويلة تمامًا — الحركة اللطيفة غالبًا أفضل.', en: 'Rest relatively; avoid total prolonged rest — gentle movement is often better.', fr: 'Reposez-vous relativement ; évitez le repos total prolongé — le mouvement doux aide souvent.' },
   { ar: 'استخدم كمادة دافئة أو باردة حسب ما يريحك (دافئة للشد العضلي، باردة للتورم).', en: 'Use a warm or cold compress as it suits you (warm for muscle strain, cold for swelling).', fr: 'Compresse chaude ou froide selon ce qui soulage (chaude pour la contracture, froide pour le gonflement).' },
   { ar: 'اشرب ماء كفاية ونم جيدًا؛ قلة النوم تزيد الإحساس بالألم.', en: 'Stay hydrated and sleep well; poor sleep increases pain perception.', fr: 'Hydratez-vous et dormez bien ; le manque de sommeil augmente la douleur.' },
-  { ar: 'لا تبدأ أدوية أو جرعات من عندك — استشر صيدلي أو طبيب.', en: 'Do not self-prescribe medicines or doses — ask a pharmacist or doctor.', fr: 'Ne prenez pas de médicaments de vous-même — demandez à un pharmacien ou médecin.' },
 ];
 
 const SELF_CARE_BY_REGION: Record<string, LocalizedText[]> = {
@@ -545,19 +645,178 @@ const SELF_CARE_BY_ORGAN: Record<string, LocalizedText[]> = {
       fr: 'Surveillez les changements de poids, de pouls ou de température, consultez pour des tests thyroïdiens.',
     },
   ],
+  gallbladder: [
+    {
+      ar: 'قلّل الأكل الدسم جدًا والوجبات الكبيرة، وكُل وجبات صغيرة منتظمة، وراقب الألم بعد الأكل الدسم.',
+      en: 'Reduce very fatty foods and large meals; eat small regular meals and watch pain after fatty food.',
+      fr: 'Réduisez les aliments très gras et les gros repas ; mangez de petits repas réguliers.',
+    },
+  ],
+  pancreas: [
+    {
+      ar: 'امتنع عن الكحول تمامًا وقلّل الأكل الدسم، واشرب سوائل، وراجع طبيب فورًا لو الألم شديد أو ينتقل للظهر.',
+      en: 'Avoid alcohol completely, reduce fatty food, keep fluids up, and see a doctor promptly if pain is severe or radiates to the back.',
+      fr: 'Évitez totalement l’alcool, réduisez les graisses, buvez, consultez vite si la douleur est intense ou irradie au dos.',
+    },
+  ],
+  appendix: [
+    {
+      ar: 'لا تأكل أو تشرب شيئًا قبل التقييم الطبي، ولا تستخدم مسكنات تخفي الأعراض، وتوجّه للطوارئ لو الألم زاد أو صاحبته حرارة.',
+      en: 'Do not eat or drink before medical assessment, avoid painkillers that mask symptoms, and go to the ER if pain worsens or fever appears.',
+      fr: 'Ne mangez ni ne buvez avant l’évaluation, évitez les antidouleurs qui masquent les signes, allez aux urgences si la douleur s’aggrave ou fièvre.',
+    },
+  ],
+  esophagus: [
+    {
+      ar: 'تجنّب الأكل قبل النوم بساعتين، وارفع رأس السرير، وقلّل الكافيين والدهون والبهارات.',
+      en: 'Avoid eating within two hours of bedtime, raise the head of the bed, and reduce caffeine, fat, and spices.',
+      fr: 'Évitez de manger deux heures avant le coucher, surélevez la tête du lit, réduisez caféine, graisses et épices.',
+    },
+  ],
 };
 
-function buildSelfCare(regions: DetectedRegion[], organs: DetectedOrgan[], language: Lang): string[] {
+/** نصائح مرتبطة بالمرض الأرجح (تظهر أولًا وتختلف حسب الحالة). */
+const SELF_CARE_BY_CONDITION: Record<string, LocalizedText[]> = {
+  'doid:appendicitis': [
+    {
+      ar: 'لو الألم انتقل لأسفل يمين البطن مع حرارة أو قيء، دي علامة تستدعي الطوارئ فورًا — متأخّرش.',
+      en: 'If pain moves to the lower-right abdomen with fever or vomiting, that needs emergency care now — do not delay.',
+      fr: 'Si la douleur migre en bas à droite avec fièvre ou vomissements, c’est une urgence — n’attendez pas.',
+    },
+  ],
+  'doid:gastritis': [
+    {
+      ar: 'قلّل الأكل الحار والدسم والكافيين، وكُل وجبات صغيرة متكرّرة، وتجنّب المسكنات (NSAID) بدون استشارة.',
+      en: 'Reduce spicy/fatty food and caffeine, eat small frequent meals, and avoid NSAID painkillers without advice.',
+      fr: 'Réduisez épicés, gras et caféine, mangez de petits repas fréquents, évitez les AINS sans avis.',
+    },
+  ],
+  'doid:peptic-ulcer': [
+    {
+      ar: 'تجنّب المسكنات (NSAID) والكحول والتدخين، وكُل وجبات صغيرة، وراجع طبيب لو استمر الحرقان.',
+      en: 'Avoid NSAIDs, alcohol, and smoking, eat small meals, and see a doctor if burning persists.',
+      fr: 'Évitez les AINS, l’alcool et le tabac, mangez peu à la fois, consultez si la brûlure persiste.',
+    },
+  ],
+  'doid:ibs': [
+    {
+      ar: 'راقب الأكل اللي بيزعّج قولونك، وزوّد الألياف والمايه بالتدريج، وقسّم الوجبات، وقلّل التوتر.',
+      en: 'Track foods that upset your bowel, increase fibre and fluids gradually, split meals, and reduce stress.',
+      fr: 'Repérez les aliments irritants, augmentez fibres et eau progressivement, fractionnez les repas, réduisez le stress.',
+    },
+  ],
+  'doid:diverticulitis': [
+    {
+      ar: 'أثناء الألم الشديد خفّف الألياف مؤقتًا، واشرب مايه كفاية، وراقب الحرارة — راجع طبيب لو زاد الألم.',
+      en: 'During severe pain, temporarily reduce fibre, keep fluids up, watch for fever, and see a doctor if pain worsens.',
+      fr: 'En cas de douleur intense, réduisez temporairement les fibres, buvez, surveillez la fièvre, consultez si ça s’aggrave.',
+    },
+  ],
+  'doid:gastroenteritis': [
+    {
+      ar: 'عوّض السوائل والأملاح (محلول معالجة الجفاف)، وكُل خفيف، وراقب علامات الجفاف (دوار، بول قليل).',
+      en: 'Replace fluids and salts (oral rehydration), eat light, and watch for dehydration (dizziness, little urine).',
+      fr: 'Réhydratez (solution de réhydratation), mangez léger, surveillez la déshydratation (vertiges, peu d’urine).',
+    },
+  ],
+  'doid:gallstones': [
+    {
+      ar: 'قلّل الأكل الدسم جدًا، وكُل وجبات صغيرة منتظمة، وراقب الألم بعد الأكل الدسم — راجع طبيب لو استمر.',
+      en: 'Reduce very fatty food, eat small regular meals, and watch pain after fatty meals — see a doctor if it persists.',
+      fr: 'Réduisez les aliments très gras, mangez de petits repas réguliers, surveillez la douleur — consultez si elle persiste.',
+    },
+  ],
+  'doid:hepatitis': [
+    {
+      ar: 'امتنع عن الكحول تمامًا، وقلّل الدهون، واشرب مايه كفاية، وراجع طبيب لعمل تحاليل الكبد.',
+      en: 'Avoid alcohol completely, reduce fats, stay hydrated, and see a doctor for liver tests.',
+      fr: 'Évitez totalement l’alcool, réduisez les graisses, hydratez-vous, consultez pour un bilan hépatique.',
+    },
+  ],
+  'doid:pancreatitis': [
+    {
+      ar: 'امتنع عن الكحول والأكل الدسم تمامًا، واشرب سوائل، وراجع طبيب فورًا — الألم الشديد المنتقل للظهر علامة خطر.',
+      en: 'Avoid alcohol and fatty food entirely, keep fluids up, and see a doctor promptly — severe pain to the back is a warning sign.',
+      fr: 'Évitez totalement alcool et graisses, buvez, consultez vite — une douleur intense au dos est un signe d’alerte.',
+    },
+  ],
+  'doid:uti': [
+    {
+      ar: 'اشرب مايه كفاية، وما تحبسش البول، وكمادات دافئة على أسفل البطن، وراجع طبيب لو ظهرت حرارة أو دم.',
+      en: 'Drink enough water, do not hold urine, use warm compresses on the lower abdomen, and see a doctor if fever or blood appears.',
+      fr: 'Buvez assez, ne retenez pas l’urine, compresses chaudes en bas du ventre, consultez si fièvre ou sang.',
+    },
+  ],
+  'doid:kidney-stone': [
+    {
+      ar: 'اشرب مايه كتير (2–3 لتر يوميًا لو مسموح طبيًا)، وقلّل الملح والأوكسالات (شاي/سبانخ)، وراجع طبيب لو الألم شديد.',
+      en: 'Drink plenty of water (2–3 L/day if medically allowed), reduce salt and oxalates, and see a doctor if pain is severe.',
+      fr: 'Buvez beaucoup d’eau (2–3 L/j si permis), réduisez sel et oxalates, consultez si douleur intense.',
+    },
+  ],
+  'doid:ovarian-cyst': [
+    {
+      ar: 'كمادات دافئة على أسفل البطن، وتابعي الألم مع الدورة، وراجعي طبيبة نساء — والطوارئ فورًا لو الألم مفاجئ شديد.',
+      en: 'Warm compresses on the lower abdomen, track pain with your cycle, see a gynaecologist — ER immediately if sudden severe pain.',
+      fr: 'Compresses chaudes en bas du ventre, suivez la douleur selon le cycle, consultez un gynécologue — urgences si douleur brutale.',
+    },
+  ],
+  'doid:endometriosis': [
+    {
+      ar: 'كمادات دافئة وتابعي الألم مع الدورة، وراجعي طبيبة نساء لتقييم السبب ووضع خطة.',
+      en: 'Warm compresses, track pain with your cycle, and see a gynaecologist to assess the cause and plan.',
+      fr: 'Compresses chaudes, suivez la douleur selon le cycle, consultez un gynécologue pour évaluer et planifier.',
+    },
+  ],
+  'doid:angina': [
+    {
+      ar: 'لو ألم الصدر بيجي مع المجهود، ارتاح فورًا، واطلب الطوارئ لو الألم مستمر أو مع ضيق نفس أو تعرّق.',
+      en: 'If chest pain comes with exertion, stop and rest, and call emergency services if it persists or comes with breathlessness or sweating.',
+      fr: 'Si la douleur thoracique survient à l’effort, arrêtez-vous, et appelez les urgences si elle persiste avec essoufflement ou sueurs.',
+    },
+  ],
+  'doid:gerd-organ': [
+    {
+      ar: 'تجنّب الأكل قبل النوم بساعتين، وارفع رأس السرير، وقلّل الكافيين والدهون والبهارات.',
+      en: 'Avoid eating within two hours of bedtime, raise the head of the bed, and reduce caffeine, fat, and spices.',
+      fr: 'Évitez de manger deux heures avant le coucher, surélevez la tête du lit, réduisez caféine, graisses et épices.',
+    },
+  ],
+};
+
+function buildSelfCare(
+  regions: DetectedRegion[],
+  organs: DetectedOrgan[],
+  conditions: ConditionMatch[],
+  triage: TriageLevel,
+  language: Lang,
+): string[] {
   const tips: string[] = [];
-  organs.forEach((organ) => {
-    const extra = SELF_CARE_BY_ORGAN[organ.id];
-    if (extra) extra.forEach((tip) => tips.push(localize(tip, language)));
-  });
-  regions.forEach((region) => {
-    const extra = SELF_CARE_BY_REGION[region.id];
-    if (extra) extra.forEach((tip) => tips.push(localize(tip, language)));
-  });
-  SELF_CARE_GENERAL.forEach((tip) => tips.push(localize(tip, language)));
+  const push = (list?: LocalizedText[]) => {
+    if (list) list.forEach((tip) => tips.push(localize(tip, language)));
+  };
+
+  // 1) نصائح مرتبطة بالمرض الأرجح (الأكثر تحديدًا) — تختلف حسب الحالة.
+  conditions.slice(0, 2).forEach((c) => push(SELF_CARE_BY_CONDITION[c.id]));
+
+  // 2) نصائح حسب العضو الداخلي المكتشف.
+  organs.forEach((organ) => push(SELF_CARE_BY_ORGAN[organ.id]));
+
+  // 3) نصائح حسب منطقة الجسم.
+  regions.forEach((region) => push(SELF_CARE_BY_REGION[region.id]));
+
+  // 4) نصيحة سلامة عامة تُضاف دائمًا.
+  tips.push(localize(SELF_CARE_SAFETY, language));
+
+  // 5) ملء الفراغ بنصائح عامة متنوّعة حسب شدّة الفَرز (بدل تكرار نفس السطور).
+  const generalOrder =
+    triage === 'emergency' || triage === 'urgent'
+      ? [SELF_CARE_GENERAL[2], SELF_CARE_GENERAL[0], SELF_CARE_GENERAL[1]]
+      : triage === 'soon'
+        ? [SELF_CARE_GENERAL[0], SELF_CARE_GENERAL[2], SELF_CARE_GENERAL[1]]
+        : [SELF_CARE_GENERAL[2], SELF_CARE_GENERAL[1], SELF_CARE_GENERAL[0]];
+  generalOrder.forEach((tip) => tips.push(localize(tip, language)));
+
   return [...new Set(tips)].slice(0, 6);
 }
 
@@ -655,11 +914,15 @@ const IMAGE_CLARIFY: LocalizedText = {
 export function analyzeMessage(rawText: string, language: Lang, hasImage = false): AssistantReply {
   const text = normalize(rawText);
   const regions = detectRegions(text);
-  const organs = detectOrgans(text);
+  const detectedOrgans = detectOrgans(text);
+  const locations = detectLocations(text);
   const symptoms = detectSymptoms(text);
   const redFlags = detectRedFlags(text);
   const severity = detectSeverity(text);
   const duration = detectDuration(text);
+
+  // دمج الأعضاء المرشّحة من المواضع الدقيقة (مثل «شمال السرة» ⇒ الأمعاء).
+  const organs = mergeLocationOrgans(detectedOrgans, locations);
 
   const hasText = regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
   // الصورة وحدها تُعدّ إشارة مفهومة (نردّ بإرشاد) حتى لا نقول «لم أفهم».
@@ -667,7 +930,7 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
   const imageOnly = hasImage && !hasText;
 
   const triage = assessTriage(redFlags, severity, duration, regions, symptoms, organs);
-  const conditions = understood ? scoreConditions(regions, symptoms, organs) : [];
+  const conditions = understood ? scoreConditions(regions, symptoms, organs, locations) : [];
 
   const understanding: string[] = [];
   if (regions.length) {
@@ -689,6 +952,18 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
           ar: `أعضاء داخلية ذكرتها: ${organs.map((o) => o.label.ar).join('، ')}.`,
           en: `Internal organs you mentioned: ${organs.map((o) => o.label.en).join(', ')}.`,
           fr: `Organes internes mentionnés : ${organs.map((o) => o.label.fr).join(', ')}.`,
+        },
+        language,
+      ),
+    );
+  }
+  if (locations.length) {
+    understanding.push(
+      localize(
+        {
+          ar: `الموضع الذي حدّدته: ${locations.map((l) => l.label.ar).join('، ')}.`,
+          en: `Location you specified: ${locations.map((l) => l.label.en).join(', ')}.`,
+          fr: `Localisation précisée : ${locations.map((l) => l.label.fr).join(', ')}.`,
         },
         language,
       ),
@@ -764,9 +1039,10 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
     regions,
     symptoms,
     organs,
+    locations,
     organDetails,
     conditions,
-    selfCare: buildSelfCare(regions, organs, language),
+    selfCare: buildSelfCare(regions, organs, conditions, triage.level, language),
     whenToSeeDoctor: WHEN_TO_SEE[triage.level],
     suggestedRegionId: primaryRegion ? primaryRegion.id : null,
     suggestedRegionLabel: primaryRegion ? primaryRegion.label : null,
