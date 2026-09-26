@@ -635,10 +635,24 @@ const CLARIFY: LocalizedText = {  ar: 'قوللي أكتر عن الألم: مك
   fr: 'Dites-m’en plus : où est la douleur, son intensité (0–10) et depuis combien de temps.',
 };
 
+/** مقدّمة عند إرفاق صورة فقط دون وصف نصّي. */
+const IMAGE_INTRO: LocalizedText = {
+  ar: 'شفت الصورة اللي أرفقتها 📷. التحليل البصري الآلي مش متاح من غير إنترنت، فساعدني بوصف بسيط وأنا أفهمك صح.',
+  en: 'I see the photo you attached 📷. Automated image analysis isn’t available offline, so help me with a short description and I’ll understand you.',
+  fr: 'Je vois la photo jointe 📷. L’analyse d’image automatique n’est pas disponible hors ligne ; décrivez brièvement et je vous comprendrai.',
+};
+
+/** سؤال توضيحي عند وجود صورة فقط. */
+const IMAGE_CLARIFY: LocalizedText = {
+  ar: 'قوللي: إيه اللي باين في الصورة (طفح/تورم/جرح/لون)، ومكانه فين في الجسم، وبقاله قد إيه؟',
+  en: 'Tell me: what does the photo show (rash/swelling/wound/colour), where on the body, and for how long?',
+  fr: 'Dites-moi : que montre la photo (éruption/gonflement/blessure/couleur), où sur le corps, et depuis quand ?',
+};
+
 // ---------------------------------------------------------------------------
 // الدالة الرئيسية
 // ---------------------------------------------------------------------------
-export function analyzeMessage(rawText: string, language: Lang): AssistantReply {
+export function analyzeMessage(rawText: string, language: Lang, hasImage = false): AssistantReply {
   const text = normalize(rawText);
   const regions = detectRegions(text);
   const organs = detectOrgans(text);
@@ -647,8 +661,10 @@ export function analyzeMessage(rawText: string, language: Lang): AssistantReply 
   const severity = detectSeverity(text);
   const duration = detectDuration(text);
 
-  const understood =
-    regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
+  const hasText = regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
+  // الصورة وحدها تُعدّ إشارة مفهومة (نردّ بإرشاد) حتى لا نقول «لم أفهم».
+  const understood = hasText || hasImage;
+  const imageOnly = hasImage && !hasText;
 
   const triage = assessTriage(redFlags, severity, duration, regions, symptoms, organs);
   const conditions = understood ? scoreConditions(regions, symptoms, organs) : [];
@@ -708,6 +724,19 @@ export function analyzeMessage(rawText: string, language: Lang): AssistantReply 
     understanding.push(localize(durationText[duration], language));
   }
 
+  if (hasImage) {
+    understanding.unshift(
+      localize(
+        {
+          ar: '📷 أرفقت صورة — سأعتمد على وصفك النصّي، لأن التحليل البصري الآلي غير متاح دون إنترنت.',
+          en: '📷 You attached a photo — I will rely on your text description, since automated image analysis is unavailable offline.',
+          fr: '📷 Vous avez joint une photo — je me base sur votre description, l’analyse d’image automatique étant indisponible hors ligne.',
+        },
+        language,
+      ),
+    );
+  }
+
   const organDetails: DetectedOrganDetail[] = organs.map((organ) => {
     const raw = ORGAN_DETAILS[organ.id];
     return {
@@ -726,10 +755,10 @@ export function analyzeMessage(rawText: string, language: Lang): AssistantReply 
   const mapOrgan = organs.find((organ) => organ.onMap) ?? null;
 
   return {
-    intro: understood ? INTRO[triage.level] : INTRO_UNCLEAR,
+    intro: understood ? (imageOnly ? IMAGE_INTRO : INTRO[triage.level]) : INTRO_UNCLEAR,
     understanding,
     understood,
-    clarifyingQuestion: understood ? null : CLARIFY,
+    clarifyingQuestion: understood ? (imageOnly ? IMAGE_CLARIFY : null) : CLARIFY,
     triage,
     redFlags,
     regions,
