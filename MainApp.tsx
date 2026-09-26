@@ -10,6 +10,8 @@ import { translate } from './services/i18n';
 import { Screen, AnatomyData, Checkup, Muscle } from './types';
 import { DATA } from './constants/appConstants';
 import { Colors } from './constants/colors';
+import { Palette, Gradients, Radii, Elevation } from './constants/design';
+import { Gradient } from './components/Gradient';
 import { getTriageStatus } from './services/triage.js';
 
 // المكونات
@@ -304,7 +306,10 @@ export default function App() {
 
 function NavItem({ icon, title, active, onPress, colors }: { icon: string; title: string; active: boolean; onPress: () => void; colors: typeof Colors }) {
   return <Pressable onPress={onPress} accessibilityRole="tab" accessibilityState={{ selected: active }} style={styles.navItem}>
-    <Text style={[styles.navIcon, { color: active ? colors.primary : colors.textLight }]}>{icon}</Text>
+    <View style={[styles.navPill, active && styles.navPillActive]}>
+      {active ? <Gradient colors={Gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} /> : null}
+      <Text style={[styles.navIcon, { color: active ? Palette.white : colors.textLight }]}>{icon}</Text>
+    </View>
     <Text style={[styles.navLabel, { color: active ? colors.primaryDark : colors.textSecondary }]}>{title}</Text>
   </Pressable>;
 }
@@ -314,11 +319,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingBottom: 18,
+    paddingBottom: 26,
   },
-  bottomNav: { flexDirection: 'row-reverse', justifyContent: 'space-around', alignItems: 'center', minHeight: 62, borderTopWidth: 1, paddingBottom: Platform.OS === 'ios' ? 2 : 0 },
-  navItem: { flex: 1, alignItems: 'center', justifyContent: 'center', minHeight: 58, gap: 1 },
-  navIcon: { fontSize: 21, fontWeight: '800', lineHeight: 25 },
+  bottomNav: { flexDirection: 'row-reverse', justifyContent: 'space-around', alignItems: 'center', marginHorizontal: 14, marginBottom: Platform.OS === 'ios' ? 10 : 12, borderRadius: Radii.xl, borderWidth: 1, paddingVertical: 8, ...Elevation.lg },
+  navItem: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3 },
+  navPill: { width: 48, height: 30, borderRadius: Radii.pill, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  navPillActive: { ...Elevation.glowTeal },
+  navIcon: { fontSize: 17, fontWeight: '900', lineHeight: 20 },
   navLabel: { fontSize: 10, fontWeight: '800' },
   welcomeTopBar: {
     flexDirection: 'row-reverse',
