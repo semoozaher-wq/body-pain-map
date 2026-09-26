@@ -41,6 +41,7 @@
     "optimize:images": "node scripts/optimize-images.js",
     "clean:data": "node scripts/clean-anatomy-data.js",
     "validate:clinical-guides": "node scripts/validate-clinical-guides.js",
+    "validate:triage": "node scripts/validate-triage-tree.js",
     "test": "node --test",
     "test:e2e": "node scripts/e2e-smoke.cjs",
     "build:ios:bundle": "expo export --platform ios --output-dir build/ios",
