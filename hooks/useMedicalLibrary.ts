@@ -6,12 +6,14 @@ import {
   getAllConditions,
   getAllSymptoms,
   getConditionById,
+  getConditionsByBatch,
   getConditionsByMuscleGroup,
   getConditionsByRegion,
   getLibraryStats,
   getSymptomById,
   getSymptomsByRegion,
   getSymptomsForCondition,
+  getRegionalConditions,
   localize,
   searchMedicalLibrary,
   type Language,
@@ -22,6 +24,16 @@ import {
 /** كل الأمراض المحلية. */
 export function useAllConditions(): MedicalCondition[] {
   return useMemo(() => getAllConditions(), []);
+}
+
+/** الحالات الإقليمية المُضافة في دفعة التوسّع. */
+export function useRegionalConditions(): MedicalCondition[] {
+  return useMemo(() => getRegionalConditions(), []);
+}
+
+/** حالات دفعة إقليمية محددة (A | B | C). */
+export function useConditionsByBatch(batch: string | null): MedicalCondition[] {
+  return useMemo(() => (batch ? getConditionsByBatch(batch) : []), [batch]);
 }
 
 /** كل الأعراض المحلية. */
