@@ -39,6 +39,7 @@ interface AssistantScreenProps {
   language: Parameters<typeof translate>[0];
   direction: 'rtl' | 'ltr';
   onOpenRegion: (regionId: string) => void;
+  onOpenOrgan: (organId: string) => void;
 }
 
 const TRIAGE_COLORS: Record<TriageLevel, { bg: string; fg: string; accent: string }> = {
@@ -52,7 +53,7 @@ const TRIAGE_COLORS: Record<TriageLevel, { bg: string; fg: string; accent: strin
 let msgCounter = 0;
 const nextId = () => `m${Date.now()}-${msgCounter++}`;
 
-export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, direction, onOpenRegion }) => {
+export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, direction, onOpenRegion, onOpenOrgan }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const rtl = direction === 'rtl';
@@ -161,7 +162,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
               </View>
             </View>
           ) : (
-            <AssistantBubble key={message.id} reply={message.reply} align={align} row={row} onOpenRegion={onOpenRegion} colors={colors} t={t} />
+            <AssistantBubble key={message.id} reply={message.reply} align={align} row={row} onOpenRegion={onOpenRegion} onOpenOrgan={onOpenOrgan} colors={colors} t={t} />
           ),
         )}
 
@@ -210,11 +211,12 @@ interface BubbleProps {
   align: 'right' | 'left';
   row: 'row' | 'row-reverse';
   onOpenRegion: (regionId: string) => void;
+  onOpenOrgan: (organId: string) => void;
   colors: typeof Colors;
   t: (key: Parameters<typeof translate>[1]) => string;
 }
 
-const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegion, colors, t }) => {
+const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegion, onOpenOrgan, colors, t }) => {
   const triage = TRIAGE_COLORS[reply.triage.level];
   const hasRedFlag = reply.redFlags.length > 0;
 
@@ -239,6 +241,61 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
             <Text style={[styles.sectionLabel, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.understood')}</Text>
             {reply.understanding.map((line) => (
               <Text key={line} style={[styles.understandLine, { color: colors.textPrimary, textAlign: align }]}>• {line}</Text>
+            ))}
+          </View>
+        )}
+
+        {/* أعضاء داخلية مذكورة — بطاقات تفصيلية */}
+        {reply.organDetails.length > 0 && (
+          <View style={styles.organsWrap}>
+            <Text style={[styles.sectionLabel, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.organsDetected')}</Text>
+            {reply.organDetails.map((organ) => (
+              <View key={organ.id} style={[styles.organCard, { borderColor: colors.border, backgroundColor: colors.backgroundAlt }]}>
+                <View style={[styles.organHead, { flexDirection: row }]}>
+                  <Text style={[styles.organName, { color: colors.textPrimary, textAlign: align }]}>
+                    {organ.label[replyIntroLang(reply)]}
+                  </Text>
+                  <View style={styles.organBadge}>
+                    <Text style={styles.organBadgeText}>{t('assistant.internalOrgan')}</Text>
+                  </View>
+                </View>
+                <Text style={[styles.organBlurb, { color: colors.textSecondary, textAlign: align }]}>
+                  {organ.blurb[replyIntroLang(reply)]}
+                </Text>
+                {organ.location && (
+                  <Text style={[styles.organLine, { color: colors.textPrimary, textAlign: align }]}>
+                    <Text style={styles.organLineLabel}>{t('assistant.organLocation')}: </Text>
+                    {organ.location}
+                  </Text>
+                )}
+                {organ.symptoms && organ.symptoms.length > 0 && (
+                  <View style={styles.organList}>
+                    <Text style={[styles.organLineLabel, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.organSymptoms')}</Text>
+                    {organ.symptoms.map((s) => (
+                      <Text key={s} style={[styles.organLine, { color: colors.textPrimary, textAlign: align }]}>• {s}</Text>
+                    ))}
+                  </View>
+                )}
+                {organ.causes && organ.causes.length > 0 && (
+                  <View style={styles.organList}>
+                    <Text style={[styles.organLineLabel, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.organCauses')}</Text>
+                    {organ.causes.map((c) => (
+                      <Text key={c} style={[styles.organLine, { color: colors.textPrimary, textAlign: align }]}>• {c}</Text>
+                    ))}
+                  </View>
+                )}
+                {organ.warning && (
+                  <View style={[styles.organWarnBox, { borderColor: triage.accent, backgroundColor: triage.bg }]}>
+                    <Text style={[styles.organWarnText, { color: triage.fg, textAlign: align }]}>⚠ {organ.warning}</Text>
+                  </View>
+                )}
+                {organ.recommendation && (
+                  <Text style={[styles.organLine, { color: colors.textSecondary, textAlign: align }]}>
+                    <Text style={styles.organLineLabel}>{t('assistant.organRecommendation')}: </Text>
+                    {organ.recommendation}
+                  </Text>
+                )}
+              </View>
             ))}
           </View>
         )}
@@ -303,6 +360,22 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
             <Text style={styles.openMapText}>
               {t('assistant.openOnMap')}
               {reply.suggestedRegionLabel ? ` · ${reply.suggestedRegionLabel[replyIntroLang(reply)]}` : ''}
+            </Text>
+          </Pressable>
+        )}
+
+        {reply.suggestedOrganId && (
+          <Pressable
+            onPress={() => onOpenOrgan(reply.suggestedOrganId as string)}
+            accessibilityRole="button"
+            accessibilityLabel={t('assistant.openOrganOnMap')}
+            style={[styles.openOrganButton, { flexDirection: row }]}
+          >
+            <Gradient colors={Gradients.brandSoft} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+            <Text style={styles.openOrganGlyph}>🫀</Text>
+            <Text style={styles.openOrganText}>
+              {t('assistant.openOrganOnMap')}
+              {reply.suggestedOrganLabel ? ` · ${reply.suggestedOrganLabel[replyIntroLang(reply)]}` : ''}
             </Text>
           </Pressable>
         )}
@@ -398,6 +471,21 @@ const styles = StyleSheet.create({
   whenToSee: { fontFamily: Fonts.arabic.medium, fontSize: Type.caption, lineHeight: 19 },
   openMapButton: { alignItems: 'center', justifyContent: 'center', borderRadius: Radii.md, paddingVertical: 12, paddingHorizontal: 16, overflow: 'hidden', ...Elevation.glowTeal },
   openMapText: { color: Palette.white, fontFamily: Fonts.arabic.bold, fontSize: Type.bodySm, fontWeight: Type.weight.black },
+  organsWrap: { gap: 8 },
+  organCard: { borderWidth: 1, borderRadius: Radii.md, padding: 12, gap: 6 },
+  organHead: { alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  organName: { flex: 1, fontFamily: Fonts.arabic.bold, fontSize: Type.body, fontWeight: Type.weight.black },
+  organBadge: { backgroundColor: Palette.teal100, borderRadius: Radii.xs, paddingHorizontal: 7, paddingVertical: 2 },
+  organBadgeText: { color: Palette.teal700, fontFamily: Fonts.arabic.bold, fontSize: Type.micro },
+  organBlurb: { fontFamily: Fonts.arabic.regular, fontSize: Type.caption, lineHeight: 19 },
+  organList: { gap: 3, marginTop: 2 },
+  organLine: { fontFamily: Fonts.arabic.regular, fontSize: Type.caption, lineHeight: 19 },
+  organLineLabel: { fontFamily: Fonts.arabic.bold, fontSize: Type.micro },
+  organWarnBox: { borderWidth: 1.5, borderRadius: Radii.sm, padding: 9, marginTop: 3 },
+  organWarnText: { fontFamily: Fonts.arabic.medium, fontSize: Type.caption, lineHeight: 19 },
+  openOrganButton: { alignItems: 'center', justifyContent: 'center', gap: 7, borderRadius: Radii.md, paddingVertical: 12, paddingHorizontal: 16, overflow: 'hidden', ...Elevation.sm },
+  openOrganGlyph: { fontSize: 15 },
+  openOrganText: { color: Palette.white, fontFamily: Fonts.arabic.bold, fontSize: Type.bodySm, fontWeight: Type.weight.black },
   disclaimer: { fontFamily: Fonts.arabic.regular, fontSize: Type.micro, lineHeight: 16, marginTop: 2 },
   agentRow2: {},
   thinkingBubble: { flexDirection: 'row', alignItems: 'center', gap: 9, borderWidth: 1, borderRadius: Radii.lg, paddingHorizontal: 14, paddingVertical: 11 },

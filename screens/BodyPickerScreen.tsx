@@ -64,6 +64,8 @@ type BodyPickerScreenProps = {
   language: 'ar' | 'en' | 'fr';
   direction: 'rtl' | 'ltr';
   quickRelief: boolean;
+  /** عضو داخلي مطلوب فتحه تلقائيًا (قادم من المساعد الذكي). */
+  initialOrgan?: string | null;
 };
 
 const quickGuides = ['neck', 'upper-back', 'lower-back', 'forearm'] as const;
@@ -83,6 +85,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   language,
   direction,
   quickRelief,
+  initialOrgan,
 }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const [activeView, setActiveView] = useState<Exclude<BodyView, 'organs'>>('front');
@@ -110,6 +113,25 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   useEffect(() => {
     if (genderLoaded) AsyncStorage.setItem(SELECTED_GENDER_KEY, gender).catch(() => undefined);
   }, [gender, genderLoaded]);
+
+  // عند وصول المستخدم من المساعد الذكي بعضو داخلي محدّد: نفتح وضع الأعضاء ونختار العضو مباشرة.
+  useEffect(() => {
+    if (!initialOrgan) return;
+    const spot = hotspots.find((item) => item.type === 'organ' && item.organId === initialOrgan);
+    if (!spot) return;
+    setShowOrganMode(true);
+    setShowAcupressureMode(false);
+    setShowNaturalReliefMode(false);
+    setShowMedicalLibraryMode(false);
+    setShowDrugLookupMode(false);
+    setActiveView(spot.view);
+    if (spot.gender) setGender(spot.gender);
+    const organ = organs[initialOrgan];
+    if (organ) {
+      setSelectedItem({ kind: 'organ', label: spot.label, organ });
+      setShowDetails(true);
+    }
+  }, [initialOrgan]);
 
   const visibleHotspots = useMemo(
     () => hotspots.filter((hotspot) => hotspot.view === activeView && hotspot.type === 'organ' && (!hotspot.gender || hotspot.gender === gender)),
