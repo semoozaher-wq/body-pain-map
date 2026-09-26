@@ -1,45 +1,40 @@
-BodyMap Pain — المساعد الذكي: صوت + صورة + أعضاء داخلية
-=========================================================
+BodyMap Pain — الملفات المعدّلة والمضافة
+==========================================
 
-الميزات المضافة في هذه النسخة
------------------------------
-1) إدخال صوتي 🎤 : زر ميكروفون بجانب حقل الكتابة، يحوّل كلامك إلى نص تلقائيًا.
-   - على الهاتف (iOS/Android): عبر expo-speech-recognition.
-   - على الويب: عبر واجهة المتصفح (Chrome يدعمها).
-   - يدعم العربية (ar-EG) والإنجليزية والفرنسية حسب لغة الواجهة.
+هذا الملف يحتوي على كل الملفات التي تم تعديلها أو إضافتها، مقسّمة على مجلدين رئيسيين:
 
-2) نطق الردود 🔊 : المساعد ينطق ردوده صوتيًا (Text-to-Speech) عبر expo-speech.
-   - زر 🔊 في رأس الشاشة لتشغيل/إيقاف النطق التلقائي.
-   - زر 🔊 صغير في كل رد لنطق ذلك الرد تحديدًا.
+1) الميزات الصوتية والصور (Voice + Image Assistant)
+---------------------------------------------------
+- screens/AssistantScreen.tsx        (المساعد الذكي: إدخال صوتي 🎤 + إرفاق صورة 📷 + نطق الردود 🔊)
+- services/aiAssistant/engine.ts     (دعم الصورة في محرّك التحليل)
+- services/aiAssistant/lexicon.ts    (المفردات)
+- app.json                           (صلاحيات الميكروفون والصور)
+- package.json                       (مكتبات expo-speech / expo-image-picker / expo-speech-recognition)
+- locales/ar.json , locales/en.json , locales/fr.json   (مفاتيح الترجمة الجديدة)
 
-3) إرفاق صورة 📷 : زر كاميرا لإرفاق صورة (طفح/تورم/جرح...) عبر expo-image-picker.
-   - تظهر الصورة داخل فقاعة رسالتك، ويأخذها المساعد في الاعتبار
-     ويرشدك لوصف ما يظهر فيها (التحليل البصري الآلي غير متاح دون إنترنت).
+2) الأعضاء الداخلية (Internal Organs)
+-------------------------------------
+- data/organDetails.json
+- data/anatomyHotspots.json
+- data/internalOrgans.json
+- MainApp.tsx
+- screens/BodyPickerScreen.tsx
 
-4) الأعضاء الداخلية 🫀 (من الجلسة السابقة): فهم 18 عضوًا داخليًا + بطاقات تفاصيل
-   + زر «افتح العضو على خريطة الأعضاء».
-
-الملفات المعدّلة/المضافة
-------------------------
-- app.json                     : أذونات الميكروفون والصور + إضافة إضافات expo.
-- package.json / package-lock  : إضافة expo-speech, expo-image-picker, expo-speech-recognition.
-- screens/AssistantScreen.tsx  : واجهة الصوت والصورة بالكامل.
-- services/aiAssistant/engine.ts: دعم الصورة في analyzeMessage + منطق الأعضاء.
-- services/aiAssistant/lexicon.ts: ORGAN_TERMS (18 عضوًا).
-- MainApp.tsx                  : ربط فتح العضو من المساعد بالخريطة.
-- screens/BodyPickerScreen.tsx : استقبال العضو المطلوب وفتحه.
-- locales/ar.json | en.json | fr.json : مفاتيح ترجمة الصوت/الصورة/الأعضاء.
-- data/organDetails.json | anatomyHotspots.json | internalOrgans.json : بيانات داعمة.
+3) PWA + المشاركة (Vercel / تثبيت على الهاتف / رابط + QR)
+--------------------------------------------------------
+- public/manifest.json
+- public/service-worker.js
+- public/icons/icon-192.png , icon-512.png , icon-maskable-512.png
+- scripts/inject-pwa.mjs
+- vercel.json
+- share-card.png , qr-code.png
 
 طريقة التركيب
 -------------
-انسخ كل ملف إلى نفس مساره داخل المشروع، ثم:
-  npm install
-  npx tsc --noEmit
-  npx expo export --platform web
+1) انسخ محتوى مجلد files/ إلى جذر مشروعك (نفس المسارات).
+2) npm install
+3) للتشغيل: npx expo start
+4) للويب: npm run build:web  (ينتج مجلد dist/ جاهز للنشر على Vercel)
 
-ملاحظات
--------
-- الإدخال الصوتي على الويب يعتمد على دعم المتصفح (Chrome/Edge). على الهاتف يعمل كاملًا.
-- النطق الصوتي يعمل على كل المنصات (يحتاج أصوات النظام للعربية على الجهاز).
-- كل المعالجة النصية تتم محليًا دون إرسال أي بيانات.
+ملاحظة: التحليل البصري الآلي للصور (تشخيص العلامات/الالتهابات) غير مُفعّل حالياً —
+التطبيق يحفظ الصورة كمرفق مع الشكوى، والتحليل يعتمد على الوصف النصّي.
