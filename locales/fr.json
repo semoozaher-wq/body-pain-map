@@ -6,29 +6,6 @@
   "welcomeTitle": "Une carte de douleur plus claire, une décision plus sereine",
   "welcomeText": "Explorez 317 zones anatomiques, décrivez votre douleur et recevez des conseils généraux avec des alertes de sécurité.",
   "start": "J’accepte et je commence",
-  "history": "Historique",
-  "language": "Langue",
-  "light": "Clair",
-  "dark": "Sombre",
-  "medicalWarning": "Avis médical important",
-  "notDiagnosis": "Cette application est éducative et ne fournit pas de diagnostic.",
-  "next": "Suivant",
-  "back": "Retour",
-  "details": "Décrivez la douleur",
-  "results": "Résumé des conseils",
-  "body": "Choisissez la zone douloureuse",
-  "historyTitle": "Examens précédents",
-  "historyButton": "Historique",
-  "nav": { "home": "Accueil", "map": "Corps", "history": "Historique", "assistant": "Assistant" },
-  "quickLog": { "neck": "Cou", "shoulder": "Épaule", "lowerBack": "Bas du dos", "chest": "Poitrine", "abdomen": "Abdomen" },
-  "welcome": {
-    "statParts": "Parties",
-    "statGroups": "Groupes",
-    "statLocal": "Local",
-    "warningText": "L'application est éducative et ne fournit pas de diagnostic. En cas de douleur sévère ou soudaine, d'essoufflement ou d'évanouissement, demandez une aide urgente.",
-    "disclaimer": "Les informations sont générales et ne remplacent pas la consultation d'un médecin qualifié.",
-    "quickCare": "Autosoins rapides pour le cou, le dos et l’avant-bras"
-  },
   "history": {
     "helperText": "Les examens sont enregistrés sur cet appareil uniquement. Ils ne sont pas téléchargés sur un serveur.",
     "statChecks": "Examens",
@@ -38,6 +15,13 @@
     "urgentText": "Nécessite une attention médicale",
     "clearAll": "Effacer tout l'historique"
   },
+  "language": "Langue",
+  "light": "Clair",
+  "dark": "Sombre",
+  "medicalWarning": "Avis médical important",
+  "notDiagnosis": "Cette application est éducative et ne fournit pas de diagnostic.",
+  "next": "Suivant",
+  "back": "Retour",
   "details": {
     "intensityTitle": "Intensité de la douleur",
     "intensityQuestion": "Choisissez un nombre de 0 à 10",
@@ -76,6 +60,30 @@
     "shareSummary": "Partager le résumé de l'examen",
     "newScan": "Nouvel examen"
   },
+  "body": "Choisissez la zone douloureuse",
+  "historyTitle": "Examens précédents",
+  "historyButton": "Historique",
+  "nav": {
+    "home": "Accueil",
+    "map": "Corps",
+    "history": "Historique",
+    "assistant": "Assistant"
+  },
+  "quickLog": {
+    "neck": "Cou",
+    "shoulder": "Épaule",
+    "lowerBack": "Bas du dos",
+    "chest": "Poitrine",
+    "abdomen": "Abdomen"
+  },
+  "welcome": {
+    "statParts": "Parties",
+    "statGroups": "Groupes",
+    "statLocal": "Local",
+    "warningText": "L'application est éducative et ne fournit pas de diagnostic. En cas de douleur sévère ou soudaine, d'essoufflement ou d'évanouissement, demandez une aide urgente.",
+    "disclaimer": "Les informations sont générales et ne remplacent pas la consultation d'un médecin qualifié.",
+    "quickCare": "Autosoins rapides pour le cou, le dos et l’avant-bras"
+  },
   "bodyPicker": {
     "title": "Carte musculaire interactive",
     "instruction": "Choisissez la zone la plus proche de votre douleur, puis consultez les conseils et alertes. La localisation seule ne diagnostique pas la cause :",
@@ -89,7 +97,12 @@
     "matching": "Appariement de la zone sélectionnée avec la base de données médicale de 317 éléments...",
     "quickCareTitle": "Autosoins rapides",
     "quickCareHint": "Choisissez une zone pour obtenir des conseils généraux doux. Arrêtez si la douleur s'aggrave ou si un signe d'alerte apparaît.",
-    "guide": { "neck": "Cou", "upper-back": "Haut du dos", "lower-back": "Bas du dos", "forearm": "Avant-bras" },
+    "guide": {
+      "neck": "Cou",
+      "upper-back": "Haut du dos",
+      "lower-back": "Bas du dos",
+      "forearm": "Avant-bras"
+    },
     "muscles": "Muscles",
     "organs": "Organes internes",
     "acupressure": "Points d’acupression",
@@ -122,7 +135,10 @@
     "defaultRecommendation": "Demandez une évaluation médicale si la douleur persiste ou s'aggrave.",
     "describePain": "Continuer pour décrire la douleur"
   },
-  "screenTitles": { "details": "Détails de la douleur", "results": "Résumé du bilan" },
+  "screenTitles": {
+    "details": "Détails de la douleur",
+    "results": "Résumé du bilan"
+  },
   "assistant": {
     "name": "Assistant IA",
     "status": "En ligne · fonctionne hors ligne",
@@ -145,6 +161,14 @@
     "organLocation": "Emplacement",
     "organSymptoms": "Symptômes fréquents",
     "organCauses": "Causes possibles",
-    "organRecommendation": "Recommandation"
+    "organRecommendation": "Recommandation",
+    "voiceInput": "Saisie vocale",
+    "voiceStop": "Arrêter l'enregistrement",
+    "listening": "J'écoute… parlez",
+    "attachImage": "Joindre une photo",
+    "removeImage": "Retirer la photo",
+    "speakReply": "Écouter la réponse",
+    "autoSpeak": "Lecture auto des réponses",
+    "photoMessage": "📷 Photo jointe"
   }
 }

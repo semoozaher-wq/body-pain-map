@@ -6,29 +6,6 @@
   "welcomeTitle": "A clearer pain map, a calmer decision",
   "welcomeText": "Explore 317 anatomical areas, describe your pain, and receive clear general guidance with safety alerts.",
   "start": "I agree and start",
-  "history": "History",
-  "language": "Language",
-  "light": "Light",
-  "dark": "Dark",
-  "medicalWarning": "Important medical notice",
-  "notDiagnosis": "This app is educational and does not provide a diagnosis.",
-  "next": "Next",
-  "back": "Back",
-  "details": "Describe the pain",
-  "results": "Guidance summary",
-  "body": "Choose pain location",
-  "historyTitle": "Previous checks",
-  "historyButton": "History",
-  "nav": { "home": "Home", "map": "Body", "history": "History", "assistant": "Assistant" },
-  "quickLog": { "neck": "Neck", "shoulder": "Shoulder", "lowerBack": "Lower back", "chest": "Chest", "abdomen": "Abdomen" },
-  "welcome": {
-    "statParts": "Parts",
-    "statGroups": "Groups",
-    "statLocal": "Local",
-    "warningText": "The app is educational and does not provide a diagnosis. In case of severe or sudden pain, shortness of breath, or fainting, seek urgent help.",
-    "disclaimer": "Information is general and does not replace consultation with a qualified doctor.",
-    "quickCare": "Quick self-care for neck, back and forearm"
-  },
   "history": {
     "helperText": "Checks are saved on this device only. They are not uploaded to any server.",
     "statChecks": "Checks",
@@ -38,6 +15,13 @@
     "urgentText": "Requires medical attention",
     "clearAll": "Clear all history"
   },
+  "language": "Language",
+  "light": "Light",
+  "dark": "Dark",
+  "medicalWarning": "Important medical notice",
+  "notDiagnosis": "This app is educational and does not provide a diagnosis.",
+  "next": "Next",
+  "back": "Back",
   "details": {
     "intensityTitle": "Pain Intensity",
     "intensityQuestion": "Choose a number from 0 to 10",
@@ -76,6 +60,30 @@
     "shareSummary": "Share Check Summary",
     "newScan": "New Check"
   },
+  "body": "Choose pain location",
+  "historyTitle": "Previous checks",
+  "historyButton": "History",
+  "nav": {
+    "home": "Home",
+    "map": "Body",
+    "history": "History",
+    "assistant": "Assistant"
+  },
+  "quickLog": {
+    "neck": "Neck",
+    "shoulder": "Shoulder",
+    "lowerBack": "Lower back",
+    "chest": "Chest",
+    "abdomen": "Abdomen"
+  },
+  "welcome": {
+    "statParts": "Parts",
+    "statGroups": "Groups",
+    "statLocal": "Local",
+    "warningText": "The app is educational and does not provide a diagnosis. In case of severe or sudden pain, shortness of breath, or fainting, seek urgent help.",
+    "disclaimer": "Information is general and does not replace consultation with a qualified doctor.",
+    "quickCare": "Quick self-care for neck, back and forearm"
+  },
   "bodyPicker": {
     "title": "Interactive Muscle Map",
     "instruction": "Choose the closest area, then review guidance and safety alerts. Pain location alone cannot diagnose the cause:",
@@ -89,7 +97,12 @@
     "matching": "Matching selected area with the 317 medical database...",
     "quickCareTitle": "Quick self-care",
     "quickCareHint": "Choose an area for gentle general guidance. Stop if pain worsens or a warning sign appears.",
-    "guide": { "neck": "Neck", "upper-back": "Upper back", "lower-back": "Lower back", "forearm": "Forearm" },
+    "guide": {
+      "neck": "Neck",
+      "upper-back": "Upper back",
+      "lower-back": "Lower back",
+      "forearm": "Forearm"
+    },
     "muscles": "Muscles",
     "organs": "Internal organs",
     "acupressure": "Acupressure points",
@@ -122,7 +135,10 @@
     "defaultRecommendation": "Seek medical evaluation if pain persists or worsens.",
     "describePain": "Continue to describe the pain"
   },
-  "screenTitles": { "details": "Pain details", "results": "Checkup summary" },
+  "screenTitles": {
+    "details": "Pain details",
+    "results": "Checkup summary"
+  },
   "assistant": {
     "name": "AI Assistant",
     "status": "Online · works offline",
@@ -145,6 +161,14 @@
     "organLocation": "Location",
     "organSymptoms": "Common symptoms",
     "organCauses": "Possible causes",
-    "organRecommendation": "Recommendation"
+    "organRecommendation": "Recommendation",
+    "voiceInput": "Voice input",
+    "voiceStop": "Stop recording",
+    "listening": "Listening… speak now",
+    "attachImage": "Attach a photo",
+    "removeImage": "Remove photo",
+    "speakReply": "Listen to reply",
+    "autoSpeak": "Auto-speak replies",
+    "photoMessage": "📷 Attached photo"
   }
 }
