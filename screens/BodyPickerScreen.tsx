@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { BodySilhouette, type BodyView as MuscleMapView, type Gender, type GroupLabelOverrides } from 'react-native-body-parts-anatomy';
 import rawAnatomyData from '../data/anatomyPainMap.json';
 import hotspotsData from '../data/anatomyHotspots.json';
@@ -8,6 +8,7 @@ import organDetails from '../data/organDetails.json';
 import { translate } from '../services/i18n';
 import { AcupressurePanel } from '../components/AcupressurePanel';
 import { IllustratedBodyMap } from '../components/IllustratedBodyMap';
+import { WebBodySilhouette } from '../components/WebBodySilhouette';
 import { NaturalReliefPanel } from '../components/NaturalReliefPanel';
 import type { BodyView, Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
@@ -27,6 +28,8 @@ type Hotspot = {
   gender?: 'male' | 'female';
 };
 const anatomyData = cleanData as { muscles: Record<string, PickerMuscle> };
+// Maps an anatomical fragment slug to its part number, for the web renderer's labels.
+const partNumberForSlug = (slug: string) => anatomyData.muscles[slug]?.partNumber;
 const hotspots = hotspotsData as unknown as Hotspot[];
 const organs = organDetails as unknown as Record<string, Organ>;
 // Female-illustration coordinates calibrated against the generated atlas; male coordinates remain in anatomyHotspots.json.
@@ -248,6 +251,12 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 title={t('bodyPicker.title')}
                 hint={t('bodyPicker.visualHintText')}
                 onSelect={(marker) => { const spot = visibleMuscleHotspots.find((item) => item.id === marker.id); if (spot) handleHotspotPress(spot); }}
+              /> : Platform.OS === 'web' ? <WebBodySilhouette
+                gender={gender}
+                view={activeView as MuscleMapView}
+                selectedSlugs={selectedMuscleId ? [selectedMuscleId] : []}
+                onFragmentPress={handleFragmentPress}
+                numberForSlug={partNumberForSlug}
               /> : <BodySilhouette
                 gender={gender}
                 view={activeView as MuscleMapView}
