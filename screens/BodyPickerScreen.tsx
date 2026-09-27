@@ -8,13 +8,19 @@ import organDetails from '../data/organDetails.json';
 import { translate } from '../services/i18n';
 import { AcupressurePanel } from '../components/AcupressurePanel';
 import { IllustratedBodyMap } from '../components/IllustratedBodyMap';
-import { WebBodySilhouette } from '../components/WebBodySilhouette';
+import WebBodySilhouette from '../components/WebBodySilhouette';
 import { NaturalReliefPanel } from '../components/NaturalReliefPanel';
 import { MedicalLibraryTabsPanel } from '../components/MedicalLibraryTabsPanel';
 import { DrugLookupPanel } from '../components/DrugLookupPanel';
 import type { BodyView, Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
 import cleanData from '../data/cleanData';
+import { useMuscleSelection } from '../hooks/useMuscleSelection';
+import {
+  BODY_REGION_LABELS,
+  getMuscleById,
+  type MuscleEntry,
+} from '../services/medical/muscleMapping';
 
 type PickerMuscle = Muscle & { labelEn?: string };
 type Organ = (typeof organDetails)[keyof typeof organDetails];
@@ -55,7 +61,8 @@ const femaleOrganAdjustments: Record<string, { x: number; y: number }> = {
 const groupLabels = Object.fromEntries(Object.entries((rawAnatomyData as { groups: Record<string, { labelAr: string }> }).groups).map(([key, group]) => [key, group.labelAr])) as GroupLabelOverrides;
 type Selection =
   | { kind: 'muscle'; label: string; muscle: Muscle }
-  | { kind: 'organ'; label: string; organ: Organ };
+  | { kind: 'organ'; label: string; organ: Organ }
+  | { kind: 'mapped'; label: string; entry: MuscleEntry };
 type SelfCareResult = { guideKey: string; pointId?: string; before: number; after: number };
 
 type BodyPickerScreenProps = {
@@ -91,7 +98,9 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   const [activeView, setActiveView] = useState<Exclude<BodyView, 'organs'>>('front');
   const [gender, setGender] = useState<Gender>('male');
   const [genderLoaded, setGenderLoaded] = useState(false);
-  const [selectedMuscleId, setSelectedMuscleId] = useState<string | null>(null);
+  // Multi-fragment selection for the detailed SVG map. The hook keeps the raw
+  // path ids and resolves them into medical records + related conditions.
+  const muscleSelection = useMuscleSelection({ onlyMapped: false });
   const [search, setSearch] = useState('');
   const [selectedItem, setSelectedItem] = useState<Selection | null>(null);
   const [showDetails, setShowDetails] = useState(false);
@@ -160,14 +169,28 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   }, [activeView, gender, search]);
 
   const showMuscle = (muscle: Muscle) => {
-    setSelectedMuscleId(muscle.id);
+    muscleSelection.selectMuscle(muscle.id);
     setSelectedItem({ kind: 'muscle', label: muscle.labelAr, muscle });
     setShowDetails(true);
   };
 
+  // Pressing a fragment on the detailed SVG map. The web renderer emits the raw
+  // SVG path id (e.g. "path2223"). We resolve it against the anatomy library
+  // first, then fall back to the dedicated muscle mapping so every mapped
+  // fragment still surfaces its clinical record and related conditions.
   const handleFragmentPress = (fragmentSlug: string) => {
     const muscle = anatomyData.muscles[fragmentSlug];
-    if (muscle) showMuscle(muscle);
+    if (muscle) {
+      showMuscle(muscle);
+      return;
+    }
+    const entry = getMuscleById(fragmentSlug);
+    const wasSelected = muscleSelection.isSelected(fragmentSlug);
+    muscleSelection.toggleMuscle(fragmentSlug);
+    if (entry && !wasSelected) {
+      setSelectedItem({ kind: 'mapped', label: entry.name, entry });
+      setShowDetails(true);
+    }
   };
 
   const handleHotspotPress = (hotspot: Hotspot) => {
@@ -283,21 +306,30 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 hint={t('bodyPicker.visualHintText')}
                 onSelect={(marker) => { const spot = visibleMuscleHotspots.find((item) => item.id === marker.id); if (spot) handleHotspotPress(spot); }}
               /> : Platform.OS === 'web' ? <WebBodySilhouette
-                gender={gender}
-                view={activeView as MuscleMapView}
-                selectedSlugs={selectedMuscleId ? [selectedMuscleId] : []}
+                view={activeView}
+                selectedSlugs={muscleSelection.selectedIds}
                 onFragmentPress={handleFragmentPress}
                 numberForSlug={partNumberForSlug}
               /> : <BodySilhouette
                 gender={gender}
                 view={activeView as MuscleMapView}
-                selectedSlugs={selectedMuscleId ? [selectedMuscleId] : []}
+                selectedSlugs={muscleSelection.selectedIds}
                 onFragmentPress={handleFragmentPress}
                 accessibilityLabel={t('bodyPicker.mapAccessibilityLabel')}
                 labels={groupLabels}
                 hitTolerance={12}
                 zoomable
               />}
+              {muscleSelection.hasSelection ? (
+                <View style={styles.selectionBar}>
+                  <Text style={styles.selectionText}>
+                    {t('bodyPicker.selectedArea')}: {muscleSelection.count}
+                  </Text>
+                  <Pressable style={styles.selectionClear} onPress={muscleSelection.clearSelection} accessibilityRole="button">
+                    <Text style={styles.selectionClearText}>{t('bodyPicker.noData')}</Text>
+                  </Pressable>
+                </View>
+              ) : null}
               <TextInput
                 value={search}
                 onChangeText={setSearch}
@@ -353,12 +385,19 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                   {selectedItem.muscle.warning ? <Info title={t('bodyPicker.warning')} text={selectedItem.muscle.warning} warning /> : null}
                   <Info title={t('bodyPicker.recommendation')} text={selectedItem.muscle.recommendation ?? t('bodyPicker.defaultRecommendation')} />
                   <Text style={styles.medicalNotice}>{selectedItem.muscle.medicalSafety}</Text>
-                  <Pressable style={[styles.actionButton, styles.detailMapButton]} onPress={() => { setShowOrganMode(false); setBodyViewMode('detailed'); setSelectedMuscleId(selectedItem.muscle.id); dismissDetails(); }} accessibilityRole="button"><Text style={styles.actionButtonText}>{t('bodyPicker.openExactParts')}</Text></Pressable>
+                  <Pressable style={[styles.actionButton, styles.detailMapButton]} onPress={() => { setShowOrganMode(false); setBodyViewMode('detailed'); muscleSelection.selectMuscle(selectedItem.muscle.id); dismissDetails(); }} accessibilityRole="button"><Text style={styles.actionButtonText}>{t('bodyPicker.openExactParts')}</Text></Pressable>
                   <Pressable
                     style={styles.actionButton}
                     onPress={() => { dismissDetails(); onNavigateToDetails(selectedItem.muscle); }}
                     accessibilityRole="button"
                   ><Text style={styles.actionButtonText}>{t('bodyPicker.describePain')}</Text></Pressable>
+                </>
+              ) : selectedItem?.kind === 'mapped' ? (
+                <>
+                  <Text style={styles.partBadge}>{BODY_REGION_LABELS[selectedItem.entry.region][language === 'ar' ? 'ar' : 'en']} · {selectedItem.entry.muscleGroup}</Text>
+                  <Info title={t('bodyPicker.medicalName')} text={selectedItem.entry.name} />
+                  <Info title={t('bodyPicker.symptoms')} text={selectedItem.entry.relatedConditions.join(' • ')} />
+                  <Info title={t('bodyPicker.recommendation')} text={t('bodyPicker.defaultRecommendation')} />
                 </>
               ) : null}
             </ScrollView>
@@ -397,6 +436,10 @@ const styles = StyleSheet.create({
   organHotspot: { position: 'absolute', width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginLeft: -24, marginTop: -24 },
   organDot: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#C23434', borderWidth: 2, borderColor: '#FFF' },
   hotspotLabel: { position: 'absolute', top: -18, fontSize: 9, fontWeight: 'bold', color: '#1F2937', backgroundColor: '#FFFFFFE8', paddingHorizontal: 4, borderRadius: 4 },
+  selectionBar: { flexDirection: 'row-reverse', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#EAF4F5', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8, marginTop: 12 },
+  selectionText: { color: '#0E6972', fontWeight: '800', fontSize: 12 },
+  selectionClear: { backgroundColor: '#0E6972', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5 },
+  selectionClearText: { color: '#FFF', fontWeight: '800', fontSize: 11 },
   search: { backgroundColor: '#FFF', borderWidth: 1, borderColor: '#CCD9DC', borderRadius: 11, padding: 12, marginTop: 12, color: '#203745' },
   searchResults: { marginTop: 8, gap: 7 },
   searchResult: { borderWidth: 1, borderColor: '#D9E7EA', borderRadius: 10, backgroundColor: '#FFF', padding: 11 },
