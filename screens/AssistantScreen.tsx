@@ -3,6 +3,8 @@
 // شاشة المساعد الذكي — دردشة تفهم كلام المستخدم وتردّ بإرشاد تعليمي.
 // تدعم: الكتابة، الإدخال الصوتي (🎤)، نطق الردود (🔊)، وإرفاق صورة (📷).
 // المحرّك النصّي يعمل بالكامل دون إنترنت (محلّي) — لا يُرسل أي بيانات لخادم.
+// ----------------------------------------------------------------------------
+// v2: إزالة أكواد ICD من العرض + تبسيط الأسماء الطبية + أيقونات
 // ============================================================================
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -54,6 +56,93 @@ const TRIAGE_COLORS: Record<TriageLevel, { bg: string; fg: string; accent: strin
   urgent: { bg: '#FFF1F2', fg: '#BE123C', accent: Palette.coral },
   emergency: { bg: '#FEF2F2', fg: '#B91C1C', accent: Palette.rose },
 };
+
+// ============================================================================
+// خريطة تبسيط الأسماء الطبية — بتحوّل الأسماء المعقّدة لعبارات يفهمها المريض
+// ============================================================================
+const SIMPLE_NAMES: Record<string, string> = {
+  // أمراض العظام والعضلات
+  'M54.5': 'وجع في أسفل الظهر',
+  'M54.2': 'وجع في الرقبة',
+  'M75.1': 'إصابة الكتف',
+  'M17': 'خشونة الركبة',
+  'M79.67': 'وجع في العضلات المنتشر',
+  'G43': 'صداع نصفي',
+  'G44.2': 'صداع من التوتر',
+  'M79.1': 'وجع في العضلات',
+  'S93.4': 'لوي الكاحل',
+  'M72.2': 'وجع الكعب',
+  'M79.64': 'وجع في اليد',
+  'M62.838': 'شد عضلي',
+  'M79.7': 'التهاب في الوتر',
+  'M19.9': 'خشونة المفاصل',
+  'M05': 'روماتويد',
+  'G56.0': 'تنميل اليد (نفق رسغي)',
+  'M50.1': 'ديسك الرقبة',
+  'M51.16': 'ديسك أسفل الظهر (عرق النسا)',
+  'G62.9': 'تنميل الأطراف',
+  'I10': 'ضغط الدم',
+  'K21.9': 'حموضة المعدة',
+  'M79.1-doms': 'وجع بعد التمرين',
+  'M25.50': 'وجع في المفاصل',
+  // أمراض الأعضاء الداخلية
+  'K35': 'التهاب الزائدة',
+  'K29': 'التهاب المعدة',
+  'K27': 'قرحة المعدة',
+  'K58': 'القولون العصبي',
+  'K57': 'التهاب القولون',
+  'A09': 'نزلة معوية',
+  'K80': 'حصى المرارة',
+  'K75.9': 'التهاب الكبد',
+  'K85': 'التهاب البنكرياس',
+  'N39.0': 'التهاب المسالك',
+  'N20.0': 'حصى الكلى',
+  'N83.2': 'كيس على المبيض',
+  'N80': 'بطانة الرحم',
+  'I20.9': 'ذبحة صدرية',
+};
+
+// ============================================================================
+// خريطة الأيقونات حسب كود ICD
+// ============================================================================
+const CONDITION_ICONS: Record<string, string> = {
+  // عظام ومفاصل
+  'M54.5': '🦴', 'M54.2': '🦴', 'M75.1': '💪', 'M17': '🦴',
+  'M79.67': '💪', 'M19.9': '🦴', 'M05': '🦴', 'M62.838': '💪',
+  'M79.7': '💪', 'M50.1': '🦴', 'M51.16': '🦴', 'M25.50': '🦴',
+  'M79.1': '💪', 'M79.1-doms': '💪',
+  // أعصاب وصداع
+  'G43': '🤕', 'G44.2': '🤕', 'G56.0': '🖐️', 'G62.9': '🧠',
+  // أطراف
+  'S93.4': '🦶', 'M72.2': '🦶', 'M79.64': '🖐️',
+  // أعضاء داخلية
+  'K35': '🫀', 'K29': '💧', 'K27': '💧', 'K58': '🫀', 'K57': '🫀',
+  'A09': '🫀', 'K80': '🫀', 'K75.9': '🫀', 'K85': '🫀',
+  'N39.0': '💧', 'N20.0': '💧', 'N83.2': '🫀', 'N80': '🫀',
+  'K21.9': '💧',
+  // قلب وضغط
+  'I20.9': '❤️', 'I10': '❤️',
+};
+
+/** الحصول على اسم بسيط + أيقونة حسب كود ICD. */
+function getSimpleCondition(icd10: string, fallbackName: string): { icon: string; name: string } {
+  const simpleName = SIMPLE_NAMES[icd10];
+  const icon = CONDITION_ICONS[icd10] ?? '🩺';
+  // لو مفيش اسم بسيط، نستخدم الاسم الأصلي بعد تنظيفه
+  const name = simpleName ?? cleanMedicalName(fallbackName);
+  return { icon, name };
+}
+
+/** تنظيف الاسم الطبي: إزالة "القطني"، "العنقي"، الأقواس الزائدة. */
+function cleanMedicalName(name: string): string {
+  return name
+    .replace(/\(القطني\)/g, '')
+    .replace(/\(العنقي\)/g, '')
+    .replace(/القطني/g, 'أسفل الظهر')
+    .replace(/العنقي/g, 'الرقبة')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 let msgCounter = 0;
 const nextId = () => `m${Date.now()}-${msgCounter++}`;
@@ -197,7 +286,6 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       setInput('');
       setPendingImage(null);
       setThinking(true);
-      // محاكاة زمن التفكير البشري القصير لإحساس طبيعي بالدردشة.
       setTimeout(() => {
         const reply = analyzeMessage(text, language as Lang, hasImg);
         const id = nextId();
@@ -524,21 +612,22 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
           </View>
         )}
 
-        {/* أمراض محتملة */}
+        {/* أمراض محتملة — نسخة مبسّطة بدون أكواد ICD */}
         {reply.conditions.length > 0 && (
           <View style={styles.conditionsWrap}>
             <Text style={[styles.sectionLabel, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.possibleConditions')}</Text>
-            {reply.conditions.map((condition) => (
-              <View key={condition.id} style={[styles.conditionCard, { borderColor: colors.border, backgroundColor: colors.backgroundAlt }]}>
-                <View style={[styles.conditionHead, { flexDirection: row }]}>
-                  <Text style={[styles.conditionName, { color: colors.textPrimary, textAlign: align }]}>{condition.name[replyIntroLang(reply)]}</Text>
-                  <View style={styles.icdChip}>
-                    <Text style={styles.icdText}>{condition.icd10}</Text>
+            {reply.conditions.map((condition) => {
+              const { icon, name } = getSimpleCondition(condition.icd10, condition.name[replyIntroLang(reply)]);
+              return (
+                <View key={condition.id} style={[styles.conditionCard, { borderColor: colors.border, backgroundColor: colors.backgroundAlt }]}>
+                  <View style={[styles.conditionHead, { flexDirection: row }]}>
+                    <Text style={styles.conditionIcon}>{icon}</Text>
+                    <Text style={[styles.conditionName, { color: colors.textPrimary, textAlign: align }]}>{name}</Text>
                   </View>
+                  <Text style={[styles.conditionSummary, { color: colors.textSecondary, textAlign: align }]}>{condition.summary[replyIntroLang(reply)]}</Text>
                 </View>
-                <Text style={[styles.conditionSummary, { color: colors.textSecondary, textAlign: align }]}>{condition.summary[replyIntroLang(reply)]}</Text>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
 
@@ -595,7 +684,6 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
 
 /**
  * اختيار لغة نص الرد — نستخدم لغة الواجهة الحالية.
- * (الرد يحمل النصوص بثلاث لغات؛ نعرض اللغة المطلوبة.)
  */
 function replyIntroLang(reply: AssistantReply): Lang {
   return reply.__lang ?? 'ar';
@@ -672,10 +760,9 @@ const styles = StyleSheet.create({
   redFlagLine: { fontFamily: Fonts.arabic.medium, fontSize: Type.bodySm, lineHeight: 21 },
   conditionsWrap: { gap: 8 },
   conditionCard: { borderWidth: 1, borderRadius: Radii.md, padding: 11, gap: 5 },
-  conditionHead: { alignItems: 'center', justifyContent: 'space-between', gap: 8 },
+  conditionHead: { alignItems: 'center', gap: 8 },
+  conditionIcon: { fontSize: 22 },
   conditionName: { flex: 1, fontFamily: Fonts.arabic.bold, fontSize: Type.bodySm, fontWeight: Type.weight.bold },
-  icdChip: { backgroundColor: Palette.teal100, borderRadius: Radii.xs, paddingHorizontal: 7, paddingVertical: 2 },
-  icdText: { color: Palette.teal700, fontFamily: Fonts.arabic.bold, fontSize: Type.micro },
   conditionSummary: { fontFamily: Fonts.arabic.regular, fontSize: Type.caption, lineHeight: 19 },
   selfCareWrap: { gap: 5 },
   selfCareLine: { fontFamily: Fonts.arabic.regular, fontSize: Type.bodySm, lineHeight: 21 },
