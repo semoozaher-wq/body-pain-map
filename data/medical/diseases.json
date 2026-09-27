@@ -744,6 +744,336 @@
         "structures": ["distal-femur", "proximal-tibia", "patella", "tibiofemoral-joint"]
       },
       "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:cluster-headache",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "G44.0",
+      "name": {
+        "ar": "الصداع العنقودي",
+        "en": "Cluster headache",
+        "fr": "Algie vasculaire de la face"
+      },
+      "summary": {
+        "ar": "صداع شديد جدًا في جانب واحد (غالبًا حول العين)، يجي في نوبات متكررة مع احمرار العين ورشح الأنف.",
+        "en": "Very severe one-sided headache (often around the eye), occurring in clusters with eye redness and runny nose.",
+        "fr": "Céphalée très sévère unilatérale (souvent péri-orbitaire), en salves avec œil rouge et nez qui coule."
+      },
+      "muscleGroups": ["head", "neck"],
+      "regions": ["head_neck"],
+      "symptoms": ["hpo:0002076", "hpo:0000988"],
+      "redFlags": {
+        "ar": "صداع شديد مفاجئ أو مع أعراض عصبية، أو أول نوبة — راجع طبيب.",
+        "en": "Sudden severe headache with neurological symptoms, or first episode — see a doctor.",
+        "fr": "Céphalée sévère soudaine avec signes neurologiques, ou première crise — consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/clusterheadaches.html",
+      "sources": [
+        { "title": "MedlinePlus — Cluster Headaches", "url": "https://medlineplus.gov/clusterheadaches.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "cranium_facial",
+        "structures": ["skull-cranium", "facial-bones", "orbit", "ocular-globe"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:sinusitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "J32",
+      "name": {
+        "ar": "التهاب الجيوب الأنفية",
+        "en": "Sinusitis",
+        "fr": "Sinusite"
+      },
+      "summary": {
+        "ar": "التهاب في الجيوب الأنفية يسبب ألمًا وضغطًا في الوجه أو الجبهة، يزيد بالانحناء للأمام، مع رشح أو انسداد الأنف.",
+        "en": "Sinus inflammation causing facial or forehead pain/pressure, worse when bending forward, with nasal congestion or discharge.",
+        "fr": "Inflammation des sinus causant douleur/pression faciale ou frontale, aggravée en se penchant, avec congestion nasale."
+      },
+      "muscleGroups": ["head", "neck"],
+      "regions": ["head_neck"],
+      "symptoms": ["hpo:0002076", "hpo:0000988"],
+      "redFlags": {
+        "ar": "تورّم حول العين، حرارة عالية، أو ألم شديد — راجع طبيب فورًا.",
+        "en": "Swelling around the eye, high fever, or severe pain — see a doctor promptly.",
+        "fr": "Gonflement péri-orbitaire, forte fièvre, ou douleur intense — consultez vite."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/sinusitis.html",
+      "sources": [
+        { "title": "MedlinePlus — Sinusitis", "url": "https://medlineplus.gov/sinusitis.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "cranium_facial",
+        "structures": ["maxillary-sinus", "frontal-sinus", "ethmoid-sinus", "sphenoid-sinus"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:otitis-media",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "H66",
+      "name": {
+        "ar": "التهاب الأذن الوسطى",
+        "en": "Otitis media",
+        "fr": "Otite moyenne"
+      },
+      "summary": {
+        "ar": "عدوى في الأذن الوسطى تسبب ألمًا في الأذن، قد يصحبه حرارة أو ضعف سمع أو إفراز.",
+        "en": "Middle ear infection causing ear pain, sometimes with fever, hearing loss, or discharge.",
+        "fr": "Infection de l'oreille moyenne causant douleur, parfois fièvre, baisse d'audition ou écoulement."
+      },
+      "muscleGroups": ["head", "neck"],
+      "regions": ["head_neck"],
+      "symptoms": ["hpo:0001945", "hpo:0000988"],
+      "redFlags": {
+        "ar": "إفراز من الأذن، تورّم حول الأذن، أو ألم شديد مع حرارة — راجع طبيب.",
+        "en": "Ear discharge, swelling around the ear, or severe pain with fever — see a doctor.",
+        "fr": "Écoulement de l'oreille, gonflement péri-auriculaire, ou douleur intense avec fièvre — consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/earinfections.html",
+      "sources": [
+        { "title": "MedlinePlus — Ear Infections", "url": "https://medlineplus.gov/earinfections.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "cranium_facial",
+        "structures": ["external-ear", "middle-ear", "inner-ear", "temporal-bone"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:toothache",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K08.8",
+      "name": {
+        "ar": "ألم الأسنان",
+        "en": "Toothache",
+        "fr": "Mal de dents"
+      },
+      "summary": {
+        "ar": "ألم في سن واحد أو أكثر يزيد مع المضغ أو الساخن والبارد، غالبًا بسبب تسوس أو التهاب.",
+        "en": "Pain in one or more teeth, worse with chewing or hot/cold, often from decay or infection.",
+        "fr": "Douleur d'une ou plusieurs dents, aggravée par la mastication ou le chaud/froid, souvent carie ou infection."
+      },
+      "muscleGroups": ["head"],
+      "regions": ["head_neck"],
+      "symptoms": ["hpo:0002076"],
+      "redFlags": {
+        "ar": "تورّم في الوجه أو الفك، حرارة، أو صعوبة في البلع أو التنفس — راجع طبيب أسنان فورًا.",
+        "en": "Facial or jaw swelling, fever, or difficulty swallowing or breathing — see a dentist promptly.",
+        "fr": "Gonflement facial ou de la mâchoire, fièvre, ou difficulté à avaler/respirer — consultez vite."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/toothdecay.html",
+      "sources": [
+        { "title": "MedlinePlus — Tooth Decay", "url": "https://medlineplus.gov/toothdecay.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "cranium_facial",
+        "structures": ["teeth", "mandible", "tmj", "facial-bones"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:pharyngitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "J02",
+      "name": {
+        "ar": "التهاب الحلق (البلعوم)",
+        "en": "Pharyngitis (sore throat)",
+        "fr": "Pharyngite"
+      },
+      "summary": {
+        "ar": "التهاب في الحلق يسبب ألمًا وحرقانًا يزيد عند البلع، مع احمرار أو حرارة أحيانًا.",
+        "en": "Throat inflammation causing pain and burning, worse when swallowing, sometimes with redness or fever.",
+        "fr": "Inflammation de la gorge : douleur et brûlure aggravées à la déglutition, parfois rougeur ou fièvre."
+      },
+      "muscleGroups": ["neck"],
+      "regions": ["head_neck"],
+      "symptoms": ["hpo:0001945"],
+      "redFlags": {
+        "ar": "صعوبة في التنفس أو بلع اللعاب، سيلان لعاب، أو تورّم في الرقبة — راجع الطوارئ.",
+        "en": "Difficulty breathing or swallowing saliva, drooling, or neck swelling — seek emergency care.",
+        "fr": "Difficulté à respirer ou à avaler la salive, bave, ou gonflement cervical — urgences."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/sorethroat.html",
+      "sources": [
+        { "title": "MedlinePlus — Sore Throat", "url": "https://medlineplus.gov/sorethroat.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "neck_soft_tissue",
+        "structures": ["pharynx", "larynx", "cervical-lymph-nodes", "thyroid-gland"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:gout",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M10",
+      "name": {
+        "ar": "النقرس",
+        "en": "Gout",
+        "fr": "Goutte"
+      },
+      "summary": {
+        "ar": "ارتفاع حمض اليوريك يسبب نوبة ألم مفاجئة وشديدة في مفصل واحد (غالبًا إبهام القدم) مع احمرار وتورم.",
+        "en": "High uric acid causing sudden severe joint pain (often big toe) with redness and swelling.",
+        "fr": "Acide urique élevé causant une douleur articulaire brutale (souvent gros orteil) avec rougeur et gonflement."
+      },
+      "muscleGroups": ["feet", "ankles", "knees"],
+      "regions": ["lower_limb"],
+      "symptoms": ["hpo:0002829", "hpo:0001386", "hpo:0001369"],
+      "redFlags": {
+        "ar": "مفصل أحمر ساخن متورم مع حرارة — راجع طبيب (احتمال عدوى).",
+        "en": "Red, hot, swollen joint with fever — see a doctor (possible infection).",
+        "fr": "Articulation rouge, chaude et gonflée avec fièvre — consultez (infection possible)."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/gout.html",
+      "sources": [
+        { "title": "MedlinePlus — Gout", "url": "https://medlineplus.gov/gout.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "ankle_foot",
+        "structures": ["metatarsals-foot", "phalanges-foot", "ankle-joint", "subtalar-joint"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:bursitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "M71",
+      "name": {
+        "ar": "التهاب الجراب",
+        "en": "Bursitis",
+        "fr": "Bursite"
+      },
+      "summary": {
+        "ar": "التهاب في الجراب (كيس صغير قرب المفصل) يسبب ألمًا موضعيًا وتورمًا يزداد بالحركة أو الضغط.",
+        "en": "Bursa inflammation causing localized pain and swelling, worse with movement or pressure.",
+        "fr": "Inflammation de la bourse séreuse : douleur locale et gonflement, aggravés par le mouvement ou la pression."
+      },
+      "muscleGroups": ["shoulder", "knees", "hip", "elbow"],
+      "regions": ["upper_limb", "lower_limb"],
+      "symptoms": ["hpo:0002829", "hpo:0001386"],
+      "redFlags": {
+        "ar": "تورم شديد، احمرار وحرارة، أو عدم قدرة على الحركة — راجع طبيب.",
+        "en": "Severe swelling, redness and heat, or inability to move — see a doctor.",
+        "fr": "Gonflement important, rougeur et chaleur, ou impossibilité de bouger — consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/bursitis.html",
+      "sources": [
+        { "title": "MedlinePlus — Bursitis", "url": "https://medlineplus.gov/bursitis.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "shoulder",
+        "structures": ["subacromial-bursa", "glenohumeral-joint", "rotator-cuff", "deltoid"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:varicose-veins",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "I83",
+      "name": {
+        "ar": "الدوالي (توسع الأوردة)",
+        "en": "Varicose veins",
+        "fr": "Varices"
+      },
+      "summary": {
+        "ar": "أوردة متضخمة ومتعرجة في الساقين تسبب ثقلًا وألمًا وتورمًا، تزيد بالوقوف الطويل.",
+        "en": "Enlarged, twisted veins in the legs causing heaviness, pain, and swelling, worse with prolonged standing.",
+        "fr": "Veines dilatées et tortueuses des jambes : lourdeur, douleur et gonflement, aggravés par la station debout."
+      },
+      "muscleGroups": ["calves", "legs", "ankles"],
+      "regions": ["lower_limb"],
+      "symptoms": ["hpo:0002829"],
+      "redFlags": {
+        "ar": "تورم في ساق واحدة، احمرار وحرارة، أو جرح لا يلتئم — راجع طبيب.",
+        "en": "One-sided leg swelling, redness and heat, or non-healing wound — see a doctor.",
+        "fr": "Gonflement unilatéral de la jambe, rougeur et chaleur, ou plaie qui ne guérit pas — consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/varicoseveins.html",
+      "sources": [
+        { "title": "MedlinePlus — Varicose Veins", "url": "https://medlineplus.gov/varicoseveins.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "lower_leg",
+        "structures": ["tibia", "fibula", "gastrocnemius", "soleus"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:shingles",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "B02",
+      "name": {
+        "ar": "الحزام الناري (القوباء المنطقية)",
+        "en": "Shingles (herpes zoster)",
+        "fr": "Zona"
+      },
+      "summary": {
+        "ar": "إعادة تنشيط فيروس الجديري المائي تسبب طفحًا حويصليًا مؤلمًا على شريط جانبي واحد من الجسم.",
+        "en": "Reactivation of chickenpox virus causing a painful blistering rash along one strip of the body.",
+        "fr": "Réactivation du virus varicelle-zona causant une éruption vésiculeuse douloureuse unilatérale."
+      },
+      "muscleGroups": [],
+      "regions": ["back", "torso_front", "head_neck", "upper_limb", "lower_limb"],
+      "symptoms": ["hpo:0000988", "hpo:0003401"],
+      "redFlags": {
+        "ar": "طفح حول العين، صعوبة رؤية، أو ألم شديد لا يتحسن — راجع طبيب فورًا.",
+        "en": "Rash around the eye, vision problems, or severe unimproving pain — see a doctor promptly.",
+        "fr": "Éruption péri-orbitaire, troubles visuels, ou douleur intense — consultez vite."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/shingles.html",
+      "sources": [
+        { "title": "MedlinePlus — Shingles", "url": "https://medlineplus.gov/shingles.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "paraspinal_soft_tissue",
+        "structures": ["thoracolumbar-fascia"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:psoriatic-arthritis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "L40.5",
+      "name": {
+        "ar": "الصدفية المفصلية",
+        "en": "Psoriatic arthritis",
+        "fr": "Rhumatisme psoriasique"
+      },
+      "summary": {
+        "ar": "التهاب في المفاصل مرتبط بمرض الصدفية الجلدي، يسبب ألمًا وتورمًا في المفاصل مع طفح جلدي.",
+        "en": "Joint inflammation linked to psoriasis skin disease, causing joint pain/swelling with a skin rash.",
+        "fr": "Inflammation articulaire liée au psoriasis : douleur/gonflement articulaire avec éruption cutanée."
+      },
+      "muscleGroups": ["hands", "feet", "knees", "lower-back"],
+      "regions": ["upper_limb", "lower_limb", "back"],
+      "symptoms": ["hpo:0002829", "hpo:0001386", "hpo:0000988"],
+      "redFlags": {
+        "ar": "تورم مفاصل متعدد، احمرار وحرارة، أو ألم يوقظك ليلًا — راجع طبيب.",
+        "en": "Multiple swollen joints, redness and heat, or night pain waking you — see a doctor.",
+        "fr": "Plusieurs articulations gonflées, rougeur et chaleur, ou douleur nocturne — consultez."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/psoriaticarthritis.html",
+      "sources": [
+        { "title": "MedlinePlus — Psoriatic Arthritis", "url": "https://medlineplus.gov/psoriaticarthritis.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "wrist_hand",
+        "structures": ["carpal-bones", "metacarpals", "radiocarpal-joint", "carpal-tunnel"]
+      },
+      "icd10Status": "unverified"
     }
   ]
-}
+      }
