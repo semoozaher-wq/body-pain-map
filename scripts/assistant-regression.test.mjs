@@ -63,4 +63,25 @@ test('recognizes foot wording and gives foot-specific guidance', () => {
   assert.ok(reply.selfCare.some((tip) => tip.includes('القدم')));
 });
 
+test('understands left and right flank wording without repeating the location question', () => {
+  for (const text of ['جنب الشمال', 'الجانب الشمال', 'والله الجنب الشمال', 'جنب اليمين', 'الجانب اليمين']) {
+    const reply = analyze(text, 'ar');
+    assert.equal(reply.clarificationOnly, false, `${text} should not trigger another location question`);
+    assert.equal(reply.suggestedRegionId, 'obliques');
+  }
+});
+
+test('forceAnswer breaks a repeated clarification loop', () => {
+  const reply = analyze('لسه الوجع في جنبي', 'ar', false, { forceAnswer: true });
+  assert.equal(reply.clarificationOnly, false);
+  assert.ok(reply.selfCare.length > 0);
+});
+
+test('recognizes Egyptian dialect and medication mentions', () => {
+  const reply = analyze('ضهرى بيوجعني من امبارح واخدت بنادول وما نفعش', 'ar');
+  assert.ok(reply.regions.some((item) => item.id === 'lower-back'));
+  assert.ok(reply.medications.some((item) => item.id === 'paracetamol'));
+  assert.ok(reply.medicationQuestion);
+});
+
 fs.rmSync(outfile, { force: true });
