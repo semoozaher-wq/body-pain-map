@@ -7,7 +7,7 @@
 //   2) استخراج: مناطق الجسم + الأعراض + علامات الإنذار + الشدّة + المدة.
 //   3) حساب درجة الاستعجال (فرز إرشادي) مع مراعاة علامات الخطر.
 //   4) مطابقة أمراض محتملة من المكتبة الطبية المحلية (diseaseLibrary) بترتيب
-//      حسب درجة التطابق — مع استخدام محرّك البحث الذكي smartSearch.
+//      حسب درجة التطابق — مع استخدام محرّك البحث الذكي smartSearch + فلتر المنطقة.
 //   5) توليد نصائح رعاية ذاتية عامة/حسب المنطقة + متى تطلب المساعدة.
 //
 // ⚠️ لا يقدّم تشخيصًا ولا قرارًا علاجيًا — إرشاد تعليمي فقط. كل شيء محلي.
@@ -38,7 +38,6 @@ import {
   type SymptomTerm,
 } from './lexicon';
 
-/** تفاصيل عضو داخلي غنية (من organDetails.json) — المحتوى عربي كما في التطبيق. */
 interface OrganDetailRaw {
   name: string;
   location?: string;
@@ -319,14 +318,11 @@ function buildOrganWeights(organs: DetectedOrgan[], locations: DetectedLocation[
 }
 
 /**
- * مطابقة الأمراض المحتملة — نسخة محسّنة (v3).
+ * مطابقة الأمراض المحتملة — v3.
  * ----------------------------------------------------------------------------
- * 1) تستخدم محرّك البحث الذكي `smartSearch` (من diseaseLibrary) على النص الأصلي
- *    للاستفادة من قاموس الكلمات المفتاحية والعامية المصرية.
- * 2) (جديد) تفلتر نتائج smartSearch حسب المنطقة: لو المستخدم ذكر منطقة جسم
- *    (زي "ضهري" → lower-back)، نستبعد أي حالة regions بتاعتها مش متوافقة.
- *    ده يمنع ظهور حالات غير مرتبطة (زي K81.0 التهاب المرارة).
- * 3) (جديد) تعطي bonus للحالات اللي regions بتاعتها مطابقة لمنطقة الاستعلام.
+ * 1) تستخدم محرّك البحث الذكي `smartSearch` على النص الأصلي.
+ * 2) تفلتر نتائج smartSearch حسب منطقة الجسم المذكورة.
+ * 3) تعطي bonus للحالات اللي regions أو muscleGroups بتاعتها مطابقة.
  * 4) تدمج النتايج مع منطق المطابقة القديم (regions / symptoms / organs).
  * 5) ترتّب النتايج النهائية حسب أعلى score وتُعيد أول 4 حالات.
  */
@@ -344,31 +340,26 @@ export function scoreConditions(
   const hasSpecificEvidence =
     specificSymptoms.length > 0 || organs.length > 0 || locations.length > 0;
 
-  // 🆕 مجموعة مناطق الاستعلام (للتفلترة والمكافأة)
   const queryRegions = new Set(regions.map((r) => r.region));
 
   const scored: ConditionMatch[] = [];
   const seen = new Set<string>();
 
-  // === 1) البحث الذكي (أعلى أولوية) ===
+  // === 1) البحث الذكي ===
   if (rawText && rawText.trim().length >= 2) {
     try {
-      const smartResults = smartSearch(rawText, getAllConditions(), 12); // نطلب 12 بدل 8 لفلترة أفضل
+      const smartResults = smartSearch(rawText, getAllConditions(), 12);
       smartResults.forEach((r) => {
-        // 🆕 فلتر المنطقة: لو المستخدم ذكر منطقة، نستبعد الحالات اللي regions بتاعتها
-        // مش متوافقة مع منطقة الاستعلام. ده يمنع K81.0 (مرارة) من الظهور لـ "ضهري".
         if (queryRegions.size > 0 && r.condition.regions.length > 0) {
           const matchesRegion = r.condition.regions.some((cr) => queryRegions.has(cr as any));
           const hasMuscleMatch = r.condition.muscleGroups.some((mg) =>
             regions.some((reg) => reg.id === mg),
           );
-          // نستبعد الحالة بس لو مفيش تطابق regions ولا muscleGroups
           if (!matchesRegion && !hasMuscleMatch) {
             return;
           }
         }
 
-        // نستبعد الحالات المنتشرة لو فيه دليل موضعي.
         if (r.condition.diffuse && localized) {
           const boosted = Math.round(r.score * 0.5);
           if (boosted <= 0) return;
@@ -377,7 +368,6 @@ export function scoreConditions(
         if (seen.has(r.condition.id)) return;
         seen.add(r.condition.id);
 
-        // 🆕 مكافأة للحالات اللي regions بتاعتها مطابقة لمنطقة الاستعلام
         let bonus = 0;
         if (queryRegions.size > 0) {
           const regionMatch = r.condition.regions.some((cr) => queryRegions.has(cr as any));
@@ -394,7 +384,6 @@ export function scoreConditions(
           summary: r.condition.summary,
           icd10: r.condition.icd10,
           medlinePlusUrl: r.condition.medlinePlusUrl,
-          // نرفع الـ score من smartSearch + البونص
           score: r.score * 3 + bonus,
         });
       });
@@ -403,7 +392,7 @@ export function scoreConditions(
     }
   }
 
-  // === 2) منطق المطابقة القديم (regions / organs / symptoms) ===
+  // === 2) منطق المطابقة القديم ===
   getAllConditions().forEach((condition: MedicalCondition) => {
     if (seen.has(condition.id)) return;
 
@@ -527,38 +516,18 @@ function assessTriageBase(
   const redFlagSymptom = symptoms.some((s) => s.redFlag);
 
   if (hasEmergency) {
-    return {
-      level: 'emergency',
-      title: TRIAGE_META.emergency.title,
-      advice: TRIAGE_META.emergency.advice,
-    };
+    return { level: 'emergency', title: TRIAGE_META.emergency.title, advice: TRIAGE_META.emergency.advice };
   }
   if (hasUrgent || redFlagSymptom || (severity !== null && severity >= 9)) {
-    return {
-      level: 'urgent',
-      title: TRIAGE_META.urgent.title,
-      advice: TRIAGE_META.urgent.advice,
-    };
+    return { level: 'urgent', title: TRIAGE_META.urgent.title, advice: TRIAGE_META.urgent.advice };
   }
   if (severity !== null && severity >= 7) {
-    return {
-      level: 'soon',
-      title: TRIAGE_META.soon.title,
-      advice: TRIAGE_META.soon.advice,
-    };
+    return { level: 'soon', title: TRIAGE_META.soon.title, advice: TRIAGE_META.soon.advice };
   }
   if (duration === 'weeks' || duration === 'months' || regions.length >= 2) {
-    return {
-      level: 'routine',
-      title: TRIAGE_META.routine.title,
-      advice: TRIAGE_META.routine.advice,
-    };
+    return { level: 'routine', title: TRIAGE_META.routine.title, advice: TRIAGE_META.routine.advice };
   }
-  return {
-    level: 'self_care',
-    title: TRIAGE_META.self_care.title,
-    advice: TRIAGE_META.self_care.advice,
-  };
+  return { level: 'self_care', title: TRIAGE_META.self_care.title, advice: TRIAGE_META.self_care.advice };
 }
 
 function assessTriage(
