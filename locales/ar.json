@@ -134,7 +134,16 @@
     "warning": "تنبيه سلامة",
     "recommendation": "إرشاد عام",
     "defaultRecommendation": "اطلب تقييمًا طبيًا إذا استمر الألم أو ازداد.",
-    "describePain": "تابع إلى تسجيل وصف الألم"
+    "describePain": "تابع إلى تسجيل وصف الألم",
+    "selectedMuscles": "العضلات المختارة",
+    "clearSelection": "إلغاء الاختيار",
+    "noSelection": "لم تختر أي عضلة بعد. اضغط على أي جزء في الجسم.",
+    "relatedConditions": "أعراض شائعة مرتبطة بهذه العضلات",
+    "askAssistant": "اسأل المساعد عن هذه العضلات",
+    "viewDetails": "اعرض التفاصيل الكاملة",
+    "muscleCount": "{{count}} عضلة مختارة",
+    "viewLabel": "العرض",
+    "switchView": "بدّل العرض"
   },
   "screenTitles": {
     "details": "تفاصيل الألم",
