@@ -22,6 +22,7 @@ import {
 } from 'react-native';
 import * as Speech from 'expo-speech';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
@@ -33,6 +34,7 @@ import { translate } from '../services/i18n';
 import {
   analyzeMessage,
   QUICK_PROMPTS,
+  SYMPTOM_QUICK_CHIPS,
   type AssistantReply,
   type Lang,
   type TriageLevel,
@@ -183,8 +185,16 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [returningReminder, setReturningReminder] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const webRecognitionRef = useRef<any>(null);
+  const clarificationStreakRef = useRef(0);
+
+  useEffect(() => {
+    AsyncStorage.getItem('bodymap.lastAssistantVisit').then((value) => {
+      if (value && Date.now() - Number(value) > 24 * 60 * 60 * 1000) setReturningReminder(true);
+    }).catch(() => {});
+  }, []);
 
   // ------------------------------------------------------------------
   // التعرّف على الكلام (إدخال صوتي)
@@ -310,6 +320,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     [language],
   );
 
+  const symptomQuickChips = useMemo(
+    () => SYMPTOM_QUICK_CHIPS.map((chip) => chip[language as Lang] ?? chip.ar),
+    [language],
+  );
+
   const send = useCallback(
     (raw: string, imageUri?: string | null) => {
       const text = raw.trim();
@@ -322,6 +337,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
         .join(' ');
 
       const fullText = `${userMessages} ${text}`.trim();
+      const forceAnswer = clarificationStreakRef.current >= 2;
+      AsyncStorage.setItem('bodymap.lastAssistantVisit', String(Date.now())).catch(() => {});
 
       setMessages((prev) => [
         ...prev,
@@ -331,7 +348,9 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       setPendingImage(null);
       setThinking(true);
       setTimeout(() => {
-        const reply = analyzeMessage(fullText, language as Lang, hasImg);
+        const reply = analyzeMessage(fullText, language as Lang, hasImg, { forceAnswer });
+        if (reply.clarificationOnly) clarificationStreakRef.current += 1;
+        else clarificationStreakRef.current = 0;
         const id = nextId();
         setMessages((prev) => [...prev, { id, role: 'assistant', reply }]);
         setThinking(false);
@@ -406,6 +425,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
 
         {messages.length === 0 && (
           <View style={styles.quickWrap}>
+            {returningReminder && <Text style={[styles.clarify, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.followUpReminder')}</Text>}
             <Text style={[styles.quickTitle, { color: colors.textSecondary, textAlign: align }]}>
               {t('assistant.tryThese')}
             </Text>
@@ -443,12 +463,26 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
               row={row}
               onOpenRegion={onOpenRegion}
               onOpenOrgan={onOpenOrgan}
+              onSend={send}
               onSpeak={() => speak(replyToSpeech(message.reply), message.id)}
               speaking={speakingId === message.id}
               colors={colors}
               t={t}
             />
           ),
+        )}
+
+        {messages.length > 0 && !thinking && (
+          <View style={styles.quickWrap}>
+            <Text style={[styles.quickTitle, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.quickSymptoms')}</Text>
+            <View style={[styles.chipRow, { flexDirection: row }]}>
+              {symptomQuickChips.map((chip) => (
+                <Pressable key={chip} onPress={() => send(chip)} style={[styles.symptomChip, { backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} accessibilityRole="button" accessibilityLabel={chip}>
+                  <Text style={[styles.symptomChipText, { color: colors.textPrimary }]}>{chip}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
         )}
 
         {thinking && (
@@ -537,13 +571,14 @@ interface BubbleProps {
   row: 'row' | 'row-reverse';
   onOpenRegion: (regionId: string) => void;
   onOpenOrgan: (organId: string) => void;
+  onSend: (text: string) => void;
   onSpeak: () => void;
   speaking: boolean;
   colors: typeof Colors;
   t: (key: Parameters<typeof translate>[1]) => string;
 }
 
-const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegion, onOpenOrgan, onSpeak, speaking, colors, t }) => {
+const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegion, onOpenOrgan, onSend, onSpeak, speaking, colors, t }) => {
   const triage = TRIAGE_COLORS[reply.triage.level];
   const hasRedFlag = reply.redFlags.length > 0;
 
@@ -642,12 +677,38 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
           </View>
         )}
 
+        {reply.medications.length > 0 && (
+          <View style={styles.selfCareWrap}>
+            <Text style={[styles.sectionLabel, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.medicationsDetected')}</Text>
+            {reply.medications.map((medication) => (
+              <View key={medication.id} style={[styles.organWarnBox, { borderColor: triage.accent, backgroundColor: triage.bg }]}>
+                <Text style={[styles.organLine, { color: triage.fg, textAlign: align }]}>{medication.label[replyIntroLang(reply)]}</Text>
+                <Text style={[styles.organWarnText, { color: triage.fg, textAlign: align }]}>{medication.caution[replyIntroLang(reply)]}</Text>
+              </View>
+            ))}
+            {reply.medicationQuestion && <Text style={[styles.clarify, { color: colors.textSecondary, textAlign: align }]}>{reply.medicationQuestion[replyIntroLang(reply)]}</Text>}
+          </View>
+        )}
+
         {/* شارة الفرز */}
         <View style={[styles.triageBadge, { backgroundColor: triage.bg, flexDirection: row }]}>
           <View style={[styles.triageDot, { backgroundColor: triage.accent }]} />
           <Text style={[styles.triageTitle, { color: triage.fg, textAlign: align }]}>{reply.triage.title[replyIntroLang(reply)]}</Text>
         </View>
         <Text style={[styles.triageAdvice, { color: colors.textSecondary, textAlign: align }]}>{reply.triage.advice[replyIntroLang(reply)]}</Text>
+
+        {reply.followUpQuestion && (
+          <View style={styles.selfCareWrap}>
+            <Text style={[styles.sectionLabel, { color: colors.textSecondary, textAlign: align }]}>{reply.followUpQuestion[replyIntroLang(reply)]}</Text>
+            <View style={[styles.chipRow, { flexDirection: row }]}>
+              {reply.followUpOptions.slice(0, 3).map((option) => (
+                <Pressable key={option.ar} onPress={() => onSend(option[replyIntroLang(reply)])} style={[styles.symptomChip, { backgroundColor: colors.backgroundAlt, borderColor: colors.border }]} accessibilityRole="button">
+                  <Text style={[styles.symptomChipText, { color: colors.textPrimary }]}>{option[replyIntroLang(reply)]}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
 
         {/* علامات الإنذار */}
         {hasRedFlag && (
@@ -783,6 +844,9 @@ const styles = StyleSheet.create({
   quickChip: { alignItems: 'center', gap: 8, borderWidth: 1, borderRadius: Radii.md, paddingHorizontal: 13, paddingVertical: 11, ...Elevation.xs },
   quickChipGlyph: { color: Palette.teal500, fontSize: 18, fontWeight: '900' },
   quickChipText: { flex: 1, fontFamily: Fonts.arabic.medium, fontSize: Type.bodySm, lineHeight: 20 },
+  chipRow: { flexWrap: 'wrap', gap: 7 },
+  symptomChip: { borderWidth: 1, borderRadius: Radii.pill, paddingHorizontal: 10, paddingVertical: 7 },
+  symptomChipText: { fontFamily: Fonts.arabic.medium, fontSize: Type.micro },
   userRow: { flexDirection: 'row' },
   userBubble: { maxWidth: '86%', borderRadius: Radii.lg, borderTopRightRadius: 6, paddingHorizontal: 14, paddingVertical: 11, overflow: 'hidden', gap: 8, ...Elevation.glowTeal },
   userImage: { width: 200, height: 200, borderRadius: Radii.md, alignSelf: 'flex-end' },
