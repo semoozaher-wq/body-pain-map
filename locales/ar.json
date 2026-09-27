@@ -134,16 +134,7 @@
     "warning": "تنبيه سلامة",
     "recommendation": "إرشاد عام",
     "defaultRecommendation": "اطلب تقييمًا طبيًا إذا استمر الألم أو ازداد.",
-    "describePain": "تابع إلى تسجيل وصف الألم",
-    "selectedMuscles": "العضلات المختارة",
-    "clearSelection": "إلغاء الاختيار",
-    "noSelection": "لم تختر أي عضلة بعد. اضغط على أي جزء في الجسم.",
-    "relatedConditions": "أعراض شائعة مرتبطة بهذه العضلات",
-    "askAssistant": "اسأل المساعد عن هذه العضلات",
-    "viewDetails": "اعرض التفاصيل الكاملة",
-    "muscleCount": "{{count}} عضلة مختارة",
-    "viewLabel": "العرض",
-    "switchView": "بدّل العرض"
+    "describePain": "تابع إلى تسجيل وصف الألم"
   },
   "screenTitles": {
     "details": "تفاصيل الألم",
@@ -157,6 +148,9 @@
     "privateBadge": "خصوصية كاملة · بلا إنترنت",
     "tryThese": "جرّب أحد الأمثلة",
     "thinking": "أفكّر…",
+    "clarifyLocation": "الألم فين بالظبط؟",
+    "clarifySeverity": "شدته قد إيه؟",
+    "clarifyDuration": "بقاله قد إيه؟",
     "placeholder": "اكتب مثلاً: حاسس بألم في أسفل ضهري…",
     "send": "إرسال",
     "understood": "فهمت من كلامك",
