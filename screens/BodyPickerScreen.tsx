@@ -19,6 +19,7 @@ import { useMuscleSelection } from '../hooks/useMuscleSelection';
 import {
   BODY_REGION_LABELS,
   getMuscleById,
+  localizeRelatedCondition,
   type MuscleEntry,
 } from '../services/medical/muscleMapping';
 
@@ -396,7 +397,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 <>
                   <Text style={styles.partBadge}>{BODY_REGION_LABELS[selectedItem.entry.region][language === 'ar' ? 'ar' : 'en']} · {selectedItem.entry.muscleGroup}</Text>
                   <Info title={t('bodyPicker.medicalName')} text={selectedItem.entry.name} />
-                  <Info title={t('bodyPicker.symptoms')} text={selectedItem.entry.relatedConditions.join(' • ')} />
+                  <Info title={t('bodyPicker.symptoms')} text={selectedItem.entry.relatedConditions.map((condition) => localizeRelatedCondition(condition, language)).join(' • ')} />
                   <Info title={t('bodyPicker.recommendation')} text={t('bodyPicker.defaultRecommendation')} />
                 </>
               ) : null}

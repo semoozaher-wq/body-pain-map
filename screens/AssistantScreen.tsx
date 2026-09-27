@@ -160,6 +160,7 @@ function replyToSpeech(reply: AssistantReply): string {
   const L = reply.__lang ?? 'ar';
   const parts: string[] = [reply.intro[L]];
   if (reply.clarifyingQuestion) parts.push(reply.clarifyingQuestion[L]);
+  if (reply.clarificationOnly) return parts.filter(Boolean).join('. ');
   parts.push(reply.triage.title[L], reply.triage.advice[L]);
   reply.redFlags.forEach((f) => parts.push(f.label[L]));
   reply.selfCare.slice(0, 4).forEach((s) => parts.push(s));
@@ -183,6 +184,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
+  const webRecognitionRef = useRef<any>(null);
 
   // ------------------------------------------------------------------
   // التعرّف على الكلام (إدخال صوتي)
@@ -209,6 +211,39 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
 
   const toggleMic = useCallback(async () => {
     try {
+      // expo-speech-recognition is native-first and does not reliably expose
+      // a permission flow on Expo Web/Vercel. Use the browser Web Speech API
+      // there, which triggers the browser's own microphone permission prompt.
+      if (Platform.OS === 'web') {
+        const browserWindow = globalThis as any;
+        const Recognition = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition;
+        if (!Recognition) return;
+        if (listening) {
+          webRecognitionRef.current?.stop?.();
+          return;
+        }
+        const recognition = new Recognition();
+        webRecognitionRef.current = recognition;
+        recognition.lang = speechLang(language);
+        recognition.interimResults = true;
+        recognition.continuous = false;
+        recognition.onstart = () => setListening(true);
+        recognition.onresult = (event: any) => {
+          const result = event?.results?.[event.results.length - 1];
+          const transcript = result?.[0]?.transcript ?? '';
+          if (!transcript) return;
+          if (result.isFinal) {
+            setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+            setInterim('');
+          } else {
+            setInterim(transcript);
+          }
+        };
+        recognition.onerror = () => { setListening(false); setInterim(''); };
+        recognition.onend = () => { setListening(false); setInterim(''); webRecognitionRef.current = null; };
+        recognition.start();
+        return;
+      }
       if (listening) {
         ExpoSpeechRecognitionModule.stop();
         return;
@@ -250,6 +285,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   useEffect(() => () => {
     try {
       Speech.stop();
+      webRecognitionRef.current?.abort?.();
       ExpoSpeechRecognitionModule.abort?.();
     } catch {}
   }, []);
@@ -548,6 +584,9 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
           </View>
         )}
 
+        {reply.clarificationOnly ? (
+          <Text style={[styles.disclaimer, { color: colors.textLight, textAlign: align }]}>{reply.disclaimer[replyIntroLang(reply)]}</Text>
+        ) : <>
         {/* أعضاء داخلية مذكورة — بطاقات تفصيلية */}
         {reply.organDetails.length > 0 && (
           <View style={styles.organsWrap}>
@@ -685,6 +724,7 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
         )}
 
         <Text style={[styles.disclaimer, { color: colors.textLight, textAlign: align }]}>{reply.disclaimer[replyIntroLang(reply)]}</Text>
+        </>}
       </View>
     </View>
   );
