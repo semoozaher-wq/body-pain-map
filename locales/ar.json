@@ -148,9 +148,6 @@
     "privateBadge": "خصوصية كاملة · بلا إنترنت",
     "tryThese": "جرّب أحد الأمثلة",
     "thinking": "أفكّر…",
-    "clarifyLocation": "الألم فين بالظبط؟",
-    "clarifySeverity": "شدته قد إيه؟",
-    "clarifyDuration": "بقاله قد إيه؟",
     "placeholder": "اكتب مثلاً: حاسس بألم في أسفل ضهري…",
     "send": "إرسال",
     "understood": "فهمت من كلامك",
@@ -173,6 +170,9 @@
     "removeImage": "إزالة الصورة",
     "speakReply": "اسمع الرد",
     "autoSpeak": "نطق الردود تلقائيًا",
-    "photoMessage": "📷 صورة مرفقة"
+    "photoMessage": "📷 صورة مرفقة",
+    "clarifyLocation": "الألم فين بالظبط؟",
+    "clarifySeverity": "شدته قد إيه؟",
+    "clarifyDuration": "بقاله قد إيه؟"
   }
 }

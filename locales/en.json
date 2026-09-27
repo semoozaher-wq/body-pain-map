@@ -148,9 +148,6 @@
     "privateBadge": "Fully private · no internet",
     "tryThese": "Try an example",
     "thinking": "Thinking…",
-    "clarifyLocation": "Where exactly is the pain?",
-    "clarifySeverity": "How intense is it?",
-    "clarifyDuration": "How long has it been?",
     "placeholder": "e.g. I have pain in my lower back…",
     "send": "Send",
     "understood": "What I understood",
@@ -173,6 +170,9 @@
     "removeImage": "Remove photo",
     "speakReply": "Listen to reply",
     "autoSpeak": "Auto-speak replies",
-    "photoMessage": "📷 Attached photo"
+    "photoMessage": "📷 Attached photo",
+    "clarifyLocation": "Where exactly is the pain?",
+    "clarifySeverity": "How intense is it?",
+    "clarifyDuration": "How long has it been?"
   }
 }

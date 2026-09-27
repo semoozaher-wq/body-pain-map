@@ -148,9 +148,6 @@
     "privateBadge": "Confidentialité totale · sans internet",
     "tryThese": "Essayez un exemple",
     "thinking": "Réflexion…",
-    "clarifyLocation": "Où exactement est la douleur ?",
-    "clarifySeverity": "Quelle est son intensité ?",
-    "clarifyDuration": "Depuis combien de temps ?",
     "placeholder": "ex. J'ai mal au bas du dos…",
     "send": "Envoyer",
     "understood": "Ce que j'ai compris",
@@ -173,6 +170,9 @@
     "removeImage": "Retirer la photo",
     "speakReply": "Écouter la réponse",
     "autoSpeak": "Lecture auto des réponses",
-    "photoMessage": "📷 Photo jointe"
+    "photoMessage": "📷 Photo jointe",
+    "clarifyLocation": "Où exactement est la douleur ?",
+    "clarifySeverity": "Quelle est son intensité ?",
+    "clarifyDuration": "Depuis combien de temps ?"
   }
 }
