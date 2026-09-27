@@ -34,6 +34,15 @@ test('recognizes commonly missed head and body areas', () => {
   }
 });
 
+test('asks only for location before presenting full guidance', () => {
+  const reply = analyze('في وجع في جمبي', 'ar');
+  assert.equal(reply.clarificationOnly, true);
+  assert.ok(reply.clarifyingQuestion);
+  assert.deepEqual(reply.conditions, []);
+  assert.deepEqual(reply.selfCare, []);
+  assert.deepEqual(reply.organDetails, []);
+});
+
 test('does not leak unrelated lower-limb diseases into testicular pain', () => {
   const reply = analyze('لدي الم في الخصيه اليمين', 'ar');
   assert.ok(reply.organs.some((item) => item.id === 'testicles'));
