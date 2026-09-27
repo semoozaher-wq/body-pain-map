@@ -7,9 +7,9 @@
 //   - تطبيع النص العربي (ضهري = ظهري، ألم = وجع، إلخ)
 //   - إزالة السوابق واللواحق (بضهري → ضهر)
 //   - بحث تقريبي (Fuzzy) للأخطاء الإملائية
-//   - قاموس كلمات مفتاحية وعامية مصرية لكل حالة
+//   - قاموس كلمات مفتاحية وعامية مصرية لكل حالة (40 حالة)
 //   - خوارزمية ترتيب (Scoring) — النتائج الأهم أولاً
-//   - (v3) تصحيح كل الـ IDs لتطابق diseases.json الحقيقي + إضافة حالات ناقصة
+//   - (v4) إضافة كلمات مفتاحية لحالات organConditions.json الـ 15
 // ============================================================================
 
 import diseasesData from '../../data/medical/diseases.json';
@@ -66,13 +66,7 @@ const BASE_CONDITIONS = (diseasesData as { conditions: MedicalCondition[] }).con
 const ORGAN_CONDITIONS = (organConditionsData as { conditions: MedicalCondition[] }).conditions;
 const REGIONAL_CONDITIONS = (regionalConditionsData as { conditions: MedicalCondition[] }).conditions;
 
-/**
- * الحالات المنتشرة (Diffuse) — بتخفّض درجتها عند وجود شكوى موضعية.
- * IDs الحقيقية من diseases.json:
- *  - doid:1490 (فيبروميالجيا)
- *  - doid:8505 (الميالجيا)
- *  - doid:8505-doms (ألم عضلي بعد المجهود)
- */
+/** حالات منتشرة (Diffuse) — بتخفّض درجتها عند وجود شكوى موضعية. */
 const DIFFUSE_IDS = new Set(['doid:1490', 'doid:8505', 'doid:8505-doms']);
 
 const CONDITIONS: MedicalCondition[] = [
@@ -86,8 +80,7 @@ const SYMPTOMS = (symptomsData as { symptoms: MedicalSymptom[] }).symptoms;
 // ============================================================================
 // قاموس الكلمات المفتاحية والعامية المصرية
 // ----------------------------------------------------------------------------
-// ⚠️ مهم جدًا: مفتاح كل حالة = الـ id الحقيقي بتاعها في diseases.json
-//    (اتصحح في v3 ليطابق الملف الفعلي)
+// مفتاح كل حالة = الـ id الحقيقي بتاعها في diseases.json أو organConditions.json
 // ============================================================================
 
 interface KeywordEntry {
@@ -96,8 +89,11 @@ interface KeywordEntry {
 }
 
 const KEYWORDS_MAP: Record<string, KeywordEntry> = {
+  // ==========================================================================
+  // أولاً: أمراض العظام والعضلات (من diseases.json) — 25 حالة
+  // ==========================================================================
+
   // ===== ألم أسفل الظهر الميكانيكي (M54.5) =====
-  // id الحقيقي: doid:4536
   'doid:4536': {
     keywords: [
       'ألم', 'وجع', 'شد', 'تعب', 'ضغط', 'حرقة', 'تقلص',
@@ -106,18 +102,13 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'back pain', 'low back', 'lumbar', 'lumbago', 'backache',
     ],
     colloquial: [
-      'ضهري بيوجعني',
-      'وجع في ضهري',
-      'حاسس بوجع في أسفل ضهري',
-      'ضهري تعبان',
-      'مش قادر أقف من وجع ضهري',
-      'وجع في وسط ضهري',
+      'ضهري بيوجعني', 'وجع في ضهري', 'حاسس بوجع في أسفل ضهري',
+      'ضهري تعبان', 'مش قادر أقف من وجع ضهري', 'وجع في وسط ضهري',
       'حاسس بشد في ضهري',
     ],
   },
 
   // ===== ألم الرقبة (M54.2) =====
-  // id الحقيقي: doid:1167
   'doid:1167': {
     keywords: [
       'رقبة', 'رقبتي', 'الرقبة', 'وجع رقبة', 'شد رقبة', 'تقلص رقبة',
@@ -125,16 +116,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'neck pain', 'cervicalgia', 'cervical', 'neck ache', 'stiff neck',
     ],
     colloquial: [
-      'رقبتي بتوجعني',
-      'وجع في رقبتي',
-      'رقبتي مش قادر ألفها',
-      'حاسس بشد في رقبتي',
-      'وجع في الرقبة من النوم',
+      'رقبتي بتوجعني', 'وجع في رقبتي', 'رقبتي مش قادر ألفها',
+      'حاسس بشد في رقبتي', 'وجع في الرقبة من النوم',
     ],
   },
 
   // ===== إصابة الكفة المدورة (M75.1) =====
-  // id الحقيقي: doid:3059
   'doid:3059': {
     keywords: [
       'كتف', 'كتفي', 'الكتف', 'وجع كتف', 'شد كتف', 'تقلص كتف',
@@ -142,16 +129,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'rotator cuff', 'shoulder pain', 'frozen shoulder', 'shoulder',
     ],
     colloquial: [
-      'كتفي بتوجعني',
-      'وجع في كتفي',
-      'مش قادر أرفع إيدي',
-      'كتفي مش قادر أحركه',
-      'حاسس بشد في كتفي',
+      'كتفي بتوجعني', 'وجع في كتفي', 'مش قادر أرفع إيدي',
+      'كتفي مش قادر أحركه', 'حاسس بشد في كتفي',
     ],
   },
 
   // ===== خشونة الركبة (M17) =====
-  // id الحقيقي: doid:8398
   'doid:8398': {
     keywords: [
       'ركبة', 'ركبتي', 'الركبة', 'وجع ركبة', 'شد ركبة',
@@ -159,31 +142,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'knee pain', 'knee osteoarthritis', 'knee', 'gonarthrosis',
     ],
     colloquial: [
-      'ركبتي بتوجعني',
-      'وجع في ركبتي',
-      'ركبتي بتعمل صوت',
-      'مش قادر أثني ركبتي',
-      'ركبتي وارمة',
-    ],
-  },
-
-  // ===== الفصال العظمي (M19.9) =====
-  // id الحقيقي: doid:8398-oa
-  'doid:8398-oa': {
-    keywords: [
-      'خشونة المفاصل', 'الفصال العظمي', 'تآكل الغضروف', 'خشونة',
-      'المفاصل', 'وجع مفاصل', 'تآكل المفاصل',
-      'osteoarthritis', 'OA', 'degenerative joint disease',
-    ],
-    colloquial: [
-      'مفاصلي بتوجعني',
-      'مفاصلي بتطلع صوت',
-      'حاسس بخشونة في مفاصلي',
+      'ركبتي بتوجعني', 'وجع في ركبتي', 'ركبتي بتعمل صوت',
+      'مش قادر أثني ركبتي', 'ركبتي وارمة',
     ],
   },
 
   // ===== فيبروميالجيا (M79.67) =====
-  // id الحقيقي: doid:1490
   'doid:1490': {
     keywords: [
       'فيبروميالجيا', 'ألم عضلي', 'ألم منتشر', 'تعب مزمن', 'إرهاق',
@@ -191,16 +155,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'fibromyalgia', 'chronic pain', 'widespread pain', 'fatigue',
     ],
     colloquial: [
-      'جسمي كله بيوجعني',
-      'وجع في كل حتة',
-      'تعبان طول الوقت',
-      'حاسس بإرهاق مستمر',
-      'جسمي مكسر',
+      'جسمي كله بيوجعني', 'وجع في كل حتة', 'تعبان طول الوقت',
+      'حاسس بإرهاق مستمر', 'جسمي مكسر',
     ],
   },
 
   // ===== الصداع النصفي (G43) =====
-  // id الحقيقي: doid:3311
   'doid:3311': {
     keywords: [
       'صداع', 'صداع نصفي', 'الشقيقة', 'وجع راس', 'وجع في راسي',
@@ -208,16 +168,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'migraine', 'headache', 'head pain', 'cephalgia',
     ],
     colloquial: [
-      'راسي بتوجعني',
-      'عندي صداع',
-      'صداع نصفي',
-      'حاسس بوجع في نص راسي',
-      'الصداع مش بيروح',
+      'راسي بتوجعني', 'عندي صداع', 'صداع نصفي',
+      'حاسس بوجع في نص راسي', 'الصداع مش بيروح',
     ],
   },
 
   // ===== الصداع التوتري (G44.2) =====
-  // id الحقيقي: doid:11476-th
   'doid:11476-th': {
     keywords: [
       'صداع توتري', 'صداع', 'شد في الرقبة', 'ضغط في الرأس',
@@ -225,16 +181,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'tension headache', 'stress headache', 'headache',
     ],
     colloquial: [
-      'صداع من الشغل',
-      'حاسس بضغط في دماغي',
-      'راسي تقيلة',
-      'صداع من التوتر',
-      'حاسس بشد في راسي',
+      'صداع من الشغل', 'حاسس بضغط في دماغي', 'راسي تقيلة',
+      'صداع من التوتر', 'حاسس بشد في راسي',
     ],
   },
 
-  // ===== الميالجيا (M79.1) — ألم العضلات العام =====
-  // id الحقيقي: doid:8505
+  // ===== ألم العضلات (M79.1) =====
   'doid:8505': {
     keywords: [
       'ألم عضلي', 'ألم في العضلات', 'ميالجيا', 'وجع عضلي', 'ألم عام',
@@ -242,14 +194,11 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'myalgia', 'muscle pain', 'muscular pain',
     ],
     colloquial: [
-      'عضلاتي بتوجعني',
-      'جسمي كله بوجع',
-      'حاسس بألم في عضلاتي',
+      'عضلاتي بتوجعني', 'جسمي كله بوجع', 'حاسس بألم في عضلاتي',
     ],
   },
 
   // ===== ألم عضلي بعد المجهود DOMS (M79.1) =====
-  // id الحقيقي: doid:8505-doms
   'doid:8505-doms': {
     keywords: [
       'ألم بعد التمرين', 'ألم بعد المجهود', 'تعب بعد الرياضة',
@@ -257,14 +206,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'delayed onset muscle soreness', 'muscle soreness',
     ],
     colloquial: [
-      'جسمي بيوجعني بعد الجيم',
-      'عضلاتي بتوجعني بعد التمرين',
+      'جسمي بيوجعني بعد الجيم', 'عضلاتي بتوجعني بعد التمرين',
       'حاسس بألم بعد ما لعبت رياضة',
     ],
   },
 
   // ===== شد عضلي (M62.838) =====
-  // id الحقيقي: doid:6713
   'doid:6713': {
     keywords: [
       'شد عضلي', 'تقلص', 'تشنج', 'تقلص عضلي', 'وجع عضلي',
@@ -272,16 +219,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'muscle spasm', 'muscle cramps', 'spasm', 'cramp', 'muscle strain',
     ],
     colloquial: [
-      'حاسس بتقلص في رجلي',
-      'عضلاتي بتشد',
-      'حاسس بشد في ضهري',
-      'رجلي بتتقلص',
-      'عضلاتي بتوجعني',
+      'حاسس بتقلص في رجلي', 'عضلاتي بتشد', 'حاسس بشد في ضهري',
+      'رجلي بتتقلص', 'عضلاتي بتوجعني',
     ],
   },
 
   // ===== الانزلاق الغضروفي العنقي (M50.1) =====
-  // id الحقيقي: doid:10202
   'doid:10202': {
     keywords: [
       'انزلاق غضروفي عنقي', 'ديسك الرقبة', 'انزلاق فقرات الرقبة',
@@ -289,15 +232,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'cervical disc herniation', 'cervical disc', 'herniated cervical disc',
     ],
     colloquial: [
-      'رقبتي بتوجعني وبتنمّل إيدي',
-      'ديسك في رقبتي',
-      'وجع في رقبتي بينزل على إيدي',
-      'إيدي بتتنمّل من رقبتي',
+      'رقبتي بتوجعني وبتنمّل إيدي', 'ديسك في رقبتي',
+      'وجع في رقبتي بينزل على إيدي', 'إيدي بتتنمّل من رقبتي',
     ],
   },
 
   // ===== الانزلاق الغضروفي القطني (M51.16) =====
-  // id الحقيقي: doid:10202-ls
   'doid:10202-ls': {
     keywords: [
       'انزلاق غضروفي قطني', 'ديسك أسفل الظهر', 'ديسك الظهر',
@@ -306,17 +246,13 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'sciatica', 'lumbar disc herniation', 'radiculopathy', 'nerve pain',
     ],
     colloquial: [
-      'وجع في ضهري بينزل على رجلي',
-      'حاسس بتنميل في رجلي',
-      'وجع في ضهري وبيوصل لساقي',
-      'رجلي بتتنمّل',
-      'حاسس بوجع في ساقي من ضهري',
-      'ديسك في ضهري',
+      'وجع في ضهري بينزل على رجلي', 'حاسس بتنميل في رجلي',
+      'وجع في ضهري وبيوصل لساقي', 'رجلي بتتنمّل',
+      'حاسس بوجع في ساقي من ضهري', 'ديسك في ضهري',
     ],
   },
 
   // ===== الروماتويد (M05) =====
-  // id الحقيقي: doid:8483
   'doid:8483': {
     keywords: [
       'روماتويد', 'التهاب المفاصل الروماتويدي', 'الروماتيزم',
@@ -324,15 +260,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'تيبس صباحي', 'rheumatoid arthritis', 'RA',
     ],
     colloquial: [
-      'مفاصلي وارمة من الصبح',
-      'مفاصلي بتوجعني وتيبست',
-      'إيديا وارمة',
-      'عندي روماتويد',
+      'مفاصلي وارمة من الصبح', 'مفاصلي بتوجعني وتيبست',
+      'إيديا وارمة', 'عندي روماتويد',
     ],
   },
 
   // ===== النفق الرسغي (G56.0) =====
-  // id الحقيقي: doid:13241
   'doid:13241': {
     keywords: [
       'النفق الرسغي', 'متلازمة النفق الرسغي', 'التنميل في الإيد',
@@ -340,29 +273,24 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'carpal tunnel', 'carpal tunnel syndrome', 'wrist pain',
     ],
     colloquial: [
-      'إيدي بتتنمّل',
-      'رسغي بوجعني',
-      'صوابعي بتتنمّل',
+      'إيدي بتتنمّل', 'رسغي بوجعني', 'صوابعي بتتنمّل',
       'إيدي بتضعف من كتر الكتابة',
     ],
   },
 
   // ===== اللفافة الأخمصية (M72.2) =====
-  // id الحقيقي: doid:4248
   'doid:4248': {
     keywords: [
       'اللفافة الأخمصية', 'وجع الكعب', 'ألم الكعب', 'ألم أسفل القدم',
       'plantar fasciitis', 'heel pain', 'foot pain',
     ],
     colloquial: [
-      'كعبي بيوجعني من الصبح',
-      'أول ما أقف كعبي بيوجعني',
+      'كعبي بيوجعني من الصبح', 'أول ما أقف كعبي بيوجعني',
       'قدمي بتوجعني تحت',
     ],
   },
 
   // ===== التهاب الأوتار (M79.7) =====
-  // id الحقيقي: doid:11067
   'doid:11067': {
     keywords: [
       'التهاب الأوتار', 'التهاب الوتر', 'وجع في الوتر',
@@ -370,27 +298,22 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'tendinitis', 'tendonitis', 'tendon pain',
     ],
     colloquial: [
-      'وتري بوجعني',
-      'حاسس بألم في الوتر',
-      'وجع في وتر رجلي',
+      'وتري بوجعني', 'حاسس بألم في الوتر', 'وجع في وتر رجلي',
     ],
   },
 
   // ===== ألم المفاصل - أرثالجا (M25.50) =====
-  // id الحقيقي: doid:0050896
   'doid:0050896': {
     keywords: [
       'ألم المفاصل', 'أرثالجا', 'وجع المفاصل',
       'joint pain', 'arthralgia',
     ],
     colloquial: [
-      'مفاصلي بتوجعني',
-      'وجع في مفاصلي',
+      'مفاصلي بتوجعني', 'وجع في مفاصلي',
     ],
   },
 
   // ===== اعتلال الأعصاب المحيطية (G62.9) =====
-  // id الحقيقي: doid:9350
   'doid:9350': {
     keywords: [
       'اعتلال الأعصاب', 'تنميل الأطراف', 'حرقان في القدم',
@@ -398,44 +321,258 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'peripheral neuropathy', 'tingling',
     ],
     colloquial: [
-      'رجليّ بتتنمّل',
-      'إيديا ورجليا بتتنمّل',
+      'رجليّ بتتنمّل', 'إيديا ورجليا بتتنمّل',
       'حاسس بحرقان في رجلي',
     ],
   },
 
   // ===== التواء الكاحل (S93.4) =====
-  // id الحقيقي: doid:10629
   'doid:10629': {
     keywords: [
       'التواء الكاحل', 'لوي الكاحل', 'إصابة الكاحل', 'كاحل',
       'ankle sprain', 'sprained ankle', 'ankle injury',
     ],
     colloquial: [
-      'كوستي',
-      'كاحلي اتلوى',
-      'كوستي بوجعني',
+      'كوستي', 'كاحلي اتلوى', 'كوستي بوجعني',
     ],
   },
 
   // ===== ألم اليد والرسغ (M79.64) =====
-  // id الحقيقي: doid:7148
   'doid:7148': {
     keywords: [
       'ألم اليد', 'ألم الرسغ', 'إجهاد متكرر', 'وجع الرسغ',
       'hand pain', 'wrist pain', 'repetitive strain',
     ],
     colloquial: [
-      'إيدي بتوجعني',
-      'رسغي بوجعني',
-      'إيدي تعبت من الكتابة',
+      'إيدي بتوجعني', 'رسغي بوجعني', 'إيدي تعبت من الكتابة',
+    ],
+  },
+
+  // ===== الفصال العظمي (M19.9) =====
+  'doid:8398-oa': {
+    keywords: [
+      'خشونة المفاصل', 'الفصال العظمي', 'تآكل الغضروف', 'خشونة',
+      'المفاصل', 'وجع مفاصل', 'تآكل المفاصل',
+      'osteoarthritis', 'OA', 'degenerative joint disease',
+    ],
+    colloquial: [
+      'مفاصلي بتوجعني', 'مفاصلي بتطلع صوت',
+      'حاسس بخشونة في مفاصلي',
+    ],
+  },
+
+  // ===== ارتفاع ضغط الدم (I10) =====
+  'doid:10763': {
+    keywords: [
+      'ضغط الدم', 'ارتفاع ضغط الدم', 'الضغط', 'ضغط عالي',
+      'hypertension', 'high blood pressure',
+    ],
+    colloquial: [
+      'عندي ضغط', 'الضغط عالي', 'حاسس بضغط في دماغي',
+      'عندي صداع من الضغط',
+    ],
+  },
+
+  // ===== الارتجاع المريئي (K21.9) =====
+  'doid:12353': {
+    keywords: [
+      'الارتجاع المريئي', 'الحموضة', 'حرقة المعدة', 'ارتجاع',
+      'gastroesophageal reflux', 'GERD', 'heartburn', 'acid reflux',
+    ],
+    colloquial: [
+      'حاسس بحموضة', 'حرقة في صدري', 'الأكل بيرجع لي',
+      'حاسس بحرقة في معدتي',
+    ],
+  },
+
+  // ==========================================================================
+  // ثانياً: أمراض الأعضاء الداخلية (من organConditions.json) — 15 حالة
+  // ==========================================================================
+
+  // ===== التهاب الزائدة الدودية (K35) =====
+  'doid:appendicitis': {
+    keywords: [
+      'التهاب الزائدة', 'الزائدة الدودية', 'زائدة', 'appendicitis',
+      'ألم أسفل يمين البطن', 'ألم حول السرة',
+    ],
+    colloquial: [
+      'وجع في أسفل يمين بطني', 'بطني بتوجعني من ناحية اليمين',
+      'وجع حول السرة', 'حاسس بوجع في بطني وجاي على اليمين',
+    ],
+  },
+
+  // ===== التهاب المعدة (K29) =====
+  'doid:gastritis': {
+    keywords: [
+      'التهاب المعدة', 'عسر الهضم', 'حرقة المعدة', 'gastritis', 'dyspepsia',
+      'ألم أعلى البطن', 'حموضة', 'انتفاخ',
+    ],
+    colloquial: [
+      'معدتي بتوجعني', 'حاسس بحرقة في معدتي',
+      'بطني من فوق بتوجعني', 'حاسس بانتفاخ بعد الأكل',
+      'معدتي تعبانة',
+    ],
+  },
+
+  // ===== قرحة المعدة/الاثني عشر (K27) =====
+  'doid:peptic-ulcer': {
+    keywords: [
+      'قرحة المعدة', 'قرحة الاثني عشر', 'peptic ulcer',
+      'حرقة شديدة', 'ألم أعلى البطن',
+    ],
+    colloquial: [
+      'عندي قرحة', 'حرقة في معدتي بتروح وتيجي',
+      'وجع في معدتي بعد الأكل', 'حرقة في بطني من فوق',
+    ],
+  },
+
+  // ===== القولون العصبي (K58) =====
+  'doid:ibs': {
+    keywords: [
+      'القولون العصبي', 'القولون', 'IBS', 'irritable bowel syndrome',
+      'انتفاخ', 'مغص', 'إسهال', 'إمساك', 'غازات',
+    ],
+    colloquial: [
+      'عندي قولون', 'القولون بيوجعني', 'بطني بتنفخ',
+      'عندي غازات', 'بطني بتعمل أصوات', 'معدتي وامعائي بتوجعني',
+    ],
+  },
+
+  // ===== التهاب الرتوج (K57) =====
+  'doid:diverticulitis': {
+    keywords: [
+      'التهاب الرتوج', 'التهاب القولون', 'diverticulitis',
+      'ألم أسفل يسار البطن', 'حرارة مع ألم البطن',
+    ],
+    colloquial: [
+      'وجع في أسفل يسار بطني', 'بطني بتوجعني من ناحية الشمال',
+      'حاسس بوجع في بطني مع حرارة',
+    ],
+  },
+
+  // ===== النزلة المعوية (A09) =====
+  'doid:gastroenteritis': {
+    keywords: [
+      'النزلة المعوية', 'نزلة معوية', 'gastroenteritis',
+      'إسهال', 'قيء', 'مغص', 'تسمم غذائي',
+    ],
+    colloquial: [
+      'عندي نزلة معوية', 'عندي إسهال وقيء',
+      'بطني بتوجعني وعندي إسهال', 'حاسس بمغص في بطني',
+    ],
+  },
+
+  // ===== حصى المرارة (K80) =====
+  'doid:gallstones': {
+    keywords: [
+      'حصى المرارة', 'التهاب المرارة', 'gallstones', 'cholecystitis',
+      'ألم أعلى يمين البطن', 'ألم بعد الأكل الدسم',
+    ],
+    colloquial: [
+      'عندي حصى في المرارة', 'وجع في يمين بطني من فوق',
+      'بطني بتوجعني بعد الأكل الدسم', 'وجع في المرارة',
+    ],
+  },
+
+  // ===== التهاب الكبد (K75.9) =====
+  'doid:hepatitis': {
+    keywords: [
+      'التهاب الكبد', 'hepatitis', 'ألم الكبد', 'اصفرار',
+      'يرقان', 'jaundice',
+    ],
+    colloquial: [
+      'عندي التهاب في الكبد', 'كبدي بتوجعني',
+      'عيوني بقت صفراء', 'حاسس بإجهاد شديد ووجع في جنبي',
+    ],
+  },
+
+  // ===== التهاب البنكرياس (K85) =====
+  'doid:pancreatitis': {
+    keywords: [
+      'التهاب البنكرياس', 'pancreatitis',
+      'ألم أعلى البطن ينتقل للظهر',
+    ],
+    colloquial: [
+      'عندي التهاب في البنكرياس', 'بطني بتوجعني وينزل على ضهري',
+      'وجع في بطني من فوق وبينزل على ضهري',
+    ],
+  },
+
+  // ===== التهاب المسالك البولية (N39.0) =====
+  'doid:uti': {
+    keywords: [
+      'التهاب المسالك', 'التهاب المسالك البولية', 'UTI',
+      'حرقان في البول', 'كثرة التبول', 'urinary tract infection',
+    ],
+    colloquial: [
+      'عندي حرقان في البول', 'بتبول كتير', 'بطني من تحت بتوجعني',
+      'حاسس بحرقان وأنا بتبول',
+    ],
+  },
+
+  // ===== حصى الكلى (N20.0) =====
+  'doid:kidney-stone': {
+    keywords: [
+      'حصى الكلى', 'حصى الكلى', 'kidney stones',
+      'ألم في الخاصرة', 'ألم الكلى', 'دم في البول',
+    ],
+    colloquial: [
+      'عندي حصى في الكلى', 'جنبي بتوجعني بشكل شديد',
+      'وجع في خاصرتي', 'حاسس بوجع في كليتي',
+    ],
+  },
+
+  // ===== كيس على المبيض (N83.2) =====
+  'doid:ovarian-cyst': {
+    keywords: [
+      'كيس على المبيض', 'كيس المبيض', 'ovarian cyst',
+      'ألم أسفل البطن', 'ألم الحوض',
+    ],
+    colloquial: [
+      'عندي كيس على المبيض', 'بطني من تحت بتوجعني من ناحية واحدة',
+      'حاسس بوجع في الحوض',
+    ],
+  },
+
+  // ===== بطانة الرحم المهاجرة (N80) =====
+  'doid:endometriosis': {
+    keywords: [
+      'بطانة الرحم المهاجرة', 'endometriosis', 'ألم الحوض',
+      'ألم الدورة الشهرية',
+    ],
+    colloquial: [
+      'عندي بطانة الرحم المهاجرة', 'بوجع بشدة وقت الدورة',
+      'وجع في الحوض وقت الدورة', 'الدورة بتوجعني بشدة',
+    ],
+  },
+
+  // ===== الذبحة الصدرية (I20.9) =====
+  'doid:angina': {
+    keywords: [
+      'الذبحة الصدرية', 'ذبحة صدرية', 'angina',
+      'ألم الصدر', 'ضغط في الصدر', 'chest pain',
+    ],
+    colloquial: [
+      'عندي ذبحة', 'صدري بيوجعني',
+      'حاسس بضغط في صدري', 'ألم في الصدر مع مجهود',
+    ],
+  },
+
+  // ===== الارتجاع المعدي المريئي (organ) (K21.9) =====
+  'doid:gerd-organ': {
+    keywords: [
+      'الارتجاع المعدي المريئي', 'حموضة المريء', 'GERD',
+      'ارتجاع', 'حموضة',
+    ],
+    colloquial: [
+      'حاسس بحموضة في صدري', 'الأكل بيرجع لي',
+      'حاسس بحرقة في صدري بعد الأكل',
     ],
   },
 };
 
 // ============================================================================
-// حالات عامة (Generic) — الـ score بتاعها يُخفَّض دايمًا عشان ما تطغاش
-// على الحالات المحددة. (IDs الحقيقية من diseases.json)
+// حالات عامة (Generic) — الـ score بتاعها يُخفَّض دايمًا
 // ============================================================================
 const GENERIC_CONDITION_IDS = new Set<string>([
   'doid:8505',       // الميالجيا M79.1
@@ -449,69 +586,30 @@ const GENERIC_CONDITION_IDS = new Set<string>([
 // أدوات معالجة النص العربي
 // ============================================================================
 
-/**
- * تطبيع النص العربي:
- * - توحيد الألف: أ إ آ ٱ → ا
- * - توحيد الهمزة: ؤ → و ، ئ → ي
- * - توحيد التاء المربوطة: ة → ه
- * - توحيد الألف المقصورة: ى → ي
- * - إزالة التشكيل والتطويل
- * - تحويل الأرقام العربية إلى إنجليزية
- * - إزالة الترقيم
- * - تحويل الإنجليزي إلى lowercase
- */
 function normalizeArabic(text: string): string {
   if (!text) return '';
-
   let n = text;
-
-  // إزالة التشكيل (Tashkeel)
   n = n.replace(/[\u064B-\u065F\u0670]/g, '');
-
-  // إزالة التطويل
   n = n.replace(/\u0640/g, '');
-
-  // توحيد الألف
   n = n.replace(/[أإآٱ]/g, 'ا');
-
-  // توحيد الهمزة
   n = n.replace(/ؤ/g, 'و').replace(/ئ/g, 'ي');
-
-  // توحيد التاء المربوطة
   n = n.replace(/ة/g, 'ه');
-
-  // توحيد الألف المقصورة
   n = n.replace(/ى/g, 'ي');
-
-  // الأرقام العربية → إنجليزية
   n = n.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d)));
-
-  // إزالة الترقيم
   n = n.replace(/[.,!?؟،؛:؛"'`~@#$%^&*()_+=\[\]{}|\\/<>]/g, ' ');
-
-  // توحيد المسافات
   n = n.replace(/\s+/g, ' ').trim();
-
-  // lowercase للإنجليزي
   n = n.toLowerCase();
-
   return n;
 }
 
-/** تقسيم النص إلى كلمات بعد التطبيع. */
 function tokenize(text: string): string[] {
   const n = normalizeArabic(text);
   if (!n) return [];
   return n.split(' ').filter((w) => w.length > 1);
 }
 
-/**
- * إزالة السوابق واللواحق العربية:
- * "والضهر" → "ضهر"، "بضهري" → "ضهر"
- */
 function stripAffixes(word: string): string {
   let w = word;
-
   const prefixes = ['وال', 'بال', 'فال', 'كال', 'لل', 'ال', 'و', 'ف', 'ب', 'ك', 'ل'];
   for (const p of prefixes) {
     if (w.startsWith(p) && w.length - p.length >= 3) {
@@ -519,7 +617,6 @@ function stripAffixes(word: string): string {
       break;
     }
   }
-
   const suffixes = ['ات', 'ين', 'ون', 'ها', 'هم', 'هن', 'كم', 'كن', 'نا', 'ي', 'ه', 'ك'];
   for (const s of suffixes) {
     if (w.endsWith(s) && w.length - s.length >= 3) {
@@ -527,16 +624,13 @@ function stripAffixes(word: string): string {
       break;
     }
   }
-
   return w;
 }
 
-/** مسافة Levenshtein (للأخطاء الإملائية). */
 function levenshtein(a: string, b: string): number {
   const matrix: number[][] = [];
   for (let i = 0; i <= b.length; i++) matrix[i] = [i];
   for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
-
   for (let i = 1; i <= b.length; i++) {
     for (let j = 1; j <= a.length; j++) {
       if (b.charAt(i - 1) === a.charAt(j - 1)) {
@@ -553,7 +647,6 @@ function levenshtein(a: string, b: string): number {
   return matrix[b.length][a.length];
 }
 
-/** نسبة التشابه بين كلمتين (0 → 1). */
 function similarity(a: string, b: string): number {
   if (a === b) return 1;
   if (!a || !b) return 0;
@@ -567,10 +660,6 @@ function similarity(a: string, b: string): number {
 // محرك البحث الذكي
 // ============================================================================
 
-/**
- * حساب درجة المطابقة لحالة واحدة.
- * كل وزن مضبوط عشان النتيجة الأهم تطلع فوق.
- */
 function scoreCondition(
   condition: MedicalCondition,
   normalizedQuery: string,
@@ -579,147 +668,71 @@ function scoreCondition(
   let score = 0;
   const matchedTerms: string[] = [];
 
-  // نصوص جاهزة للتطابق
   const nameAr = normalizeArabic(condition.name.ar);
   const nameEn = condition.name.en.toLowerCase();
   const nameFr = condition.name.fr.toLowerCase();
   const summaryAr = normalizeArabic(condition.summary.ar);
 
-  // الكلمات المفتاحية من القاموس
   const kwEntry = KEYWORDS_MAP[condition.id];
   const keywords = kwEntry ? kwEntry.keywords.map(normalizeArabic) : [];
   const colloquial = kwEntry ? kwEntry.colloquial.map(normalizeArabic) : [];
 
-  // -------------------------------------------------------------------------
-  // 1) مطابقة الجملة الكاملة (أعلى وزن)
-  // -------------------------------------------------------------------------
-  if (normalizedQuery === nameAr) {
-    score += 1000;
-    matchedTerms.push('name_exact');
-  }
-  if (colloquial.some((c) => c === normalizedQuery)) {
-    score += 900;
-    matchedTerms.push('colloquial_exact');
-  }
-  if (keywords.some((k) => k === normalizedQuery)) {
-    score += 800;
-    matchedTerms.push('keyword_exact');
-  }
+  // 1) مطابقة الجملة الكاملة
+  if (normalizedQuery === nameAr) { score += 1000; matchedTerms.push('name_exact'); }
+  if (colloquial.some((c) => c === normalizedQuery)) { score += 900; matchedTerms.push('colloquial_exact'); }
+  if (keywords.some((k) => k === normalizedQuery)) { score += 800; matchedTerms.push('keyword_exact'); }
 
-  // -------------------------------------------------------------------------
   // 2) مطابقة الجملة كجزء من النص
-  // -------------------------------------------------------------------------
-  if (nameAr.includes(normalizedQuery)) {
-    score += 500;
-    matchedTerms.push('name_includes');
-  }
-  if (colloquial.some((c) => c.includes(normalizedQuery))) {
-    score += 450;
-    matchedTerms.push('colloquial_includes');
-  }
-  if (keywords.some((k) => k.includes(normalizedQuery))) {
-    score += 400;
-    matchedTerms.push('keyword_includes');
-  }
-  if (nameEn.includes(normalizedQuery) || nameFr.includes(normalizedQuery)) {
-    score += 350;
-    matchedTerms.push('name_en_fr');
-  }
-  if (summaryAr.includes(normalizedQuery)) {
-    score += 100;
-    matchedTerms.push('summary');
-  }
+  if (nameAr.includes(normalizedQuery)) { score += 500; matchedTerms.push('name_includes'); }
+  if (colloquial.some((c) => c.includes(normalizedQuery))) { score += 450; matchedTerms.push('colloquial_includes'); }
+  if (keywords.some((k) => k.includes(normalizedQuery))) { score += 400; matchedTerms.push('keyword_includes'); }
+  if (nameEn.includes(normalizedQuery) || nameFr.includes(normalizedQuery)) { score += 350; matchedTerms.push('name_en_fr'); }
+  if (summaryAr.includes(normalizedQuery)) { score += 100; matchedTerms.push('summary'); }
 
-  // -------------------------------------------------------------------------
-  // 3) مطابقة الكلمات المنفصلة (Token-based)
-  // -------------------------------------------------------------------------
+  // 3) مطابقة الكلمات المنفصلة
   for (const token of queryTokens) {
     const stripped = stripAffixes(token);
-
-    // مطابقة تامة
-    if (nameAr.split(' ').some((w) => w === token || w === stripped)) {
-      score += 150;
-      matchedTerms.push(`name_token:${token}`);
-    }
-    if (keywords.some((k) => k.split(' ').includes(token) || k.split(' ').includes(stripped))) {
-      score += 120;
-      matchedTerms.push(`keyword_token:${token}`);
-    }
-    if (colloquial.some((c) => c.split(' ').includes(token) || c.split(' ').includes(stripped))) {
-      score += 100;
-      matchedTerms.push(`colloquial_token:${token}`);
-    }
-
-    // مطابقة جزئية
-    if (nameAr.includes(token) || (stripped.length >= 3 && nameAr.includes(stripped))) {
-      score += 60;
-      matchedTerms.push(`name_sub:${token}`);
-    }
-    if (keywords.some((k) => k.includes(token) || (stripped.length >= 3 && k.includes(stripped)))) {
-      score += 50;
-    }
-    if (colloquial.some((c) => c.includes(token) || (stripped.length >= 3 && c.includes(stripped)))) {
-      score += 40;
-    }
-
-    // مطابقة تقريبية (Fuzzy) — للكلمات الطويلة بس
+    if (nameAr.split(' ').some((w) => w === token || w === stripped)) { score += 150; matchedTerms.push(`name_token:${token}`); }
+    if (keywords.some((k) => k.split(' ').includes(token) || k.split(' ').includes(stripped))) { score += 120; matchedTerms.push(`keyword_token:${token}`); }
+    if (colloquial.some((c) => c.split(' ').includes(token) || c.split(' ').includes(stripped))) { score += 100; matchedTerms.push(`colloquial_token:${token}`); }
+    if (nameAr.includes(token) || (stripped.length >= 3 && nameAr.includes(stripped))) { score += 60; matchedTerms.push(`name_sub:${token}`); }
+    if (keywords.some((k) => k.includes(token) || (stripped.length >= 3 && k.includes(stripped)))) { score += 50; }
+    if (colloquial.some((c) => c.includes(token) || (stripped.length >= 3 && c.includes(stripped)))) { score += 40; }
     if (token.length >= 4) {
       const bestNameSim = Math.max(...nameAr.split(' ').map((w) => similarity(w, token)), 0);
-      if (bestNameSim > 0.8) {
-        score += 80;
-        matchedTerms.push(`name_fuzzy:${token}`);
-      }
+      if (bestNameSim > 0.8) { score += 80; matchedTerms.push(`name_fuzzy:${token}`); }
       const bestKwSim = Math.max(...keywords.map((k) => similarity(k, token)), 0);
-      if (bestKwSim > 0.85) {
-        score += 60;
-        matchedTerms.push(`keyword_fuzzy:${token}`);
-      }
+      if (bestKwSim > 0.85) { score += 60; matchedTerms.push(`keyword_fuzzy:${token}`); }
     }
   }
 
-  // -------------------------------------------------------------------------
   // 4) مطابقة المنطقة / مجموعة العضلات
-  // -------------------------------------------------------------------------
   const regionKeywords = [
     'back', 'lower-back', 'neck', 'shoulder', 'knee', 'leg', 'arm',
     'head', 'chest', 'torso', 'hip', 'hand', 'foot',
   ];
   for (const token of queryTokens) {
     if (regionKeywords.includes(token)) {
-      if (condition.regions.includes(token)) {
-        score += 70;
-        matchedTerms.push(`region:${token}`);
-      }
-      if (condition.muscleGroups.includes(token)) {
-        score += 50;
-        matchedTerms.push(`muscle:${token}`);
-      }
+      if (condition.regions.includes(token)) { score += 70; matchedTerms.push(`region:${token}`); }
+      if (condition.muscleGroups.includes(token)) { score += 50; matchedTerms.push(`muscle:${token}`); }
     }
   }
 
-  // -------------------------------------------------------------------------
-  // 5) تخفيض الحالات المنتشرة (diffuse) عند وجود شكوى موضعية
-  // -------------------------------------------------------------------------
+  // 5) تخفيض الحالات المنتشرة
   if (condition.diffuse && queryTokens.length >= 1) {
     const hasLocalRegion = queryTokens.some(
       (t) => regionKeywords.includes(t) && condition.regions.includes(t),
     );
-    if (!hasLocalRegion) {
-      score *= 0.6;
-    }
+    if (!hasLocalRegion) score *= 0.6;
   }
 
-  // -------------------------------------------------------------------------
-  // 6) مكافأة إضافية للـ colloquial المطابق
-  // -------------------------------------------------------------------------
+  // 6) مكافأة colloquial المطابق
   if (colloquial.some((c) => c === normalizedQuery)) {
     score += 500;
     matchedTerms.push('colloquial_bonus');
   }
 
-  // -------------------------------------------------------------------------
-  // 7) عقوبة للحالات العامة (Generic) عند وجود شكوى موضعية
-  // -------------------------------------------------------------------------
+  // 7) عقوبة الحالات العامة عند وجود شكوى موضعية
   if (GENERIC_CONDITION_IDS.has(condition.id)) {
     const hasLocalRegion = queryTokens.some((t) => regionKeywords.includes(t));
     if (hasLocalRegion) {
@@ -735,9 +748,6 @@ function scoreCondition(
   };
 }
 
-/**
- * البحث الذكي في المكتبة.
- */
 export function smartSearch(
   query: string,
   conditions: MedicalCondition[] = CONDITIONS,
@@ -758,7 +768,7 @@ export function smartSearch(
 }
 
 // ============================================================================
-// الواجهة العامة (نفس الأسماء القديمة — بدون كسر أي حاجة)
+// الواجهة العامة
 // ============================================================================
 
 export function localize(value: LocalizedText, language: Language): string {
@@ -828,10 +838,8 @@ export function searchMedicalLibrary(query: string): {
   if (!query || query.trim().length < 2) {
     return { conditions: [], symptoms: [], results: [] };
   }
-
   const results = smartSearch(query, CONDITIONS, 20);
   const conditions = results.map((r) => r.condition);
-
   const normalizedQ = query.trim().toLowerCase();
   const symptoms = SYMPTOMS.filter((s) => {
     const ar = s.name.ar.toLowerCase();
@@ -839,7 +847,6 @@ export function searchMedicalLibrary(query: string): {
     const fr = s.name.fr.toLowerCase();
     return ar.includes(normalizedQ) || en.includes(normalizedQ) || fr.includes(normalizedQ);
   });
-
   return { conditions, symptoms, results };
 }
 
@@ -864,9 +871,7 @@ export function getLibraryStats() {
     c.regions.forEach((r) => regions.add(r));
   });
   const batches = new Set<string>();
-  CONDITIONS.forEach((c) => {
-    if (c.batch) batches.add(c.batch);
-  });
+  CONDITIONS.forEach((c) => { if (c.batch) batches.add(c.batch); });
   return {
     conditions: CONDITIONS.length,
     regionalConditions: REGIONAL_CONDITIONS.length,
@@ -878,52 +883,26 @@ export function getLibraryStats() {
 }
 
 // ============================================================================
-// دوال مساعدة إضافية (زيادة — بدون كسر أي حاجة قديمة)
+// دوال مساعدة إضافية
 // ============================================================================
 
-/**
- * الحالات اللي عندها كلمات مفتاحية مسجّلة في KEYWORDS_MAP.
- */
 export function getConditionsWithKeywords(): MedicalCondition[] {
   return CONDITIONS.filter((c) => KEYWORDS_MAP[c.id] !== undefined);
 }
 
-/**
- * الحالات اللي عندها كلمات مفتاحية مسجّلة لكن الـ id بتاعها مش موجود
- * في المكتبة (يعني مفتاح ميت). مفيدة للتنظيف.
- */
 export function getOrphanKeywordIds(): string[] {
   const libraryIds = new Set(CONDITIONS.map((c) => c.id));
   return Object.keys(KEYWORDS_MAP).filter((id) => !libraryIds.has(id));
 }
 
-/**
- * إحصائيات قاموس الكلمات المفتاحية.
- */
 export function getKeywordStats() {
   const total = Object.keys(KEYWORDS_MAP).length;
-  const withColloquial = Object.values(KEYWORDS_MAP).filter(
-    (e) => e.colloquial.length > 0,
-  ).length;
-  const totalKeywords = Object.values(KEYWORDS_MAP).reduce(
-    (sum, e) => sum + e.keywords.length,
-    0,
-  );
-  const totalColloquial = Object.values(KEYWORDS_MAP).reduce(
-    (sum, e) => sum + e.colloquial.length,
-    0,
-  );
-  return {
-    mappedConditions: total,
-    withColloquial,
-    totalKeywords,
-    totalColloquial,
-  };
+  const withColloquial = Object.values(KEYWORDS_MAP).filter((e) => e.colloquial.length > 0).length;
+  const totalKeywords = Object.values(KEYWORDS_MAP).reduce((sum, e) => sum + e.keywords.length, 0);
+  const totalColloquial = Object.values(KEYWORDS_MAP).reduce((sum, e) => sum + e.colloquial.length, 0);
+  return { mappedConditions: total, withColloquial, totalKeywords, totalColloquial };
 }
 
-/**
- * البحث التشخيصي (Debug) — بترجع تفاصيل المطابقة لكل حالة.
- */
 export function debugSearch(query: string, maxResults = 10): Array<{
   id: string;
   name: string;
@@ -939,29 +918,16 @@ export function debugSearch(query: string, maxResults = 10): Array<{
   }));
 }
 
-/**
- * الحالات العامة (Generic) — اللي الـ score بتاعها بيتخفّض دايمًا.
- */
 export function getGenericConditionIds(): string[] {
   return [...GENERIC_CONDITION_IDS];
 }
 
 // ============================================================================
-// Stubs للتوافق مع hooks القديمة (لو مش موجودة عندك امسحهم)
+// Stubs للتوافق مع hooks القديمة
 // ============================================================================
 
-export function getTaxonomy() {
-  return { regions: [], subRegions: [], structures: [] };
-}
-export function getSubRegions(_regionId: string) {
-  return [];
-}
-export function getStructure(_structureId: string) {
-  return null;
-}
-export function getTaxonomyStats() {
-  return { regions: 0, subRegions: 0, structures: 0 };
-}
-export function getTaxonomyNotice(_lang: Language) {
-  return '';
-      }
+export function getTaxonomy() { return { regions: [], subRegions: [], structures: [] }; }
+export function getSubRegions(_regionId: string) { return []; }
+export function getStructure(_structureId: string) { return null; }
+export function getTaxonomyStats() { return { regions: 0, subRegions: 0, structures: 0 }; }
+export function getTaxonomyNotice(_lang: Language) { return ''; }
