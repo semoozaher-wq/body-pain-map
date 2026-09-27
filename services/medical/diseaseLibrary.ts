@@ -9,7 +9,7 @@
 //   - بحث تقريبي (Fuzzy) للأخطاء الإملائية
 //   - قاموس كلمات مفتاحية وعامية مصرية لكل حالة
 //   - خوارزمية ترتيب (Scoring) — النتائج الأهم أولاً
-//   - (v2) دعم الحالات العامة (M79.1 وغيرها) + مكافآت للـ colloquial المطابق
+//   - (v3) تصحيح كل الـ IDs لتطابق diseases.json الحقيقي + إضافة حالات ناقصة
 // ============================================================================
 
 import diseasesData from '../../data/medical/diseases.json';
@@ -66,7 +66,13 @@ const BASE_CONDITIONS = (diseasesData as { conditions: MedicalCondition[] }).con
 const ORGAN_CONDITIONS = (organConditionsData as { conditions: MedicalCondition[] }).conditions;
 const REGIONAL_CONDITIONS = (regionalConditionsData as { conditions: MedicalCondition[] }).conditions;
 
-/** حالات منتشرة (فيبروميالجيا، ألم عضلي عام...) — تُخفَّض درجتها عند وجود شكوى موضعية. */
+/**
+ * الحالات المنتشرة (Diffuse) — بتخفّض درجتها عند وجود شكوى موضعية.
+ * IDs الحقيقية من diseases.json:
+ *  - doid:1490 (فيبروميالجيا)
+ *  - doid:8505 (الميالجيا)
+ *  - doid:8505-doms (ألم عضلي بعد المجهود)
+ */
 const DIFFUSE_IDS = new Set(['doid:1490', 'doid:8505', 'doid:8505-doms']);
 
 const CONDITIONS: MedicalCondition[] = [
@@ -80,8 +86,8 @@ const SYMPTOMS = (symptomsData as { symptoms: MedicalSymptom[] }).symptoms;
 // ============================================================================
 // قاموس الكلمات المفتاحية والعامية المصرية
 // ----------------------------------------------------------------------------
-// مفتاح كل حالة = الـ id الحقيقي بتاعها في diseases.json
-// لو لقيت id مختلف، عدّل المفتاح بس.
+// ⚠️ مهم جدًا: مفتاح كل حالة = الـ id الحقيقي بتاعها في diseases.json
+//    (اتصحح في v3 ليطابق الملف الفعلي)
 // ============================================================================
 
 interface KeywordEntry {
@@ -90,8 +96,9 @@ interface KeywordEntry {
 }
 
 const KEYWORDS_MAP: Record<string, KeywordEntry> = {
-  // ===== ألم أسفل الظهر =====
-  'doid:6354': {
+  // ===== ألم أسفل الظهر الميكانيكي (M54.5) =====
+  // id الحقيقي: doid:4536
+  'doid:4536': {
     keywords: [
       'ألم', 'وجع', 'شد', 'تعب', 'ضغط', 'حرقة', 'تقلص',
       'ظهر', 'ضهر', 'أسفل الظهر', 'أسفل ضهري', 'وسط ضهري', 'وسط ظهري',
@@ -109,8 +116,9 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== ألم الرقبة =====
-  'doid:1001167': {
+  // ===== ألم الرقبة (M54.2) =====
+  // id الحقيقي: doid:1167
+  'doid:1167': {
     keywords: [
       'رقبة', 'رقبتي', 'الرقبة', 'وجع رقبة', 'شد رقبة', 'تقلص رقبة',
       'فقرات الرقبة', 'الفقرات العنقية', 'عنقي', 'عنق', 'تصلب الرقبة',
@@ -125,8 +133,9 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== إصابة الكفة المدورة =====
-  'doid:0116': {
+  // ===== إصابة الكفة المدورة (M75.1) =====
+  // id الحقيقي: doid:3059
+  'doid:3059': {
     keywords: [
       'كتف', 'كتفي', 'الكتف', 'وجع كتف', 'شد كتف', 'تقلص كتف',
       'الكفة المدورة', 'الكتف الأيسر', 'الكتف الأيمن', 'كتف متجمد',
@@ -141,8 +150,9 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== خشونة الركبة =====
-  'doid:839': {
+  // ===== خشونة الركبة (M17) =====
+  // id الحقيقي: doid:8398
+  'doid:8398': {
     keywords: [
       'ركبة', 'ركبتي', 'الركبة', 'وجع ركبة', 'شد ركبة',
       'خشونة الركبة', 'الغضروف', 'غضروف الركبة', 'المفصل', 'مفصل الركبة',
@@ -157,8 +167,24 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== فيبروميالجيا =====
-  'doid:8545': {
+  // ===== الفصال العظمي (M19.9) =====
+  // id الحقيقي: doid:8398-oa
+  'doid:8398-oa': {
+    keywords: [
+      'خشونة المفاصل', 'الفصال العظمي', 'تآكل الغضروف', 'خشونة',
+      'المفاصل', 'وجع مفاصل', 'تآكل المفاصل',
+      'osteoarthritis', 'OA', 'degenerative joint disease',
+    ],
+    colloquial: [
+      'مفاصلي بتوجعني',
+      'مفاصلي بتطلع صوت',
+      'حاسس بخشونة في مفاصلي',
+    ],
+  },
+
+  // ===== فيبروميالجيا (M79.67) =====
+  // id الحقيقي: doid:1490
+  'doid:1490': {
     keywords: [
       'فيبروميالجيا', 'ألم عضلي', 'ألم منتشر', 'تعب مزمن', 'إرهاق',
       'ألم في كل الجسم', 'وجع في كل حتة', 'إجهاد مزمن', 'ألم ليلي',
@@ -173,8 +199,9 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الصداع النصفي (الشقيقة) =====
-  'doid:6364': {
+  // ===== الصداع النصفي (G43) =====
+  // id الحقيقي: doid:3311
+  'doid:3311': {
     keywords: [
       'صداع', 'صداع نصفي', 'الشقيقة', 'وجع راس', 'وجع في راسي',
       'ألم في الرأس', 'صداع شديد', 'غثيان', 'دوخة', 'حساسية للضوء',
@@ -189,8 +216,9 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الصداع التوتري =====
-  'doid:14747': {
+  // ===== الصداع التوتري (G44.2) =====
+  // id الحقيقي: doid:11476-th
+  'doid:11476-th': {
     keywords: [
       'صداع توتري', 'صداع', 'شد في الرقبة', 'ضغط في الرأس',
       'صداع من التوتر', 'صداع من الشغل', 'صداع خفيف مستمر',
@@ -205,43 +233,9 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== عرق النسا / ألم جذور الأعصاب القطنية =====
+  // ===== الميالجيا (M79.1) — ألم العضلات العام =====
+  // id الحقيقي: doid:8505
   'doid:8505': {
-    keywords: [
-      'عرق النسا', 'ألم الساق', 'ألم ينزل', 'شد في الساق',
-      'تنميل', 'ضغط على العصب', 'ألم الساق الأيسر', 'ألم الساق الأيمن',
-      'ألم عصبي', 'جذور الأعصاب', 'انزلاق غضروفي',
-      'sciatica', 'radiculopathy', 'nerve pain', 'lumbar radiculopathy',
-    ],
-    colloquial: [
-      'وجع في ضهري بينزل على رجلي',
-      'حاسس بتنميل في رجلي',
-      'وجع في ضهري وبيوصل لساقي',
-      'رجلي بتتنمّل',
-      'حاسس بوجع في ساقي من ضهري',
-    ],
-  },
-
-  // ===== شد / تقلص عضلي =====
-  'doid:6314': {
-    keywords: [
-      'شد عضلي', 'تقلص', 'تشنج', 'تقلص عضلي', 'وجع عضلي',
-      'شد في العضلة', 'تعب العضلة', 'تشنج عضلي', 'تقلصات',
-      'muscle spasm', 'muscle cramps', 'spasm', 'cramp',
-    ],
-    colloquial: [
-      'حاسس بتقلص في رجلي',
-      'عضلاتي بتشد',
-      'حاسس بشد في ضهري',
-      'رجلي بتتقلص',
-      'عضلاتي بتوجعني',
-    ],
-  },
-
-  // ===== ألم العضلات (الميالجيا) M79.1 =====
-  // ⚠️ دي حالة عامة — بنحطها هنا عشان نحدد كلماتها المفتاحية بدقة،
-  // لكن الـ score بتاعها في smartSearch منخفض (generic: true).
-  'doid:8483': {
     keywords: [
       'ألم عضلي', 'ألم في العضلات', 'ميالجيا', 'وجع عضلي', 'ألم عام',
       'ألم في كل العضلات', 'تعب عضلي',
@@ -254,50 +248,125 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== حالات إضافية (احتياطي للتوافق مع diseases.json) =====
-  'doid:10933': {
+  // ===== ألم عضلي بعد المجهود DOMS (M79.1) =====
+  // id الحقيقي: doid:8505-doms
+  'doid:8505-doms': {
     keywords: [
-      'التهاب المفاصل', 'روماتويد', 'التهاب المفصل الروماتويدي',
-      'وجع في المفاصل', 'تورم المفاصل', 'التهاب المفاصل الرثياني',
-      'rheumatoid arthritis', 'arthritis',
+      'ألم بعد التمرين', 'ألم بعد المجهود', 'تعب بعد الرياضة',
+      'وجع بعد الجيم', 'ألم عضلي متأخر', 'DOMS',
+      'delayed onset muscle soreness', 'muscle soreness',
     ],
     colloquial: [
-      'مفاصلي بتوجعني',
-      'مفاصلي وارمة',
-      'وجع في مفاصلي',
+      'جسمي بيوجعني بعد الجيم',
+      'عضلاتي بتوجعني بعد التمرين',
+      'حاسس بألم بعد ما لعبت رياضة',
     ],
   },
 
-  'doid:11483': {
+  // ===== شد عضلي (M62.838) =====
+  // id الحقيقي: doid:6713
+  'doid:6713': {
     keywords: [
-      'الانزلاق الغضروفي', 'الديسك', 'انزلاق الديسك', 'انزلاق الفقرات',
-      'الانزلاق الغضروفي القطني', 'انزلاق غضروفي عنقي',
-      'herniated disc', 'disc herniation', 'slipped disc',
+      'شد عضلي', 'تقلص', 'تشنج', 'تقلص عضلي', 'وجع عضلي',
+      'شد في العضلة', 'تعب العضلة', 'تشنج عضلي', 'تقلصات',
+      'muscle spasm', 'muscle cramps', 'spasm', 'cramp', 'muscle strain',
     ],
     colloquial: [
-      'عندي ديسك في ضهري',
-      'الديسك ضاغط على العصب',
-      'وجع في ضهري من الديسك',
+      'حاسس بتقلص في رجلي',
+      'عضلاتي بتشد',
+      'حاسس بشد في ضهري',
+      'رجلي بتتقلص',
+      'عضلاتي بتوجعني',
     ],
   },
 
-  'doid:0055': {
+  // ===== الانزلاق الغضروفي العنقي (M50.1) =====
+  // id الحقيقي: doid:10202
+  'doid:10202': {
+    keywords: [
+      'انزلاق غضروفي عنقي', 'ديسك الرقبة', 'انزلاق فقرات الرقبة',
+      'الانزلاق العنقي', 'غضروف الرقبة', 'ضغط على عصب الرقبة',
+      'cervical disc herniation', 'cervical disc', 'herniated cervical disc',
+    ],
+    colloquial: [
+      'رقبتي بتوجعني وبتنمّل إيدي',
+      'ديسك في رقبتي',
+      'وجع في رقبتي بينزل على إيدي',
+      'إيدي بتتنمّل من رقبتي',
+    ],
+  },
+
+  // ===== الانزلاق الغضروفي القطني (M51.16) =====
+  // id الحقيقي: doid:10202-ls
+  'doid:10202-ls': {
+    keywords: [
+      'انزلاق غضروفي قطني', 'ديسك أسفل الظهر', 'ديسك الظهر',
+      'عرق النسا', 'ألم الساق', 'ألم ينزل', 'شد في الساق',
+      'تنميل', 'ضغط على العصب', 'ألم عصبي', 'جذور الأعصاب',
+      'sciatica', 'lumbar disc herniation', 'radiculopathy', 'nerve pain',
+    ],
+    colloquial: [
+      'وجع في ضهري بينزل على رجلي',
+      'حاسس بتنميل في رجلي',
+      'وجع في ضهري وبيوصل لساقي',
+      'رجلي بتتنمّل',
+      'حاسس بوجع في ساقي من ضهري',
+      'ديسك في ضهري',
+    ],
+  },
+
+  // ===== الروماتويد (M05) =====
+  // id الحقيقي: doid:8483
+  'doid:8483': {
+    keywords: [
+      'روماتويد', 'التهاب المفاصل الروماتويدي', 'الروماتيزم',
+      'التهاب المفاصل المزمن', 'مرض مناعي', 'تورم المفاصل',
+      'تيبس صباحي', 'rheumatoid arthritis', 'RA',
+    ],
+    colloquial: [
+      'مفاصلي وارمة من الصبح',
+      'مفاصلي بتوجعني وتيبست',
+      'إيديا وارمة',
+      'عندي روماتويد',
+    ],
+  },
+
+  // ===== النفق الرسغي (G56.0) =====
+  // id الحقيقي: doid:13241
+  'doid:13241': {
     keywords: [
       'النفق الرسغي', 'متلازمة النفق الرسغي', 'التنميل في الإيد',
-      'تنميل الأصابع', 'وجع في الرسغ', 'ضعف الإيد',
+      'تنميل الأصابع', 'وجع في الرسغ', 'ضعف الإيد', 'إبهام',
       'carpal tunnel', 'carpal tunnel syndrome', 'wrist pain',
     ],
     colloquial: [
       'إيدي بتتنمّل',
       'رسغي بوجعني',
       'صوابعي بتتنمّل',
+      'إيدي بتضعف من كتر الكتابة',
     ],
   },
 
-  'doid:0115': {
+  // ===== اللفافة الأخمصية (M72.2) =====
+  // id الحقيقي: doid:4248
+  'doid:4248': {
+    keywords: [
+      'اللفافة الأخمصية', 'وجع الكعب', 'ألم الكعب', 'ألم أسفل القدم',
+      'plantar fasciitis', 'heel pain', 'foot pain',
+    ],
+    colloquial: [
+      'كعبي بيوجعني من الصبح',
+      'أول ما أقف كعبي بيوجعني',
+      'قدمي بتوجعني تحت',
+    ],
+  },
+
+  // ===== التهاب الأوتار (M79.7) =====
+  // id الحقيقي: doid:11067
+  'doid:11067': {
     keywords: [
       'التهاب الأوتار', 'التهاب الوتر', 'وجع في الوتر',
-      'التهاب وتر أخيل', 'التهاب أوتار الكتف',
+      'التهاب وتر أخيل', 'التهاب أوتار الكتف', 'تندينيت',
       'tendinitis', 'tendonitis', 'tendon pain',
     ],
     colloquial: [
@@ -307,27 +376,73 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  'doid:0084': {
+  // ===== ألم المفاصل - أرثالجا (M25.50) =====
+  // id الحقيقي: doid:0050896
+  'doid:0050896': {
     keywords: [
-      'خشونة المفاصل', 'خشونة الركبة', 'خشونة الورك',
-      'الفصال العظمي', 'الفصال', 'تآكل الغضروف',
-      'osteoarthritis', 'OA', 'degenerative joint disease',
+      'ألم المفاصل', 'أرثالجا', 'وجع المفاصل',
+      'joint pain', 'arthralgia',
     ],
     colloquial: [
-      'عندي خشونة في ركبتي',
-      'مفاصلي بتطلع صوت',
-      'ركبتي بتفرقع',
+      'مفاصلي بتوجعني',
+      'وجع في مفاصلي',
+    ],
+  },
+
+  // ===== اعتلال الأعصاب المحيطية (G62.9) =====
+  // id الحقيقي: doid:9350
+  'doid:9350': {
+    keywords: [
+      'اعتلال الأعصاب', 'تنميل الأطراف', 'حرقان في القدم',
+      'التنميل المزمن', 'ألم عصبي مزمن', 'neuropathy',
+      'peripheral neuropathy', 'tingling',
+    ],
+    colloquial: [
+      'رجليّ بتتنمّل',
+      'إيديا ورجليا بتتنمّل',
+      'حاسس بحرقان في رجلي',
+    ],
+  },
+
+  // ===== التواء الكاحل (S93.4) =====
+  // id الحقيقي: doid:10629
+  'doid:10629': {
+    keywords: [
+      'التواء الكاحل', 'لوي الكاحل', 'إصابة الكاحل', 'كاحل',
+      'ankle sprain', 'sprained ankle', 'ankle injury',
+    ],
+    colloquial: [
+      'كوستي',
+      'كاحلي اتلوى',
+      'كوستي بوجعني',
+    ],
+  },
+
+  // ===== ألم اليد والرسغ (M79.64) =====
+  // id الحقيقي: doid:7148
+  'doid:7148': {
+    keywords: [
+      'ألم اليد', 'ألم الرسغ', 'إجهاد متكرر', 'وجع الرسغ',
+      'hand pain', 'wrist pain', 'repetitive strain',
+    ],
+    colloquial: [
+      'إيدي بتوجعني',
+      'رسغي بوجعني',
+      'إيدي تعبت من الكتابة',
     ],
   },
 };
 
 // ============================================================================
 // حالات عامة (Generic) — الـ score بتاعها يُخفَّض دايمًا عشان ما تطغاش
-// على الحالات المحددة. مفتاحها الـ id بتاع الحالة.
+// على الحالات المحددة. (IDs الحقيقية من diseases.json)
 // ============================================================================
 const GENERIC_CONDITION_IDS = new Set<string>([
-  'doid:8483', // ألم العضلات (الميالجيا) — M79.1
-  'doid:8545', // فيبروميالجيا — عامة
+  'doid:8505',       // الميالجيا M79.1
+  'doid:8505-doms',  // DOMS M79.1
+  'doid:1490',       // فيبروميالجيا M79.67
+  'doid:0050896',    // ألم المفاصل (عام) M25.50
+  'doid:9350',       // اعتلال الأعصاب (عام) G62.9
 ]);
 
 // ============================================================================
@@ -455,9 +570,6 @@ function similarity(a: string, b: string): number {
 /**
  * حساب درجة المطابقة لحالة واحدة.
  * كل وزن مضبوط عشان النتيجة الأهم تطلع فوق.
- *
- * v2: أضفنا مكافآت إضافية للـ colloquial المطابق، وعقوبة للحالات العامة
- * (GENERIC_CONDITION_IDS) عشان ما تطغاش على الحالات المحددة.
  */
 function scoreCondition(
   condition: MedicalCondition,
@@ -598,7 +710,7 @@ function scoreCondition(
   }
 
   // -------------------------------------------------------------------------
-  // 6) 🆕 مكافأة إضافية للـ colloquial المطابق (لو الجملة كلها موجودة)
+  // 6) مكافأة إضافية للـ colloquial المطابق
   // -------------------------------------------------------------------------
   if (colloquial.some((c) => c === normalizedQuery)) {
     score += 500;
@@ -606,12 +718,12 @@ function scoreCondition(
   }
 
   // -------------------------------------------------------------------------
-  // 7) 🆕 عقوبة للحالات العامة (M79.1, فيبروميالجيا) عند وجود شكوى موضعية
+  // 7) عقوبة للحالات العامة (Generic) عند وجود شكوى موضعية
   // -------------------------------------------------------------------------
   if (GENERIC_CONDITION_IDS.has(condition.id)) {
     const hasLocalRegion = queryTokens.some((t) => regionKeywords.includes(t));
     if (hasLocalRegion) {
-      score *= 0.4; // خصم 60%
+      score *= 0.4;
       matchedTerms.push('generic_penalty');
     }
   }
@@ -625,9 +737,6 @@ function scoreCondition(
 
 /**
  * البحث الذكي في المكتبة.
- * @example
- * smartSearch('ضهري بيوجعني', getAllConditions())
- * // → [{ condition: Low Back Pain, score: 950, matchedTerms: [...] }]
  */
 export function smartSearch(
   query: string,
@@ -652,83 +761,65 @@ export function smartSearch(
 // الواجهة العامة (نفس الأسماء القديمة — بدون كسر أي حاجة)
 // ============================================================================
 
-/** ترجمة نص ثلاثي اللغة مع الرجوع للعربية. */
 export function localize(value: LocalizedText, language: Language): string {
   return value[language] ?? value.ar;
 }
 
-/** الحالات المرضية المرتبطة بمنطقة فرعية تشريحية. */
 export function getConditionsBySubRegion(subRegionId: string): MedicalCondition[] {
   return CONDITIONS.filter((c) => c.taxonomy?.subRegion === subRegionId);
 }
 
-/** الحالات المرضية المرتبطة ببنية تشريحية محددة. */
 export function getConditionsByStructure(structureId: string): MedicalCondition[] {
   return CONDITIONS.filter((c) => c.taxonomy?.structures?.includes(structureId));
 }
 
-/** الحالات الإقليمية. */
 export function getRegionalConditions(): MedicalCondition[] {
   return REGIONAL_CONDITIONS;
 }
 
-/** الحالات المُضافة في دفعة إقليمية محددة. */
 export function getConditionsByBatch(batch: string): MedicalCondition[] {
   return CONDITIONS.filter((c) => c.batch === batch);
 }
 
-/** كل الأمراض. */
 export function getAllConditions(): MedicalCondition[] {
   return CONDITIONS;
 }
 
-/** كل الأعراض. */
 export function getAllSymptoms(): MedicalSymptom[] {
   return SYMPTOMS;
 }
 
-/** جلب حالة بالمعرّف. */
 export function getConditionById(id: string): MedicalCondition | null {
   return CONDITIONS.find((c) => c.id === id) ?? null;
 }
 
-/** جلب عرض بالمعرّف. */
 export function getSymptomById(id: string): MedicalSymptom | null {
   return SYMPTOMS.find((s) => s.id === id) ?? null;
 }
 
-/** الأمراض المرتبطة بمجموعة عضلات. */
 export function getConditionsByMuscleGroup(group: string): MedicalCondition[] {
   return CONDITIONS.filter((c) => c.muscleGroups.includes(group));
 }
 
-/** الأمراض المرتبطة بمنطقة جسم. */
 export function getConditionsByRegion(region: string): MedicalCondition[] {
   return CONDITIONS.filter((c) => c.regions.includes(region));
 }
 
-/** الأعراض المرتبطة بمنطقة جسم. */
 export function getSymptomsByRegion(region: string): MedicalSymptom[] {
   return SYMPTOMS.filter((s) => s.regions.includes(region));
 }
 
-/** الأعراض المرتبطة بحالة (HPO). */
 export function getSymptomsForCondition(condition: MedicalCondition): MedicalSymptom[] {
   return condition.symptoms
     .map((code) => SYMPTOMS.find((s) => s.id === code))
     .filter((x): x is MedicalSymptom => Boolean(x));
 }
 
-/** هل الحالة فيها red flags؟ */
 export function hasRedFlags(condition: MedicalCondition): boolean {
   const rf = condition.redFlags;
   return Boolean(rf && (rf.ar || rf.en || rf.fr));
 }
 
-/**
- * البحث الطبي (الواجهة القديمة — بقت بتستخدم smartSearch جوّه).
- * بترجع نفس الشكل القديم عشان ما تكسرش أي كود بيستخدمها.
- */
 export function searchMedicalLibrary(query: string): {
   conditions: MedicalCondition[];
   symptoms: MedicalSymptom[];
@@ -752,7 +843,6 @@ export function searchMedicalLibrary(query: string): {
   return { conditions, symptoms, results };
 }
 
-/** اقتراحات سريعة للواجهة. */
 export function getSearchSuggestions(): string[] {
   return [
     'وجع في ضهري',
@@ -766,7 +856,6 @@ export function getSearchSuggestions(): string[] {
   ];
 }
 
-/** إحصائيات المكتبة. */
 export function getLibraryStats() {
   const groups = new Set<string>();
   const regions = new Set<string>();
@@ -789,12 +878,11 @@ export function getLibraryStats() {
 }
 
 // ============================================================================
-// 🆕 دوال مساعدة إضافية (زيادة — بدون كسر أي حاجة قديمة)
+// دوال مساعدة إضافية (زيادة — بدون كسر أي حاجة قديمة)
 // ============================================================================
 
 /**
  * الحالات اللي عندها كلمات مفتاحية مسجّلة في KEYWORDS_MAP.
- * مفيدة للمراجعة والتأكد من تغطية المكتبة.
  */
 export function getConditionsWithKeywords(): MedicalCondition[] {
   return CONDITIONS.filter((c) => KEYWORDS_MAP[c.id] !== undefined);
@@ -835,7 +923,6 @@ export function getKeywordStats() {
 
 /**
  * البحث التشخيصي (Debug) — بترجع تفاصيل المطابقة لكل حالة.
- * مفيدة أثناء التطوير لمعرفة ليه حالة معينة طلعت أو لأ.
  */
 export function debugSearch(query: string, maxResults = 10): Array<{
   id: string;
@@ -877,4 +964,4 @@ export function getTaxonomyStats() {
 }
 export function getTaxonomyNotice(_lang: Language) {
   return '';
-    }
+      }
