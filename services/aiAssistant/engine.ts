@@ -61,7 +61,6 @@ export interface DetectedRegion {
 export interface DetectedOrgan {
   id: string;
   region: BodyRegionKey;
-  /** هل للعضو نقطة على خريطة الأعضاء (يمكن فتحه)؟ */
   onMap: boolean;
   label: LocalizedText;
   blurb: LocalizedText;
@@ -78,13 +77,10 @@ export interface DetectedOrganDetail {
   recommendation?: string;
 }
 
-/** موضع دقيق داخل البطن تمّ التعرّف عليه (مثل «أسفل يسار البطن»). */
 export interface DetectedLocation {
   id: string;
   label: LocalizedText;
-  /** أعضاء مرشّحة لهذا الموضع. */
   organs: string[];
-  /** مناطق الجسم المرتبطة. */
   regions: string[];
 }
 
@@ -92,7 +88,6 @@ export interface DetectedSymptom {
   id: string;
   label: LocalizedText;
   redFlag: boolean;
-  /** عرض عام (كلمة «وجع» وحدها) لا يرفّح أي مرض محدّد. */
   generic: boolean;
 }
 
@@ -118,41 +113,32 @@ export interface TriageAssessment {
 }
 
 export interface AssistantReply {
-  /** مقدّمة تعاطفية. */
   intro: LocalizedText;
-  /** عناصر فهم ما قاله المستخدم (جاهزة للعرض). */
   understanding: string[];
-  /** هل فُهمت جملة ذات معنى؟ إن لا نطلب توضيحًا. */
   understood: boolean;
-  /** سؤال توضيحي عند غياب التفاصيل. */
   clarifyingQuestion: LocalizedText | null;
   triage: TriageAssessment;
   redFlags: DetectedRedFlag[];
   regions: DetectedRegion[];
   symptoms: DetectedSymptom[];
-  /** الأعضاء الداخلية التي ذكرها المستخدم. */
   organs: DetectedOrgan[];
-  /** المواضع الدقيقة داخل البطن (أرباع/جهات) التي ذُكرت. */
   locations: DetectedLocation[];
-  /** تفاصيل غنية للأعضاء المتوفّرة في organDetails.json. */
   organDetails: DetectedOrganDetail[];
   conditions: ConditionMatch[];
   selfCare: string[];
   whenToSeeDoctor: LocalizedText;
   suggestedRegionId: string | null;
   suggestedRegionLabel: LocalizedText | null;
-  /** العضو المقترح لفتحه على خريطة الأعضاء (إن وُجدت نقطة له). */
   suggestedOrganId: string | null;
   suggestedOrganLabel: LocalizedText | null;
   disclaimer: LocalizedText;
-  /** اللغة التي طُلبت بها الإجابة (لتُعرض الحقول متعددة اللغات). */
   __lang: Lang;
 }
 
 // ---------------------------------------------------------------------------
 // تطبيع النص
 // ---------------------------------------------------------------------------
-const AR_DIACRITICS = /[\u064B-\u0652\u0670\u0640]/g; // تشكيل + تطويل
+const AR_DIACRITICS = /[\u064B-\u0652\u0670\u0640]/g;
 
 export function normalize(text: string): string {
   return text
@@ -177,7 +163,6 @@ function matchAny(text: string, keywords: Record<Lang, string[]>): boolean {
   return [...keywords.ar, ...keywords.en, ...keywords.fr].some((k) => containsKeyword(text, k));
 }
 
-/** هل الكلمة مسبوقة بنفي؟ (نافذة 16 حرفًا قبلها، مع مطابقة حدود الكلمات). */
 function isNegated(text: string, keyword: string): boolean {
   const needle = normalize(keyword);
   const idx = text.indexOf(needle);
@@ -242,7 +227,6 @@ export function detectSymptoms(text: string): DetectedSymptom[] {
   return [...found.values()];
 }
 
-/** مواضع دقيقة داخل البطن (أرباع/جهات بالنسبة للسرة). */
 export function detectLocations(text: string): DetectedLocation[] {
   const found = new Map<string, DetectedLocation>();
   ABDOMEN_LOCATIONS.forEach((loc: AbdomenLocation) => {
@@ -256,7 +240,6 @@ export function detectLocations(text: string): DetectedLocation[] {
   return [...found.values()];
 }
 
-/** يدمج الأعضاء المذكورة صراحةً مع الأعضاء المرشّحة من المواضع الدقيقة. */
 function mergeLocationOrgans(organs: DetectedOrgan[], locations: DetectedLocation[]): DetectedOrgan[] {
   const byId = new Map<string, DetectedOrgan>();
   organs.forEach((o) => byId.set(o.id, o));
@@ -288,7 +271,6 @@ export function detectRedFlags(text: string): DetectedRedFlag[] {
   return [...found.values()];
 }
 
-/** شدّة 0..10 من الأرقام أو الكلمات. */
 export function detectSeverity(text: string): number | null {
   const NON_SEVERITY = new Set<string>([
     'يوم', 'ايام', 'ساعه', 'ساعات', 'اسبوع', 'اسابيع', 'شهر', 'شهور', 'دقيقه', 'دقايق',
@@ -313,7 +295,6 @@ export function detectSeverity(text: string): number | null {
   return null;
 }
 
-/** المدة (وحدة تقريبية). */
 export function detectDuration(text: string): keyof typeof DURATION_WORDS | null {
   if (matchAny(text, DURATION_WORDS.months)) return 'months';
   if (matchAny(text, DURATION_WORDS.weeks)) return 'weeks';
@@ -327,10 +308,6 @@ export function detectDuration(text: string): keyof typeof DURATION_WORDS | null
 // ---------------------------------------------------------------------------
 const symBase = (id: string) => id.replace(/[^0-9]+$/, '');
 
-/**
- * أوزان الأعضاء المرشّحة: العضو الأول في الموضع (أو العضو المذكور صراحةً)
- * يأخذ وزنًا أعلى من الأعضاء الثانوية، حتى يفوز السبب الموضعي الأرجح.
- */
 function buildOrganWeights(organs: DetectedOrgan[], locations: DetectedLocation[]): Map<string, number> {
   const weights = new Map<string, number>();
   const bump = (id: string, w: number) => weights.set(id, Math.max(weights.get(id) ?? 0, w));
@@ -342,12 +319,16 @@ function buildOrganWeights(organs: DetectedOrgan[], locations: DetectedLocation[
 }
 
 /**
- * مطابقة الأمراض المحتملة — نسخة محسّنة.
+ * مطابقة الأمراض المحتملة — نسخة محسّنة (v3).
  * ----------------------------------------------------------------------------
  * 1) تستخدم محرّك البحث الذكي `smartSearch` (من diseaseLibrary) على النص الأصلي
  *    للاستفادة من قاموس الكلمات المفتاحية والعامية المصرية.
- * 2) تدمج النتايج مع منطق المطابقة القديم (regions / symptoms / organs).
- * 3) ترتّب النتايج النهائية حسب أعلى score وتُعيد أول 4 حالات.
+ * 2) (جديد) تفلتر نتائج smartSearch حسب المنطقة: لو المستخدم ذكر منطقة جسم
+ *    (زي "ضهري" → lower-back)، نستبعد أي حالة regions بتاعتها مش متوافقة.
+ *    ده يمنع ظهور حالات غير مرتبطة (زي K81.0 التهاب المرارة).
+ * 3) (جديد) تعطي bonus للحالات اللي regions بتاعتها مطابقة لمنطقة الاستعلام.
+ * 4) تدمج النتايج مع منطق المطابقة القديم (regions / symptoms / organs).
+ * 5) ترتّب النتايج النهائية حسب أعلى score وتُعيد أول 4 حالات.
  */
 export function scoreConditions(
   regions: DetectedRegion[],
@@ -356,7 +337,6 @@ export function scoreConditions(
   locations: DetectedLocation[] = [],
   rawText: string = '',
 ): ConditionMatch[] {
-  // الأعراض العامة (كلمة «وجع» وحدها) لا تُرجّح أي مرض محدّد.
   const specificSymptoms = symptoms.filter((s) => !s.generic);
   const symptomBases = new Set(specificSymptoms.map((s) => symBase(s.id)));
   const organWeights = buildOrganWeights(organs, locations);
@@ -364,31 +344,58 @@ export function scoreConditions(
   const hasSpecificEvidence =
     specificSymptoms.length > 0 || organs.length > 0 || locations.length > 0;
 
+  // 🆕 مجموعة مناطق الاستعلام (للتفلترة والمكافأة)
+  const queryRegions = new Set(regions.map((r) => r.region));
+
   const scored: ConditionMatch[] = [];
   const seen = new Set<string>();
 
   // === 1) البحث الذكي (أعلى أولوية) ===
-  // يشتغل على النص الخام حتى لو مفيش regions/symptoms مفهومة.
   if (rawText && rawText.trim().length >= 2) {
     try {
-      const smartResults = smartSearch(rawText, getAllConditions(), 8);
+      const smartResults = smartSearch(rawText, getAllConditions(), 12); // نطلب 12 بدل 8 لفلترة أفضل
       smartResults.forEach((r) => {
+        // 🆕 فلتر المنطقة: لو المستخدم ذكر منطقة، نستبعد الحالات اللي regions بتاعتها
+        // مش متوافقة مع منطقة الاستعلام. ده يمنع K81.0 (مرارة) من الظهور لـ "ضهري".
+        if (queryRegions.size > 0 && r.condition.regions.length > 0) {
+          const matchesRegion = r.condition.regions.some((cr) => queryRegions.has(cr as any));
+          const hasMuscleMatch = r.condition.muscleGroups.some((mg) =>
+            regions.some((reg) => reg.id === mg),
+          );
+          // نستبعد الحالة بس لو مفيش تطابق regions ولا muscleGroups
+          if (!matchesRegion && !hasMuscleMatch) {
+            return;
+          }
+        }
+
         // نستبعد الحالات المنتشرة لو فيه دليل موضعي.
         if (r.condition.diffuse && localized) {
-          // نخفّضها لكن مش نستبعدها تمامًا.
           const boosted = Math.round(r.score * 0.5);
           if (boosted <= 0) return;
         }
+
         if (seen.has(r.condition.id)) return;
         seen.add(r.condition.id);
+
+        // 🆕 مكافأة للحالات اللي regions بتاعتها مطابقة لمنطقة الاستعلام
+        let bonus = 0;
+        if (queryRegions.size > 0) {
+          const regionMatch = r.condition.regions.some((cr) => queryRegions.has(cr as any));
+          if (regionMatch) bonus += 500;
+          const muscleMatch = r.condition.muscleGroups.some((mg) =>
+            regions.some((reg) => reg.id === mg),
+          );
+          if (muscleMatch) bonus += 300;
+        }
+
         scored.push({
           id: r.condition.id,
           name: r.condition.name,
           summary: r.condition.summary,
           icd10: r.condition.icd10,
           medlinePlusUrl: r.condition.medlinePlusUrl,
-          // نرفع الـ score من smartSearch حتى يكون فوق النتايج القديمة
-          score: r.score * 3,
+          // نرفع الـ score من smartSearch + البونص
+          score: r.score * 3 + bonus,
         });
       });
     } catch {
@@ -400,9 +407,7 @@ export function scoreConditions(
   getAllConditions().forEach((condition: MedicalCondition) => {
     if (seen.has(condition.id)) return;
 
-    // لو فيه أعضاء داخلية محددة، نرجّح بس الحالات المرتبطة بيها.
     if (organs.length > 0 && !condition.organs?.some((id) => organWeights.has(id))) {
-      // لكن نسيب فرصة للحالات المرتبطة إقليميًا لو مفيش عضوية.
       if (!hasSpecificEvidence) return;
       return;
     }
@@ -410,9 +415,7 @@ export function scoreConditions(
     let score = 0;
 
     regions.forEach((region) => {
-      // مطابقة المنطقة عريضة → نقطة صغيرة، بشرط وجود دليل محدد.
       if (condition.regions.includes(region.region) && hasSpecificEvidence) score += 2;
-      // مطابقة مجموعة العضلات الدقيقة → نقطة أعلى.
       if (condition.muscleGroups.includes(region.id)) score += 2;
     });
 
@@ -431,13 +434,11 @@ export function scoreConditions(
       if (symptomBases.has(symBase(sid))) score += 3;
     });
 
-    // الحالات المنتشرة: تخفيض عند وجود شكوى موضعية.
     if (condition.diffuse) {
       if (localized) score -= 5;
       if (regions.length <= 1 && organs.length === 0) score -= 3;
     }
 
-    // لو مفيش دليل محدد خالص، ما نضيفش الحالة بالمنطق القديم.
     if (!hasSpecificEvidence && score <= 0) return;
 
     if (score > 0) {
@@ -990,8 +991,6 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
 
   const triage = assessTriage(redFlags, severity, duration, regions, symptoms, organs);
 
-  // ملاحظة مهمة: نمرّر النص الخام (rawText) لدالة scoreConditions
-  // حتى تستخدم محرّك البحث الذكي smartSearch للاستفادة من العامية والمرادفات.
   const conditions = understood
     ? scoreConditions(regions, symptoms, organs, locations, rawText)
     : [];
