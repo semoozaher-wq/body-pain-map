@@ -1,6 +1,6 @@
 {
-  "schemaVersion": 1,
-  "notice": "شروط مرتبطة بأعضاء داخلية محددة (أعراض هضمية/بطنية/بولية). تُدمج مع diseases.json لتحسين مطابقة الشكاوى الموضعية (مثل ألم حول/جانب السرة). إرشاد تعليمي فقط.",
+  "schemaVersion": 1.1,
+  "notice": "شروط مرتبطة بأعضاء داخلية محددة (أعراض هضمية/بطنية/بولية/غددية). تُدمج مع diseases.json لتحسين مطابقة الشكاوى الموضعية (مثل ألم حول/جانب السرة). إرشاد تعليمي فقط.",
   "conditions": [
     {
       "id": "doid:appendicitis",
@@ -17,17 +17,9 @@
         "fr": "Inflammation de l’appendice en bas à droite de l’abdomen ; la douleur débute souvent autour du nombril puis migre en bas à droite, avec nausées et fièvre."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "appendix"
-      ],
-      "symptoms": [
-        "hpo:0002017",
-        "hpo:0001945",
-        "hpo:0003326"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["appendix"],
+      "symptoms": ["hpo:0002017", "hpo:0001945", "hpo:0003326"],
       "redFlags": {
         "ar": "ألم يزداد بشدة في أسفل يمين البطن، حرارة، قيء متكرر، أو عدم القدرة على المشي — اطلب الطوارئ.",
         "en": "Worsening lower-right pain, fever, repeated vomiting, or inability to walk — seek emergency care.",
@@ -35,19 +27,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/appendicitis.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Appendicitis",
-          "url": "https://medlineplus.gov/appendicitis.html"
-        }
+        { "title": "MedlinePlus — Appendicitis", "url": "https://medlineplus.gov/appendicitis.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -66,16 +50,9 @@
         "fr": "Inflammation de la muqueuse gastrique : douleur/brûlure de l’estomac avec nausées ou ballonnements après les repas."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "stomach"
-      ],
-      "symptoms": [
-        "hpo:0002020",
-        "hpo:0002017"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["stomach"],
+      "symptoms": ["hpo:0002020", "hpo:0002017"],
       "redFlags": {
         "ar": "قيء دم أو براز أسود، ألم شديد مفاجئ، أو فقدان وزن — راجع الطبيب فورًا.",
         "en": "Vomiting blood or black stool, sudden severe pain, or weight loss — see a doctor urgently.",
@@ -83,19 +60,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/gastritis.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Gastritis",
-          "url": "https://medlineplus.gov/gastritis.html"
-        }
+        { "title": "MedlinePlus — Gastritis", "url": "https://medlineplus.gov/gastritis.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -114,16 +83,9 @@
         "fr": "Ulcère de l’estomac ou du duodénum : brûlure/douleur épigastrique modifiée par les repas."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "stomach"
-      ],
-      "symptoms": [
-        "hpo:0002020",
-        "hpo:0002017"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["stomach"],
+      "symptoms": ["hpo:0002020", "hpo:0002017"],
       "redFlags": {
         "ar": "ألم حارق شديد، قيء دم، أو براز أسود — راجع الطوارئ.",
         "en": "Severe burning pain, vomiting blood, or black stool — seek urgent care.",
@@ -131,19 +93,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/peptic ulcer.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Peptic Ulcer",
-          "url": "https://medlineplus.gov/peptic ulcer.html"
-        }
+        { "title": "MedlinePlus — Peptic Ulcer", "url": "https://medlineplus.gov/peptic ulcer.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -162,16 +116,9 @@
         "fr": "Trouble fonctionnel de l’intestin : crampes/douleurs autour ou sous le nombril avec modification du transit (diarrhée/constipation/ballonnements)."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "intestines"
-      ],
-      "symptoms": [
-        "hpo:0002014",
-        "hpo:0003326"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["intestines"],
+      "symptoms": ["hpo:0002014", "hpo:0003326"],
       "redFlags": {
         "ar": "نزيف، فقدان وزن، حرارة، أو أعراض تبدأ بعد سن 50 — راجع الطبيب.",
         "en": "Bleeding, weight loss, fever, or symptoms starting after age 50 — see a doctor.",
@@ -179,19 +126,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/irritablebowelsyndrome.html",
       "sources": [
-        {
-          "title": "MedlinePlus — IBS",
-          "url": "https://medlineplus.gov/irritablebowelsyndrome.html"
-        }
+        { "title": "MedlinePlus — IBS", "url": "https://medlineplus.gov/irritablebowelsyndrome.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -210,17 +149,9 @@
         "fr": "Inflammation de petits diverticules du côlon, souvent en bas à gauche, avec douleur, fièvre et transit modifié."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "intestines"
-      ],
-      "symptoms": [
-        "hpo:0001945",
-        "hpo:0002014",
-        "hpo:0003326"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["intestines"],
+      "symptoms": ["hpo:0001945", "hpo:0002014", "hpo:0003326"],
       "redFlags": {
         "ar": "ألم شديد في أسفل يسار البطن مع حرارة أو دم في البراز — راجع الطوارئ.",
         "en": "Severe lower-left pain with fever or blood in stool — seek urgent care.",
@@ -228,19 +159,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/diverticulosisanddiverticulitis.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Diverticulitis",
-          "url": "https://medlineplus.gov/diverticulosisanddiverticulitis.html"
-        }
+        { "title": "MedlinePlus — Diverticulitis", "url": "https://medlineplus.gov/diverticulosisanddiverticulitis.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -259,18 +182,9 @@
         "fr": "Infection digestive : diarrhée, vomissements, crampes abdominales, parfois fièvre."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "stomach",
-        "intestines"
-      ],
-      "symptoms": [
-        "hpo:0002014",
-        "hpo:0002017",
-        "hpo:0001945"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["stomach", "intestines"],
+      "symptoms": ["hpo:0002014", "hpo:0002017", "hpo:0001945"],
       "redFlags": {
         "ar": "جفاف شديد، دم في البراز، أو عدم القدرة على شرب السوائل — راجع الطبيب.",
         "en": "Severe dehydration, blood in stool, or inability to keep fluids down — see a doctor.",
@@ -278,19 +192,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/gastroenteritis.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Gastroenteritis",
-          "url": "https://medlineplus.gov/gastroenteritis.html"
-        }
+        { "title": "MedlinePlus — Gastroenteritis", "url": "https://medlineplus.gov/gastroenteritis.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -309,18 +215,9 @@
         "fr": "Calculs biliaires : douleur en haut à droite (sous les côtes) irradiant parfois à l’épaule, surtout après un repas gras."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "gallbladder",
-        "liver"
-      ],
-      "symptoms": [
-        "hpo:0002017",
-        "hpo:0002020",
-        "hpo:0003326"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["gallbladder", "liver"],
+      "symptoms": ["hpo:0002017", "hpo:0002020", "hpo:0003326"],
       "redFlags": {
         "ar": "ألم شديد مستمر مع حرارة أو اصفرار العين/الجلد — راجع الطوارئ.",
         "en": "Severe ongoing pain with fever or yellowing of eyes/skin — seek urgent care.",
@@ -328,19 +225,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/gallstones.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Gallstones",
-          "url": "https://medlineplus.gov/gallstones.html"
-        }
+        { "title": "MedlinePlus — Gallstones", "url": "https://medlineplus.gov/gallstones.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -359,16 +248,9 @@
         "fr": "Inflammation du foie : douleur/lourdeur en haut à droite avec fatigue, nausées et parfois jaunisse."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "liver"
-      ],
-      "symptoms": [
-        "hpo:0012378",
-        "hpo:0002017"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["liver"],
+      "symptoms": ["hpo:0012378", "hpo:0002017"],
       "redFlags": {
         "ar": "اصفرار العين/الجلد، بول غامق، أو إجهاد شديد — راجع الطبيب فورًا.",
         "en": "Yellow eyes/skin, dark urine, or severe fatigue — see a doctor promptly.",
@@ -376,19 +258,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/hepatitis.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Hepatitis",
-          "url": "https://medlineplus.gov/hepatitis.html"
-        }
+        { "title": "MedlinePlus — Hepatitis", "url": "https://medlineplus.gov/hepatitis.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -407,16 +281,9 @@
         "fr": "Inflammation du pancréas : douleur intense en haut de l’abdomen irradiant au dos avec nausées et vomissements."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "pancreas"
-      ],
-      "symptoms": [
-        "hpo:0002017",
-        "hpo:0003326"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["pancreas"],
+      "symptoms": ["hpo:0002017", "hpo:0003326"],
       "redFlags": {
         "ar": "ألم شديد ينتقل للظهر مع قيء — راجع الطوارئ فورًا.",
         "en": "Severe pain radiating to the back with vomiting — seek emergency care.",
@@ -424,19 +291,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/pancreatitis.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Pancreatitis",
-          "url": "https://medlineplus.gov/pancreatitis.html"
-        }
+        { "title": "MedlinePlus — Pancreatitis", "url": "https://medlineplus.gov/pancreatitis.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -455,17 +314,9 @@
         "fr": "Infection urinaire : brûlure à la miction et douleur du bas-ventre avec envies fréquentes."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "bladder",
-        "kidneys"
-      ],
-      "symptoms": [
-        "hpo:0003326",
-        "hpo:0001945"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["bladder", "kidneys"],
+      "symptoms": ["hpo:0003326", "hpo:0001945"],
       "redFlags": {
         "ar": "حرارة عالية مع ألم في الخاصرة أو دم في البول — راجع الطبيب فورًا.",
         "en": "High fever with flank pain or blood in urine — see a doctor promptly.",
@@ -473,19 +324,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/urinarytractinfections.html",
       "sources": [
-        {
-          "title": "MedlinePlus — UTI",
-          "url": "https://medlineplus.gov/urinarytractinfections.html"
-        }
+        { "title": "MedlinePlus — UTI", "url": "https://medlineplus.gov/urinarytractinfections.html" }
       ],
       "taxonomy": {
         "subRegion": "pelvis",
-        "structures": [
-          "bladder",
-          "prostate",
-          "uterus",
-          "testis"
-        ]
+        "structures": ["bladder", "prostate", "uterus", "testis"]
       },
       "icd10Status": "unverified"
     },
@@ -504,17 +347,9 @@
         "fr": "Calculs rénaux/urétéraux : douleur lombaire intense par vagues irradiant au bas-ventre et à l’aine, parfois sang dans les urines."
       },
       "muscleGroups": [],
-      "regions": [
-        "back",
-        "torso_front"
-      ],
-      "organs": [
-        "kidneys"
-      ],
-      "symptoms": [
-        "hpo:0003326",
-        "hpo:0002017"
-      ],
+      "regions": ["back", "torso_front"],
+      "organs": ["kidneys"],
+      "symptoms": ["hpo:0003326", "hpo:0002017"],
       "redFlags": {
         "ar": "ألم شديد لا يتحمّل، حرارة، أو دم واضح في البول — راجع الطوارئ.",
         "en": "Unbearable pain, fever, or visible blood in urine — seek urgent care.",
@@ -522,19 +357,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/kidneystones.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Kidney Stones",
-          "url": "https://medlineplus.gov/kidneystones.html"
-        }
+        { "title": "MedlinePlus — Kidney Stones", "url": "https://medlineplus.gov/kidneystones.html" }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": [
-          "stomach",
-          "small-intestine",
-          "colon",
-          "liver"
-        ]
+        "structures": ["stomach", "small-intestine", "colon", "liver"]
       },
       "icd10Status": "unverified"
     },
@@ -553,16 +380,9 @@
         "fr": "Kyste ovarien : douleur du bas-ventre (souvent d’un côté) aggravée par le cycle ou les rapports."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "ovaries",
-        "uterus"
-      ],
-      "symptoms": [
-        "hpo:0003326"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["ovaries", "uterus"],
+      "symptoms": ["hpo:0003326"],
       "redFlags": {
         "ar": "ألم مفاجئ شديد مع قيء أو دوخة — راجع الطوارئ (احتمال التفاف الكيس).",
         "en": "Sudden severe pain with vomiting or dizziness — seek emergency care (possible torsion).",
@@ -570,19 +390,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/ovariancysts.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Ovarian Cysts",
-          "url": "https://medlineplus.gov/ovariancysts.html"
-        }
+        { "title": "MedlinePlus — Ovarian Cysts", "url": "https://medlineplus.gov/ovariancysts.html" }
       ],
       "taxonomy": {
         "subRegion": "pelvis",
-        "structures": [
-          "bladder",
-          "prostate",
-          "uterus",
-          "testis"
-        ]
+        "structures": ["bladder", "prostate", "uterus", "testis"]
       },
       "icd10Status": "unverified"
     },
@@ -601,16 +413,9 @@
         "fr": "Tissu de type endométrial hors de l’utérus : douleur du bas-ventre/bassin liée au cycle."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "uterus",
-        "ovaries"
-      ],
-      "symptoms": [
-        "hpo:0003326"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["uterus", "ovaries"],
+      "symptoms": ["hpo:0003326"],
       "redFlags": {
         "ar": "ألم حوض شديد يعطّل حياتك اليومية — راجع طبيبة نساء.",
         "en": "Severe pelvic pain disrupting daily life — see a gynaecologist.",
@@ -618,19 +423,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/endometriosis.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Endometriosis",
-          "url": "https://medlineplus.gov/endometriosis.html"
-        }
+        { "title": "MedlinePlus — Endometriosis", "url": "https://medlineplus.gov/endometriosis.html" }
       ],
       "taxonomy": {
         "subRegion": "pelvis",
-        "structures": [
-          "bladder",
-          "prostate",
-          "uterus",
-          "testis"
-        ]
+        "structures": ["bladder", "prostate", "uterus", "testis"]
       },
       "icd10Status": "unverified"
     },
@@ -649,15 +446,9 @@
         "fr": "Ischémie cardiaque : oppression/douleur thoracique irradiant au bras ou à la mâchoire, souvent à l’effort."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "heart"
-      ],
-      "symptoms": [
-        "hpo:0003326"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["heart"],
+      "symptoms": ["hpo:0003326"],
       "redFlags": {
         "ar": "ألم صدر مع ضيق نفس أو تعرّق أو إغماء — اطلب الطوارئ فورًا.",
         "en": "Chest pain with breathlessness, sweating, or fainting — call emergency services now.",
@@ -665,19 +456,11 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/angina.html",
       "sources": [
-        {
-          "title": "MedlinePlus — Angina",
-          "url": "https://medlineplus.gov/angina.html"
-        }
+        { "title": "MedlinePlus — Angina", "url": "https://medlineplus.gov/angina.html" }
       ],
       "taxonomy": {
         "subRegion": "thoracic_cavity",
-        "structures": [
-          "heart",
-          "aorta",
-          "lungs",
-          "pleura"
-        ]
+        "structures": ["heart", "aorta", "lungs", "pleura"]
       },
       "icd10Status": "unverified"
     },
@@ -696,17 +479,9 @@
         "fr": "Reflux acide dans l’œsophage : brûlure rétrosternale/épigastrique, pire après les repas ou allongé."
       },
       "muscleGroups": [],
-      "regions": [
-        "torso_front"
-      ],
-      "organs": [
-        "esophagus",
-        "stomach"
-      ],
-      "symptoms": [
-        "hpo:0002020",
-        "hpo:0002017"
-      ],
+      "regions": ["torso_front"],
+      "organs": ["esophagus", "stomach"],
+      "symptoms": ["hpo:0002020", "hpo:0002017"],
       "redFlags": {
         "ar": "صعوبة بلع، فقدان وزن، أو قيء دم — راجع الطبيب.",
         "en": "Difficulty swallowing, weight loss, or vomiting blood — see a doctor.",
@@ -714,19 +489,351 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/gerd.html",
       "sources": [
-        {
-          "title": "MedlinePlus — GERD",
-          "url": "https://medlineplus.gov/gerd.html"
-        }
+        { "title": "MedlinePlus — GERD", "url": "https://medlineplus.gov/gerd.html" }
       ],
       "taxonomy": {
         "subRegion": "thoracic_cavity",
-        "structures": [
-          "heart",
-          "aorta",
-          "lungs",
-          "pleura"
-        ]
+        "structures": ["heart", "aorta", "lungs", "pleura"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:cholecystitis-acute",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K81.0",
+      "name": {
+        "ar": "التهاب المرارة الحاد",
+        "en": "Acute cholecystitis",
+        "fr": "Cholécystite aiguë"
+      },
+      "summary": {
+        "ar": "التهاب حاد في المرارة غالبًا بسبب حصوة تسد القناة، يسبب ألمًا شديدًا في أعلى يمين البطن مع حرارة وغثيان.",
+        "en": "Acute gallbladder inflammation often due to a blocking stone, causing severe upper-right abdominal pain with fever and nausea.",
+        "fr": "Inflammation aiguë de la vésicule souvent due à un calcul bloquant, avec douleur intense en haut à droite, fièvre et nausées."
+      },
+      "muscleGroups": [],
+      "regions": ["torso_front"],
+      "organs": ["gallbladder", "liver"],
+      "symptoms": ["hpo:0002017", "hpo:0001945", "hpo:0002017"],
+      "redFlags": {
+        "ar": "ألم مستمر مع حرارة عالية أو اصفرار — راجع الطوارئ فورًا.",
+        "en": "Ongoing pain with high fever or jaundice — seek emergency care now.",
+        "fr": "Douleur persistante avec forte fièvre ou jaunisse — urgences immédiates."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/gallstones.html",
+      "sources": [
+        { "title": "MedlinePlus — Gallstones", "url": "https://medlineplus.gov/gallstones.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "abdominal_cavity",
+        "structures": ["liver", "gallbladder", "biliary-ducts", "pancreas"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:duodenal-ulcer",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K26",
+      "name": {
+        "ar": "قرحة الاثني عشر",
+        "en": "Duodenal ulcer",
+        "fr": "Ulcère duodénal"
+      },
+      "summary": {
+        "ar": "قرحة في الاثني عشر (أول جزء من الأمعاء الدقيقة) تسبب ألمًا/حرقانًا في أعلى البطن يتحسّن مع الأكل.",
+        "en": "An ulcer in the duodenum causing upper-abdominal pain/burning that improves with eating.",
+        "fr": "Ulcère duodénal : douleur/brûlure épigastrique améliorée par les repas."
+      },
+      "muscleGroups": [],
+      "regions": ["torso_front"],
+      "organs": ["stomach", "intestines"],
+      "symptoms": ["hpo:0002020", "hpo:0002017"],
+      "redFlags": {
+        "ar": "قيء دم أو براز أسود، ألم شديد مفاجئ — راجع الطوارئ.",
+        "en": "Vomiting blood or black stool, sudden severe pain — seek emergency care.",
+        "fr": "Vomissements de sang ou selles noires, douleur brutale — urgences."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/pepticulcer.html",
+      "sources": [
+        { "title": "MedlinePlus — Peptic Ulcer", "url": "https://medlineplus.gov/pepticulcer.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "abdominal_cavity",
+        "structures": ["stomach", "duodenum", "small-intestine", "colon"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:acute-diverticulitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "K57.3",
+      "name": {
+        "ar": "التهاب الرتج الحاد",
+        "en": "Acute diverticulitis",
+        "fr": "Diverticulite aiguë"
+      },
+      "summary": {
+        "ar": "التهاب حاد في الرتوج (جيوب صغيرة في القولون) يسبب ألمًا شديدًا في أسفل يسار البطن مع حرارة وغثيان.",
+        "en": "Acute inflammation of colonic diverticula causing severe lower-left abdominal pain with fever and nausea.",
+        "fr": "Inflammation aiguë des diverticules coliques : douleur intense en bas à gauche, fièvre, nausées."
+      },
+      "muscleGroups": [],
+      "regions": ["torso_front"],
+      "organs": ["intestines"],
+      "symptoms": ["hpo:0002017", "hpo:0001945", "hpo:0002014"],
+      "redFlags": {
+        "ar": "ألم شديد مع حرارة أو دم في البراز — راجع الطوارئ فورًا.",
+        "en": "Severe pain with fever or blood in stool — seek emergency care now.",
+        "fr": "Douleur intense avec fièvre ou sang dans les selles — urgences immédiates."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/diverticulosisanddiverticulitis.html",
+      "sources": [
+        { "title": "MedlinePlus — Diverticulitis", "url": "https://medlineplus.gov/diverticulosisanddiverticulitis.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "abdominal_cavity",
+        "structures": ["colon", "sigmoid-colon", "small-intestine", "rectum"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:pyelonephritis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N10",
+      "name": {
+        "ar": "التهاب الكلى (الحويضة والكلية)",
+        "en": "Pyelonephritis",
+        "fr": "Pyélonéphrite"
+      },
+      "summary": {
+        "ar": "عدوى في الكلى تسبب ألمًا في الخاصرة مع حرارة وقشعريرة وحرقان عند التبول.",
+        "en": "Kidney infection causing flank pain with fever, chills, and burning on urination.",
+        "fr": "Infection rénale : douleur lombaire avec fièvre, frissons et brûlure à la miction."
+      },
+      "muscleGroups": [],
+      "regions": ["back", "torso_front"],
+      "organs": ["kidneys", "bladder"],
+      "symptoms": ["hpo:0001945", "hpo:0003326"],
+      "redFlags": {
+        "ar": "حرارة عالية مع قشعريرة، قيء، أو ألم شديد في الخاصرة — راجع الطوارئ.",
+        "en": "High fever with chills, vomiting, or severe flank pain — seek emergency care.",
+        "fr": "Forte fièvre avec frissons, vomissements, ou douleur lombaire intense — urgences."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/pyelonephritis.html",
+      "sources": [
+        { "title": "MedlinePlus — Kidney Infection", "url": "https://medlineplus.gov/kidneyinfection.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "abdominal_cavity",
+        "structures": ["kidneys", "ureters", "bladder", "adrenal-glands"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:ureteral-stone",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N20.1",
+      "name": {
+        "ar": "حصى الحالب",
+        "en": "Ureteral stone",
+        "fr": "Calcul urétéral"
+      },
+      "summary": {
+        "ar": "حصوة عالقة في الحالب تسبب ألمًا شديدًا متموّجًا في الخاصرة ينتقل لأسفل البطن والفخذ مع دم أحيانًا في البول.",
+        "en": "A stone lodged in the ureter causing severe waves of flank pain radiating to the lower abdomen and groin, sometimes with blood in urine.",
+        "fr": "Calcul bloqué dans l’uretère : douleur lombaire intense par vagues irradiant au bas-ventre et à l’aine, parfois sang dans les urines."
+      },
+      "muscleGroups": [],
+      "regions": ["back", "torso_front"],
+      "organs": ["kidneys", "bladder"],
+      "symptoms": ["hpo:0003326", "hpo:0002017"],
+      "redFlags": {
+        "ar": "ألم شديد لا يتحمّل، حرارة، أو دم واضح في البول — راجع الطوارئ.",
+        "en": "Unbearable pain, fever, or visible blood in urine — seek emergency care.",
+        "fr": "Douleur insupportable, fièvre, ou sang visible dans les urines — urgences."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/kidneystones.html",
+      "sources": [
+        { "title": "MedlinePlus — Kidney Stones", "url": "https://medlineplus.gov/kidneystones.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "abdominal_cavity",
+        "structures": ["kidneys", "ureters", "bladder", "adrenal-glands"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:prostatitis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "N41",
+      "name": {
+        "ar": "التهاب البروستاتا",
+        "en": "Prostatitis",
+        "fr": "Prostatite"
+      },
+      "summary": {
+        "ar": "التهاب في غدة البروستاتا يسبب ألمًا في أسفل البطن أو الحوض مع حرقان عند التبول أو صعوبة في التبول.",
+        "en": "Inflammation of the prostate causing lower-abdominal or pelvic pain with burning or difficulty urinating.",
+        "fr": "Inflammation de la prostate : douleur du bas-ventre/bassin avec brûlure ou difficulté à uriner."
+      },
+      "muscleGroups": [],
+      "regions": ["torso_front"],
+      "organs": ["prostate", "bladder"],
+      "symptoms": ["hpo:0003326"],
+      "redFlags": {
+        "ar": "حرارة عالية، احتباس بولي كامل، أو ألم شديد — راجع الطوارئ.",
+        "en": "High fever, complete urinary retention, or severe pain — seek emergency care.",
+        "fr": "Forte fièvre, rétention urinaire complète, ou douleur intense — urgences."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/prostatitis.html",
+      "sources": [
+        { "title": "MedlinePlus — Prostatitis", "url": "https://medlineplus.gov/prostatitis.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "pelvis",
+        "structures": ["prostate", "bladder", "urethra", "spermatic-cord"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:pcos",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "E28.2",
+      "name": {
+        "ar": "تكيس المبايض",
+        "en": "Polycystic ovary syndrome (PCOS)",
+        "fr": "Syndrome des ovaires polykystiques"
+      },
+      "summary": {
+        "ar": "اختلال هرموني يسبب عدم انتظام الدورة، حب الشباب، زيادة الشعر، وأكياس صغيرة على المبيض.",
+        "en": "Hormonal disorder causing irregular periods, acne, excess hair, and small ovarian cysts.",
+        "fr": "Trouble hormonal : règles irrégulières, acné, pilosité excessive, petits kystes ovariens."
+      },
+      "muscleGroups": [],
+      "regions": ["torso_front"],
+      "organs": ["ovaries", "uterus"],
+      "symptoms": ["hpo:0003326"],
+      "redFlags": {
+        "ar": "نزيف رحمي غزير أو مستمر، أو ألم حوض شديد — راجع طبيبة نساء.",
+        "en": "Heavy or prolonged uterine bleeding, or severe pelvic pain — see a gynaecologist.",
+        "fr": "Saignement utérin abondant ou prolongé, ou douleur pelvienne sévère — consultez un gynécologue."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/polycysticovarysyndrome.html",
+      "sources": [
+        { "title": "MedlinePlus — PCOS", "url": "https://medlineplus.gov/polycysticovarysyndrome.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "pelvis",
+        "structures": ["ovaries", "uterus", "fallopian-tubes", "bladder"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:hyperthyroidism",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "E05",
+      "name": {
+        "ar": "فرط نشاط الغدة الدرقية",
+        "en": "Hyperthyroidism",
+        "fr": "Hyperthyroïdie"
+      },
+      "summary": {
+        "ar": "زيادة نشاط الغدة الدرقية تسبب خفقانًا، فقدان وزن، تعرّقًا، قلقًا، وعدم تحمّل الحرارة.",
+        "en": "Overactive thyroid causing palpitations, weight loss, sweating, anxiety, and heat intolerance.",
+        "fr": "Thyroïde hyperactive : palpitations, perte de poids, sueurs, anxiété et intolérance à la chaleur."
+      },
+      "muscleGroups": ["neck"],
+      "regions": ["head_neck"],
+      "organs": ["thyroid-gland"],
+      "symptoms": ["hpo:0012378"],
+      "redFlags": {
+        "ar": "خفقان شديد مع ألم صدر، أو حمى مع ارتباك (عاصفة درقية) — راجع الطوارئ.",
+        "en": "Severe palpitations with chest pain, or fever with confusion (thyroid storm) — seek emergency care.",
+        "fr": "Palpitations intenses avec douleur thoracique, ou fièvre avec confusion (orage thyroïdien) — urgences."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hyperthyroidism.html",
+      "sources": [
+        { "title": "MedlinePlus — Hyperthyroidism", "url": "https://medlineplus.gov/hyperthyroidism.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "neck_soft_tissue",
+        "structures": ["thyroid-gland", "parathyroid-glands", "larynx", "pharynx"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:hypothyroidism",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "E03",
+      "name": {
+        "ar": "قصور الغدة الدرقية",
+        "en": "Hypothyroidism",
+        "fr": "Hypothyroïdie"
+      },
+      "summary": {
+        "ar": "نقص نشاط الغدة الدرقية يسبب تعبًا، زيادة وزن، جفاف الجلد، إمساكًا، وعدم تحمّل البرد.",
+        "en": "Underactive thyroid causing fatigue, weight gain, dry skin, constipation, and cold intolerance.",
+        "fr": "Thyroïde sous-active : fatigue, prise de poids, peau sèche, constipation, intolérance au froid."
+      },
+      "muscleGroups": ["neck"],
+      "regions": ["head_neck"],
+      "organs": ["thyroid-gland"],
+      "symptoms": ["hpo:0012378"],
+      "redFlags": {
+        "ar": "تعب شديد مع انخفاض الوعي أو انخفاض حرارة الجسم — راجع الطوارئ.",
+        "en": "Severe fatigue with decreased consciousness or low body temperature — seek emergency care.",
+        "fr": "Fatigue intense avec baisse de conscience ou hypothermie — urgences."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/hypothyroidism.html",
+      "sources": [
+        { "title": "MedlinePlus — Hypothyroidism", "url": "https://medlineplus.gov/hypothyroidism.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "neck_soft_tissue",
+        "structures": ["thyroid-gland", "parathyroid-glands", "larynx", "pharynx"]
+      },
+      "icd10Status": "unverified"
+    },
+    {
+      "id": "doid:pericarditis",
+      "doid": null,
+      "doidStatus": "not-mapped",
+      "icd10": "I30",
+      "name": {
+        "ar": "التهاب التامور",
+        "en": "Pericarditis",
+        "fr": "Péricardite"
+      },
+      "summary": {
+        "ar": "التهاب في الغشاء المحيط بالقلب يسبب ألمًا في الصدر يزيد مع الشهيق والاستلقاء، ويقل بالجلوس للأمام.",
+        "en": "Inflammation of the sac around the heart causing chest pain worse with breathing and lying down, better when sitting forward.",
+        "fr": "Inflammation du péricarde : douleur thoracique aggravée par l’inspiration et le décubitus, améliorée en position assise penchée."
+      },
+      "muscleGroups": [],
+      "regions": ["torso_front"],
+      "organs": ["heart"],
+      "symptoms": ["hpo:0003326"],
+      "redFlags": {
+        "ar": "ألم صدر شديد مع ضيق نفس أو خفقان — راجع الطوارئ فورًا.",
+        "en": "Severe chest pain with breathlessness or palpitations — seek emergency care now.",
+        "fr": "Douleur thoracique intense avec essoufflement ou palpitations — urgences immédiates."
+      },
+      "medlinePlusUrl": "https://medlineplus.gov/pericarditis.html",
+      "sources": [
+        { "title": "MedlinePlus — Pericarditis", "url": "https://medlineplus.gov/pericarditis.html" }
+      ],
+      "taxonomy": {
+        "subRegion": "thoracic_cavity",
+        "structures": ["heart", "pericardium", "aorta", "lungs"]
       },
       "icd10Status": "unverified"
     }
