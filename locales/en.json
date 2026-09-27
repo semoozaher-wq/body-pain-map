@@ -134,7 +134,16 @@
     "warning": "Safety notice",
     "recommendation": "General guidance",
     "defaultRecommendation": "Seek medical evaluation if pain persists or worsens.",
-    "describePain": "Continue to describe the pain"
+    "describePain": "Continue to describe the pain",
+    "selectedMuscles": "Selected muscles",
+    "clearSelection": "Clear selection",
+    "noSelection": "No muscle selected yet. Tap any part of the body.",
+    "relatedConditions": "Common conditions related to these muscles",
+    "askAssistant": "Ask the assistant about these muscles",
+    "viewDetails": "View full details",
+    "muscleCount": "{{count}} muscles selected",
+    "viewLabel": "View",
+    "switchView": "Switch view"
   },
   "screenTitles": {
     "details": "Pain details",
