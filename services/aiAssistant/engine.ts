@@ -117,6 +117,8 @@ export interface AssistantReply {
   intro: LocalizedText;
   understanding: string[];
   understood: boolean;
+  /** True when the assistant must ask for missing location before giving guidance. */
+  clarificationOnly: boolean;
   clarifyingQuestion: LocalizedText | null;
   triage: TriageAssessment;
   redFlags: DetectedRedFlag[];
@@ -259,11 +261,16 @@ export function needsClarification(
   regionLocations: RegionLocation[],
   abdomenLocations: DetectedLocation[],
   redFlags: DetectedRedFlag[],
+  organs: DetectedOrgan[] = [],
 ): boolean {
   if (redFlags.length > 0) return false;
   if (regionLocations.length > 0) return false;
   if (abdomenLocations.length > 0) return false;
-  return true;
+  if (organs.length > 0) return false;
+  // “My side/flank hurts” is genuinely ambiguous; specific regions such as
+  // eye, foot, groin, or breast are already actionable without another map
+  // question.
+  return regions.length === 0 || regions.some((region) => region.id === 'obliques');
 }
 
 function buildLocationQuestion(regions: DetectedRegion[], language: Lang): LocalizedText {
@@ -993,7 +1000,7 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
   const duration = detectDuration(text);
 
   const organs = mergeLocationOrgans(detectedOrgans, locations);
-  const askForLocation = needsClarification(regions, regionLocations, locations, redFlags);
+  const askForLocation = needsClarification(regions, regionLocations, locations, redFlags, organs);
 
   const hasText =
     regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
@@ -1002,7 +1009,8 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
 
   const triage = assessTriage(redFlags, severity, duration, regions, symptoms, organs);
 
-  const conditions = understood && !askForLocation
+  const organNeedsProtectedMatching = organs.some((organ) => organ.id === 'testicles');
+  const conditions = understood && !askForLocation && !organNeedsProtectedMatching
     ? scoreConditions(regions, symptoms, organs, locations, rawText)
     : [];
 
@@ -1111,6 +1119,7 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
     intro: understood ? (imageOnly ? IMAGE_INTRO : INTRO[triage.level]) : INTRO_UNCLEAR,
     understanding,
     understood,
+    clarificationOnly: askForLocation,
     clarifyingQuestion: askForLocation
       ? buildLocationQuestion(regions, language)
       : (understood && !imageOnly ? null : (imageOnly ? IMAGE_CLARIFY : CLARIFY)),
