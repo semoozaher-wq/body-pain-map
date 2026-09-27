@@ -180,7 +180,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState('');
   const [pendingImage, setPendingImage] = useState<string | null>(null);
-  const [autoSpeak, setAutoSpeak] = useState(true);
+  const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
 
