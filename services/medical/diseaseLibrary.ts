@@ -9,6 +9,7 @@
 //   - بحث تقريبي (Fuzzy) للأخطاء الإملائية
 //   - قاموس كلمات مفتاحية وعامية مصرية لكل حالة
 //   - خوارزمية ترتيب (Scoring) — النتائج الأهم أولاً
+//   - (v2) دعم الحالات العامة (M79.1 وغيرها) + مكافآت للـ colloquial المطابق
 // ============================================================================
 
 import diseasesData from '../../data/medical/diseases.json';
@@ -236,7 +237,98 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'عضلاتي بتوجعني',
     ],
   },
+
+  // ===== ألم العضلات (الميالجيا) M79.1 =====
+  // ⚠️ دي حالة عامة — بنحطها هنا عشان نحدد كلماتها المفتاحية بدقة،
+  // لكن الـ score بتاعها في smartSearch منخفض (generic: true).
+  'doid:8483': {
+    keywords: [
+      'ألم عضلي', 'ألم في العضلات', 'ميالجيا', 'وجع عضلي', 'ألم عام',
+      'ألم في كل العضلات', 'تعب عضلي',
+      'myalgia', 'muscle pain', 'muscular pain',
+    ],
+    colloquial: [
+      'عضلاتي بتوجعني',
+      'جسمي كله بوجع',
+      'حاسس بألم في عضلاتي',
+    ],
+  },
+
+  // ===== حالات إضافية (احتياطي للتوافق مع diseases.json) =====
+  'doid:10933': {
+    keywords: [
+      'التهاب المفاصل', 'روماتويد', 'التهاب المفصل الروماتويدي',
+      'وجع في المفاصل', 'تورم المفاصل', 'التهاب المفاصل الرثياني',
+      'rheumatoid arthritis', 'arthritis',
+    ],
+    colloquial: [
+      'مفاصلي بتوجعني',
+      'مفاصلي وارمة',
+      'وجع في مفاصلي',
+    ],
+  },
+
+  'doid:11483': {
+    keywords: [
+      'الانزلاق الغضروفي', 'الديسك', 'انزلاق الديسك', 'انزلاق الفقرات',
+      'الانزلاق الغضروفي القطني', 'انزلاق غضروفي عنقي',
+      'herniated disc', 'disc herniation', 'slipped disc',
+    ],
+    colloquial: [
+      'عندي ديسك في ضهري',
+      'الديسك ضاغط على العصب',
+      'وجع في ضهري من الديسك',
+    ],
+  },
+
+  'doid:0055': {
+    keywords: [
+      'النفق الرسغي', 'متلازمة النفق الرسغي', 'التنميل في الإيد',
+      'تنميل الأصابع', 'وجع في الرسغ', 'ضعف الإيد',
+      'carpal tunnel', 'carpal tunnel syndrome', 'wrist pain',
+    ],
+    colloquial: [
+      'إيدي بتتنمّل',
+      'رسغي بوجعني',
+      'صوابعي بتتنمّل',
+    ],
+  },
+
+  'doid:0115': {
+    keywords: [
+      'التهاب الأوتار', 'التهاب الوتر', 'وجع في الوتر',
+      'التهاب وتر أخيل', 'التهاب أوتار الكتف',
+      'tendinitis', 'tendonitis', 'tendon pain',
+    ],
+    colloquial: [
+      'وتري بوجعني',
+      'حاسس بألم في الوتر',
+      'وجع في وتر رجلي',
+    ],
+  },
+
+  'doid:0084': {
+    keywords: [
+      'خشونة المفاصل', 'خشونة الركبة', 'خشونة الورك',
+      'الفصال العظمي', 'الفصال', 'تآكل الغضروف',
+      'osteoarthritis', 'OA', 'degenerative joint disease',
+    ],
+    colloquial: [
+      'عندي خشونة في ركبتي',
+      'مفاصلي بتطلع صوت',
+      'ركبتي بتفرقع',
+    ],
+  },
 };
+
+// ============================================================================
+// حالات عامة (Generic) — الـ score بتاعها يُخفَّض دايمًا عشان ما تطغاش
+// على الحالات المحددة. مفتاحها الـ id بتاع الحالة.
+// ============================================================================
+const GENERIC_CONDITION_IDS = new Set<string>([
+  'doid:8483', // ألم العضلات (الميالجيا) — M79.1
+  'doid:8545', // فيبروميالجيا — عامة
+]);
 
 // ============================================================================
 // أدوات معالجة النص العربي
@@ -363,6 +455,9 @@ function similarity(a: string, b: string): number {
 /**
  * حساب درجة المطابقة لحالة واحدة.
  * كل وزن مضبوط عشان النتيجة الأهم تطلع فوق.
+ *
+ * v2: أضفنا مكافآت إضافية للـ colloquial المطابق، وعقوبة للحالات العامة
+ * (GENERIC_CONDITION_IDS) عشان ما تطغاش على الحالات المحددة.
  */
 function scoreCondition(
   condition: MedicalCondition,
@@ -499,6 +594,25 @@ function scoreCondition(
     );
     if (!hasLocalRegion) {
       score *= 0.6;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // 6) 🆕 مكافأة إضافية للـ colloquial المطابق (لو الجملة كلها موجودة)
+  // -------------------------------------------------------------------------
+  if (colloquial.some((c) => c === normalizedQuery)) {
+    score += 500;
+    matchedTerms.push('colloquial_bonus');
+  }
+
+  // -------------------------------------------------------------------------
+  // 7) 🆕 عقوبة للحالات العامة (M79.1, فيبروميالجيا) عند وجود شكوى موضعية
+  // -------------------------------------------------------------------------
+  if (GENERIC_CONDITION_IDS.has(condition.id)) {
+    const hasLocalRegion = queryTokens.some((t) => regionKeywords.includes(t));
+    if (hasLocalRegion) {
+      score *= 0.4; // خصم 60%
+      matchedTerms.push('generic_penalty');
     }
   }
 
@@ -675,6 +789,77 @@ export function getLibraryStats() {
 }
 
 // ============================================================================
+// 🆕 دوال مساعدة إضافية (زيادة — بدون كسر أي حاجة قديمة)
+// ============================================================================
+
+/**
+ * الحالات اللي عندها كلمات مفتاحية مسجّلة في KEYWORDS_MAP.
+ * مفيدة للمراجعة والتأكد من تغطية المكتبة.
+ */
+export function getConditionsWithKeywords(): MedicalCondition[] {
+  return CONDITIONS.filter((c) => KEYWORDS_MAP[c.id] !== undefined);
+}
+
+/**
+ * الحالات اللي عندها كلمات مفتاحية مسجّلة لكن الـ id بتاعها مش موجود
+ * في المكتبة (يعني مفتاح ميت). مفيدة للتنظيف.
+ */
+export function getOrphanKeywordIds(): string[] {
+  const libraryIds = new Set(CONDITIONS.map((c) => c.id));
+  return Object.keys(KEYWORDS_MAP).filter((id) => !libraryIds.has(id));
+}
+
+/**
+ * إحصائيات قاموس الكلمات المفتاحية.
+ */
+export function getKeywordStats() {
+  const total = Object.keys(KEYWORDS_MAP).length;
+  const withColloquial = Object.values(KEYWORDS_MAP).filter(
+    (e) => e.colloquial.length > 0,
+  ).length;
+  const totalKeywords = Object.values(KEYWORDS_MAP).reduce(
+    (sum, e) => sum + e.keywords.length,
+    0,
+  );
+  const totalColloquial = Object.values(KEYWORDS_MAP).reduce(
+    (sum, e) => sum + e.colloquial.length,
+    0,
+  );
+  return {
+    mappedConditions: total,
+    withColloquial,
+    totalKeywords,
+    totalColloquial,
+  };
+}
+
+/**
+ * البحث التشخيصي (Debug) — بترجع تفاصيل المطابقة لكل حالة.
+ * مفيدة أثناء التطوير لمعرفة ليه حالة معينة طلعت أو لأ.
+ */
+export function debugSearch(query: string, maxResults = 10): Array<{
+  id: string;
+  name: string;
+  score: number;
+  matchedTerms: string[];
+}> {
+  const results = smartSearch(query, CONDITIONS, maxResults);
+  return results.map((r) => ({
+    id: r.condition.id,
+    name: r.condition.name.ar,
+    score: r.score,
+    matchedTerms: r.matchedTerms,
+  }));
+}
+
+/**
+ * الحالات العامة (Generic) — اللي الـ score بتاعها بيتخفّض دايمًا.
+ */
+export function getGenericConditionIds(): string[] {
+  return [...GENERIC_CONDITION_IDS];
+}
+
+// ============================================================================
 // Stubs للتوافق مع hooks القديمة (لو مش موجودة عندك امسحهم)
 // ============================================================================
 
@@ -692,4 +877,4 @@ export function getTaxonomyStats() {
 }
 export function getTaxonomyNotice(_lang: Language) {
   return '';
-}
+    }
