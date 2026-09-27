@@ -7,9 +7,9 @@
 //   - تطبيع النص العربي (ضهري = ظهري، ألم = وجع، إلخ)
 //   - إزالة السوابق واللواحق (بضهري → ضهر)
 //   - بحث تقريبي (Fuzzy) للأخطاء الإملائية
-//   - قاموس كلمات مفتاحية وعامية مصرية لكل حالة (40 حالة)
+//   - قاموس كلمات مفتاحية وعامية مصرية لكل حالة (60 حالة)
 //   - خوارزمية ترتيب (Scoring) — النتائج الأهم أولاً
-//   - (v4) إضافة كلمات مفتاحية لحالات organConditions.json الـ 15
+//   - (v5) إضافة كلمات مفتاحية للحالات الـ 20 الجديدة
 // ============================================================================
 
 import diseasesData from '../../data/medical/diseases.json';
@@ -90,10 +90,9 @@ interface KeywordEntry {
 
 const KEYWORDS_MAP: Record<string, KeywordEntry> = {
   // ==========================================================================
-  // أولاً: أمراض العظام والعضلات (من diseases.json) — 25 حالة
+  // القسم 1: أمراض العظام والعضلات (من diseases.json) — 25 حالة أصلية
   // ==========================================================================
 
-  // ===== ألم أسفل الظهر الميكانيكي (M54.5) =====
   'doid:4536': {
     keywords: [
       'ألم', 'وجع', 'شد', 'تعب', 'ضغط', 'حرقة', 'تقلص',
@@ -108,7 +107,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== ألم الرقبة (M54.2) =====
   'doid:1167': {
     keywords: [
       'رقبة', 'رقبتي', 'الرقبة', 'وجع رقبة', 'شد رقبة', 'تقلص رقبة',
@@ -121,7 +119,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== إصابة الكفة المدورة (M75.1) =====
   'doid:3059': {
     keywords: [
       'كتف', 'كتفي', 'الكتف', 'وجع كتف', 'شد كتف', 'تقلص كتف',
@@ -134,7 +131,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== خشونة الركبة (M17) =====
   'doid:8398': {
     keywords: [
       'ركبة', 'ركبتي', 'الركبة', 'وجع ركبة', 'شد ركبة',
@@ -147,7 +143,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== فيبروميالجيا (M79.67) =====
   'doid:1490': {
     keywords: [
       'فيبروميالجيا', 'ألم عضلي', 'ألم منتشر', 'تعب مزمن', 'إرهاق',
@@ -160,7 +155,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الصداع النصفي (G43) =====
   'doid:3311': {
     keywords: [
       'صداع', 'صداع نصفي', 'الشقيقة', 'وجع راس', 'وجع في راسي',
@@ -173,7 +167,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الصداع التوتري (G44.2) =====
   'doid:11476-th': {
     keywords: [
       'صداع توتري', 'صداع', 'شد في الرقبة', 'ضغط في الرأس',
@@ -186,7 +179,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== ألم العضلات (M79.1) =====
   'doid:8505': {
     keywords: [
       'ألم عضلي', 'ألم في العضلات', 'ميالجيا', 'وجع عضلي', 'ألم عام',
@@ -198,7 +190,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== ألم عضلي بعد المجهود DOMS (M79.1) =====
   'doid:8505-doms': {
     keywords: [
       'ألم بعد التمرين', 'ألم بعد المجهود', 'تعب بعد الرياضة',
@@ -211,7 +202,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== شد عضلي (M62.838) =====
   'doid:6713': {
     keywords: [
       'شد عضلي', 'تقلص', 'تشنج', 'تقلص عضلي', 'وجع عضلي',
@@ -224,7 +214,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الانزلاق الغضروفي العنقي (M50.1) =====
   'doid:10202': {
     keywords: [
       'انزلاق غضروفي عنقي', 'ديسك الرقبة', 'انزلاق فقرات الرقبة',
@@ -237,7 +226,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الانزلاق الغضروفي القطني (M51.16) =====
   'doid:10202-ls': {
     keywords: [
       'انزلاق غضروفي قطني', 'ديسك أسفل الظهر', 'ديسك الظهر',
@@ -252,7 +240,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الروماتويد (M05) =====
   'doid:8483': {
     keywords: [
       'روماتويد', 'التهاب المفاصل الروماتويدي', 'الروماتيزم',
@@ -265,7 +252,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== النفق الرسغي (G56.0) =====
   'doid:13241': {
     keywords: [
       'النفق الرسغي', 'متلازمة النفق الرسغي', 'التنميل في الإيد',
@@ -278,7 +264,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== اللفافة الأخمصية (M72.2) =====
   'doid:4248': {
     keywords: [
       'اللفافة الأخمصية', 'وجع الكعب', 'ألم الكعب', 'ألم أسفل القدم',
@@ -290,7 +275,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== التهاب الأوتار (M79.7) =====
   'doid:11067': {
     keywords: [
       'التهاب الأوتار', 'التهاب الوتر', 'وجع في الوتر',
@@ -302,7 +286,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== ألم المفاصل - أرثالجا (M25.50) =====
   'doid:0050896': {
     keywords: [
       'ألم المفاصل', 'أرثالجا', 'وجع المفاصل',
@@ -313,7 +296,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== اعتلال الأعصاب المحيطية (G62.9) =====
   'doid:9350': {
     keywords: [
       'اعتلال الأعصاب', 'تنميل الأطراف', 'حرقان في القدم',
@@ -326,7 +308,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== التواء الكاحل (S93.4) =====
   'doid:10629': {
     keywords: [
       'التواء الكاحل', 'لوي الكاحل', 'إصابة الكاحل', 'كاحل',
@@ -337,7 +318,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== ألم اليد والرسغ (M79.64) =====
   'doid:7148': {
     keywords: [
       'ألم اليد', 'ألم الرسغ', 'إجهاد متكرر', 'وجع الرسغ',
@@ -348,7 +328,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الفصال العظمي (M19.9) =====
   'doid:8398-oa': {
     keywords: [
       'خشونة المفاصل', 'الفصال العظمي', 'تآكل الغضروف', 'خشونة',
@@ -361,7 +340,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== ارتفاع ضغط الدم (I10) =====
   'doid:10763': {
     keywords: [
       'ضغط الدم', 'ارتفاع ضغط الدم', 'الضغط', 'ضغط عالي',
@@ -373,7 +351,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الارتجاع المريئي (K21.9) =====
   'doid:12353': {
     keywords: [
       'الارتجاع المريئي', 'الحموضة', 'حرقة المعدة', 'ارتجاع',
@@ -386,10 +363,9 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
   },
 
   // ==========================================================================
-  // ثانياً: أمراض الأعضاء الداخلية (من organConditions.json) — 15 حالة
+  // القسم 2: أمراض الأعضاء الداخلية (من organConditions.json) — 15 حالة أصلية
   // ==========================================================================
 
-  // ===== التهاب الزائدة الدودية (K35) =====
   'doid:appendicitis': {
     keywords: [
       'التهاب الزائدة', 'الزائدة الدودية', 'زائدة', 'appendicitis',
@@ -401,7 +377,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== التهاب المعدة (K29) =====
   'doid:gastritis': {
     keywords: [
       'التهاب المعدة', 'عسر الهضم', 'حرقة المعدة', 'gastritis', 'dyspepsia',
@@ -414,7 +389,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== قرحة المعدة/الاثني عشر (K27) =====
   'doid:peptic-ulcer': {
     keywords: [
       'قرحة المعدة', 'قرحة الاثني عشر', 'peptic ulcer',
@@ -426,7 +400,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== القولون العصبي (K58) =====
   'doid:ibs': {
     keywords: [
       'القولون العصبي', 'القولون', 'IBS', 'irritable bowel syndrome',
@@ -438,7 +411,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== التهاب الرتوج (K57) =====
   'doid:diverticulitis': {
     keywords: [
       'التهاب الرتوج', 'التهاب القولون', 'diverticulitis',
@@ -450,7 +422,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== النزلة المعوية (A09) =====
   'doid:gastroenteritis': {
     keywords: [
       'النزلة المعوية', 'نزلة معوية', 'gastroenteritis',
@@ -462,7 +433,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== حصى المرارة (K80) =====
   'doid:gallstones': {
     keywords: [
       'حصى المرارة', 'التهاب المرارة', 'gallstones', 'cholecystitis',
@@ -474,7 +444,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== التهاب الكبد (K75.9) =====
   'doid:hepatitis': {
     keywords: [
       'التهاب الكبد', 'hepatitis', 'ألم الكبد', 'اصفرار',
@@ -486,7 +455,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== التهاب البنكرياس (K85) =====
   'doid:pancreatitis': {
     keywords: [
       'التهاب البنكرياس', 'pancreatitis',
@@ -498,7 +466,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== التهاب المسالك البولية (N39.0) =====
   'doid:uti': {
     keywords: [
       'التهاب المسالك', 'التهاب المسالك البولية', 'UTI',
@@ -510,7 +477,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== حصى الكلى (N20.0) =====
   'doid:kidney-stone': {
     keywords: [
       'حصى الكلى', 'حصى الكلى', 'kidney stones',
@@ -522,7 +488,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== كيس على المبيض (N83.2) =====
   'doid:ovarian-cyst': {
     keywords: [
       'كيس على المبيض', 'كيس المبيض', 'ovarian cyst',
@@ -534,7 +499,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== بطانة الرحم المهاجرة (N80) =====
   'doid:endometriosis': {
     keywords: [
       'بطانة الرحم المهاجرة', 'endometriosis', 'ألم الحوض',
@@ -546,7 +510,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الذبحة الصدرية (I20.9) =====
   'doid:angina': {
     keywords: [
       'الذبحة الصدرية', 'ذبحة صدرية', 'angina',
@@ -558,7 +521,6 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
   },
 
-  // ===== الارتجاع المعدي المريئي (organ) (K21.9) =====
   'doid:gerd-organ': {
     keywords: [
       'الارتجاع المعدي المريئي', 'حموضة المريء', 'GERD',
@@ -569,17 +531,248 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'حاسس بحرقة في صدري بعد الأكل',
     ],
   },
+
+  // ==========================================================================
+  // القسم 3: الحالات الجديدة في diseases.json — 10 حالات
+  // ==========================================================================
+
+  'doid:cluster-headache': {
+    keywords: [
+      'الصداع العنقودي', 'صداع عنقودي', 'cluster headache',
+      'صداع شديد حول العين', 'صداع نصفي شديد',
+    ],
+    colloquial: [
+      'عندي صداع شديد حول عيني', 'صداع بيجي في نوبات',
+      'حاسس بوجع شديد في عيني', 'صداع عنقودي',
+    ],
+  },
+
+  'doid:sinusitis': {
+    keywords: [
+      'التهاب الجيوب', 'التهاب الجيوب الأنفية', 'sinusitis', 'sinus',
+      'ألم في الوجه', 'ضغط في الجبهة', 'انسداد الأنف', 'رشح',
+    ],
+    colloquial: [
+      'جيوبي بتوجعني', 'حاسس بضغط في جبهتي',
+      'مناخيري مسدودة ووجع في وشي', 'وجع في عضم وشي',
+      'حاسس بوجع في جيوبي الأنفية',
+    ],
+  },
+
+  'doid:otitis-media': {
+    keywords: [
+      'التهاب الأذن', 'التهاب الأذن الوسطى', 'otitis media',
+      'ألم الأذن', 'ear infection', 'ear pain', 'otalgia',
+    ],
+    colloquial: [
+      'ودني بتوجعني', 'أذني بتوجعني', 'وجع في أذني',
+      'وجع في ودني', 'حاسس بوجع في وdني', 'أذني بتصرخ',
+      'حاسس بضغط في أذني',
+    ],
+  },
+
+  'doid:toothache': {
+    keywords: [
+      'ألم الأسنان', 'toothache', 'وجع سن', 'ألم في الضرس',
+      'dental pain', 'وجع ضرس',
+    ],
+    colloquial: [
+      'سناني بتوجعني', 'ضرسي بيوجعني', 'وجع في ضرسي',
+      'وجع في سني', 'حاسس بوجع في سناني',
+    ],
+  },
+
+  'doid:pharyngitis': {
+    keywords: [
+      'التهاب الحلق', 'pharyngitis', 'sore throat',
+      'وجع في الزور', 'ألم الحلق', 'التهاب البلعوم',
+    ],
+    colloquial: [
+      'زوري بيوجعني', 'حلقي بيوجعني', 'وجع في حلقي',
+      'صعوبة في البلع', 'زوري تعبان', 'حلقي تعبان',
+    ],
+  },
+
+  'doid:gout': {
+    keywords: [
+      'النقرس', 'gout', 'حمض اليوريك',
+      'ألم إبهام القدم', 'تورم مفصل مع احمرار',
+    ],
+    colloquial: [
+      'عندي نقرس', 'إبهام رجلي بيوجعني', 'صباعي بيوجعني بشدة',
+      'مفصل بيوجعني ووارم وأحمر', 'حاسس بوجع في صباع رجلي',
+    ],
+  },
+
+  'doid:bursitis': {
+    keywords: [
+      'التهاب الجراب', 'bursitis', 'التهاب كيس المفصل',
+      'ألم في الكتف', 'ألم في الركبة', 'ألم في الورك',
+    ],
+    colloquial: [
+      'كتفي بيوجعني ووارم', 'ركبتي وارمة وبتوجعني',
+      'حاسس بوجع في جراب المفصل',
+    ],
+  },
+
+  'doid:varicose-veins': {
+    keywords: [
+      'الدوالي', 'توسع الأوردة', 'varicose veins',
+      'أوردة متضخمة', 'أوردة الساق',
+    ],
+    colloquial: [
+      'عندي دوالي', 'رجلي فيها عروق بارزة',
+      'رجلي بتوجعني من الدوالي', 'رجلي تقيلة',
+    ],
+  },
+
+  'doid:shingles': {
+    keywords: [
+      'الحزام الناري', 'القوباء المنطقية', 'shingles', 'herpes zoster',
+      'طفح مؤلم', 'حويصلات على الجلد',
+    ],
+    colloquial: [
+      'عندي حزام ناري', 'طلعلي طفح مؤلم', 'حاسس بحرقان وطفح',
+      'حزام ناري على ضهري', 'طلعلي حبوب مؤلمة على جنبي',
+    ],
+  },
+
+  'doid:psoriatic-arthritis': {
+    keywords: [
+      'الصدفية المفصلية', 'psoriatic arthritis',
+      'صدفية', 'psoriasis', 'التهاب مفاصل مع صدفية',
+    ],
+    colloquial: [
+      'عندي صدفية في جلدي ومفاصلي بتوجعني',
+      'جلدي فيه قشور ومفاصلي وارمة',
+      'عندي صدفية',
+    ],
+  },
+
+  // ==========================================================================
+  // القسم 4: الحالات الجديدة في organConditions.json — 10 حالات
+  // ==========================================================================
+
+  'doid:cholecystitis-acute': {
+    keywords: [
+      'التهاب المرارة الحاد', 'acute cholecystitis',
+      'التهاب المرارة', 'ألم شديد أعلى يمين البطن',
+    ],
+    colloquial: [
+      'المرارة بتوجعني بشدة', 'عندي التهاب في المرارة',
+      'وجع شديد في يمين بطني مع حرارة',
+    ],
+  },
+
+  'doid:duodenal-ulcer': {
+    keywords: [
+      'قرحة الاثني عشر', 'duodenal ulcer',
+      'قرحة الأمعاء', 'حرقة في أعلى البطن',
+    ],
+    colloquial: [
+      'عندي قرحة في الاثني عشر', 'حرقة في بطني بتروح مع الأكل',
+      'وجع في أعلى بطني',
+    ],
+  },
+
+  'doid:acute-diverticulitis': {
+    keywords: [
+      'التهاب الرتج الحاد', 'acute diverticulitis',
+      'التهاب الرتوج الحاد', 'ألم شديد أسفل يسار البطن',
+    ],
+    colloquial: [
+      'عندي التهاب حاد في القولون',
+      'وجع شديد في يسار بطني مع حرارة',
+    ],
+  },
+
+  'doid:pyelonephritis': {
+    keywords: [
+      'التهاب الكلى', 'pyelonephritis',
+      'التهاب الحويضة والكلية', 'ألم في الخاصرة مع حرارة',
+    ],
+    colloquial: [
+      'عندي التهاب في كليتي', 'جنبي بتوجعني مع حرارة',
+      'حاسس بوجع في خاصرتي وقشعريرة',
+    ],
+  },
+
+  'doid:ureteral-stone': {
+    keywords: [
+      'حصى الحالب', 'ureteral stone', 'حصوة في الحالب',
+      'ألم شديد في الخاصرة ينتقل لأسفل',
+    ],
+    colloquial: [
+      'عندي حصوة في الحالب', 'جنبي بتوجعني وبتنزل لتحت',
+      'وجع شديد بينزل من جنبي لبطني',
+    ],
+  },
+
+  'doid:prostatitis': {
+    keywords: [
+      'التهاب البروستاتا', 'prostatitis',
+      'ألم في الحوض', 'صعوبة التبول', 'حرقان مع التبول',
+    ],
+    colloquial: [
+      'عندي التهاب في البروستاتا',
+      'حاسس بوجع في الحوض', 'بتبول بصعوبة',
+    ],
+  },
+
+  'doid:pcos': {
+    keywords: [
+      'تكيس المبايض', 'PCOS', 'polycystic ovary syndrome',
+      'عدم انتظام الدورة', 'زيادة الشعر',
+    ],
+    colloquial: [
+      'عندي تكيس في المبايض', 'الدورة مش منتظمة',
+      'حاسس بوجع في المبايض',
+    ],
+  },
+
+  'doid:hyperthyroidism': {
+    keywords: [
+      'فرط نشاط الغدة الدرقية', 'hyperthyroidism',
+      'زيادة نشاط الدرقية', 'خفقان', 'فقدان وزن', 'تعرق',
+    ],
+    colloquial: [
+      'عندي فرط في نشاط الغدة', 'قلبي بيدق بسرعة',
+      'بعرق كتير وبفقد وزني',
+    ],
+  },
+
+  'doid:hypothyroidism': {
+    keywords: [
+      'قصور الغدة الدرقية', 'hypothyroidism',
+      'نقص نشاط الدرقية', 'تعب مستمر', 'زيادة وزن', 'جفاف الجلد',
+    ],
+    colloquial: [
+      'عندي قصور في الغدة', 'دایمًا تعبان',
+      'بزداد في الوزن وبحس ببرد',
+    ],
+  },
+
+  'doid:pericarditis': {
+    keywords: [
+      'التهاب التامور', 'pericarditis',
+      'التهاب غشاء القلب', 'ألم صدر يزيد مع الشهيق',
+    ],
+    colloquial: [
+      'عندي التهاب في غشاء القلب',
+      'صدري بيوجعني لما بشهق', 'ألم في الصدر بيزيد مع النفس',
+    ],
+  },
 };
 
 // ============================================================================
 // حالات عامة (Generic) — الـ score بتاعها يُخفَّض دايمًا
 // ============================================================================
 const GENERIC_CONDITION_IDS = new Set<string>([
-  'doid:8505',       // الميالجيا M79.1
-  'doid:8505-doms',  // DOMS M79.1
-  'doid:1490',       // فيبروميالجيا M79.67
-  'doid:0050896',    // ألم المفاصل (عام) M25.50
-  'doid:9350',       // اعتلال الأعصاب (عام) G62.9
+  'doid:8505',
+  'doid:8505-doms',
+  'doid:1490',
+  'doid:0050896',
+  'doid:9350',
 ]);
 
 // ============================================================================
@@ -677,19 +870,16 @@ function scoreCondition(
   const keywords = kwEntry ? kwEntry.keywords.map(normalizeArabic) : [];
   const colloquial = kwEntry ? kwEntry.colloquial.map(normalizeArabic) : [];
 
-  // 1) مطابقة الجملة الكاملة
   if (normalizedQuery === nameAr) { score += 1000; matchedTerms.push('name_exact'); }
   if (colloquial.some((c) => c === normalizedQuery)) { score += 900; matchedTerms.push('colloquial_exact'); }
   if (keywords.some((k) => k === normalizedQuery)) { score += 800; matchedTerms.push('keyword_exact'); }
 
-  // 2) مطابقة الجملة كجزء من النص
   if (nameAr.includes(normalizedQuery)) { score += 500; matchedTerms.push('name_includes'); }
   if (colloquial.some((c) => c.includes(normalizedQuery))) { score += 450; matchedTerms.push('colloquial_includes'); }
   if (keywords.some((k) => k.includes(normalizedQuery))) { score += 400; matchedTerms.push('keyword_includes'); }
   if (nameEn.includes(normalizedQuery) || nameFr.includes(normalizedQuery)) { score += 350; matchedTerms.push('name_en_fr'); }
   if (summaryAr.includes(normalizedQuery)) { score += 100; matchedTerms.push('summary'); }
 
-  // 3) مطابقة الكلمات المنفصلة
   for (const token of queryTokens) {
     const stripped = stripAffixes(token);
     if (nameAr.split(' ').some((w) => w === token || w === stripped)) { score += 150; matchedTerms.push(`name_token:${token}`); }
@@ -706,7 +896,6 @@ function scoreCondition(
     }
   }
 
-  // 4) مطابقة المنطقة / مجموعة العضلات
   const regionKeywords = [
     'back', 'lower-back', 'neck', 'shoulder', 'knee', 'leg', 'arm',
     'head', 'chest', 'torso', 'hip', 'hand', 'foot',
@@ -718,7 +907,6 @@ function scoreCondition(
     }
   }
 
-  // 5) تخفيض الحالات المنتشرة
   if (condition.diffuse && queryTokens.length >= 1) {
     const hasLocalRegion = queryTokens.some(
       (t) => regionKeywords.includes(t) && condition.regions.includes(t),
@@ -726,13 +914,11 @@ function scoreCondition(
     if (!hasLocalRegion) score *= 0.6;
   }
 
-  // 6) مكافأة colloquial المطابق
   if (colloquial.some((c) => c === normalizedQuery)) {
     score += 500;
     matchedTerms.push('colloquial_bonus');
   }
 
-  // 7) عقوبة الحالات العامة عند وجود شكوى موضعية
   if (GENERIC_CONDITION_IDS.has(condition.id)) {
     const hasLocalRegion = queryTokens.some((t) => regionKeywords.includes(t));
     if (hasLocalRegion) {
