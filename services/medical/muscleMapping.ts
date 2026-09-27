@@ -73,6 +73,27 @@ export interface MuscleMapStats {
   aliasCount: number;
 }
 
+/** Patient-facing labels for common clinical descriptors used by the map. */
+export const RELATED_CONDITION_LABELS_AR: Record<string, string> = {
+  'Side stitch': 'شد جانبي',
+  'Abdominal strain': 'إجهاد عضلات البطن',
+  'Flank pain': 'ألم في الخاصرة',
+  'Hernia risk': 'احتمال فتق — يحتاج تقييمًا طبيًا',
+  'Core weakness': 'ضعف عضلات الجذع',
+  'Lower abdominal pain': 'ألم أسفل البطن',
+  'Low back pain': 'ألم أسفل الظهر',
+  'Muscle spasm': 'تقلص عضلي',
+  'Shoulder pain': 'ألم الكتف',
+  'Neck stiffness': 'تيبّس الرقبة',
+  'Neck pain': 'ألم الرقبة',
+  'Knee pain': 'ألم الركبة',
+  'Wrist pain': 'ألم الرسغ',
+};
+
+export function localizeRelatedCondition(condition: string, language: 'ar' | 'en' | 'fr'): string {
+  return language === 'ar' ? (RELATED_CONDITION_LABELS_AR[condition] ?? condition) : condition;
+}
+
 /* ===========================================================================
  * The master muscle map (70 entries)
  * ======================================================================== */
