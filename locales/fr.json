@@ -134,16 +134,7 @@
     "warning": "Avis de sécurité",
     "recommendation": "Conseil général",
     "defaultRecommendation": "Demandez une évaluation médicale si la douleur persiste ou s'aggrave.",
-    "describePain": "Continuer pour décrire la douleur",
-    "selectedMuscles": "Muscles sélectionnés",
-    "clearSelection": "Effacer la sélection",
-    "noSelection": "Aucun muscle sélectionné. Touchez une partie du corps.",
-    "relatedConditions": "Affections courantes liées à ces muscles",
-    "askAssistant": "Interroger l'assistant sur ces muscles",
-    "viewDetails": "Voir tous les détails",
-    "muscleCount": "{{count}} muscles sélectionnés",
-    "viewLabel": "Vue",
-    "switchView": "Changer de vue"
+    "describePain": "Continuer pour décrire la douleur"
   },
   "screenTitles": {
     "details": "Détails de la douleur",
@@ -157,6 +148,9 @@
     "privateBadge": "Confidentialité totale · sans internet",
     "tryThese": "Essayez un exemple",
     "thinking": "Réflexion…",
+    "clarifyLocation": "Où exactement est la douleur ?",
+    "clarifySeverity": "Quelle est son intensité ?",
+    "clarifyDuration": "Depuis combien de temps ?",
     "placeholder": "ex. J'ai mal au bas du dos…",
     "send": "Envoyer",
     "understood": "Ce que j'ai compris",
