@@ -134,16 +134,7 @@
     "warning": "Safety notice",
     "recommendation": "General guidance",
     "defaultRecommendation": "Seek medical evaluation if pain persists or worsens.",
-    "describePain": "Continue to describe the pain",
-    "selectedMuscles": "Selected muscles",
-    "clearSelection": "Clear selection",
-    "noSelection": "No muscle selected yet. Tap any part of the body.",
-    "relatedConditions": "Common conditions related to these muscles",
-    "askAssistant": "Ask the assistant about these muscles",
-    "viewDetails": "View full details",
-    "muscleCount": "{{count}} muscles selected",
-    "viewLabel": "View",
-    "switchView": "Switch view"
+    "describePain": "Continue to describe the pain"
   },
   "screenTitles": {
     "details": "Pain details",
@@ -157,6 +148,9 @@
     "privateBadge": "Fully private · no internet",
     "tryThese": "Try an example",
     "thinking": "Thinking…",
+    "clarifyLocation": "Where exactly is the pain?",
+    "clarifySeverity": "How intense is it?",
+    "clarifyDuration": "How long has it been?",
     "placeholder": "e.g. I have pain in my lower back…",
     "send": "Send",
     "understood": "What I understood",
