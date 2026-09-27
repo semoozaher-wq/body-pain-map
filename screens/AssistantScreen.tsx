@@ -279,6 +279,14 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       const text = raw.trim();
       const hasImg = !!imageUri;
       if ((!text && !hasImg) || thinking) return;
+
+      const userMessages = messages
+        .filter((m) => m.role === 'user')
+        .map((m) => (m.role === 'user' ? m.text : ''))
+        .join(' ');
+
+      const fullText = `${userMessages} ${text}`.trim();
+
       setMessages((prev) => [
         ...prev,
         { id: nextId(), role: 'user', text: text || t('assistant.photoMessage'), imageUri: imageUri ?? undefined },
@@ -287,14 +295,14 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       setPendingImage(null);
       setThinking(true);
       setTimeout(() => {
-        const reply = analyzeMessage(text, language as Lang, hasImg);
+        const reply = analyzeMessage(fullText, language as Lang, hasImg);
         const id = nextId();
         setMessages((prev) => [...prev, { id, role: 'assistant', reply }]);
         setThinking(false);
         if (autoSpeak) speak(replyToSpeech(reply), id);
       }, 650);
     },
-    [language, thinking, autoSpeak, speak, t],
+    [language, thinking, autoSpeak, speak, t, messages],
   );
 
   const scrollToEnd = useCallback(() => {
