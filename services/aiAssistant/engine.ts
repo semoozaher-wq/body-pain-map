@@ -27,6 +27,7 @@ import {
   NEGATION_WORDS,
   ORGAN_TERMS,
   RED_FLAG_TERMS,
+  REGION_LOCATIONS,
   SEVERITY_WORDS,
   SYMPTOM_TERMS,
   type AbdomenLocation,
@@ -34,6 +35,7 @@ import {
   type Lang,
   type LocalizedText,
   type OrganTerm,
+  type RegionLocation,
   type RegionTerm,
   type SymptomTerm,
 } from './lexicon';
@@ -237,6 +239,44 @@ export function detectLocations(text: string): DetectedLocation[] {
     }
   });
   return [...found.values()];
+}
+
+export function detectRegionLocations(text: string): RegionLocation[] {
+  const found = new Map<string, RegionLocation>();
+  REGION_LOCATIONS.forEach((loc) => {
+    const hit = [...loc.keywords.ar, ...loc.keywords.en, ...loc.keywords.fr].find((k) =>
+      containsKeyword(text, k),
+    );
+    if (hit && !isNegated(text, hit)) {
+      found.set(loc.id, loc);
+    }
+  });
+  return [...found.values()];
+}
+
+export function needsClarification(
+  regions: DetectedRegion[],
+  regionLocations: RegionLocation[],
+  abdomenLocations: DetectedLocation[],
+  redFlags: DetectedRedFlag[],
+): boolean {
+  if (redFlags.length > 0) return false;
+  if (regionLocations.length > 0) return false;
+  if (abdomenLocations.length > 0) return false;
+  return true;
+}
+
+function buildLocationQuestion(regions: DetectedRegion[], language: Lang): LocalizedText {
+  if (regions.length === 0) return CLARIFY;
+  const primary = regions[0];
+  const locations = REGION_LOCATIONS.filter((l) => l.parent === primary.id);
+  if (locations.length === 0) return CLARIFY;
+  const list = locations.map((l) => l.label[language]).join('، ');
+  return {
+    ar: `الألم في ${primary.label.ar} — فين بالظبط؟ (${list})`,
+    en: `Pain in the ${primary.label.en} — where exactly? (${list})`,
+    fr: `Douleur dans ${primary.label.fr} — où exactement ? (${list})`,
+  };
 }
 
 function mergeLocationOrgans(organs: DetectedOrgan[], locations: DetectedLocation[]): DetectedOrgan[] {
@@ -946,12 +986,14 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
   const regions = detectRegions(text);
   const detectedOrgans = detectOrgans(text);
   const locations = detectLocations(text);
+  const regionLocations = detectRegionLocations(text);
   const symptoms = detectSymptoms(text);
   const redFlags = detectRedFlags(text);
   const severity = detectSeverity(text);
   const duration = detectDuration(text);
 
   const organs = mergeLocationOrgans(detectedOrgans, locations);
+  const askForLocation = needsClarification(regions, regionLocations, locations, redFlags);
 
   const hasText =
     regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
@@ -1069,7 +1111,9 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
     intro: understood ? (imageOnly ? IMAGE_INTRO : INTRO[triage.level]) : INTRO_UNCLEAR,
     understanding,
     understood,
-    clarifyingQuestion: understood ? (imageOnly ? IMAGE_CLARIFY : null) : CLARIFY,
+    clarifyingQuestion: askForLocation
+      ? buildLocationQuestion(regions, language)
+      : (understood && !imageOnly ? null : (imageOnly ? IMAGE_CLARIFY : CLARIFY)),
     triage,
     redFlags,
     regions,

@@ -1155,3 +1155,100 @@ export const NEGATION_WORDS: Record<Lang, string[]> = {
   en: ['no', 'not', 'without', 'none', 'never'],
   fr: ['pas', 'sans', 'aucun', 'non'],
 };
+
+// ---------------------------------------------------------------------------
+// 7) المواضع الدقيقة داخل كل منطقة (للسؤال التوضيحي)
+// ---------------------------------------------------------------------------
+export interface RegionLocation {
+  id: string;
+  parent: string;
+  label: LocalizedText;
+  keywords: Record<Lang, string[]>;
+}
+
+export const REGION_LOCATIONS: RegionLocation[] = [
+  // الرأس
+  { id: 'head-front', parent: 'head', label: { ar: 'مقدمة الرأس', en: 'Front of head', fr: 'Avant de la tête' }, keywords: { ar: ['مقدمه راسي','جبهتي'], en: ['front of head','forehead'], fr: ['avant de la tête'] } },
+  { id: 'head-back', parent: 'head', label: { ar: 'مؤخرة الرأس', en: 'Back of head', fr: 'Arrière de la tête' }, keywords: { ar: ['مؤخره راسي','قفايا'], en: ['back of head'], fr: ['arrière de la tête'] } },
+  { id: 'head-right', parent: 'head', label: { ar: 'يمين الرأس', en: 'Right side of head', fr: 'Côté droit de la tête' }, keywords: { ar: ['يمين راسي'], en: ['right side of head'], fr: ['côté droit'] } },
+  { id: 'head-left', parent: 'head', label: { ar: 'شمال الرأس', en: 'Left side of head', fr: 'Côté gauche de la tête' }, keywords: { ar: ['شمال راسي'], en: ['left side of head'], fr: ['côté gauche'] } },
+  { id: 'head-top', parent: 'head', label: { ar: 'أعلى الرأس', en: 'Top of head', fr: 'Sommet de la tête' }, keywords: { ar: ['قمة راسي','فوق راسي'], en: ['top of head'], fr: ['sommet'] } },
+
+  // الرقبة
+  { id: 'neck-front', parent: 'neck', label: { ar: 'مقدمة الرقبة', en: 'Front of neck', fr: 'Avant du cou' }, keywords: { ar: ['مقدمه رقبتي','زوري'], en: ['front of neck'], fr: ['avant du cou'] } },
+  { id: 'neck-back', parent: 'neck', label: { ar: 'خلف الرقبة', en: 'Back of neck', fr: 'Arrière du cou' }, keywords: { ar: ['خلف رقبتي','ورا رقبتي','نقره رقبتي'], en: ['back of neck','nape'], fr: ['arrière du cou','nuque'] } },
+  { id: 'neck-right', parent: 'neck', label: { ar: 'يمين الرقبة', en: 'Right side of neck', fr: 'Côté droit du cou' }, keywords: { ar: ['يمين رقبتي'], en: ['right side of neck'], fr: ['côté droit'] } },
+  { id: 'neck-left', parent: 'neck', label: { ar: 'شمال الرقبة', en: 'Left side of neck', fr: 'Côté gauche du cou' }, keywords: { ar: ['شمال رقبتي'], en: ['left side of neck'], fr: ['côté gauche'] } },
+
+  // أعلى الظهر
+  { id: 'upper-back-right', parent: 'upper-back', label: { ar: 'أعلى الظهر يمين', en: 'Upper back right', fr: 'Haut du dos à droite' }, keywords: { ar: ['اعلى ضهري يمين','بين كتافي يمين'], en: ['upper back right'], fr: ['haut du dos à droite'] } },
+  { id: 'upper-back-left', parent: 'upper-back', label: { ar: 'أعلى الظهر شمال', en: 'Upper back left', fr: 'Haut du dos à gauche' }, keywords: { ar: ['اعلى ضهري شمال','بين كتافي شمال'], en: ['upper back left'], fr: ['haut du dos à gauche'] } },
+  { id: 'upper-back-center', parent: 'upper-back', label: { ar: 'نص أعلى الظهر', en: 'Upper back center', fr: 'Centre haut du dos' }, keywords: { ar: ['نص ضهري من فوق','وسط ضهري من فوق'], en: ['upper back center'], fr: ['centre haut du dos'] } },
+  { id: 'upper-back-between', parent: 'upper-back', label: { ar: 'بين الكتفين', en: 'Between shoulders', fr: 'Entre les omoplates' }, keywords: { ar: ['بين الكتفين','بين لوح الكتف'], en: ['between shoulder blades'], fr: ['entre les omoplates'] } },
+
+  // وسط الظهر
+  { id: 'mid-back-right', parent: 'lower-back', label: { ar: 'وسط الظهر يمين', en: 'Mid back right', fr: 'Milieu dos droite' }, keywords: { ar: ['وسط ضهري يمين','نص ضهري يمين'], en: ['mid back right'], fr: ['milieu dos droite'] } },
+  { id: 'mid-back-left', parent: 'lower-back', label: { ar: 'وسط الظهر شمال', en: 'Mid back left', fr: 'Milieu dos gauche' }, keywords: { ar: ['وسط ضهري شمال','نص ضهري شمال'], en: ['mid back left'], fr: ['milieu dos gauche'] } },
+  { id: 'mid-back-center', parent: 'lower-back', label: { ar: 'نص وسط الظهر', en: 'Mid back center', fr: 'Centre milieu dos' }, keywords: { ar: ['وسط ضهري','نص ضهري'], en: ['mid back'], fr: ['milieu du dos'] } },
+
+  // أسفل الظهر
+  { id: 'lower-back-right', parent: 'lower-back', label: { ar: 'أسفل الظهر يمين', en: 'Lower back right', fr: 'Bas dos droite' }, keywords: { ar: ['اسفل ضهري يمين','قطني يمين'], en: ['lower back right'], fr: ['bas dos droite'] } },
+  { id: 'lower-back-left', parent: 'lower-back', label: { ar: 'أسفل الظهر شمال', en: 'Lower back left', fr: 'Bas dos gauche' }, keywords: { ar: ['اسفل ضهري شمال','قطني شمال'], en: ['lower back left'], fr: ['bas dos gauche'] } },
+  { id: 'lower-back-center', parent: 'lower-back', label: { ar: 'نص أسفل الظهر', en: 'Lower back center', fr: 'Centre bas dos' }, keywords: { ar: ['اسفل ضهري','قطني'], en: ['lower back'], fr: ['bas du dos'] } },
+
+  // الصدر
+  { id: 'chest-right', parent: 'chest', label: { ar: 'الصدر يمين', en: 'Right chest', fr: 'Poitrine droite' }, keywords: { ar: ['صدري يمين'], en: ['right chest'], fr: ['poitrine droite'] } },
+  { id: 'chest-left', parent: 'chest', label: { ar: 'الصدر شمال (فوق القلب)', en: 'Left chest', fr: 'Poitrine gauche' }, keywords: { ar: ['صدري شمال','فوق قلبي'], en: ['left chest'], fr: ['poitrine gauche'] } },
+  { id: 'chest-center', parent: 'chest', label: { ar: 'نص الصدر', en: 'Center of chest', fr: 'Centre poitrine' }, keywords: { ar: ['نص صدري','قصي'], en: ['center of chest'], fr: ['centre poitrine'] } },
+  { id: 'chest-ribs-right', parent: 'chest', label: { ar: 'تحت الضلوع يمين', en: 'Below right ribs', fr: 'Sous côtes droites' }, keywords: { ar: ['تحت ضلوعي يمين'], en: ['below right ribs'], fr: ['sous côtes droites'] } },
+  { id: 'chest-ribs-left', parent: 'chest', label: { ar: 'تحت الضلوع شمال', en: 'Below left ribs', fr: 'Sous côtes gauches' }, keywords: { ar: ['تحت ضلوعي شمال'], en: ['below left ribs'], fr: ['sous côtes gauches'] } },
+
+  // الجانب
+  { id: 'flank-right', parent: 'obliques', label: { ar: 'الجانب يمين', en: 'Right flank', fr: 'Flanc droit' }, keywords: { ar: ['جنبي يمين'], en: ['right flank'], fr: ['flanc droit'] } },
+  { id: 'flank-left', parent: 'obliques', label: { ar: 'الجانب شمال', en: 'Left flank', fr: 'Flanc gauche' }, keywords: { ar: ['جنبي شمال'], en: ['left flank'], fr: ['flanc gauche'] } },
+
+  // الكتف
+  { id: 'shoulder-right', parent: 'deltoids', label: { ar: 'الكتف يمين', en: 'Right shoulder', fr: 'Épaule droite' }, keywords: { ar: ['كتفي يمين'], en: ['right shoulder'], fr: ['épaule droite'] } },
+  { id: 'shoulder-left', parent: 'deltoids', label: { ar: 'الكتف شمال', en: 'Left shoulder', fr: 'Épaule gauche' }, keywords: { ar: ['كتفي شمال'], en: ['left shoulder'], fr: ['épaule gauche'] } },
+
+  // الذراع
+  { id: 'arm-right', parent: 'biceps', label: { ar: 'الذراع يمين', en: 'Right upper arm', fr: 'Bras droit' }, keywords: { ar: ['دراعي يمين'], en: ['right upper arm'], fr: ['bras droit'] } },
+  { id: 'arm-left', parent: 'biceps', label: { ar: 'الذراع شمال', en: 'Left upper arm', fr: 'Bras gauche' }, keywords: { ar: ['دراعي شمال'], en: ['left upper arm'], fr: ['bras gauche'] } },
+
+  // الساعد
+  { id: 'forearm-right', parent: 'forearm', label: { ar: 'الساعد يمين', en: 'Right forearm', fr: 'Avant-bras droit' }, keywords: { ar: ['ساعدي يمين'], en: ['right forearm'], fr: ['avant-bras droit'] } },
+  { id: 'forearm-left', parent: 'forearm', label: { ar: 'الساعد شمال', en: 'Left forearm', fr: 'Avant-bras gauche' }, keywords: { ar: ['ساعدي شمال'], en: ['left forearm'], fr: ['avant-bras gauche'] } },
+
+  // اليد
+  { id: 'hand-right', parent: 'hands', label: { ar: 'اليد يمين', en: 'Right hand', fr: 'Main droite' }, keywords: { ar: ['ايدي يمين'], en: ['right hand'], fr: ['main droite'] } },
+  { id: 'hand-left', parent: 'hands', label: { ar: 'اليد شمال', en: 'Left hand', fr: 'Main gauche' }, keywords: { ar: ['ايدي شمال'], en: ['left hand'], fr: ['main gauche'] } },
+
+  // الأرداف
+  { id: 'gluteal-right', parent: 'gluteal', label: { ar: 'الأرداف يمين', en: 'Right buttock', fr: 'Fessier droit' }, keywords: { ar: ['طيزي يمين'], en: ['right buttock'], fr: ['fessier droit'] } },
+  { id: 'gluteal-left', parent: 'gluteal', label: { ar: 'الأرداف شمال', en: 'Left buttock', fr: 'Fessier gauche' }, keywords: { ar: ['طيزي شمال'], en: ['left buttock'], fr: ['fessier gauche'] } },
+  { id: 'gluteal-center', parent: 'gluteal', label: { ar: 'نص الأرداف', en: 'Center of buttocks', fr: 'Centre fessiers' }, keywords: { ar: ['نص طيزي'], en: ['center of buttocks'], fr: ['centre des fessiers'] } },
+
+  // الفخذ
+  { id: 'thigh-right', parent: 'quadriceps', label: { ar: 'الفخذ يمين', en: 'Right thigh', fr: 'Cuisse droite' }, keywords: { ar: ['فخذي يمين'], en: ['right thigh'], fr: ['cuisse droite'] } },
+  { id: 'thigh-left', parent: 'quadriceps', label: { ar: 'الفخذ شمال', en: 'Left thigh', fr: 'Cuisse gauche' }, keywords: { ar: ['فخذي شمال'], en: ['left thigh'], fr: ['cuisse gauche'] } },
+
+  // الركبة
+  { id: 'knee-right', parent: 'knees', label: { ar: 'الركبة يمين', en: 'Right knee', fr: 'Genou droit' }, keywords: { ar: ['ركبتي يمين'], en: ['right knee'], fr: ['genou droit'] } },
+  { id: 'knee-left', parent: 'knees', label: { ar: 'الركبة شمال', en: 'Left knee', fr: 'Genou gauche' }, keywords: { ar: ['ركبتي شمال'], en: ['left knee'], fr: ['genou gauche'] } },
+
+  // السمانة
+  { id: 'calf-right', parent: 'calves', label: { ar: 'السمانة يمين', en: 'Right calf', fr: 'Mollet droit' }, keywords: { ar: ['سمانتي يمين'], en: ['right calf'], fr: ['mollet droit'] } },
+  { id: 'calf-left', parent: 'calves', label: { ar: 'السمانة شمال', en: 'Left calf', fr: 'Mollet gauche' }, keywords: { ar: ['سمانتي شمال'], en: ['left calf'], fr: ['mollet gauche'] } },
+
+  // الكاحل
+  { id: 'ankle-right', parent: 'ankles', label: { ar: 'الكاحل يمين', en: 'Right ankle', fr: 'Cheville droite' }, keywords: { ar: ['كاحلي يمين'], en: ['right ankle'], fr: ['cheville droite'] } },
+  { id: 'ankle-left', parent: 'ankles', label: { ar: 'الكاحل شمال', en: 'Left ankle', fr: 'Cheville gauche' }, keywords: { ar: ['كاحلي شمال'], en: ['left ankle'], fr: ['cheville gauche'] } },
+
+  // الرجل
+  { id: 'leg-right', parent: 'legs', label: { ar: 'الرجل يمين', en: 'Right leg', fr: 'Jambe droite' }, keywords: { ar: ['رجلي يمين'], en: ['right leg'], fr: ['jambe droite'] } },
+  { id: 'leg-left', parent: 'legs', label: { ar: 'الرجل شمال', en: 'Left leg', fr: 'Jambe gauche' }, keywords: { ar: ['رجلي شمال'], en: ['left leg'], fr: ['jambe gauche'] } },
+
+  // القدم
+  { id: 'foot-right', parent: 'feet', label: { ar: 'القدم يمين', en: 'Right foot', fr: 'Pied droit' }, keywords: { ar: ['قدمي يمين'], en: ['right foot'], fr: ['pied droit'] } },
+  { id: 'foot-left', parent: 'feet', label: { ar: 'القدم شمال', en: 'Left foot', fr: 'Pied gauche' }, keywords: { ar: ['قدمي شمال'], en: ['left foot'], fr: ['pied gauche'] } },
+];
