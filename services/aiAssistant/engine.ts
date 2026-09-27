@@ -1002,7 +1002,7 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
 
   const triage = assessTriage(redFlags, severity, duration, regions, symptoms, organs);
 
-  const conditions = understood
+  const conditions = understood && !askForLocation
     ? scoreConditions(regions, symptoms, organs, locations, rawText)
     : [];
 
@@ -1105,7 +1105,7 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
   });
 
   const primaryRegion = regions[0] ?? null;
-  const mapOrgan = organs.find((organ) => organ.onMap) ?? null;
+  const mapOrgan = askForLocation ? null : (organs.find((organ) => organ.onMap) ?? null);
 
   return {
     intro: understood ? (imageOnly ? IMAGE_INTRO : INTRO[triage.level]) : INTRO_UNCLEAR,
@@ -1120,9 +1120,9 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
     symptoms,
     organs,
     locations,
-    organDetails,
+    organDetails: askForLocation ? [] : organDetails,
     conditions,
-    selfCare: buildSelfCare(regions, organs, conditions, triage.level, language),
+    selfCare: askForLocation ? [] : buildSelfCare(regions, organs, conditions, triage.level, language),
     whenToSeeDoctor: WHEN_TO_SEE[triage.level],
     suggestedRegionId: primaryRegion ? primaryRegion.id : null,
     suggestedRegionLabel: primaryRegion ? primaryRegion.label : null,

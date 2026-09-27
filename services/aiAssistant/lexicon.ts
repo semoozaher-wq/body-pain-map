@@ -142,7 +142,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'torso_front',
     label: { ar: 'الخواصر (الجانب)', en: 'Flank / side', fr: 'Flanc / côté' },
     keywords: {
-      ar: ['جنبي', 'خواصري', 'الخاصرة', 'الجانب', 'على جنب'],
+      ar: ['جنبي', 'خواصري', 'الخاصرة', 'الجانب', 'على جنب', 'جبي', 'جمبي', 'جنبي', 'على جبي', 'على جمبي', 'جنابي', 'الجنب'],
       en: ['flank', 'side', 'waist'],
       fr: ['flanc', 'côté', 'taille'],
     },
