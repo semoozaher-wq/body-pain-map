@@ -7,13 +7,18 @@
 //   2) استخراج: مناطق الجسم + الأعراض + علامات الإنذار + الشدّة + المدة.
 //   3) حساب درجة الاستعجال (فرز إرشادي) مع مراعاة علامات الخطر.
 //   4) مطابقة أمراض محتملة من المكتبة الطبية المحلية (diseaseLibrary) بترتيب
-//      حسب درجة التطابق.
+//      حسب درجة التطابق — مع استخدام محرّك البحث الذكي smartSearch.
 //   5) توليد نصائح رعاية ذاتية عامة/حسب المنطقة + متى تطلب المساعدة.
 //
 // ⚠️ لا يقدّم تشخيصًا ولا قرارًا علاجيًا — إرشاد تعليمي فقط. كل شيء محلي.
 // ============================================================================
 
-import { getAllConditions, localize, type MedicalCondition } from '../medical/diseaseLibrary';
+import {
+  getAllConditions,
+  localize,
+  smartSearch,
+  type MedicalCondition,
+} from '../medical/diseaseLibrary';
 import organDetailsData from '../../data/organDetails.json';
 import {
   ABDOMEN_LOCATIONS,
@@ -172,7 +177,7 @@ function matchAny(text: string, keywords: Record<Lang, string[]>): boolean {
   return [...keywords.ar, ...keywords.en, ...keywords.fr].some((k) => containsKeyword(text, k));
 }
 
-/** هل الكلمة مسبوقة بنفي؟ (نافذة 16 حرفًا قبلها، مع مطابقة حدود الكلمات لتجنّب أخطاء مثل «مش» داخل «مشكلة»). */
+/** هل الكلمة مسبوقة بنفي؟ (نافذة 16 حرفًا قبلها، مع مطابقة حدود الكلمات). */
 function isNegated(text: string, keyword: string): boolean {
   const needle = normalize(keyword);
   const idx = text.indexOf(needle);
@@ -285,7 +290,6 @@ export function detectRedFlags(text: string): DetectedRedFlag[] {
 
 /** شدّة 0..10 من الأرقام أو الكلمات. */
 export function detectSeverity(text: string): number | null {
-  // كلمات تدل على المدة أو العدد (لا تمثّل شدّة الألم) — بعد تطبيع النص.
   const NON_SEVERITY = new Set<string>([
     'يوم', 'ايام', 'ساعه', 'ساعات', 'اسبوع', 'اسابيع', 'شهر', 'شهور', 'دقيقه', 'دقايق',
     'سنه', 'سنين', 'عام', 'اعوام', 'مره', 'مرات', 'منطقه', 'مناطق', 'مكان', 'اماكن', 'موضع', 'مواضع',
@@ -330,59 +334,114 @@ const symBase = (id: string) => id.replace(/[^0-9]+$/, '');
 function buildOrganWeights(organs: DetectedOrgan[], locations: DetectedLocation[]): Map<string, number> {
   const weights = new Map<string, number>();
   const bump = (id: string, w: number) => weights.set(id, Math.max(weights.get(id) ?? 0, w));
-  organs.forEach((o) => bump(o.id, 6)); // ذكر العضو صراحةً = إشارة قوية
+  organs.forEach((o) => bump(o.id, 6));
   locations.forEach((loc) => {
     loc.organs.forEach((id, index) => bump(id, index === 0 ? 6 : 3));
   });
   return weights;
 }
 
+/**
+ * مطابقة الأمراض المحتملة — نسخة محسّنة.
+ * ----------------------------------------------------------------------------
+ * 1) تستخدم محرّك البحث الذكي `smartSearch` (من diseaseLibrary) على النص الأصلي
+ *    للاستفادة من قاموس الكلمات المفتاحية والعامية المصرية.
+ * 2) تدمج النتايج مع منطق المطابقة القديم (regions / symptoms / organs).
+ * 3) ترتّب النتايج النهائية حسب أعلى score وتُعيد أول 4 حالات.
+ */
 export function scoreConditions(
   regions: DetectedRegion[],
   symptoms: DetectedSymptom[],
   organs: DetectedOrgan[] = [],
   locations: DetectedLocation[] = [],
+  rawText: string = '',
 ): ConditionMatch[] {
   // الأعراض العامة (كلمة «وجع» وحدها) لا تُرجّح أي مرض محدّد.
   const specificSymptoms = symptoms.filter((s) => !s.generic);
   const symptomBases = new Set(specificSymptoms.map((s) => symBase(s.id)));
   const organWeights = buildOrganWeights(organs, locations);
   const localized = organs.length > 0 || locations.length > 0;
-  const hasSpecificEvidence = specificSymptoms.length > 0 || organs.length > 0 || locations.length > 0;
-  const scored: ConditionMatch[] = [];
+  const hasSpecificEvidence =
+    specificSymptoms.length > 0 || organs.length > 0 || locations.length > 0;
 
+  const scored: ConditionMatch[] = [];
+  const seen = new Set<string>();
+
+  // === 1) البحث الذكي (أعلى أولوية) ===
+  // يشتغل على النص الخام حتى لو مفيش regions/symptoms مفهومة.
+  if (rawText && rawText.trim().length >= 2) {
+    try {
+      const smartResults = smartSearch(rawText, getAllConditions(), 8);
+      smartResults.forEach((r) => {
+        // نستبعد الحالات المنتشرة لو فيه دليل موضعي.
+        if (r.condition.diffuse && localized) {
+          // نخفّضها لكن مش نستبعدها تمامًا.
+          const boosted = Math.round(r.score * 0.5);
+          if (boosted <= 0) return;
+        }
+        if (seen.has(r.condition.id)) return;
+        seen.add(r.condition.id);
+        scored.push({
+          id: r.condition.id,
+          name: r.condition.name,
+          summary: r.condition.summary,
+          icd10: r.condition.icd10,
+          medlinePlusUrl: r.condition.medlinePlusUrl,
+          // نرفع الـ score من smartSearch حتى يكون فوق النتايج القديمة
+          score: r.score * 3,
+        });
+      });
+    } catch {
+      // لو smartSearch فشلت لأي سبب، نكمّل بالمنطق القديم.
+    }
+  }
+
+  // === 2) منطق المطابقة القديم (regions / organs / symptoms) ===
   getAllConditions().forEach((condition: MedicalCondition) => {
-    // Once an internal organ is explicitly identified, do not leak unrelated
-    // conditions that merely share a broad region such as lower_limb.
-    if (organs.length > 0 && !condition.organs?.some((id) => organWeights.has(id))) return;
+    if (seen.has(condition.id)) return;
+
+    // لو فيه أعضاء داخلية محددة، نرجّح بس الحالات المرتبطة بيها.
+    if (organs.length > 0 && !condition.organs?.some((id) => organWeights.has(id))) {
+      // لكن نسيب فرصة للحالات المرتبطة إقليميًا لو مفيش عضوية.
+      if (!hasSpecificEvidence) return;
+      return;
+    }
+
     let score = 0;
+
     regions.forEach((region) => {
-      // A broad region alone is not enough to claim a disease. Prefer an
-      // exact muscle-group match, or require a symptom/organ/location clue.
+      // مطابقة المنطقة عريضة → نقطة صغيرة، بشرط وجود دليل محدد.
       if (condition.regions.includes(region.region) && hasSpecificEvidence) score += 2;
+      // مطابقة مجموعة العضلات الدقيقة → نقطة أعلى.
       if (condition.muscleGroups.includes(region.id)) score += 2;
     });
+
     organs.forEach((organ) => {
       if (condition.regions.includes(organ.region)) score += 1;
     });
-    // مطابقة عضو مرشّح = إشارة قوية (الأعضاء الأرجح أولًا).
+
     if (condition.organs) {
       condition.organs.forEach((oid) => {
         const w = organWeights.get(oid);
         if (w) score += w;
       });
     }
+
     condition.symptoms.forEach((sid) => {
       if (symptomBases.has(symBase(sid))) score += 3;
     });
 
-    // الحالات المنتشرة (فيبروميالجيا/ألم عضلي عام) لا تُرجّح عند شكوى موضعية واحدة.
+    // الحالات المنتشرة: تخفيض عند وجود شكوى موضعية.
     if (condition.diffuse) {
       if (localized) score -= 5;
       if (regions.length <= 1 && organs.length === 0) score -= 3;
     }
 
+    // لو مفيش دليل محدد خالص، ما نضيفش الحالة بالمنطق القديم.
+    if (!hasSpecificEvidence && score <= 0) return;
+
     if (score > 0) {
+      seen.add(condition.id);
       scored.push({
         id: condition.id,
         name: condition.name,
@@ -400,10 +459,8 @@ export function scoreConditions(
 // ---------------------------------------------------------------------------
 // الفرز الإرشادي
 // ---------------------------------------------------------------------------
-// ترتيب مستويات الفرز من الأخفّ إلى الأشدّ (لرفع الدرجة عند الحاجة).
 const TRIAGE_ORDER: TriageLevel[] = ['self_care', 'routine', 'soon', 'urgent', 'emergency'];
 
-// الحدّ الأدنى لدرجة الفرز حسب العضو (أعضاء حرجة تستدعي انتباهًا أكبر).
 const ORGAN_TRIAGE_FLOOR: Partial<Record<string, TriageLevel>> = {
   heart: 'soon',
   lungs: 'routine',
@@ -411,12 +468,9 @@ const ORGAN_TRIAGE_FLOOR: Partial<Record<string, TriageLevel>> = {
   appendix: 'soon',
   pancreas: 'soon',
   gallbladder: 'routine',
-  // Testicular pain needs prompt assessment because torsion can be time-critical,
-  // while the explicit sudden/severe/swelling terms above still raise emergency.
   testicles: 'urgent',
 };
 
-/** عنوان ونصيحة كل مستوى فرز. */
 const TRIAGE_META: Record<TriageLevel, { title: LocalizedText; advice: LocalizedText }> = {
   self_care: {
     title: { ar: 'رعاية ذاتية ومتابعة', en: 'Self-care and monitoring', fr: 'Auto-soins et surveillance' },
@@ -460,7 +514,6 @@ const TRIAGE_META: Record<TriageLevel, { title: LocalizedText; advice: Localized
   },
 };
 
-/** الفرز الأساسي قبل تطبيق حدّ العضو. */
 function assessTriageBase(
   redFlags: DetectedRedFlag[],
   severity: number | null,
@@ -475,62 +528,38 @@ function assessTriageBase(
   if (hasEmergency) {
     return {
       level: 'emergency',
-      title: { ar: 'طوارئ — اطلب المساعدة فورًا', en: 'Emergency — seek help now', fr: 'Urgence — demandez de l’aide maintenant' },
-      advice: {
-        ar: 'العلامات اللي ذكرتها قد تكون خطرة. أوقف أي مجهود واتصل بخدمات الطوارئ المحلية أو روح أقرب مستشفى حالًا.',
-        en: 'The signs you mentioned may be dangerous. Stop any activity and call local emergency services or go to the nearest ER now.',
-        fr: 'Les signes mentionnés peuvent être dangereux. Arrêtez toute activité et appelez les urgences ou allez aux urgences maintenant.',
-      },
+      title: TRIAGE_META.emergency.title,
+      advice: TRIAGE_META.emergency.advice,
     };
   }
   if (hasUrgent || redFlagSymptom || (severity !== null && severity >= 9)) {
     return {
       level: 'urgent',
-      title: { ar: 'تقييم عاجل خلال ساعات', en: 'Urgent — evaluate within hours', fr: 'Urgent — évaluation dans les heures' },
-      advice: {
-        ar: 'الأفضل تتواصل مع طبيب أو عيادة عاجلة في أسرع وقت، ولو زادت الأعراض روح الطوارئ.',
-        en: 'Best to contact a doctor or urgent-care clinic soon; if symptoms worsen, go to the ER.',
-        fr: 'Il vaut mieux consulter un médecin ou une clinique sans tarder ; si ça s’aggrave, allez aux urgences.',
-      },
+      title: TRIAGE_META.urgent.title,
+      advice: TRIAGE_META.urgent.advice,
     };
   }
   if (severity !== null && severity >= 7) {
     return {
       level: 'soon',
-      title: { ar: 'يُستحسن مراجعة طبيب قريبًا', en: 'See a doctor soon', fr: 'Consultez bientôt' },
-      advice: {
-        ar: 'الشدّة عالية نسبيًا. رتّب موعدًا مع طبيب خلال يوم أو يومين، وتابع تطوّر الألم.',
-        en: 'The intensity is fairly high. Arrange a doctor visit within a day or two and track the pain.',
-        fr: 'L’intensité est assez élevée. Prenez rendez-vous sous un ou deux jours et suivez l’évolution.',
-      },
+      title: TRIAGE_META.soon.title,
+      advice: TRIAGE_META.soon.advice,
     };
   }
   if (duration === 'weeks' || duration === 'months' || regions.length >= 2) {
     return {
       level: 'routine',
-      title: { ar: 'متابعة روتينية', en: 'Routine follow-up', fr: 'Suivi de routine' },
-      advice: {
-        ar: 'لو الألم مستمر أو متكرر، يفضّل استشارة طبيب لتقييم السبب ووضع خطة مناسبة.',
-        en: 'If the pain persists or recurs, consider seeing a doctor to assess the cause and plan.',
-        fr: 'Si la douleur persiste ou revient, consultez un médecin pour évaluer la cause.',
-      },
+      title: TRIAGE_META.routine.title,
+      advice: TRIAGE_META.routine.advice,
     };
   }
   return {
     level: 'self_care',
-    title: { ar: 'رعاية ذاتية ومتابعة', en: 'Self-care and monitoring', fr: 'Auto-soins et surveillance' },
-    advice: {
-      ar: 'غالبًا يمكن التعامل معه بالرعاية الذاتية، مع مراقبة الأعراض وطلب المساعدة لو تغيّرت.',
-      en: 'Likely manageable with self-care, while monitoring symptoms and seeking help if they change.',
-      fr: 'Généralement gérable par l’auto-soin, en surveillant et en consultant si ça change.',
-    },
+    title: TRIAGE_META.self_care.title,
+    advice: TRIAGE_META.self_care.advice,
   };
 }
 
-// ---------------------------------------------------------------------------
-// نصائح الرعاية الذاتية
-// ---------------------------------------------------------------------------
-/** الفرز النهائي مع مراعاة العضو (رفع الحدّ الأدنى للأعضاء الحرجة). */
 function assessTriage(
   redFlags: DetectedRedFlag[],
   severity: number | null,
@@ -552,14 +581,15 @@ function assessTriage(
   return base;
 }
 
-/** نصيحة سلامة عامة تُضاف دائمًا (لا تبدأ دواء من عندك). */
+// ---------------------------------------------------------------------------
+// نصائح الرعاية الذاتية
+// ---------------------------------------------------------------------------
 const SELF_CARE_SAFETY: LocalizedText = {
   ar: 'لا تبدأ أدوية أو جرعات من عندك — استشر صيدلي أو طبيب.',
   en: 'Do not self-prescribe medicines or doses — ask a pharmacist or doctor.',
   fr: 'Ne prenez pas de médicaments de vous-même — demandez à un pharmacien ou médecin.',
 };
 
-/** نصائح عامة (تُستخدم كملء فقط بعد النصائح المرتبطة بالعضو/المرض). */
 const SELF_CARE_GENERAL: LocalizedText[] = [
   { ar: 'ارتاح بشكل نسبي وتجنّب الراحة الطويلة تمامًا — الحركة اللطيفة غالبًا أفضل.', en: 'Rest relatively; avoid total prolonged rest — gentle movement is often better.', fr: 'Reposez-vous relativement ; évitez le repos total prolongé — le mouvement doux aide souvent.' },
   { ar: 'استخدم كمادة دافئة أو باردة حسب ما يريحك (دافئة للشد العضلي، باردة للتورم).', en: 'Use a warm or cold compress as it suits you (warm for muscle strain, cold for swelling).', fr: 'Compresse chaude ou froide selon ce qui soulage (chaude pour la contracture, froide pour le gonflement).' },
@@ -716,7 +746,6 @@ const SELF_CARE_BY_ORGAN: Record<string, LocalizedText[]> = {
   ],
 };
 
-/** نصائح مرتبطة بالمرض الأرجح (تظهر أولًا وتختلف حسب الحالة). */
 const SELF_CARE_BY_CONDITION: Record<string, LocalizedText[]> = {
   'doid:appendicitis': [
     {
@@ -837,19 +866,11 @@ function buildSelfCare(
     if (list) list.forEach((tip) => tips.push(localize(tip, language)));
   };
 
-  // 1) نصائح مرتبطة بالمرض الأرجح (الأكثر تحديدًا) — تختلف حسب الحالة.
   conditions.slice(0, 2).forEach((c) => push(SELF_CARE_BY_CONDITION[c.id]));
-
-  // 2) نصائح حسب العضو الداخلي المكتشف.
   organs.forEach((organ) => push(SELF_CARE_BY_ORGAN[organ.id]));
-
-  // 3) نصائح حسب منطقة الجسم.
   regions.forEach((region) => push(SELF_CARE_BY_REGION[region.id]));
-
-  // 4) نصيحة سلامة عامة تُضاف دائمًا.
   tips.push(localize(SELF_CARE_SAFETY, language));
 
-  // 5) ملء الفراغ بنصائح عامة متنوّعة حسب شدّة الفَرز (بدل تكرار نفس السطور).
   const generalOrder =
     triage === 'emergency' || triage === 'urgent'
       ? [SELF_CARE_GENERAL[2], SELF_CARE_GENERAL[0], SELF_CARE_GENERAL[1]]
@@ -923,26 +944,24 @@ const INTRO: Record<TriageLevel, LocalizedText> = {
   },
 };
 
-/** مقدّمة عندما لا نفهم تفاصيل كافية من رسالة المستخدم. */
 const INTRO_UNCLEAR: LocalizedText = {
   ar: 'تمام، عايز أفهمك صح — قوللي إيه اللي حاسس بيه بالظبط وأنا أساعدك.',
   en: 'Alright, let me understand you better — tell me exactly what you’re feeling.',
   fr: 'D’accord, laissez-moi mieux comprendre — dites-moi exactement ce que vous ressentez.',
 };
 
-const CLARIFY: LocalizedText = {  ar: 'قوللي أكتر عن الألم: مكانه فين، وشدته من 0 لـ10، وبقاله قد إيه؟',
+const CLARIFY: LocalizedText = {
+  ar: 'قوللي أكتر عن الألم: مكانه فين، وشدته من 0 لـ10، وبقاله قد إيه؟',
   en: 'Tell me more about the pain: where it is, its intensity (0–10), and how long it’s been.',
   fr: 'Dites-m’en plus : où est la douleur, son intensité (0–10) et depuis combien de temps.',
 };
 
-/** مقدّمة عند إرفاق صورة فقط دون وصف نصّي. */
 const IMAGE_INTRO: LocalizedText = {
   ar: 'شفت الصورة اللي أرفقتها 📷. التحليل البصري الآلي مش متاح من غير إنترنت، فساعدني بوصف بسيط وأنا أفهمك صح.',
   en: 'I see the photo you attached 📷. Automated image analysis isn’t available offline, so help me with a short description and I’ll understand you.',
   fr: 'Je vois la photo jointe 📷. L’analyse d’image automatique n’est pas disponible hors ligne ; décrivez brièvement et je vous comprendrai.',
 };
 
-/** سؤال توضيحي عند وجود صورة فقط. */
 const IMAGE_CLARIFY: LocalizedText = {
   ar: 'قوللي: إيه اللي باين في الصورة (طفح/تورم/جرح/لون)، ومكانه فين في الجسم، وبقاله قد إيه؟',
   en: 'Tell me: what does the photo show (rash/swelling/wound/colour), where on the body, and for how long?',
@@ -962,16 +981,20 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
   const severity = detectSeverity(text);
   const duration = detectDuration(text);
 
-  // دمج الأعضاء المرشّحة من المواضع الدقيقة (مثل «شمال السرة» ⇒ الأمعاء).
   const organs = mergeLocationOrgans(detectedOrgans, locations);
 
-  const hasText = regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
-  // الصورة وحدها تُعدّ إشارة مفهومة (نردّ بإرشاد) حتى لا نقول «لم أفهم».
+  const hasText =
+    regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
   const understood = hasText || hasImage;
   const imageOnly = hasImage && !hasText;
 
   const triage = assessTriage(redFlags, severity, duration, regions, symptoms, organs);
-  const conditions = understood ? scoreConditions(regions, symptoms, organs, locations) : [];
+
+  // ملاحظة مهمة: نمرّر النص الخام (rawText) لدالة scoreConditions
+  // حتى تستخدم محرّك البحث الذكي smartSearch للاستفادة من العامية والمرادفات.
+  const conditions = understood
+    ? scoreConditions(regions, symptoms, organs, locations, rawText)
+    : [];
 
   const understanding: string[] = [];
   if (regions.length) {
@@ -1025,7 +1048,11 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
   if (severity !== null) {
     understanding.push(
       localize(
-        { ar: `شدّة الألم المقدّرة: ${severity}/10.`, en: `Estimated pain intensity: ${severity}/10.`, fr: `Intensité estimée : ${severity}/10.` },
+        {
+          ar: `شدّة الألم المقدّرة: ${severity}/10.`,
+          en: `Estimated pain intensity: ${severity}/10.`,
+          fr: `Intensité estimée : ${severity}/10.`,
+        },
         language,
       ),
     );
