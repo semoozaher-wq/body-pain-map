@@ -17,6 +17,13 @@
 export type Lang = 'ar' | 'en' | 'fr';
 export type LocalizedText = { ar: string; en: string; fr: string };
 
+export interface MedicationTerm {
+  id: string;
+  label: LocalizedText;
+  keywords: Record<Lang, string[]>;
+  caution: LocalizedText;
+}
+
 /** مناطق الجسم المرجعية (نفس مفردات diseaseLibrary). */
 export type BodyRegionKey =
   | 'back'
@@ -82,7 +89,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'head_neck',
     label: { ar: 'الرأس', en: 'Head', fr: 'Tête' },
     keywords: {
-      ar: ['راسي', 'الراس', 'دماغي', 'فروة', 'جبهتي', 'صدغي', 'وجع الراس', 'صداع'],
+      ar: ['راسي', 'راسى', 'رأسى', 'الراس', 'الرأس', 'دماغي', 'فروة', 'جبهتي', 'صدغي', 'وجع الراس', 'صداع'],
       en: ['head', 'forehead', 'temple', 'skull'],
       fr: ['tête', 'front', 'tempe', 'crâne'],
     },
@@ -92,7 +99,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'head_neck',
     label: { ar: 'الرقبة', en: 'Neck', fr: 'Cou' },
     keywords: {
-      ar: ['رقبتي', 'الرقبة', 'رقبه', 'الرقاب', 'تقل في رقبتي'],
+      ar: ['رقبتي', 'رقبتى', 'الرقبة', 'رقبه', 'الرقاب', 'تقل في رقبتي'],
       en: ['neck', 'cervical'],
       fr: ['cou', 'nuque', 'cervical'],
     },
@@ -112,7 +119,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'back',
     label: { ar: 'أسفل الظهر', en: 'Lower back', fr: 'Bas du dos' },
     keywords: {
-      ar: ['اسفل ضهري', 'أسفل الظهر', 'وسط ضهري', 'قطني', 'القطنية', 'ضهري', 'ظهري', 'الظهر', 'اسفل الظهر', 'الفقرات', 'الحرقفة', 'حقوي'],
+      ar: ['اسفل ضهري', 'أسفل الظهر', 'وسط ضهري', 'قطني', 'القطنية', 'ضهري', 'ظهري', 'ضهرى', 'ظهرى', 'الظهر', 'اسفل الظهر', 'الفقرات', 'الحرقفة', 'حقوي'],
       en: ['lower back', 'low back', 'lumbar', 'lumbago'],
       fr: ['bas du dos', 'lombaire', 'lombalgie'],
     },
@@ -122,7 +129,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'torso_front',
     label: { ar: 'الصدر', en: 'Chest', fr: 'Poitrine' },
     keywords: {
-      ar: ['صدري', 'الصدر', 'قلبي', 'القلب', 'منطقة القلب', 'قص', 'القص'],
+      ar: ['صدري', 'صدرى', 'الصدر', 'قلبي', 'القلب', 'منطقة القلب', 'قص', 'القص'],
       en: ['chest', 'sternum', 'heart area'],
       fr: ['poitrine', 'thorax', 'sternum', 'cœur'],
     },
@@ -132,7 +139,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'torso_front',
     label: { ar: 'البطن', en: 'Abdomen', fr: 'Abdomen' },
     keywords: {
-      ar: ['بطني', 'البطن', 'المعدة', 'معدتي', 'المصران', 'القولون', 'الكرش', 'تحت ضلوعي'],
+      ar: ['بطني', 'بطنى', 'البطن', 'المعدة', 'معدتي', 'المصران', 'القولون', 'الكرش', 'تحت ضلوعي'],
       en: ['abdomen', 'stomach', 'belly', 'tummy', 'gut'],
       fr: ['abdomen', 'ventre', 'estomac'],
     },
@@ -142,7 +149,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'torso_front',
     label: { ar: 'الخواصر (الجانب)', en: 'Flank / side', fr: 'Flanc / côté' },
     keywords: {
-      ar: ['جنبي', 'خواصري', 'الخاصرة', 'الجانب', 'على جنب', 'جبي', 'جمبي', 'جنبي', 'على جبي', 'على جمبي', 'جنابي', 'الجنب'],
+      ar: ['جنبي', 'خواصري', 'الخاصرة', 'الجانب', 'على جنب', 'جبي', 'جمبي', 'جنبي', 'على جبي', 'على جمبي', 'جنابي', 'الجنب', 'جنبى', 'الجانب'],
       en: ['flank', 'side', 'waist'],
       fr: ['flanc', 'côté', 'taille'],
     },
@@ -212,7 +219,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'lower_limb',
     label: { ar: 'الركبة', en: 'Knee', fr: 'Genou' },
     keywords: {
-      ar: ['ركبتي', 'الركبة', 'ركبتين', 'ركبي', 'مفصل الركبة'],
+      ar: ['ركبتي', 'ركبتى', 'الركبة', 'ركبتين', 'ركبي', 'مفصل الركبة'],
       en: ['knee', 'knees'],
       fr: ['genou', 'genoux'],
     },
@@ -887,7 +894,7 @@ export const SYMPTOM_TERMS: SymptomTerm[] = [
     redFlag: false,
     generic: true,
     keywords: {
-      ar: ['وجع', 'ألم', 'الم', 'بيوجعني', 'حاسس بألم', 'بتوجعني', 'مؤلم', 'أوجاع', 'اوجاع'],
+      ar: ['وجع', 'ألم', 'الم', 'بيوجعني', 'بتوجعني', 'بتحرق', 'بتلسع', 'بتنخ', 'بتقرص', 'حاسس بوجع', 'عندي وجع', 'عندي ألم', 'حاسس بألم', 'مؤلم', 'أوجاع', 'اوجاع'],
       en: ['pain', 'ache', 'hurts', 'sore'],
       fr: ['douleur', 'mal', 'ça fait mal'],
     },
@@ -1105,17 +1112,17 @@ export const RED_FLAG_TERMS: RedFlagTerm[] = [
 // ---------------------------------------------------------------------------
 export const SEVERITY_WORDS = {
   mild: {
-    ar: ['خفيف', 'بسيط', 'طفييف', 'مش جامد', 'شوية وجع', 'بسيطة'],
+    ar: ['خفيف', 'بسيط', 'طفييف', 'مش جامد', 'شوية وجع', 'بسيطة', 'بيضايق شوية', 'خفيف خالص'],
     en: ['mild', 'slight', 'minor', 'light'],
     fr: ['léger', 'léger', 'faible', 'léger'],
   } as Record<Lang, string[]>,
   moderate: {
-    ar: ['متوسط', 'موسط', 'لا بأس به', 'معقول'],
+    ar: ['متوسط', 'موسط', 'لا بأس به', 'معقول', 'بيضايقني', 'بيزعجني'],
     en: ['moderate', 'medium'],
     fr: ['modéré', 'moyen'],
   } as Record<Lang, string[]>,
   severe: {
-    ar: ['شديد', 'قوي', 'رهيب', 'مؤلم جداً', 'فايت', 'لا يطاق', 'قاسي', 'مزعج جداً'],
+    ar: ['شديد', 'قوي', 'رهيب', 'مؤلم جداً', 'فايت', 'لا يطاق', 'قاسي', 'مزعج جداً', 'مش قادر أتحرك', 'مفش قادر أقعد', 'وجع بيقطع'],
     en: ['severe', 'intense', 'strong', 'unbearable', 'terrible'],
     fr: ['sévère', 'intense', 'fort', 'insupportable'],
   } as Record<Lang, string[]>,
@@ -1126,17 +1133,17 @@ export const SEVERITY_WORDS = {
 // ---------------------------------------------------------------------------
 export const DURATION_WORDS = {
   hours: {
-    ar: ['ساعة', 'ساعات', 'من ساعة', 'من شوية', 'دلوقتي', 'النهاردة'],
+    ar: ['ساعة', 'ساعات', 'من ساعة', 'من شوية', 'دلوقتي', 'النهاردة', 'من الصبح', 'من ساعتين'],
     en: ['hour', 'hours', 'today', 'just now'],
     fr: ['heure', 'heures', "aujourd'hui"],
   } as Record<Lang, string[]>,
   days: {
-    ar: ['يوم', 'أيام', 'ايام', 'من يومين', 'من 3 أيام', 'بقاله أيام', 'بقالي أيام'],
+    ar: ['يوم', 'أيام', 'ايام', 'من امبارح', 'من يومين', 'من 3 أيام', 'بقاله أيام', 'بقالي أيام', 'بقاله كام يوم'],
     en: ['day', 'days', 'a few days'],
     fr: ['jour', 'jours', 'quelques jours'],
   } as Record<Lang, string[]>,
   weeks: {
-    ar: ['أسبوع', 'اسبوع', 'أسابيع', 'اسابيع', 'بقاله أسابيع'],
+    ar: ['أسبوع', 'اسبوع', 'أسابيع', 'اسابيع', 'من أسبوع', 'بقاله أسبوعين', 'بقاله أسابيع'],
     en: ['week', 'weeks'],
     fr: ['semaine', 'semaines'],
   } as Record<Lang, string[]>,
@@ -1204,8 +1211,8 @@ export const REGION_LOCATIONS: RegionLocation[] = [
   { id: 'chest-ribs-left', parent: 'chest', label: { ar: 'تحت الضلوع شمال', en: 'Below left ribs', fr: 'Sous côtes gauches' }, keywords: { ar: ['تحت ضلوعي شمال'], en: ['below left ribs'], fr: ['sous côtes gauches'] } },
 
   // الجانب
-  { id: 'flank-right', parent: 'obliques', label: { ar: 'الجانب يمين', en: 'Right flank', fr: 'Flanc droit' }, keywords: { ar: ['جنبي يمين'], en: ['right flank'], fr: ['flanc droit'] } },
-  { id: 'flank-left', parent: 'obliques', label: { ar: 'الجانب شمال', en: 'Left flank', fr: 'Flanc gauche' }, keywords: { ar: ['جنبي شمال'], en: ['left flank'], fr: ['flanc gauche'] } },
+  { id: 'flank-right', parent: 'obliques', label: { ar: 'الجانب يمين', en: 'Right flank', fr: 'Flanc droit' }, keywords: { ar: ['جنب اليمين', 'جنب يمين', 'الجانب اليمين', 'الجانب يمين', 'الجنب اليمين', 'الجنب يمين', 'اليمين', 'يمين', 'يمنى', 'على اليمين', 'على يمين', 'اليمني', 'جنبي يمين'], en: ['right flank'], fr: ['flanc droit'] } },
+  { id: 'flank-left', parent: 'obliques', label: { ar: 'الجانب شمال', en: 'Left flank', fr: 'Flanc gauche' }, keywords: { ar: ['جنب الشمال', 'جنب شمال', 'الجانب الشمال', 'الجانب شمال', 'الجنب الشمال', 'الجنب شمال', 'الشمال', 'شمال', 'يسار', 'على الشمال', 'على شمال', 'الشمالي', 'جنبي شمال'], en: ['left flank'], fr: ['flanc gauche'] } },
 
   // الكتف
   { id: 'shoulder-right', parent: 'deltoids', label: { ar: 'الكتف يمين', en: 'Right shoulder', fr: 'Épaule droite' }, keywords: { ar: ['كتفي يمين'], en: ['right shoulder'], fr: ['épaule droite'] } },
@@ -1251,4 +1258,25 @@ export const REGION_LOCATIONS: RegionLocation[] = [
   // القدم
   { id: 'foot-right', parent: 'feet', label: { ar: 'القدم يمين', en: 'Right foot', fr: 'Pied droit' }, keywords: { ar: ['قدمي يمين'], en: ['right foot'], fr: ['pied droit'] } },
   { id: 'foot-left', parent: 'feet', label: { ar: 'القدم شمال', en: 'Left foot', fr: 'Pied gauche' }, keywords: { ar: ['قدمي شمال'], en: ['left foot'], fr: ['pied gauche'] } },
+];
+
+export const MEDICATION_TERMS: MedicationTerm[] = [
+  { id: 'paracetamol', label: { ar: 'بنادول / باراسيتامول', en: 'Panadol / paracetamol', fr: 'Panadol / paracétamol' }, keywords: { ar: ['بنادول', 'باراسيتامول', 'باراسيتامول'], en: ['panadol', 'paracetamol', 'acetaminophen'], fr: ['panadol', 'paracétamol'] }, caution: { ar: 'لا تكرر الجرعة أو تجمعه مع دواء آخر قبل مراجعة النشرة أو الصيدلي.', en: 'Do not repeat or combine doses without checking the label or a pharmacist.', fr: 'Ne répétez pas ou ne combinez pas les doses sans vérifier la notice ou demander au pharmacien.' } },
+  { id: 'ibuprofen', label: { ar: 'بروفين / إيبوبروفين', en: 'Brufen / ibuprofen', fr: 'Brufen / ibuprofène' }, keywords: { ar: ['بروفين', 'ايبوبروفين', 'إيبوبروفين'], en: ['brufen', 'ibuprofen'], fr: ['brufen', 'ibuprofène'] }, caution: { ar: 'اسأل الصيدلي قبل استخدامه مع قرحة المعدة أو مشاكل الكلى أو الحمل أو مميعات الدم.', en: 'Ask a pharmacist first with ulcers, kidney disease, pregnancy, or blood thinners.', fr: 'Demandez au pharmacien en cas d’ulcère, maladie rénale, grossesse ou anticoagulants.' } },
+  { id: 'diclofenac', label: { ar: 'فولتارين / كتافلام', en: 'Voltaren / diclofenac', fr: 'Voltaren / diclofénac' }, keywords: { ar: ['فولتارين', 'كتافلام', 'ديكلوفيناك'], en: ['voltaren', 'diclofenac'], fr: ['voltaren', 'diclofénac'] }, caution: { ar: 'لا تجمعه مع مسكنات مضادة للالتهاب أخرى دون سؤال الصيدلي.', en: 'Do not combine it with other anti-inflammatory painkillers without pharmacist advice.', fr: 'Ne l’associez pas à d’autres anti-inflammatoires sans avis pharmaceutique.' } },
+  { id: 'aspirin', label: { ar: 'أسبرين', en: 'Aspirin', fr: 'Aspirine' }, keywords: { ar: ['اسبرين', 'أسبرين'], en: ['aspirin'], fr: ['aspirine'] }, caution: { ar: 'اذكر أي حساسية أو نزيف أو استخدام لمميعات الدم للطبيب أو الصيدلي.', en: 'Tell a clinician or pharmacist about allergy, bleeding, or blood thinners.', fr: 'Signalez toute allergie, saignement ou anticoagulant au professionnel.' } },
+];
+
+export const FOLLOW_UP_QUESTIONS: LocalizedText[] = [
+  { ar: 'الألم بيزيد مع إيه؟', en: 'What makes the pain worse?', fr: 'Qu’est-ce qui aggrave la douleur ?' },
+  { ar: 'فيه أعراض تانية زي تنميل أو حرارة أو دوخة؟', en: 'Any other symptoms such as numbness, fever, or dizziness?', fr: 'D’autres symptômes comme engourdissement, fièvre ou vertiges ?' },
+  { ar: 'بتحس بوخز أو حرقان؟', en: 'Do you feel tingling or burning?', fr: 'Ressentez-vous des fourmillements ou une brûlure ?' },
+];
+
+export const SYMPTOM_QUICK_CHIPS: LocalizedText[] = [
+  { ar: 'فيه تنميل', en: 'There is numbness', fr: 'Il y a un engourdissement' },
+  { ar: 'فيه حرارة', en: 'There is fever', fr: 'Il y a de la fièvre' },
+  { ar: 'فيه تورم', en: 'There is swelling', fr: 'Il y a un gonflement' },
+  { ar: 'بيزيد مع الحركة', en: 'It worsens with movement', fr: 'Cela augmente avec le mouvement' },
+  { ar: 'بيهدأ مع الراحة', en: 'It improves with rest', fr: 'Cela s’améliore au repos' },
 ];

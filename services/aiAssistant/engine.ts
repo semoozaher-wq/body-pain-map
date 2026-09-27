@@ -30,6 +30,8 @@ import {
   REGION_LOCATIONS,
   SEVERITY_WORDS,
   SYMPTOM_TERMS,
+  MEDICATION_TERMS,
+  FOLLOW_UP_QUESTIONS,
   type AbdomenLocation,
   type BodyRegionKey,
   type Lang,
@@ -92,6 +94,12 @@ export interface DetectedSymptom {
   generic: boolean;
 }
 
+export interface DetectedMedication {
+  id: string;
+  label: LocalizedText;
+  caution: LocalizedText;
+}
+
 export interface DetectedRedFlag {
   id: string;
   level: 'emergency' | 'urgent';
@@ -124,6 +132,10 @@ export interface AssistantReply {
   redFlags: DetectedRedFlag[];
   regions: DetectedRegion[];
   symptoms: DetectedSymptom[];
+  medications: DetectedMedication[];
+  medicationQuestion: LocalizedText | null;
+  followUpQuestion: LocalizedText | null;
+  followUpOptions: LocalizedText[];
   organs: DetectedOrgan[];
   locations: DetectedLocation[];
   organDetails: DetectedOrganDetail[];
@@ -228,6 +240,12 @@ export function detectSymptoms(text: string): DetectedSymptom[] {
     }
   });
   return [...found.values()];
+}
+
+export function detectMedications(text: string): DetectedMedication[] {
+  return MEDICATION_TERMS
+    .filter((term) => matchAny(text, term.keywords))
+    .map((term) => ({ id: term.id, label: term.label, caution: term.caution }));
 }
 
 export function detectLocations(text: string): DetectedLocation[] {
@@ -988,19 +1006,31 @@ const IMAGE_CLARIFY: LocalizedText = {
 // ---------------------------------------------------------------------------
 // الدالة الرئيسية
 // ---------------------------------------------------------------------------
-export function analyzeMessage(rawText: string, language: Lang, hasImage = false): AssistantReply {
+export function analyzeMessage(
+  rawText: string,
+  language: Lang,
+  hasImage = false,
+  options: { forceAnswer?: boolean } = {},
+): AssistantReply {
   const text = normalize(rawText);
-  const regions = detectRegions(text);
+  const detectedRegions = detectRegions(text);
   const detectedOrgans = detectOrgans(text);
   const locations = detectLocations(text);
   const regionLocations = detectRegionLocations(text);
+  const regions = detectedRegions.length > 0
+    ? detectedRegions
+    : [...new Map(regionLocations.map((location) => {
+      const parent = BODY_REGIONS.find((region) => region.id === location.parent);
+      return parent ? [parent.id, { id: parent.id, region: parent.region, label: parent.label }] as const : null;
+    }).filter((entry): entry is readonly [string, { id: string; region: BodyRegionKey; label: LocalizedText }] => entry !== null))].map(([, region]) => region);
   const symptoms = detectSymptoms(text);
+  const medications = detectMedications(text);
   const redFlags = detectRedFlags(text);
   const severity = detectSeverity(text);
   const duration = detectDuration(text);
 
   const organs = mergeLocationOrgans(detectedOrgans, locations);
-  const askForLocation = needsClarification(regions, regionLocations, locations, redFlags, organs);
+  const askForLocation = !options.forceAnswer && needsClarification(regions, regionLocations, locations, redFlags, organs);
 
   const hasText =
     regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
@@ -1112,6 +1142,13 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
     };
   });
 
+  const followUpQuestion = understood && !askForLocation && severity !== null
+    ? FOLLOW_UP_QUESTIONS[(symptoms.length + regions.length) % FOLLOW_UP_QUESTIONS.length]
+    : null;
+  const medicationQuestion = medications.length > 0
+    ? { ar: 'إيه الجرعة وإمتى أخدته؟ وهل عندك حساسية أو مانع طبي؟', en: 'What dose did you take and when? Any allergy or medical reason to avoid it?', fr: 'Quelle dose et quand ? Avez-vous une allergie ou une contre-indication ?' }
+    : null;
+
   const primaryRegion = regions[0] ?? null;
   const mapOrgan = askForLocation ? null : (organs.find((organ) => organ.onMap) ?? null);
 
@@ -1127,6 +1164,10 @@ export function analyzeMessage(rawText: string, language: Lang, hasImage = false
     redFlags,
     regions,
     symptoms,
+    medications: askForLocation ? [] : medications,
+    medicationQuestion: askForLocation ? null : medicationQuestion,
+    followUpQuestion: askForLocation ? null : followUpQuestion,
+    followUpOptions: askForLocation ? [] : FOLLOW_UP_QUESTIONS,
     organs,
     locations,
     organDetails: askForLocation ? [] : organDetails,
