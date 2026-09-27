@@ -173,6 +173,9 @@
     "photoMessage": "📷 صورة مرفقة",
     "clarifyLocation": "الألم فين بالظبط؟",
     "clarifySeverity": "شدته قد إيه؟",
-    "clarifyDuration": "بقاله قد إيه؟"
+    "clarifyDuration": "بقاله قد إيه؟",
+    "quickSymptoms": "أعراض سريعة",
+    "medicationsDetected": "أدوية مذكورة",
+    "followUpReminder": "لسه الألم موجود؟ حالته اتحسنت ولا زي ما هي؟"
   }
 }

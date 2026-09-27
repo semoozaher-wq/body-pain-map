@@ -173,6 +173,9 @@
     "photoMessage": "📷 Photo jointe",
     "clarifyLocation": "Où exactement est la douleur ?",
     "clarifySeverity": "Quelle est son intensité ?",
-    "clarifyDuration": "Depuis combien de temps ?"
+    "clarifyDuration": "Depuis combien de temps ?",
+    "quickSymptoms": "Symptômes rapides",
+    "medicationsDetected": "Médicaments mentionnés",
+    "followUpReminder": "La douleur est-elle toujours là ? S’est-elle améliorée ou reste-t-elle la même ?"
   }
 }

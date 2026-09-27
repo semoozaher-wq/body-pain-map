@@ -173,6 +173,9 @@
     "photoMessage": "📷 Attached photo",
     "clarifyLocation": "Where exactly is the pain?",
     "clarifySeverity": "How intense is it?",
-    "clarifyDuration": "How long has it been?"
+    "clarifyDuration": "How long has it been?",
+    "quickSymptoms": "Quick symptoms",
+    "medicationsDetected": "Medicines mentioned",
+    "followUpReminder": "Is the pain still there? Has it improved or stayed the same?"
   }
 }
