@@ -9,7 +9,7 @@
 //   - بحث تقريبي (Fuzzy) للأخطاء الإملائية
 //   - قاموس كلمات مفتاحية وعامية مصرية لكل حالة (60 حالة)
 //   - خوارزمية ترتيب (Scoring) — النتائج الأهم أولاً
-//   - (v5) إضافة كلمات مفتاحية للحالات الـ 20 الجديدة
+//   - (v6) دعم "يمين/شمال" للتمييز بين حالات البطن
 // ============================================================================
 
 import diseasesData from '../../data/medical/diseases.json';
@@ -66,7 +66,6 @@ const BASE_CONDITIONS = (diseasesData as { conditions: MedicalCondition[] }).con
 const ORGAN_CONDITIONS = (organConditionsData as { conditions: MedicalCondition[] }).conditions;
 const REGIONAL_CONDITIONS = (regionalConditionsData as { conditions: MedicalCondition[] }).conditions;
 
-/** حالات منتشرة (Diffuse) — بتخفّض درجتها عند وجود شكوى موضعية. */
 const DIFFUSE_IDS = new Set(['doid:1490', 'doid:8505', 'doid:8505-doms']);
 
 const CONDITIONS: MedicalCondition[] = [
@@ -78,9 +77,37 @@ const CONDITIONS: MedicalCondition[] = [
 const SYMPTOMS = (symptomsData as { symptoms: MedicalSymptom[] }).symptoms;
 
 // ============================================================================
-// قاموس الكلمات المفتاحية والعامية المصرية
+// خريطة الجهة (يمين / شمال / وسط) لكل حالة بطنية
 // ----------------------------------------------------------------------------
-// مفتاح كل حالة = الـ id الحقيقي بتاعها في diseases.json أو organConditions.json
+// بتُستخدم في scoreCondition عشان تعاقب الحالات اللي في الجهة الغلط.
+// ============================================================================
+const ABDOMEN_SIDE_MAP: Record<string, 'right' | 'left' | 'center' | 'both'> = {
+  'doid:appendicitis': 'right',        // الزائدة → أسفل يمين
+  'doid:gallstones': 'right',          // المرارة → أعلى يمين
+  'doid:cholecystitis-acute': 'right', // التهاب المرارة الحاد → أعلى يمين
+  'doid:diverticulitis': 'left',       // الرتوج → أسفل شمال
+  'doid:acute-diverticulitis': 'left', // الرتوج الحاد → أسفل شمال
+  'doid:ibs': 'both',                  // القولون العصبي → ممكن أي ناحية
+  'doid:gastritis': 'center',          // المعدة → وسط/أعلى
+  'doid:peptic-ulcer': 'center',       // القرحة → وسط/أعلى
+  'doid:duodenal-ulcer': 'center',     // قرحة الاثني عشر → وسط/أعلى
+  'doid:gastroenteritis': 'both',      // النزلة المعوية → كل البطن
+  'doid:uti': 'center',                // المسالك → أسفل وسط
+  'doid:kidney-stone': 'both',         // حصى الكلى → خاصرة أي ناحية
+  'doid:ureteral-stone': 'both',       // حصى الحالب → خاصرة أي ناحية
+  'doid:pyelonephritis': 'both',       // التهاب الكلى → خاصرة أي ناحية
+  'doid:ovarian-cyst': 'both',         // كيس المبيض → أي ناحية
+  'doid:endometriosis': 'center',      // بطانة الرحم → وسط الحوض
+  'doid:pcos': 'both',                 // تكيس المبايض → أي ناحية
+  'doid:prostatitis': 'center',        // البروستاتا → وسط أسفل
+  'doid:hepatitis': 'right',           // الكبد → أعلى يمين
+  'doid:pancreatitis': 'center',       // البنكرياس → وسط
+  'doid:gerd-organ': 'center',         // الارتجاع → وسط
+  'doid:angina': 'center',             // الذبحة → وسط الصدر
+};
+
+// ============================================================================
+// قاموس الكلمات المفتاحية والعامية المصرية
 // ============================================================================
 
 interface KeywordEntry {
@@ -90,7 +117,7 @@ interface KeywordEntry {
 
 const KEYWORDS_MAP: Record<string, KeywordEntry> = {
   // ==========================================================================
-  // القسم 1: أمراض العظام والعضلات (من diseases.json) — 25 حالة أصلية
+  // القسم 1: أمراض العظام والعضلات (من diseases.json) — 25 حالة
   // ==========================================================================
 
   'doid:4536': {
@@ -185,9 +212,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'ألم في كل العضلات', 'تعب عضلي',
       'myalgia', 'muscle pain', 'muscular pain',
     ],
-    colloquial: [
-      'عضلاتي بتوجعني', 'جسمي كله بوجع', 'حاسس بألم في عضلاتي',
-    ],
+    colloquial: ['عضلاتي بتوجعني', 'جسمي كله بوجع', 'حاسس بألم في عضلاتي'],
   },
 
   'doid:8505-doms': {
@@ -281,19 +306,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'التهاب وتر أخيل', 'التهاب أوتار الكتف', 'تندينيت',
       'tendinitis', 'tendonitis', 'tendon pain',
     ],
-    colloquial: [
-      'وتري بوجعني', 'حاسس بألم في الوتر', 'وجع في وتر رجلي',
-    ],
+    colloquial: ['وتري بوجعني', 'حاسس بألم في الوتر', 'وجع في وتر رجلي'],
   },
 
   'doid:0050896': {
-    keywords: [
-      'ألم المفاصل', 'أرثالجا', 'وجع المفاصل',
-      'joint pain', 'arthralgia',
-    ],
-    colloquial: [
-      'مفاصلي بتوجعني', 'وجع في مفاصلي',
-    ],
+    keywords: ['ألم المفاصل', 'أرثالجا', 'وجع المفاصل', 'joint pain', 'arthralgia'],
+    colloquial: ['مفاصلي بتوجعني', 'وجع في مفاصلي'],
   },
 
   'doid:9350': {
@@ -303,8 +321,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'peripheral neuropathy', 'tingling',
     ],
     colloquial: [
-      'رجليّ بتتنمّل', 'إيديا ورجليا بتتنمّل',
-      'حاسس بحرقان في رجلي',
+      'رجليّ بتتنمّل', 'إيديا ورجليا بتتنمّل', 'حاسس بحرقان في رجلي',
     ],
   },
 
@@ -313,9 +330,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'التواء الكاحل', 'لوي الكاحل', 'إصابة الكاحل', 'كاحل',
       'ankle sprain', 'sprained ankle', 'ankle injury',
     ],
-    colloquial: [
-      'كوستي', 'كاحلي اتلوى', 'كوستي بوجعني',
-    ],
+    colloquial: ['كوستي', 'كاحلي اتلوى', 'كوستي بوجعني'],
   },
 
   'doid:7148': {
@@ -323,9 +338,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'ألم اليد', 'ألم الرسغ', 'إجهاد متكرر', 'وجع الرسغ',
       'hand pain', 'wrist pain', 'repetitive strain',
     ],
-    colloquial: [
-      'إيدي بتوجعني', 'رسغي بوجعني', 'إيدي تعبت من الكتابة',
-    ],
+    colloquial: ['إيدي بتوجعني', 'رسغي بوجعني', 'إيدي تعبت من الكتابة'],
   },
 
   'doid:8398-oa': {
@@ -334,10 +347,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'المفاصل', 'وجع مفاصل', 'تآكل المفاصل',
       'osteoarthritis', 'OA', 'degenerative joint disease',
     ],
-    colloquial: [
-      'مفاصلي بتوجعني', 'مفاصلي بتطلع صوت',
-      'حاسس بخشونة في مفاصلي',
-    ],
+    colloquial: ['مفاصلي بتوجعني', 'مفاصلي بتطلع صوت', 'حاسس بخشونة في مفاصلي'],
   },
 
   'doid:10763': {
@@ -345,10 +355,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'ضغط الدم', 'ارتفاع ضغط الدم', 'الضغط', 'ضغط عالي',
       'hypertension', 'high blood pressure',
     ],
-    colloquial: [
-      'عندي ضغط', 'الضغط عالي', 'حاسس بضغط في دماغي',
-      'عندي صداع من الضغط',
-    ],
+    colloquial: ['عندي ضغط', 'الضغط عالي', 'حاسس بضغط في دماغي', 'عندي صداع من الضغط'],
   },
 
   'doid:12353': {
@@ -357,35 +364,38 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
       'gastroesophageal reflux', 'GERD', 'heartburn', 'acid reflux',
     ],
     colloquial: [
-      'حاسس بحموضة', 'حرقة في صدري', 'الأكل بيرجع لي',
-      'حاسس بحرقة في معدتي',
+      'حاسس بحموضة', 'حرقة في صدري', 'الأكل بيرجع لي', 'حاسس بحرقة في معدتي',
     ],
   },
 
   // ==========================================================================
-  // القسم 2: أمراض الأعضاء الداخلية (من organConditions.json) — 15 حالة أصلية
+  // القسم 2: أمراض الأعضاء الداخلية (من organConditions.json) — 15 حالة
   // ==========================================================================
 
   'doid:appendicitis': {
     keywords: [
       'التهاب الزائدة', 'الزائدة الدودية', 'زائدة', 'appendicitis',
       'ألم أسفل يمين البطن', 'ألم حول السرة',
+      'يمين البطن', 'جنب يميني', 'أسفل يمين',
     ],
     colloquial: [
       'وجع في أسفل يمين بطني', 'بطني بتوجعني من ناحية اليمين',
       'وجع حول السرة', 'حاسس بوجع في بطني وجاي على اليمين',
+      'بطني من يمين بتوجعني', 'بطني بتوجعني من نحية اليمين',
+      'بطني بتوجعني من جهة اليمين', 'ألم في أسفل يمين البطن',
+      'وجع في يمين بطني',
     ],
   },
 
   'doid:gastritis': {
     keywords: [
       'التهاب المعدة', 'عسر الهضم', 'حرقة المعدة', 'gastritis', 'dyspepsia',
-      'ألم أعلى البطن', 'حموضة', 'انتفاخ',
+      'ألم أعلى البطن', 'حموضة', 'انتفاخ', 'وسط البطن',
     ],
     colloquial: [
       'معدتي بتوجعني', 'حاسس بحرقة في معدتي',
       'بطني من فوق بتوجعني', 'حاسس بانتفاخ بعد الأكل',
-      'معدتي تعبانة',
+      'معدتي تعبانة', 'بطني من وسط بتوجعني',
     ],
   },
 
@@ -415,10 +425,14 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     keywords: [
       'التهاب الرتوج', 'التهاب القولون', 'diverticulitis',
       'ألم أسفل يسار البطن', 'حرارة مع ألم البطن',
+      'شمال البطن', 'جنب شمالي', 'أسفل شمال',
     ],
     colloquial: [
       'وجع في أسفل يسار بطني', 'بطني بتوجعني من ناحية الشمال',
       'حاسس بوجع في بطني مع حرارة',
+      'بطني من شمال بتوجعني', 'بطني بتوجعني من نحية الشمال',
+      'بطني بتوجعني من جهة الشمال', 'ألم في أسفل شمال البطن',
+      'وجع في شمال بطني',
     ],
   },
 
@@ -437,28 +451,31 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     keywords: [
       'حصى المرارة', 'التهاب المرارة', 'gallstones', 'cholecystitis',
       'ألم أعلى يمين البطن', 'ألم بعد الأكل الدسم',
+      'يمين البطن', 'جنب يميني', 'أعلى يمين',
     ],
     colloquial: [
       'عندي حصى في المرارة', 'وجع في يمين بطني من فوق',
       'بطني بتوجعني بعد الأكل الدسم', 'وجع في المرارة',
+      'بطني من يمين فوق بتوجعني', 'ألم في أعلى يمين البطن',
     ],
   },
 
   'doid:hepatitis': {
     keywords: [
       'التهاب الكبد', 'hepatitis', 'ألم الكبد', 'اصفرار',
-      'يرقان', 'jaundice',
+      'يرقان', 'jaundice', 'يمين البطن', 'أعلى يمين',
     ],
     colloquial: [
       'عندي التهاب في الكبد', 'كبدي بتوجعني',
       'عيوني بقت صفراء', 'حاسس بإجهاد شديد ووجع في جنبي',
+      'جنبي اليمين بتوجعني',
     ],
   },
 
   'doid:pancreatitis': {
     keywords: [
       'التهاب البنكرياس', 'pancreatitis',
-      'ألم أعلى البطن ينتقل للظهر',
+      'ألم أعلى البطن ينتقل للظهر', 'وسط البطن', 'حزامي',
     ],
     colloquial: [
       'عندي التهاب في البنكرياس', 'بطني بتوجعني وينزل على ضهري',
@@ -479,8 +496,9 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
 
   'doid:kidney-stone': {
     keywords: [
-      'حصى الكلى', 'حصى الكلى', 'kidney stones',
+      'حصى الكلى', 'kidney stones',
       'ألم في الخاصرة', 'ألم الكلى', 'دم في البول',
+      'جنب', 'خاصرة',
     ],
     colloquial: [
       'عندي حصى في الكلى', 'جنبي بتوجعني بشكل شديد',
@@ -555,7 +573,8 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     colloquial: [
       'جيوبي بتوجعني', 'حاسس بضغط في جبهتي',
       'مناخيري مسدودة ووجع في وشي', 'وجع في عضم وشي',
-      'حاسس بوجع في جيوبي الأنفية',
+      'حاسس بوجع في جيوبي الأنفية', 'جيوبي الأنفية بتوجعني',
+      'جيوبي الانفية بتوجعني',
     ],
   },
 
@@ -644,8 +663,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     ],
     colloquial: [
       'عندي صدفية في جلدي ومفاصلي بتوجعني',
-      'جلدي فيه قشور ومفاصلي وارمة',
-      'عندي صدفية',
+      'جلدي فيه قشور ومفاصلي وارمة', 'عندي صدفية',
     ],
   },
 
@@ -657,17 +675,19 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     keywords: [
       'التهاب المرارة الحاد', 'acute cholecystitis',
       'التهاب المرارة', 'ألم شديد أعلى يمين البطن',
+      'يمين البطن', 'أعلى يمين',
     ],
     colloquial: [
       'المرارة بتوجعني بشدة', 'عندي التهاب في المرارة',
       'وجع شديد في يمين بطني مع حرارة',
+      'بطني من يمين فوق بتوجعني بشدة',
     ],
   },
 
   'doid:duodenal-ulcer': {
     keywords: [
       'قرحة الاثني عشر', 'duodenal ulcer',
-      'قرحة الأمعاء', 'حرقة في أعلى البطن',
+      'قرحة الأمعاء', 'حرقة في أعلى البطن', 'وسط البطن',
     ],
     colloquial: [
       'عندي قرحة في الاثني عشر', 'حرقة في بطني بتروح مع الأكل',
@@ -679,10 +699,12 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     keywords: [
       'التهاب الرتج الحاد', 'acute diverticulitis',
       'التهاب الرتوج الحاد', 'ألم شديد أسفل يسار البطن',
+      'شمال البطن', 'أسفل شمال',
     ],
     colloquial: [
       'عندي التهاب حاد في القولون',
       'وجع شديد في يسار بطني مع حرارة',
+      'بطني من شمال تحت بتوجعني بشدة',
     ],
   },
 
@@ -690,6 +712,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
     keywords: [
       'التهاب الكلى', 'pyelonephritis',
       'التهاب الحويضة والكلية', 'ألم في الخاصرة مع حرارة',
+      'جنب', 'خاصرة',
     ],
     colloquial: [
       'عندي التهاب في كليتي', 'جنبي بتوجعني مع حرارة',
@@ -700,7 +723,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
   'doid:ureteral-stone': {
     keywords: [
       'حصى الحالب', 'ureteral stone', 'حصوة في الحالب',
-      'ألم شديد في الخاصرة ينتقل لأسفل',
+      'ألم شديد في الخاصرة ينتقل لأسفل', 'جنب', 'خاصرة',
     ],
     colloquial: [
       'عندي حصوة في الحالب', 'جنبي بتوجعني وبتنزل لتحت',
@@ -765,7 +788,7 @@ const KEYWORDS_MAP: Record<string, KeywordEntry> = {
 };
 
 // ============================================================================
-// حالات عامة (Generic) — الـ score بتاعها يُخفَّض دايمًا
+// حالات عامة (Generic)
 // ============================================================================
 const GENERIC_CONDITION_IDS = new Set<string>([
   'doid:8505',
@@ -850,6 +873,22 @@ function similarity(a: string, b: string): number {
 }
 
 // ============================================================================
+// كشف الجهة (يمين / شمال / وسط) من النص
+// ============================================================================
+
+const RIGHT_WORDS = ['يمين', 'يميني', 'اليمين', 'يمنية', 'ناحية اليمين', 'جهة اليمين', 'نحيه اليمين', 'right'];
+const LEFT_WORDS = ['شمال', 'شمالي', 'الشمال', 'شمالية', 'يسار', 'يساري', 'اليسار', 'ناحية الشمال', 'جهة الشمال', 'نحيه الشمال', 'left'];
+
+function detectSide(text: string): 'right' | 'left' | null {
+  const n = normalizeArabic(text);
+  const hasRight = RIGHT_WORDS.some((w) => n.includes(normalizeArabic(w)));
+  const hasLeft = LEFT_WORDS.some((w) => n.includes(normalizeArabic(w)));
+  if (hasRight && !hasLeft) return 'right';
+  if (hasLeft && !hasRight) return 'left';
+  return null;
+}
+
+// ============================================================================
 // محرك البحث الذكي
 // ============================================================================
 
@@ -857,6 +896,7 @@ function scoreCondition(
   condition: MedicalCondition,
   normalizedQuery: string,
   queryTokens: string[],
+  querySide: 'right' | 'left' | null = null,
 ): SearchResult {
   let score = 0;
   const matchedTerms: string[] = [];
@@ -927,6 +967,22 @@ function scoreCondition(
     }
   }
 
+  // 🆕 عقوبة/مكافأة الجهة (يمين / شمال)
+  if (querySide) {
+    const condSide = ABDOMEN_SIDE_MAP[condition.id];
+    if (condSide && condSide !== 'both' && condSide !== 'center') {
+      if (condSide !== querySide) {
+        // الحالة في الجهة الغلط → خصم كبير
+        score *= 0.1;
+        matchedTerms.push('wrong_side_penalty');
+      } else {
+        // الحالة في الجهة الصح → مكافأة
+        score += 300;
+        matchedTerms.push('right_side_bonus');
+      }
+    }
+  }
+
   return {
     condition,
     score: Math.round(score),
@@ -943,10 +999,11 @@ export function smartSearch(
   if (!normalizedQuery || normalizedQuery.length < 2) return [];
 
   const queryTokens = tokenize(normalizedQuery);
+  const querySide = detectSide(normalizedQuery);
   const results: SearchResult[] = [];
 
   for (const condition of conditions) {
-    const result = scoreCondition(condition, normalizedQuery, queryTokens);
+    const result = scoreCondition(condition, normalizedQuery, queryTokens, querySide);
     if (result.score > 0) results.push(result);
   }
 
@@ -1106,6 +1163,10 @@ export function debugSearch(query: string, maxResults = 10): Array<{
 
 export function getGenericConditionIds(): string[] {
   return [...GENERIC_CONDITION_IDS];
+}
+
+export function getAbdomenSideMap(): Record<string, string> {
+  return { ...ABDOMEN_SIDE_MAP };
 }
 
 // ============================================================================
