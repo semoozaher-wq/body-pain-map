@@ -8,14 +8,10 @@
  * UI layer (and the selection hook in `hooks/useMuscleSelection.ts`) can reason
  * about the human body in anatomical terms instead of raw SVG path ids.
  *
- * The map covers the 70 clinically meaningful muscle groups exposed to the user.
- * Some entries intentionally declare additional `svgAliases` because the source
- * artwork contains duplicated / suffixed path ids (e.g. `path1152-2`,
- * `path1304-3`) that must resolve to the same medical record.
- *
- * Additional decorative / skeletal paths remain clickable through the
- * silhouette component but are not part of the medical map (see
- * `MAPPED_MUSCLE_IDS`).
+ * The map intentionally covers the 70 clinically meaningful muscle groups that
+ * are exposed to the user. Additional decorative / skeletal paths present in
+ * the source artwork remain clickable through the silhouette component but are
+ * not part of the medical map (see `MAPPED_MUSCLE_IDS`).
  * ---------------------------------------------------------------------------
  */
 
@@ -41,13 +37,8 @@ export type BodyView = 'front' | 'back';
  * A single mapped muscle / muscle group.
  */
 export interface MuscleEntry {
-  /** The primary SVG `<path id="...">` this entry is bound to. */
+  /** The SVG `<path id="...">` this entry is bound to. */
   id: string;
-  /**
-   * Additional SVG `<path id>` values that must resolve to this same entry.
-   * Used for duplicated / suffixed ids in the source artwork.
-   */
-  svgAliases?: string[];
   /** Human readable anatomical name (English). */
   name: string;
   /** High level region the muscle belongs to. */
@@ -70,7 +61,6 @@ export interface MuscleMapStats {
   byView: Record<BodyView, number>;
   byRegion: Record<BodyRegion, number>;
   mappedIds: string[];
-  aliasCount: number;
 }
 
 /* ===========================================================================
@@ -193,11 +183,9 @@ export const MUSCLE_MAP: Record<string, MuscleEntry> = {
     view: 'front',
     relatedConditions: ['Intercostal neuralgia', 'Rib fracture', 'Pleuritic pain'],
   },
-
   /* ----------------------------- Back ----------------------------------- */
   path1152: {
     id: 'path1152',
-    svgAliases: ['path1152-2'],
     name: 'Trapezius (lower fibers)',
     region: 'back',
     muscleGroup: 'Scapular retractors',
@@ -238,7 +226,6 @@ export const MUSCLE_MAP: Record<string, MuscleEntry> = {
   },
   path1304: {
     id: 'path1304',
-    svgAliases: ['path1304-3'],
     name: 'Levator scapulae',
     region: 'back',
     muscleGroup: 'Scapular elevators',
@@ -659,42 +646,25 @@ export const MUSCLE_MAP: Record<string, MuscleEntry> = {
  * Derived collections
  * ======================================================================== */
 
+/**
+ * Set of every `<path id>` that has an associated {@link MuscleEntry}.
+ * Useful for fast membership checks without touching the map object.
+ */
+export const MAPPED_MUSCLE_IDS: Set<string> = new Set(Object.keys(MUSCLE_MAP));
+
 /** All mapped entries materialised once for reuse. */
 const ALL_MUSCLES: MuscleEntry[] = Object.values(MUSCLE_MAP);
-
-/**
- * Reverse index: any SVG id (primary or alias) -> its MuscleEntry.
- * Allows `getMuscleById('path1152-2')` to resolve correctly.
- */
-const ID_TO_ENTRY: Map<string, MuscleEntry> = (() => {
-  const map = new Map<string, MuscleEntry>();
-  for (const entry of ALL_MUSCLES) {
-    map.set(entry.id, entry);
-    if (entry.svgAliases) {
-      for (const alias of entry.svgAliases) {
-        map.set(alias, entry);
-      }
-    }
-  }
-  return map;
-})();
-
-/**
- * Set of every `<path id>` (primary + aliases) that has an associated
- * {@link MuscleEntry}. Useful for fast membership checks.
- */
-export const MAPPED_MUSCLE_IDS: Set<string> = new Set(ID_TO_ENTRY.keys());
 
 /* ===========================================================================
  * Query helpers
  * ======================================================================== */
 
 /**
- * Returns the muscle entry bound to a given SVG path id (or alias),
- * or `undefined` when the id is not part of the medical map.
+ * Returns the muscle entry bound to a given SVG path id, or `undefined` when
+ * the id is not part of the medical map.
  */
 export function getMuscleById(id: string): MuscleEntry | undefined {
-  return ID_TO_ENTRY.get(id);
+  return MUSCLE_MAP[id];
 }
 
 /**
@@ -730,17 +700,11 @@ export function getMuscleMapStats(): MuscleMapStats {
     byRegion[muscle.region] += 1;
   }
 
-  const aliasCount = ALL_MUSCLES.reduce(
-    (sum, m) => sum + (m.svgAliases?.length ?? 0),
-    0,
-  );
-
   return {
     total: ALL_MUSCLES.length,
     byView,
     byRegion,
     mappedIds: Array.from(MAPPED_MUSCLE_IDS),
-    aliasCount,
   };
 }
 
