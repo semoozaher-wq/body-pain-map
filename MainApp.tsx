@@ -12,6 +12,7 @@ import { Colors } from './constants/colors';
 import { Palette, Gradients, Radii, Elevation } from './constants/design';
 import { Gradient } from './components/Gradient';
 import { getTriageStatus } from './services/triage.js';
+import { createLocalId } from './services/id';
 
 // المكونات
 import { Header } from './components/Header';
@@ -92,7 +93,7 @@ export default function App() {
     const triageStatus = getTriageStatus(intensity, redFlags);
     const urgent = triageStatus === 'urgent';
     addRecord({
-      id: `${Date.now()}`,
+      id: createLocalId('checkup'),
       partId: selected.id,
       intensity,
       painType,
@@ -117,7 +118,7 @@ export default function App() {
 
   const saveSelfCareResult = (result: { guideKey: string; pointId?: string; before: number; after: number }) => {
     addRecord({
-      id: `self-care-${Date.now()}`,
+      id: createLocalId('self-care'),
       partId: `self-care:${result.guideKey}`,
       intensity: result.before,
       afterIntensity: result.after,
