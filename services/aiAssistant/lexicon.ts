@@ -1372,7 +1372,7 @@ export const REGION_LOCATIONS: RegionLocation[] = [
   // أسفل الظهر
   { id: 'lower-back-right', parent: 'lower-back', label: { ar: 'أسفل الظهر يمين', en: 'Lower back right', fr: 'Bas dos droite' }, keywords: { ar: ['اسفل ضهري يمين','قطني يمين'], en: ['lower back right'], fr: ['bas dos droite'] } },
   { id: 'lower-back-left', parent: 'lower-back', label: { ar: 'أسفل الظهر شمال', en: 'Lower back left', fr: 'Bas dos gauche' }, keywords: { ar: ['اسفل ضهري شمال','قطني شمال'], en: ['lower back left'], fr: ['bas dos gauche'] } },
-  { id: 'lower-back-center', parent: 'lower-back', label: { ar: 'نص أسفل الظهر', en: 'Lower back center', fr: 'Centre bas dos' }, keywords: { ar: ['اسفل ضهري','قطني'], en: ['lower back'], fr: ['bas du dos'] } },
+  { id: 'lower-back-center', parent: 'lower-back', label: { ar: 'نص أسفل الظهر', en: 'Center of lower back', fr: 'Centre du bas du dos' }, keywords: { ar: ['وسط ضهري', 'نص ضهري', 'نص اسفل ضهري', 'وسط اسفل ضهري', 'منتصف ضهري', 'منتصف الظهر'], en: ['center of lower back', 'middle of lower back', 'mid back'], fr: ['centre du bas du dos', 'milieu du bas du dos'] } },
 
   // الصدر
   { id: 'chest-right', parent: 'chest', label: { ar: 'الصدر يمين', en: 'Right chest', fr: 'Poitrine droite' }, keywords: { ar: ['صدري يمين'], en: ['right chest'], fr: ['poitrine droite'] } },

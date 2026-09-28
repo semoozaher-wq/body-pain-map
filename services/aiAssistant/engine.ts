@@ -397,7 +397,6 @@ export function detectRegionLocations(text: string): RegionLocation[] {
 }
 
 export function needsClarification(
-  regions: DetectedRegion[],
   regionLocations: RegionLocation[],
   abdomenLocations: DetectedLocation[],
   redFlags: DetectedRedFlag[],
@@ -407,10 +406,12 @@ export function needsClarification(
   if (regionLocations.length > 0) return false;
   if (abdomenLocations.length > 0) return false;
   if (organs.length > 0) return false;
-  // “My side/flank hurts” is genuinely ambiguous; specific regions such as
-  // eye, foot, groin, or breast are already actionable without another map
-  // question.
-  return regions.length === 0 || regions.some((region) => region.id === 'obliques');
+  // A broad body-region mention (for example "ضهري" / "ظهري") is not
+  // enough to produce disease results. The assistant must first establish the
+  // actual pain spot. Precise sub-locations (right/left/front/back/center) are
+  // already actionable.
+  // A detected region without a precise sub-location is still ambiguous.
+  return true;
 }
 
 function buildLocationQuestion(regions: DetectedRegion[], language: Lang): LocalizedText {
@@ -1303,7 +1304,7 @@ export function analyzeMessage(
 
   const organs = mergeLocationOrgans(detectedOrgans, locations);
   const missingLocation =
-    needsClarification(regions, regionLocations, locations, redFlags, organs) &&
+    needsClarification(regionLocations, locations, redFlags, organs) &&
     // A named place - even a vague one such as "\u0648\u0633\u0637 \u0627\u0644\u0638\u0647\u0631" - is a sufficient answer.
     !mentionsGenericArea(rawText);
   const mustAnswer = forceAnswer || askedEnough;
