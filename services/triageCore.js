@@ -36,7 +36,7 @@ const HIGH_INTENSITY_THRESHOLD = 8;
  * @returns {'routine' | 'high_reported_intensity' | 'urgent'}
  */
 function getTriageStatus(intensity, redFlags) {
-  if (Array.isArray(redFlags) && redFlags.length > 0) return 'urgent';
+  if (Array.isArray(redFlags) && redFlags.some((flag) => typeof flag === 'string' && flag.trim().length > 0)) return 'urgent';
   const value = Number(intensity);
   if (Number.isFinite(value) && value >= HIGH_INTENSITY_THRESHOLD) return 'high_reported_intensity';
   return 'routine';
