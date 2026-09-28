@@ -232,6 +232,32 @@ test('منطقة الجنب تتصرف بنفس الطريقة بالثلاث ل
   }
 });
 
+// ---------------------------------------------------------------------------
+// 9) الإصلاح: الصيغة المجرّدة "جنب" كانت لا تُطابق أي منطقة، فتضيع رسالة
+//    المستخدم في حالة سؤال الموقع وتتكرّر بلا داعٍ. الآن تُحلّ إلى الخواصر.
+// ---------------------------------------------------------------------------
+test('الإصلاح: "جنب" المجرّدة تُحلّ إلى الخواصر وتمنع ضياع الرسالة', () => {
+  assert.equal(
+    mentionsGenericArea('جنب'),
+    false,
+    '"جنب" تحلّ لمنطقة محددة، لذا ليست كلمة مكان عامة',
+  );
+  const reply = analyzeMessage('في وجع في جنب', 'ar', false, { askCount: 0, userTurnCount: 1 });
+  assert.ok(
+    reply.regions.some((region) => region.id === 'obliques'),
+    '"جنب" يجب أن تُفهم كخواصر',
+  );
+  assert.equal(reply.clarificationOnly, true, '"جنب" تسأل مرة واحدة فقط ولا تُسقَط');
+});
+
+test('الإصلاح: مكان عام بعد سؤال واحد ينهي السؤال بلا تكرار (جنب -> وسط)', () => {
+  const turns = runConversation(['في وجع في جنب', 'وسط']);
+  assert.equal(turns[0].reply.clarificationOnly, true, 'الرسالة الأولى تسأل');
+  assert.equal(turns[0].reply.regions.some((r) => r.id === 'obliques'), true, '"جنب" فُهمت كخواصر');
+  assert.equal(turns[1].reply.clarificationOnly, false, 'ذكر مكان عام بعد سؤال = إجابة كافية');
+  assert.equal(turns[1].forceAnswer, false, 'العدّاد لم يصل للحد، لكن المكان العام كفى');
+});
+
 test.after(() => {
   fs.rmSync(outfile, { force: true });
 });
