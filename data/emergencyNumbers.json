@@ -1,0 +1,233 @@
+{
+  "_meta": {
+    "version": 1,
+    "defaultCountry": "EG",
+    "needsConfirmationDefault": true,
+    "_warning": "DEFAULT VALUES - NOT VERIFIED. Emergency numbers change and differ by region. Every entry below is a best-effort default and MUST be confirmed by the app owner before release. See the comment block at the top of services/emergencyCore.js.",
+    "lastReviewed": "2026-09-28"
+  },
+  "countries": [
+    {
+      "code": "EG",
+      "name": { "ar": "مصر", "en": "Egypt", "fr": "Égypte" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "ambulance", "number": "123" },
+        { "key": "police", "number": "122" },
+        { "key": "fire", "number": "180" }
+      ]
+    },
+    {
+      "code": "SA",
+      "name": { "ar": "السعودية", "en": "Saudi Arabia", "fr": "Arabie saoudite" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "911" },
+        { "key": "ambulance", "number": "997" },
+        { "key": "police", "number": "999" },
+        { "key": "fire", "number": "998" }
+      ]
+    },
+    {
+      "code": "AE",
+      "name": { "ar": "الإمارات", "en": "United Arab Emirates", "fr": "Émirats arabes unis" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "police", "number": "999" },
+        { "key": "ambulance", "number": "998" },
+        { "key": "fire", "number": "997" }
+      ]
+    },
+    {
+      "code": "MA",
+      "name": { "ar": "المغرب", "en": "Morocco", "fr": "Maroc" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "ambulance", "number": "141" },
+        { "key": "police", "number": "190" },
+        { "key": "fire", "number": "150" }
+      ]
+    },
+    {
+      "code": "DZ",
+      "name": { "ar": "الجزائر", "en": "Algeria", "fr": "Algérie" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "ambulance", "number": "14" },
+        { "key": "police", "number": "17" },
+        { "key": "fire", "number": "14" }
+      ]
+    },
+    {
+      "code": "TN",
+      "name": { "ar": "تونس", "en": "Tunisia", "fr": "Tunisie" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "ambulance", "number": "190" },
+        { "key": "police", "number": "197" },
+        { "key": "fire", "number": "198" }
+      ]
+    },
+    {
+      "code": "LY",
+      "name": { "ar": "ليبيا", "en": "Libya", "fr": "Libye" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "ambulance", "number": "191" },
+        { "key": "police", "number": "193" },
+        { "key": "fire", "number": "192" }
+      ]
+    },
+    {
+      "code": "SD",
+      "name": { "ar": "السودان", "en": "Sudan", "fr": "Soudan" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "999" }
+      ]
+    },
+    {
+      "code": "JO",
+      "name": { "ar": "الأردن", "en": "Jordan", "fr": "Jordanie" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "911" },
+        { "key": "police", "number": "199" },
+        { "key": "ambulance", "number": "193" }
+      ]
+    },
+    {
+      "code": "LB",
+      "name": { "ar": "لبنان", "en": "Lebanon", "fr": "Liban" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "ambulance", "number": "140" },
+        { "key": "police", "number": "999" },
+        { "key": "fire", "number": "175" }
+      ]
+    },
+    {
+      "code": "KW",
+      "name": { "ar": "الكويت", "en": "Kuwait", "fr": "Koweït" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "112" },
+        { "key": "ambulance", "number": "777" }
+      ]
+    },
+    {
+      "code": "QA",
+      "name": { "ar": "قطر", "en": "Qatar", "fr": "Qatar" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "999" }
+      ]
+    },
+    {
+      "code": "BH",
+      "name": { "ar": "البحرين", "en": "Bahrain", "fr": "Bahreïn" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "999" }
+      ]
+    },
+    {
+      "code": "OM",
+      "name": { "ar": "عُمان", "en": "Oman", "fr": "Oman" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "9999" }
+      ]
+    },
+    {
+      "code": "YE",
+      "name": { "ar": "اليمن", "en": "Yemen", "fr": "Yémen" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "police", "number": "191" },
+        { "key": "ambulance", "number": "194" }
+      ]
+    },
+    {
+      "code": "PS",
+      "name": { "ar": "فلسطين", "en": "Palestine", "fr": "Palestine" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "ambulance", "number": "101" },
+        { "key": "police", "number": "100" },
+        { "key": "fire", "number": "102" }
+      ]
+    },
+    {
+      "code": "IQ",
+      "name": { "ar": "العراق", "en": "Iraq", "fr": "Irak" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "police", "number": "104" },
+        { "key": "ambulance", "number": "122" }
+      ]
+    },
+    {
+      "code": "TR",
+      "name": { "ar": "تركيا", "en": "Türkiye", "fr": "Turquie" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "112" }
+      ]
+    },
+    {
+      "code": "FR",
+      "name": { "ar": "فرنسا", "en": "France", "fr": "France" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "112" },
+        { "key": "ambulance", "number": "15" },
+        { "key": "police", "number": "17" },
+        { "key": "fire", "number": "18" }
+      ]
+    },
+    {
+      "code": "GB",
+      "name": { "ar": "المملكة المتحدة", "en": "United Kingdom", "fr": "Royaume-Uni" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "999" },
+        { "key": "alternative", "number": "112" }
+      ]
+    },
+    {
+      "code": "US",
+      "name": { "ar": "الولايات المتحدة", "en": "United States", "fr": "États-Unis" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "911" }
+      ]
+    },
+    {
+      "code": "DE",
+      "name": { "ar": "ألمانيا", "en": "Germany", "fr": "Allemagne" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "ambulance", "number": "112" },
+        { "key": "police", "number": "110" }
+      ]
+    },
+    {
+      "code": "CA",
+      "name": { "ar": "كندا", "en": "Canada", "fr": "Canada" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "911" }
+      ]
+    },
+    {
+      "code": "AU",
+      "name": { "ar": "أستراليا", "en": "Australia", "fr": "Australie" },
+      "needsConfirmation": true,
+      "numbers": [
+        { "key": "general", "number": "000" },
+        { "key": "alternative", "number": "112" }
+      ]
+    }
+  ]
+}
