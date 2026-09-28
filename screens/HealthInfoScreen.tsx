@@ -34,7 +34,7 @@ export const HealthInfoScreen: React.FC<Props> = ({ language, direction, onOpenA
     </View>
 
     {results.map(({ condition }: { condition: MedicalCondition }) => <ConditionCard key={condition.id} condition={condition} language={language} colors={colors} rtl={rtl} />)}
-    {organMatches.map(({ id, detail }) => <OrganCard key={id} id={id} detail={detail} language={language} colors={colors} rtl={rtl} />)}
+    {organMatches.map(({ id, detail }) => <OrganCard key={id} id={id} detail={detail} colors={colors} rtl={rtl} />)}
 
     {query.trim().length >= 2 && results.length === 0 && organMatches.length === 0 && <Text style={[styles.empty, { color: colors.textSecondary }]}>{t('ملقتش نتيجة مطابقة في المكتبة المحلية. جرّب كلمة أبسط أو اسأل المساعد الذكي.', 'No matching item was found in the local library. Try a simpler term or ask the AI assistant.', 'Aucun résultat correspondant dans la bibliothèque locale. Essayez un terme plus simple ou demandez à l’assistant IA.')}</Text>}
 
@@ -57,7 +57,7 @@ function ConditionCard({ condition, language, colors, rtl }: any) {
   </View>;
 }
 
-function OrganCard({ detail, language, colors, rtl }: any) {
+function OrganCard({ detail, colors, rtl }: any) {
   const name = detail.name;
   return <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
     <Text style={[styles.cardTitle, { color: colors.textPrimary, textAlign: rtl ? 'right' : 'left' }]}>{name}</Text>
