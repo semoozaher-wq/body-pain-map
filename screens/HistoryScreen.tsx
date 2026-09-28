@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
 import { Spacing, BorderRadius } from '../constants/spacing';
 import { Button } from '../components/Button';
