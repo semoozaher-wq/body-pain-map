@@ -225,6 +225,7 @@ export default function App() {
       {screen !== 'welcome' && (
         <Header
           title={getTitle()}
+          onBack={goBack}
           rightAction={(
             <View style={styles.headerActions}>
               <LanguageSwitcher language={language} onChange={setLanguage} />
