@@ -22,9 +22,20 @@
         "en": "Lower back pain usually from muscle strain, posture, or overload; improves with relative rest and gentle movement.",
         "fr": "Lombalgie souvent liée à un effort, une posture ou une surcharge ; s'améliore avec du repos relatif et un mouvement doux."
       },
-      "muscleGroups": ["lower-back", "gluteal", "obliques"],
-      "regions": ["back", "torso_front"],
-      "symptoms": ["hpo:0003326", "hpo:0003418", "hpo:0002829"],
+      "muscleGroups": [
+        "lower-back",
+        "gluteal",
+        "obliques"
+      ],
+      "regions": [
+        "back",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0003418",
+        "hpo:0002829"
+      ],
       "redFlags": {
         "ar": "فقدان التحكم في البول/البراز، خدر منطقة السرج، ضعف متزايد في الساقين، حرارة مع الألم.",
         "en": "Loss of bladder/bowel control, saddle numbness, progressive leg weakness, fever with pain.",
@@ -32,12 +43,23 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/backpain.html",
       "sources": [
-        { "title": "MedlinePlus — Back Pain", "url": "https://medlineplus.gov/backpain.html" },
-        { "title": "Disease Ontology", "url": "https://disease-ontology.org/" }
+        {
+          "title": "MedlinePlus — Back Pain",
+          "url": "https://medlineplus.gov/backpain.html"
+        },
+        {
+          "title": "Disease Ontology",
+          "url": "https://disease-ontology.org/"
+        }
       ],
       "taxonomy": {
         "subRegion": "lumbar_spine",
-        "structures": ["l1-l5", "lumbar-discs", "lumbar-facet-joints", "lumbar-roots"]
+        "structures": [
+          "l1-l5",
+          "lumbar-discs",
+          "lumbar-facet-joints",
+          "lumbar-roots"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -55,9 +77,20 @@
         "en": "Neck strain common with prolonged sitting, screens, or poor posture; often improves with stretching and ergonomics.",
         "fr": "Tension cervicale fréquente avec la position assise prolongée ou une mauvaise posture ; s'améliore par des étirements."
       },
-      "muscleGroups": ["neck", "trapezius", "upper-back"],
-      "regions": ["head_neck", "back"],
-      "symptoms": ["hpo:0003326", "hpo:0002829", "hpo:0003401"],
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "upper-back"
+      ],
+      "regions": [
+        "head_neck",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829",
+        "hpo:0003401"
+      ],
       "redFlags": {
         "ar": "ألم ينتشر للذراع مع ضعف، صعوبة في المشي، حرارة، أو بعد إصابة/حادث.",
         "en": "Pain radiating to arm with weakness, difficulty walking, fever, or after trauma/accident.",
@@ -65,11 +98,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/neckinjuriesanddisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Neck Injuries and Disorders", "url": "https://medlineplus.gov/neckinjuriesanddisorders.html" }
+        {
+          "title": "MedlinePlus — Neck Injuries and Disorders",
+          "url": "https://medlineplus.gov/neckinjuriesanddisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "cervical_spine",
-        "structures": ["c1-atlas", "c2-axis", "c3-c7", "atlanto-occipital-joint"]
+        "structures": [
+          "c1-atlas",
+          "c2-axis",
+          "c3-c7",
+          "atlanto-occipital-joint"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -87,9 +128,19 @@
         "en": "Shoulder pain worsening with arm elevation, common after repetitive overhead motion or with age.",
         "fr": "Douleur de l'épaule aggravée par l'élévation du bras, fréquente après des mouvements répétés."
       },
-      "muscleGroups": ["deltoids", "trapezius"],
-      "regions": ["upper_limb", "back"],
-      "symptoms": ["hpo:0002829", "hpo:0003326", "hpo:0001324"],
+      "muscleGroups": [
+        "deltoids",
+        "trapezius"
+      ],
+      "regions": [
+        "upper_limb",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326",
+        "hpo:0001324"
+      ],
       "redFlags": {
         "ar": "عدم القدرة على رفع الذراع إطلاقًا بعد إصابة، تشوه واضح، أو خدر مستمر.",
         "en": "Inability to lift the arm at all after injury, visible deformity, or persistent numbness.",
@@ -97,11 +148,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/shoulderinjuriesanddisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Shoulder Injuries and Disorders", "url": "https://medlineplus.gov/shoulderinjuriesanddisorders.html" }
+        {
+          "title": "MedlinePlus — Shoulder Injuries and Disorders",
+          "url": "https://medlineplus.gov/shoulderinjuriesanddisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "shoulder",
-        "structures": ["clavicle", "scapula", "humerus-head", "glenohumeral-joint"]
+        "structures": [
+          "clavicle",
+          "scapula",
+          "humerus-head",
+          "glenohumeral-joint"
+        ]
       },
       "icd10Status": "verified"
     },
@@ -119,9 +178,20 @@
         "en": "Gradual knee cartilage wear causing pain and stiffness that worsens with activity and eases with rest.",
         "fr": "Usure progressive du cartilage du genou causant douleur et raideur, aggravée par l'activité."
       },
-      "muscleGroups": ["knees", "quadriceps", "hamstring"],
-      "regions": ["lower_limb"],
-      "symptoms": ["hpo:0002829", "hpo:0003326", "hpo:0003401", "hpo:0001386"],
+      "muscleGroups": [
+        "knees",
+        "quadriceps",
+        "hamstring"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326",
+        "hpo:0003401",
+        "hpo:0001386"
+      ],
       "redFlags": {
         "ar": "تورم مفاجئ شديد، عدم القدرة على تحمل الوزن، قفل الركبة، أو حرارة واحمرار.",
         "en": "Sudden severe swelling, inability to bear weight, knee locking, or heat and redness.",
@@ -129,11 +199,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/kneeinjuriesanddisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Knee Injuries and Disorders", "url": "https://medlineplus.gov/kneeinjuriesanddisorders.html" }
+        {
+          "title": "MedlinePlus — Knee Injuries and Disorders",
+          "url": "https://medlineplus.gov/kneeinjuriesanddisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "knee",
-        "structures": ["distal-femur", "proximal-tibia", "patella", "tibiofemoral-joint"]
+        "structures": [
+          "distal-femur",
+          "proximal-tibia",
+          "patella",
+          "tibiofemoral-joint"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -151,9 +229,25 @@
         "en": "Widespread chronic muscle pain with fatigue and sleep disturbance across multiple body regions.",
         "fr": "Douleur musculaire diffuse chronique avec fatigue et troubles du sommeil."
       },
-      "muscleGroups": ["trapezius", "upper-back", "lower-back", "deltoids", "quadriceps"],
-      "regions": ["back", "upper_limb", "lower_limb", "torso_front"],
-      "symptoms": ["hpo:0003326", "hpo:0012378", "hpo:0002829", "hpo:0002360"],
+      "muscleGroups": [
+        "trapezius",
+        "upper-back",
+        "lower-back",
+        "deltoids",
+        "quadriceps"
+      ],
+      "regions": [
+        "back",
+        "upper_limb",
+        "lower_limb",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0012378",
+        "hpo:0002829",
+        "hpo:0002360"
+      ],
       "redFlags": {
         "ar": "ألم جديد غير معتاد، فقدان وزن، حرارة، أو ضعف عضلي حقيقي.",
         "en": "New unusual pain, weight loss, fever, or true muscle weakness.",
@@ -161,11 +255,16 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/fibromyalgia.html",
       "sources": [
-        { "title": "MedlinePlus — Fibromyalgia", "url": "https://medlineplus.gov/fibromyalgia.html" }
+        {
+          "title": "MedlinePlus — Fibromyalgia",
+          "url": "https://medlineplus.gov/fibromyalgia.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "paraspinal_soft_tissue",
-        "structures": ["thoracolumbar-fascia"]
+        "structures": [
+          "thoracolumbar-fascia"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -183,9 +282,19 @@
         "en": "Throbbing headache often on one side, may include nausea and light/sound sensitivity, worse with movement.",
         "fr": "Céphalée pulsatile souvent unilatérale, avec nausées et sensibilité à la lumière et au bruit."
       },
-      "muscleGroups": ["head", "neck"],
-      "regions": ["head_neck"],
-      "symptoms": ["hpo:0002076", "hpo:0002017", "hpo:0002321", "hpo:0000988"],
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002076",
+        "hpo:0002017",
+        "hpo:0002321",
+        "hpo:0000988"
+      ],
       "redFlags": {
         "ar": "صداع مفاجئ شديد جدًا (كالصاعقة)، ضعف أو تنميل في جانب الجسم، تشوش كلام، أو حرارة مع تيبس رقبة.",
         "en": "Sudden thunderclap headache, one-sided weakness or numbness, speech disturbance, or fever with neck stiffness.",
@@ -193,11 +302,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/migraine.html",
       "sources": [
-        { "title": "MedlinePlus — Migraine", "url": "https://medlineplus.gov/migraine.html" }
+        {
+          "title": "MedlinePlus — Migraine",
+          "url": "https://medlineplus.gov/migraine.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "cranium_facial",
-        "structures": ["skull-cranium", "facial-bones", "mandible", "tmj"]
+        "structures": [
+          "skull-cranium",
+          "facial-bones",
+          "mandible",
+          "tmj"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -215,9 +332,19 @@
         "en": "Pressure-like headache as if a band around the head, often from stress and neck/shoulder tension.",
         "fr": "Céphalée en étau autour de la tête, souvent liée au stress et à la tension cervicale."
       },
-      "muscleGroups": ["head", "neck", "trapezius"],
-      "regions": ["head_neck", "back"],
-      "symptoms": ["hpo:0002076", "hpo:0003401"],
+      "muscleGroups": [
+        "head",
+        "neck",
+        "trapezius"
+      ],
+      "regions": [
+        "head_neck",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0002076",
+        "hpo:0003401"
+      ],
       "redFlags": {
         "ar": "صداع جديد بعد سن 50، تغير في نمط الصداع المعتاد، أو أعراض عصبية.",
         "en": "New headache after age 50, change in usual pattern, or neurological symptoms.",
@@ -225,11 +352,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/headache.html",
       "sources": [
-        { "title": "MedlinePlus — Headache", "url": "https://medlineplus.gov/headache.html" }
+        {
+          "title": "MedlinePlus — Headache",
+          "url": "https://medlineplus.gov/headache.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "neck_soft_tissue",
-        "structures": ["scm-muscle", "scalenes", "cervical-lymph-nodes", "thyroid-gland"]
+        "structures": [
+          "scm-muscle",
+          "scalenes",
+          "cervical-lymph-nodes",
+          "thyroid-gland"
+        ]
       },
       "icd10Status": "verified"
     },
@@ -247,9 +382,24 @@
         "en": "Muscle pain from strain, viral infection, or medications, affecting multiple regions.",
         "fr": "Douleur musculaire due à un effort, une infection virale ou des médicaments."
       },
-      "muscleGroups": ["biceps", "triceps", "forearm", "calves", "quadriceps", "hamstring", "abs"],
-      "regions": ["upper_limb", "lower_limb", "torso_front"],
-      "symptoms": ["hpo:0003326", "hpo:0002829"],
+      "muscleGroups": [
+        "biceps",
+        "triceps",
+        "forearm",
+        "calves",
+        "quadriceps",
+        "hamstring",
+        "abs"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829"
+      ],
       "redFlags": {
         "ar": "ألم شديد مع بول داكن (لون الشاي)، ضعف، أو بعد أدوية الستاتين.",
         "en": "Severe pain with dark (tea-colored) urine, weakness, or after statin drugs.",
@@ -257,11 +407,16 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/muscledisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Muscle Disorders", "url": "https://medlineplus.gov/muscledisorders.html" }
+        {
+          "title": "MedlinePlus — Muscle Disorders",
+          "url": "https://medlineplus.gov/muscledisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "paraspinal_soft_tissue",
-        "structures": ["thoracolumbar-fascia"]
+        "structures": [
+          "thoracolumbar-fascia"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -279,9 +434,20 @@
         "en": "Ligament stretch or tear after ankle twisting, causing pain, swelling, and difficulty walking.",
         "fr": "Étirement ou déchirure des ligaments après une torsion, avec douleur et gonflement."
       },
-      "muscleGroups": ["ankles", "calves", "feet", "tibialis"],
-      "regions": ["lower_limb"],
-      "symptoms": ["hpo:0002829", "hpo:0001386", "hpo:0003326"],
+      "muscleGroups": [
+        "ankles",
+        "calves",
+        "feet",
+        "tibialis"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0001386",
+        "hpo:0003326"
+      ],
       "redFlags": {
         "ar": "عدم القدرة على تحمل الوزن 4 خطوات، تشوه، أو خدر في القدم.",
         "en": "Inability to bear weight 4 steps, deformity, or foot numbness.",
@@ -289,11 +455,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/ankleinjuriesanddisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Ankle Injuries and Disorders", "url": "https://medlineplus.gov/ankleinjuriesanddisorders.html" }
+        {
+          "title": "MedlinePlus — Ankle Injuries and Disorders",
+          "url": "https://medlineplus.gov/ankleinjuriesanddisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "ankle_foot",
-        "structures": ["talus", "calcaneus", "metatarsals-foot", "plantar-fascia"]
+        "structures": [
+          "talus",
+          "calcaneus",
+          "metatarsals-foot",
+          "plantar-fascia"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -311,9 +485,18 @@
         "en": "Heel/foot pain worse with first morning steps or after rest, common with prolonged standing.",
         "fr": "Douleur du talon aggravée aux premiers pas du matin ou après le repos."
       },
-      "muscleGroups": ["feet", "calves", "tibialis"],
-      "regions": ["lower_limb"],
-      "symptoms": ["hpo:0002829", "hpo:0003326"],
+      "muscleGroups": [
+        "feet",
+        "calves",
+        "tibialis"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326"
+      ],
       "redFlags": {
         "ar": "خدر أو حرقان مستمر، فقدان إحساس، أو ألم ليلي شديد.",
         "en": "Persistent numbness or burning, loss of sensation, or severe night pain.",
@@ -321,11 +504,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/footinjuriesanddisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Foot Injuries and Disorders", "url": "https://medlineplus.gov/footinjuriesanddisorders.html" }
+        {
+          "title": "MedlinePlus — Foot Injuries and Disorders",
+          "url": "https://medlineplus.gov/footinjuriesanddisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "ankle_foot",
-        "structures": ["talus", "calcaneus", "metatarsals-foot", "plantar-fascia"]
+        "structures": [
+          "talus",
+          "calcaneus",
+          "metatarsals-foot",
+          "plantar-fascia"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -343,9 +534,18 @@
         "en": "Hand or wrist pain from repetitive motion or poor posture, may include mild numbness.",
         "fr": "Douleur de la main ou du poignet due à des mouvements répétitifs."
       },
-      "muscleGroups": ["hands", "forearm"],
-      "regions": ["upper_limb"],
-      "symptoms": ["hpo:0002829", "hpo:0003401", "hpo:0003326"],
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003401",
+        "hpo:0003326"
+      ],
       "redFlags": {
         "ar": "خدر وضعف مستمر في اليد، تورم مفصل، أو ألم ليلي يوقظك.",
         "en": "Persistent hand numbness and weakness, joint swelling, or night pain waking you.",
@@ -353,11 +553,17 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/arminjuriesanddisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Arm Injuries and Disorders", "url": "https://medlineplus.gov/arminjuriesanddisorders.html" }
+        {
+          "title": "MedlinePlus — Arm Injuries and Disorders",
+          "url": "https://medlineplus.gov/arminjuriesanddisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "elbow",
-        "structures": ["elbow-joint", "ulnar-collateral-ligament"]
+        "structures": [
+          "elbow-joint",
+          "ulnar-collateral-ligament"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -375,9 +581,25 @@
         "en": "Sudden muscle strain or spasm after effort or wrong movement, causing localized pain.",
         "fr": "Contracture ou spasme musculaire soudain après un effort ou un mauvais mouvement."
       },
-      "muscleGroups": ["trapezius", "upper-back", "lower-back", "hamstring", "quadriceps", "calves", "biceps", "triceps"],
-      "regions": ["back", "lower_limb", "upper_limb"],
-      "symptoms": ["hpo:0003326", "hpo:0002829"],
+      "muscleGroups": [
+        "trapezius",
+        "upper-back",
+        "lower-back",
+        "hamstring",
+        "quadriceps",
+        "calves",
+        "biceps",
+        "triceps"
+      ],
+      "regions": [
+        "back",
+        "lower_limb",
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829"
+      ],
       "redFlags": {
         "ar": "تشنج مستمر مع ضعف، ألم لا يتحسن، أو تورم واضح.",
         "en": "Persistent spasm with weakness, non-improving pain, or obvious swelling.",
@@ -385,11 +607,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/sprainsandstrains.html",
       "sources": [
-        { "title": "MedlinePlus — Sprains and Strains", "url": "https://medlineplus.gov/sprainsandstrains.html" }
+        {
+          "title": "MedlinePlus — Sprains and Strains",
+          "url": "https://medlineplus.gov/sprainsandstrains.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "thigh",
-        "structures": ["femur-shaft", "quadriceps", "hamstrings", "adductors"]
+        "structures": [
+          "femur-shaft",
+          "quadriceps",
+          "hamstrings",
+          "adductors"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -407,9 +637,23 @@
         "en": "Tendon inflammation causing localized pain worse with movement, common with overuse.",
         "fr": "Inflammation du tendon causant une douleur locale aggravée par le mouvement."
       },
-      "muscleGroups": ["deltoids", "forearm", "hands", "ankles", "feet", "knees"],
-      "regions": ["upper_limb", "lower_limb"],
-      "symptoms": ["hpo:0002829", "hpo:0003326", "hpo:0001386"],
+      "muscleGroups": [
+        "deltoids",
+        "forearm",
+        "hands",
+        "ankles",
+        "feet",
+        "knees"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326",
+        "hpo:0001386"
+      ],
       "redFlags": {
         "ar": "سماع صوت طقطقة مع ألم مفاجئ (احتمال تمزق)، أو عدم قدرة على الحركة.",
         "en": "A pop sound with sudden pain (possible tear), or inability to move.",
@@ -417,11 +661,16 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/tendinitis.html",
       "sources": [
-        { "title": "MedlinePlus — Tendinitis", "url": "https://medlineplus.gov/tendinitis.html" }
+        {
+          "title": "MedlinePlus — Tendinitis",
+          "url": "https://medlineplus.gov/tendinitis.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "paraspinal_soft_tissue",
-        "structures": ["thoracolumbar-fascia"]
+        "structures": [
+          "thoracolumbar-fascia"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -439,9 +688,24 @@
         "en": "Gradual joint cartilage wear causing pain and stiffness worse with activity.",
         "fr": "Usure progressive du cartilage articulaire causant douleur et raideur."
       },
-      "muscleGroups": ["knees", "hands", "ankles", "lower-back", "neck"],
-      "regions": ["lower_limb", "upper_limb", "back", "head_neck"],
-      "symptoms": ["hpo:0002829", "hpo:0003326", "hpo:0003401"],
+      "muscleGroups": [
+        "knees",
+        "hands",
+        "ankles",
+        "lower-back",
+        "neck"
+      ],
+      "regions": [
+        "lower_limb",
+        "upper_limb",
+        "back",
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326",
+        "hpo:0003401"
+      ],
       "redFlags": {
         "ar": "تورم مفاجئ، احمرار وحرارة، أو عدم قدرة على تحريك المفصل.",
         "en": "Sudden swelling, redness and heat, or inability to move the joint.",
@@ -449,11 +713,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/osteoarthritis.html",
       "sources": [
-        { "title": "MedlinePlus — Osteoarthritis", "url": "https://medlineplus.gov/osteoarthritis.html" }
+        {
+          "title": "MedlinePlus — Osteoarthritis",
+          "url": "https://medlineplus.gov/osteoarthritis.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "knee",
-        "structures": ["distal-femur", "proximal-tibia", "patella", "tibiofemoral-joint"]
+        "structures": [
+          "distal-femur",
+          "proximal-tibia",
+          "patella",
+          "tibiofemoral-joint"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -471,9 +743,21 @@
         "en": "Chronic immune disease causing joint inflammation (often hands/feet) with morning stiffness and symmetric swelling.",
         "fr": "Maladie immunitaire chronique avec inflammation articulaire, raideur matinale et gonflement symétrique."
       },
-      "muscleGroups": ["hands", "feet", "knees", "forearm"],
-      "regions": ["upper_limb", "lower_limb"],
-      "symptoms": ["hpo:0002829", "hpo:0001386", "hpo:0012378"],
+      "muscleGroups": [
+        "hands",
+        "feet",
+        "knees",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0001386",
+        "hpo:0012378"
+      ],
       "redFlags": {
         "ar": "تورم مفاصل متعدد ومتماثل، حرارة، أو أعراض عامة مستمرة.",
         "en": "Multiple symmetric joint swelling, fever, or persistent systemic symptoms.",
@@ -481,11 +765,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/rheumatoidarthritis.html",
       "sources": [
-        { "title": "MedlinePlus — Rheumatoid Arthritis", "url": "https://medlineplus.gov/rheumatoidarthritis.html" }
+        {
+          "title": "MedlinePlus — Rheumatoid Arthritis",
+          "url": "https://medlineplus.gov/rheumatoidarthritis.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "wrist_hand",
-        "structures": ["carpal-bones", "metacarpals", "radiocarpal-joint", "carpal-tunnel"]
+        "structures": [
+          "carpal-bones",
+          "metacarpals",
+          "radiocarpal-joint",
+          "carpal-tunnel"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -503,9 +795,17 @@
         "en": "Wrist nerve compression causing tingling in the hand (thumb/index), worse at night.",
         "fr": "Compression nerveuse au poignet causant picotements dans la main, pire la nuit."
       },
-      "muscleGroups": ["hands", "forearm"],
-      "regions": ["upper_limb"],
-      "symptoms": ["hpo:0003401", "hpo:0002829"],
+      "muscleGroups": [
+        "hands",
+        "forearm"
+      ],
+      "regions": [
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0002829"
+      ],
       "redFlags": {
         "ar": "ضعف مستمر في الإبهام، ضمور عضلي، أو فقدان إحساس دائم.",
         "en": "Persistent thumb weakness, muscle wasting, or permanent loss of sensation.",
@@ -513,11 +813,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/carpaltunnelsyndrome.html",
       "sources": [
-        { "title": "MedlinePlus — Carpal Tunnel Syndrome", "url": "https://medlineplus.gov/carpaltunnelsyndrome.html" }
+        {
+          "title": "MedlinePlus — Carpal Tunnel Syndrome",
+          "url": "https://medlineplus.gov/carpaltunnelsyndrome.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "wrist_hand",
-        "structures": ["carpal-bones", "metacarpals", "radiocarpal-joint", "carpal-tunnel"]
+        "structures": [
+          "carpal-bones",
+          "metacarpals",
+          "radiocarpal-joint",
+          "carpal-tunnel"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -535,9 +843,24 @@
         "en": "Neck disc herniation that may compress a nerve, causing arm pain with tingling.",
         "fr": "Hernie discale cervicale pouvant comprimer un nerf, causant douleur et picotements au bras."
       },
-      "muscleGroups": ["neck", "trapezius", "deltoids", "biceps", "triceps", "forearm"],
-      "regions": ["head_neck", "upper_limb", "back"],
-      "symptoms": ["hpo:0003401", "hpo:0002829", "hpo:0003326"],
+      "muscleGroups": [
+        "neck",
+        "trapezius",
+        "deltoids",
+        "biceps",
+        "triceps",
+        "forearm"
+      ],
+      "regions": [
+        "head_neck",
+        "upper_limb",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0002829",
+        "hpo:0003326"
+      ],
       "redFlags": {
         "ar": "ضعف في الذراع أو اليد، صعوبة المشي، أو فقدان التحكم في المثانة.",
         "en": "Arm/hand weakness, difficulty walking, or loss of bladder control.",
@@ -545,11 +868,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/herniateddisk.html",
       "sources": [
-        { "title": "MedlinePlus — Herniated Disk", "url": "https://medlineplus.gov/herniateddisk.html" }
+        {
+          "title": "MedlinePlus — Herniated Disk",
+          "url": "https://medlineplus.gov/herniateddisk.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "cervical_spine",
-        "structures": ["c1-atlas", "c2-axis", "c3-c7", "atlanto-occipital-joint"]
+        "structures": [
+          "c1-atlas",
+          "c2-axis",
+          "c3-c7",
+          "atlanto-occipital-joint"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -567,9 +898,22 @@
         "en": "Lower back disc herniation that may compress a nerve, causing leg pain (sciatica).",
         "fr": "Hernie discale lombaire pouvant comprimer un nerf, causant une douleur à la jambe (sciatique)."
       },
-      "muscleGroups": ["lower-back", "gluteal", "hamstring", "calves", "quadriceps"],
-      "regions": ["back", "lower_limb"],
-      "symptoms": ["hpo:0003401", "hpo:0002829", "hpo:0003326"],
+      "muscleGroups": [
+        "lower-back",
+        "gluteal",
+        "hamstring",
+        "calves",
+        "quadriceps"
+      ],
+      "regions": [
+        "back",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0002829",
+        "hpo:0003326"
+      ],
       "redFlags": {
         "ar": "خدر منطقة السرج، فقدان التحكم في البول/البراز، ضعف متزايد في الساق.",
         "en": "Saddle numbness, loss of bladder/bowel control, progressive leg weakness.",
@@ -577,11 +921,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/sciatica.html",
       "sources": [
-        { "title": "MedlinePlus — Sciatica", "url": "https://medlineplus.gov/sciatica.html" }
+        {
+          "title": "MedlinePlus — Sciatica",
+          "url": "https://medlineplus.gov/sciatica.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "lumbar_spine",
-        "structures": ["l1-l5", "lumbar-discs", "lumbar-facet-joints", "lumbar-roots"]
+        "structures": [
+          "l1-l5",
+          "lumbar-discs",
+          "lumbar-facet-joints",
+          "lumbar-roots"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -599,9 +951,21 @@
         "en": "Peripheral nerve damage causing numbness, burning, and tingling in hands and feet, common with diabetes.",
         "fr": "Atteinte des nerfs périphériques causant engourdissement et brûlure des mains et pieds."
       },
-      "muscleGroups": ["feet", "hands", "calves", "forearm", "tibialis"],
-      "regions": ["lower_limb", "upper_limb"],
-      "symptoms": ["hpo:0003401", "hpo:0002829"],
+      "muscleGroups": [
+        "feet",
+        "hands",
+        "calves",
+        "forearm",
+        "tibialis"
+      ],
+      "regions": [
+        "lower_limb",
+        "upper_limb"
+      ],
+      "symptoms": [
+        "hpo:0003401",
+        "hpo:0002829"
+      ],
       "redFlags": {
         "ar": "ضعف متزايد، فقدان إحساس، أو تقرحات في القدم لا تلتئم.",
         "en": "Progressive weakness, loss of sensation, or non-healing foot ulcers.",
@@ -609,11 +973,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/peripheralnervedisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Peripheral Nerve Disorders", "url": "https://medlineplus.gov/peripheralnervedisorders.html" }
+        {
+          "title": "MedlinePlus — Peripheral Nerve Disorders",
+          "url": "https://medlineplus.gov/peripheralnervedisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "lower_leg",
-        "structures": ["tibia", "fibula", "gastrocnemius", "soleus"]
+        "structures": [
+          "tibia",
+          "fibula",
+          "gastrocnemius",
+          "soleus"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -631,9 +1003,17 @@
         "en": "Chronic high blood pressure may cause headache and neck pain, and raises heart risk.",
         "fr": "Hypertension chronique pouvant causer céphalée et cervicalgie."
       },
-      "muscleGroups": ["head", "neck"],
-      "regions": ["head_neck"],
-      "symptoms": ["hpo:0002076", "hpo:0000822"],
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002076",
+        "hpo:0000822"
+      ],
       "redFlags": {
         "ar": "صداع شديد مفاجئ، ألم صدر، ضيق نفس، أو اضطراب رؤية.",
         "en": "Severe sudden headache, chest pain, shortness of breath, or vision changes.",
@@ -641,11 +1021,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/highbloodpressure.html",
       "sources": [
-        { "title": "MedlinePlus — High Blood Pressure", "url": "https://medlineplus.gov/highbloodpressure.html" }
+        {
+          "title": "MedlinePlus — High Blood Pressure",
+          "url": "https://medlineplus.gov/highbloodpressure.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "thoracic_cavity",
-        "structures": ["heart", "aorta", "lungs", "pleura"]
+        "structures": [
+          "heart",
+          "aorta",
+          "lungs",
+          "pleura"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -663,9 +1051,17 @@
         "en": "Stomach acid reflux causing chest burning and pain that may mimic heart pain, worse after meals.",
         "fr": "Reflux acide causant brûlure et douleur thoracique, pire après les repas."
       },
-      "muscleGroups": ["chest", "abs"],
-      "regions": ["torso_front"],
-      "symptoms": ["hpo:0002020", "hpo:0002829"],
+      "muscleGroups": [
+        "chest",
+        "abs"
+      ],
+      "regions": [
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0002020",
+        "hpo:0002829"
+      ],
       "redFlags": {
         "ar": "ألم صدر ضاغط ينتشر للذراع/الفك، ضيق نفس، أو تعرق (اشتباه قلب — إسعاف فوري).",
         "en": "Pressing chest pain radiating to arm/jaw, shortness of breath, or sweating (possible heart — emergency).",
@@ -673,11 +1069,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/gerd.html",
       "sources": [
-        { "title": "MedlinePlus — GERD", "url": "https://medlineplus.gov/gerd.html" }
+        {
+          "title": "MedlinePlus — GERD",
+          "url": "https://medlineplus.gov/gerd.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "abdominal_cavity",
-        "structures": ["stomach", "small-intestine", "colon", "liver"]
+        "structures": [
+          "stomach",
+          "small-intestine",
+          "colon",
+          "liver"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -695,9 +1099,25 @@
         "en": "Muscle pain 24–72 hours after unaccustomed exercise, gradually improving with gentle movement.",
         "fr": "Douleur musculaire 24–72 h après un effort inhabituel, s'améliore par un mouvement doux."
       },
-      "muscleGroups": ["biceps", "triceps", "quadriceps", "hamstring", "calves", "abs", "obliques", "adductors"],
-      "regions": ["upper_limb", "lower_limb", "torso_front"],
-      "symptoms": ["hpo:0003326", "hpo:0002829"],
+      "muscleGroups": [
+        "biceps",
+        "triceps",
+        "quadriceps",
+        "hamstring",
+        "calves",
+        "abs",
+        "obliques",
+        "adductors"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "torso_front"
+      ],
+      "symptoms": [
+        "hpo:0003326",
+        "hpo:0002829"
+      ],
       "redFlags": {
         "ar": "بول داكن، ألم شديد متزايد، تورم، أو ضعف حقيقي.",
         "en": "Dark urine, severe worsening pain, swelling, or true weakness.",
@@ -705,11 +1125,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/exerciseandphysicalfitness.html",
       "sources": [
-        { "title": "MedlinePlus — Exercise and Physical Fitness", "url": "https://medlineplus.gov/exerciseandphysicalfitness.html" }
+        {
+          "title": "MedlinePlus — Exercise and Physical Fitness",
+          "url": "https://medlineplus.gov/exerciseandphysicalfitness.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "thigh",
-        "structures": ["femur-shaft", "quadriceps", "hamstrings", "adductors"]
+        "structures": [
+          "femur-shaft",
+          "quadriceps",
+          "hamstrings",
+          "adductors"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -727,9 +1155,24 @@
         "en": "Joint pain without obvious swelling, may result from strain, infection, or immune conditions.",
         "fr": "Douleur articulaire sans gonflement évident, due à un effort, une infection ou une maladie immunitaire."
       },
-      "muscleGroups": ["knees", "ankles", "hands", "feet", "lower-back", "neck"],
-      "regions": ["lower_limb", "upper_limb", "back", "head_neck"],
-      "symptoms": ["hpo:0002829", "hpo:0003326"],
+      "muscleGroups": [
+        "knees",
+        "ankles",
+        "hands",
+        "feet",
+        "lower-back",
+        "neck"
+      ],
+      "regions": [
+        "lower_limb",
+        "upper_limb",
+        "back",
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0003326"
+      ],
       "redFlags": {
         "ar": "مفصل أحمر ساخن متورم، حرارة، أو عدم قدرة على الحركة.",
         "en": "A red, hot, swollen joint, fever, or inability to move.",
@@ -737,11 +1180,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/jointdisorders.html",
       "sources": [
-        { "title": "MedlinePlus — Joint Disorders", "url": "https://medlineplus.gov/jointdisorders.html" }
+        {
+          "title": "MedlinePlus — Joint Disorders",
+          "url": "https://medlineplus.gov/jointdisorders.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "knee",
-        "structures": ["distal-femur", "proximal-tibia", "patella", "tibiofemoral-joint"]
+        "structures": [
+          "distal-femur",
+          "proximal-tibia",
+          "patella",
+          "tibiofemoral-joint"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -760,9 +1211,17 @@
         "en": "Very severe one-sided headache (often around the eye), occurring in clusters with eye redness and runny nose.",
         "fr": "Céphalée très sévère unilatérale (souvent péri-orbitaire), en salves avec œil rouge et nez qui coule."
       },
-      "muscleGroups": ["head", "neck"],
-      "regions": ["head_neck"],
-      "symptoms": ["hpo:0002076", "hpo:0000988"],
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002076",
+        "hpo:0000988"
+      ],
       "redFlags": {
         "ar": "صداع شديد مفاجئ أو مع أعراض عصبية، أو أول نوبة — راجع طبيب.",
         "en": "Sudden severe headache with neurological symptoms, or first episode — see a doctor.",
@@ -770,11 +1229,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/clusterheadaches.html",
       "sources": [
-        { "title": "MedlinePlus — Cluster Headaches", "url": "https://medlineplus.gov/clusterheadaches.html" }
+        {
+          "title": "MedlinePlus — Cluster Headaches",
+          "url": "https://medlineplus.gov/clusterheadaches.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "cranium_facial",
-        "structures": ["skull-cranium", "facial-bones", "orbit", "ocular-globe"]
+        "structures": [
+          "skull-cranium",
+          "facial-bones",
+          "orbit",
+          "ocular-globe"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -793,9 +1260,17 @@
         "en": "Sinus inflammation causing facial or forehead pain/pressure, worse when bending forward, with nasal congestion or discharge.",
         "fr": "Inflammation des sinus causant douleur/pression faciale ou frontale, aggravée en se penchant, avec congestion nasale."
       },
-      "muscleGroups": ["head", "neck"],
-      "regions": ["head_neck"],
-      "symptoms": ["hpo:0002076", "hpo:0000988"],
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002076",
+        "hpo:0000988"
+      ],
       "redFlags": {
         "ar": "تورّم حول العين، حرارة عالية، أو ألم شديد — راجع طبيب فورًا.",
         "en": "Swelling around the eye, high fever, or severe pain — see a doctor promptly.",
@@ -803,11 +1278,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/sinusitis.html",
       "sources": [
-        { "title": "MedlinePlus — Sinusitis", "url": "https://medlineplus.gov/sinusitis.html" }
+        {
+          "title": "MedlinePlus — Sinusitis",
+          "url": "https://medlineplus.gov/sinusitis.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "cranium_facial",
-        "structures": ["maxillary-sinus", "frontal-sinus", "ethmoid-sinus", "sphenoid-sinus"]
+        "structures": [
+          "maxillary-sinus",
+          "frontal-sinus",
+          "ethmoid-sinus",
+          "sphenoid-sinus"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -826,9 +1309,17 @@
         "en": "Middle ear infection causing ear pain, sometimes with fever, hearing loss, or discharge.",
         "fr": "Infection de l'oreille moyenne causant douleur, parfois fièvre, baisse d'audition ou écoulement."
       },
-      "muscleGroups": ["head", "neck"],
-      "regions": ["head_neck"],
-      "symptoms": ["hpo:0001945", "hpo:0000988"],
+      "muscleGroups": [
+        "head",
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0001945",
+        "hpo:0000988"
+      ],
       "redFlags": {
         "ar": "إفراز من الأذن، تورّم حول الأذن، أو ألم شديد مع حرارة — راجع طبيب.",
         "en": "Ear discharge, swelling around the ear, or severe pain with fever — see a doctor.",
@@ -836,11 +1327,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/earinfections.html",
       "sources": [
-        { "title": "MedlinePlus — Ear Infections", "url": "https://medlineplus.gov/earinfections.html" }
+        {
+          "title": "MedlinePlus — Ear Infections",
+          "url": "https://medlineplus.gov/earinfections.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "cranium_facial",
-        "structures": ["external-ear", "middle-ear", "inner-ear", "temporal-bone"]
+        "structures": [
+          "external-ear",
+          "middle-ear",
+          "inner-ear",
+          "temporal-bone"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -859,9 +1358,15 @@
         "en": "Pain in one or more teeth, worse with chewing or hot/cold, often from decay or infection.",
         "fr": "Douleur d'une ou plusieurs dents, aggravée par la mastication ou le chaud/froid, souvent carie ou infection."
       },
-      "muscleGroups": ["head"],
-      "regions": ["head_neck"],
-      "symptoms": ["hpo:0002076"],
+      "muscleGroups": [
+        "head"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0002076"
+      ],
       "redFlags": {
         "ar": "تورّم في الوجه أو الفك، حرارة، أو صعوبة في البلع أو التنفس — راجع طبيب أسنان فورًا.",
         "en": "Facial or jaw swelling, fever, or difficulty swallowing or breathing — see a dentist promptly.",
@@ -869,11 +1374,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/toothdecay.html",
       "sources": [
-        { "title": "MedlinePlus — Tooth Decay", "url": "https://medlineplus.gov/toothdecay.html" }
+        {
+          "title": "MedlinePlus — Tooth Decay",
+          "url": "https://medlineplus.gov/toothdecay.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "cranium_facial",
-        "structures": ["teeth", "mandible", "tmj", "facial-bones"]
+        "structures": [
+          "teeth",
+          "mandible",
+          "tmj",
+          "facial-bones"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -892,9 +1405,15 @@
         "en": "Throat inflammation causing pain and burning, worse when swallowing, sometimes with redness or fever.",
         "fr": "Inflammation de la gorge : douleur et brûlure aggravées à la déglutition, parfois rougeur ou fièvre."
       },
-      "muscleGroups": ["neck"],
-      "regions": ["head_neck"],
-      "symptoms": ["hpo:0001945"],
+      "muscleGroups": [
+        "neck"
+      ],
+      "regions": [
+        "head_neck"
+      ],
+      "symptoms": [
+        "hpo:0001945"
+      ],
       "redFlags": {
         "ar": "صعوبة في التنفس أو بلع اللعاب، سيلان لعاب، أو تورّم في الرقبة — راجع الطوارئ.",
         "en": "Difficulty breathing or swallowing saliva, drooling, or neck swelling — seek emergency care.",
@@ -902,11 +1421,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/sorethroat.html",
       "sources": [
-        { "title": "MedlinePlus — Sore Throat", "url": "https://medlineplus.gov/sorethroat.html" }
+        {
+          "title": "MedlinePlus — Sore Throat",
+          "url": "https://medlineplus.gov/sorethroat.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "neck_soft_tissue",
-        "structures": ["pharynx", "larynx", "cervical-lymph-nodes", "thyroid-gland"]
+        "structures": [
+          "pharynx",
+          "larynx",
+          "cervical-lymph-nodes",
+          "thyroid-gland"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -925,9 +1452,19 @@
         "en": "High uric acid causing sudden severe joint pain (often big toe) with redness and swelling.",
         "fr": "Acide urique élevé causant une douleur articulaire brutale (souvent gros orteil) avec rougeur et gonflement."
       },
-      "muscleGroups": ["feet", "ankles", "knees"],
-      "regions": ["lower_limb"],
-      "symptoms": ["hpo:0002829", "hpo:0001386", "hpo:0001369"],
+      "muscleGroups": [
+        "feet",
+        "ankles",
+        "knees"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0001386",
+        "hpo:0001369"
+      ],
       "redFlags": {
         "ar": "مفصل أحمر ساخن متورم مع حرارة — راجع طبيب (احتمال عدوى).",
         "en": "Red, hot, swollen joint with fever — see a doctor (possible infection).",
@@ -935,11 +1472,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/gout.html",
       "sources": [
-        { "title": "MedlinePlus — Gout", "url": "https://medlineplus.gov/gout.html" }
+        {
+          "title": "MedlinePlus — Gout",
+          "url": "https://medlineplus.gov/gout.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "ankle_foot",
-        "structures": ["metatarsals-foot", "phalanges-foot", "ankle-joint", "subtalar-joint"]
+        "structures": [
+          "metatarsals-foot",
+          "phalanges-foot",
+          "ankle-joint",
+          "subtalar-joint"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -958,9 +1503,20 @@
         "en": "Bursa inflammation causing localized pain and swelling, worse with movement or pressure.",
         "fr": "Inflammation de la bourse séreuse : douleur locale et gonflement, aggravés par le mouvement ou la pression."
       },
-      "muscleGroups": ["shoulder", "knees", "hip", "elbow"],
-      "regions": ["upper_limb", "lower_limb"],
-      "symptoms": ["hpo:0002829", "hpo:0001386"],
+      "muscleGroups": [
+        "deltoids",
+        "knees",
+        "gluteal",
+        "triceps"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0001386"
+      ],
       "redFlags": {
         "ar": "تورم شديد، احمرار وحرارة، أو عدم قدرة على الحركة — راجع طبيب.",
         "en": "Severe swelling, redness and heat, or inability to move — see a doctor.",
@@ -968,11 +1524,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/bursitis.html",
       "sources": [
-        { "title": "MedlinePlus — Bursitis", "url": "https://medlineplus.gov/bursitis.html" }
+        {
+          "title": "MedlinePlus — Bursitis",
+          "url": "https://medlineplus.gov/bursitis.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "shoulder",
-        "structures": ["subacromial-bursa", "glenohumeral-joint", "rotator-cuff", "deltoid"]
+        "structures": [
+          "subacromial-bursa",
+          "glenohumeral-joint",
+          "rotator-cuff",
+          "deltoid"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -991,9 +1555,16 @@
         "en": "Enlarged, twisted veins in the legs causing heaviness, pain, and swelling, worse with prolonged standing.",
         "fr": "Veines dilatées et tortueuses des jambes : lourdeur, douleur et gonflement, aggravés par la station debout."
       },
-      "muscleGroups": ["calves", "legs", "ankles"],
-      "regions": ["lower_limb"],
-      "symptoms": ["hpo:0002829"],
+      "muscleGroups": [
+        "calves",
+        "ankles"
+      ],
+      "regions": [
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0002829"
+      ],
       "redFlags": {
         "ar": "تورم في ساق واحدة، احمرار وحرارة، أو جرح لا يلتئم — راجع طبيب.",
         "en": "One-sided leg swelling, redness and heat, or non-healing wound — see a doctor.",
@@ -1001,11 +1572,19 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/varicoseveins.html",
       "sources": [
-        { "title": "MedlinePlus — Varicose Veins", "url": "https://medlineplus.gov/varicoseveins.html" }
+        {
+          "title": "MedlinePlus — Varicose Veins",
+          "url": "https://medlineplus.gov/varicoseveins.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "lower_leg",
-        "structures": ["tibia", "fibula", "gastrocnemius", "soleus"]
+        "structures": [
+          "tibia",
+          "fibula",
+          "gastrocnemius",
+          "soleus"
+        ]
       },
       "icd10Status": "unverified"
     },
@@ -1025,8 +1604,17 @@
         "fr": "Réactivation du virus varicelle-zona causant une éruption vésiculeuse douloureuse unilatérale."
       },
       "muscleGroups": [],
-      "regions": ["back", "torso_front", "head_neck", "upper_limb", "lower_limb"],
-      "symptoms": ["hpo:0000988", "hpo:0003401"],
+      "regions": [
+        "back",
+        "torso_front",
+        "head_neck",
+        "upper_limb",
+        "lower_limb"
+      ],
+      "symptoms": [
+        "hpo:0000988",
+        "hpo:0003401"
+      ],
       "redFlags": {
         "ar": "طفح حول العين، صعوبة رؤية، أو ألم شديد لا يتحسن — راجع طبيب فورًا.",
         "en": "Rash around the eye, vision problems, or severe unimproving pain — see a doctor promptly.",
@@ -1034,13 +1622,21 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/shingles.html",
       "sources": [
-        { "title": "MedlinePlus — Shingles", "url": "https://medlineplus.gov/shingles.html" }
+        {
+          "title": "MedlinePlus — Shingles",
+          "url": "https://medlineplus.gov/shingles.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "paraspinal_soft_tissue",
-        "structures": ["thoracolumbar-fascia"]
+        "structures": [
+          "thoracolumbar-fascia"
+        ]
       },
-      "icd10Status": "unverified"
+      "icd10Status": "unverified",
+      "organs": [
+        "skin"
+      ]
     },
     {
       "id": "doid:psoriatic-arthritis",
@@ -1057,9 +1653,22 @@
         "en": "Joint inflammation linked to psoriasis skin disease, causing joint pain/swelling with a skin rash.",
         "fr": "Inflammation articulaire liée au psoriasis : douleur/gonflement articulaire avec éruption cutanée."
       },
-      "muscleGroups": ["hands", "feet", "knees", "lower-back"],
-      "regions": ["upper_limb", "lower_limb", "back"],
-      "symptoms": ["hpo:0002829", "hpo:0001386", "hpo:0000988"],
+      "muscleGroups": [
+        "hands",
+        "feet",
+        "knees",
+        "lower-back"
+      ],
+      "regions": [
+        "upper_limb",
+        "lower_limb",
+        "back"
+      ],
+      "symptoms": [
+        "hpo:0002829",
+        "hpo:0001386",
+        "hpo:0000988"
+      ],
       "redFlags": {
         "ar": "تورم مفاصل متعدد، احمرار وحرارة، أو ألم يوقظك ليلًا — راجع طبيب.",
         "en": "Multiple swollen joints, redness and heat, or night pain waking you — see a doctor.",
@@ -1067,13 +1676,21 @@
       },
       "medlinePlusUrl": "https://medlineplus.gov/psoriaticarthritis.html",
       "sources": [
-        { "title": "MedlinePlus — Psoriatic Arthritis", "url": "https://medlineplus.gov/psoriaticarthritis.html" }
+        {
+          "title": "MedlinePlus — Psoriatic Arthritis",
+          "url": "https://medlineplus.gov/psoriaticarthritis.html"
+        }
       ],
       "taxonomy": {
         "subRegion": "wrist_hand",
-        "structures": ["carpal-bones", "metacarpals", "radiocarpal-joint", "carpal-tunnel"]
+        "structures": [
+          "carpal-bones",
+          "metacarpals",
+          "radiocarpal-joint",
+          "carpal-tunnel"
+        ]
       },
       "icd10Status": "unverified"
     }
   ]
-      }
+}
