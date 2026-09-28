@@ -149,6 +149,13 @@ function cleanMedicalName(name: string): string {
 let msgCounter = 0;
 const nextId = () => `m${Date.now()}-${msgCounter++}`;
 
+/**
+ * Loop breaker: how many clarifying questions the assistant may ask in a row
+ * before it must answer with whatever the user already gave.
+ * Kept in sync with the engine's `askCount >= 2` rule.
+ */
+const MAX_CLARIFY_ASKS = 2;
+
 /** لغة التعرّف على الكلام حسب لغة الواجهة. */
 const speechLang = (language: string): string =>
   language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
@@ -186,9 +193,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [returningReminder, setReturningReminder] = useState(false);
+  /** How many clarifying questions were asked in a row (shown in the status line). */
+  const [askCount, setAskCount] = useState(0);
   const scrollRef = useRef<ScrollView>(null);
   const webRecognitionRef = useRef<any>(null);
-  const clarificationStreakRef = useRef(0);
+  // Mirror of `askCount` so two sends in the same tick can never both read a
+  // stale counter (this is what previously made the question repeat forever).
+  const askCountRef = useRef(0);
 
   useEffect(() => {
     AsyncStorage.getItem('bodymap.lastAssistantVisit').then((value) => {
@@ -337,7 +348,12 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
         .join(' ');
 
       const fullText = `${userMessages} ${text}`.trim();
-      const forceAnswer = clarificationStreakRef.current >= 2;
+      // Loop breaker: `askCountRef` is the single source of truth for how many
+      // clarifying questions we already asked, and `userTurnCount` is the hard
+      // ceiling (from the user's 3rd message the engine must always answer).
+      const askedSoFar = askCountRef.current;
+      const forceAnswer = askedSoFar >= MAX_CLARIFY_ASKS;
+      const userTurnCount = messages.filter((m) => m.role === 'user').length + 1;
       AsyncStorage.setItem('bodymap.lastAssistantVisit', String(Date.now())).catch(() => {});
 
       setMessages((prev) => [
@@ -348,9 +364,16 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       setPendingImage(null);
       setThinking(true);
       setTimeout(() => {
-        const reply = analyzeMessage(fullText, language as Lang, hasImg, { forceAnswer });
-        if (reply.clarificationOnly) clarificationStreakRef.current += 1;
-        else clarificationStreakRef.current = 0;
+        const reply = analyzeMessage(fullText, language as Lang, hasImg, {
+          forceAnswer,
+          askCount: askedSoFar,
+          userTurnCount,
+        });
+        // A clarifying question raises the counter; a real answer (conditions +
+        // self-care) resets it, because the user clearly gave something we understood.
+        const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
+        askCountRef.current = nextAskCount;
+        setAskCount(nextAskCount);
         const id = nextId();
         setMessages((prev) => [...prev, { id, role: 'assistant', reply }]);
         setThinking(false);
@@ -382,7 +405,10 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           <Text style={[styles.agentName, { color: colors.textPrimary }]}>{t('assistant.name')}</Text>
           <View style={[styles.statusRow, { flexDirection: row }]}>
             <View style={styles.statusDot} />
-            <Text style={[styles.statusText, { color: colors.textSecondary }]}>{t('assistant.status')}</Text>
+            <Text style={[styles.statusText, { color: colors.textSecondary }]}>
+              {t('assistant.status')}
+              {askCount > 0 ? ` \u00b7 ${askCount}/${MAX_CLARIFY_ASKS}` : ''}
+            </Text>
           </View>
         </View>
         <Pressable
