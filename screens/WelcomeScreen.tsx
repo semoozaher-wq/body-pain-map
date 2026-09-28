@@ -7,6 +7,7 @@ import { Gradient } from '../components/Gradient';
 import { GlowOrb } from '../components/GlowOrb';
 import { QuickLogCard } from '../components/QuickLogCard';
 import { ClinicalAnalysisPanel } from '../components/ClinicalAnalysisPanel';
+import { MedicalContactsCard } from '../components/MedicalContactsCard';
 import { useTheme } from '../hooks/useTheme';
 import { translate } from '../services/i18n';
 import type { Checkup } from '../types';
@@ -108,6 +109,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, onQuickRe
     </View>
 
     <QuickLogCard areas={quickAreas} onSave={onQuickSave} language={language} />
+
+    <MedicalContactsCard language={language} direction={direction} />
 
     <ClinicalAnalysisPanel />
 

@@ -9,6 +9,7 @@ import { useTheme } from '../hooks/useTheme';
 import { PAIN_TYPES, DURATIONS, RED_FLAGS } from '../constants/appConstants';
 import { translate } from '../services/i18n';
 import { getTriageStatus } from '../services/triage.js';
+import { EmergencyPanel } from '../components/EmergencyPanel';
 
 interface DetailsScreenProps {
   intensity: number;
@@ -43,7 +44,7 @@ interface DetailsScreenProps {
 export const DetailsScreen: React.FC<DetailsScreenProps> = ({
   intensity, setIntensity, painType, setPainType, duration, setDuration,
   note, setNote, medication, setMedication, triggers, setTriggers, sleepHours, setSleepHours, activity, setActivity,
-  redFlags, setRedFlags, symptoms, setSymptoms, afterIntensity, setAfterIntensity, onBack, onNext, language, contextWarning
+  redFlags, setRedFlags, symptoms, setSymptoms, afterIntensity, setAfterIntensity, onBack, onNext, language, direction, contextWarning
 }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
@@ -76,6 +77,8 @@ export const DetailsScreen: React.FC<DetailsScreenProps> = ({
           <Text style={[styles.triageText, { color: colors.textPrimary }]}>{t('details.highIntensityText')}</Text>
         </View>
       )}
+      {urgent && <EmergencyPanel language={language} direction={direction} />}
+
       <Accordion title={t('details.redFlagsTitle')} icon="⚠️" isWarning defaultOpen>
         <Text style={[styles.hint, { color: colors.danger }]}>{t('details.redFlagsHint')}</Text>
         <View style={styles.flagList}>

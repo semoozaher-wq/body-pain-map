@@ -12,6 +12,7 @@ import { FirstAidCard } from '../components/FirstAidCard';
 import { ReportExport } from '../components/ReportExport';
 import { translate } from '../services/i18n';
 import { getTriageStatus } from '../services/triage.js';
+import { EmergencyPanel } from '../components/EmergencyPanel';
 
 interface ResultsScreenProps {
   selected: Muscle;
@@ -28,11 +29,12 @@ interface ResultsScreenProps {
 }
 
 export const ResultsScreen: React.FC<ResultsScreenProps> = ({
-  selected, group, intensity, painType, duration, note, redFlags, onRestart, language
+  selected, group, intensity, painType, duration, note, redFlags, onRestart, language, direction
 }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const triageStatus = getTriageStatus(intensity, redFlags);
+  const showEmergencyPanel = triageStatus === 'urgent' || triageStatus === 'high_reported_intensity';
   const urgent = triageStatus === 'urgent';
   const highReportedIntensity = triageStatus === 'high_reported_intensity';
   const warning = selected.warning ?? group?.defaultWarning;
@@ -70,6 +72,8 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
           <Text style={[styles.alertText, { color: colors.textPrimary }]}>{t('results.highIntensityText')}</Text>
         </View>
       )}
+
+      {showEmergencyPanel && <EmergencyPanel language={language} direction={direction} />}
 
       {warning && (
         <Card style={styles.alertCard}>

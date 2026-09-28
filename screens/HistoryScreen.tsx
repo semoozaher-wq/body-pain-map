@@ -15,6 +15,7 @@ import { LocalReminder } from '../components/LocalReminder';
 import { PainDashboard } from '../components/PainDashboard';
 import { DoctorReport } from '../components/DoctorReport';
 import { LocalDataTools } from '../components/LocalDataTools';
+import { MedicalContactsCard } from '../components/MedicalContactsCard';
 import type { Language } from '../services/i18n';
 
 const data = anatomyMap as unknown as AnatomyData;
@@ -25,9 +26,10 @@ interface HistoryScreenProps {
   onClear: () => void;
   onImport: (records: Checkup[]) => void;
   language: Language;
+  direction?: 'rtl' | 'ltr';
 }
 
-export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, onClear, onImport, language }) => {
+export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, onClear, onImport, language, direction = 'rtl' }) => {
   const { colors } = useTheme();
   const average = history.length
     ? (history.reduce((sum, item) => sum + item.intensity, 0) / history.length).toFixed(1)
@@ -48,6 +50,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
       </Text>
       <PainDashboard history={history} language={language} />
       <DoctorReport records={history} language={language} />
+      <MedicalContactsCard language={language} direction={direction} />
       <LocalDataTools records={history} onImport={onImport} />
 
       {/* Stats */}
