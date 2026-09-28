@@ -30,6 +30,12 @@ import {
   REGION_LOCATIONS,
   SEVERITY_WORDS,
   SYMPTOM_TERMS,
+  SYMPTOM_TYPES,
+  TIMINGS,
+  CONTEXTS,
+  SYMPTOM_CONDITIONS,
+  SYMPTOM_TIMING_BOOSTS,
+  CONTEXT_CONDITION_BOOSTS,
   MEDICATION_TERMS,
   FOLLOW_UP_QUESTIONS,
   type AbdomenLocation,
@@ -93,6 +99,12 @@ export interface DetectedSymptom {
   redFlag: boolean;
   generic: boolean;
 }
+
+const URINARY_LOCATION_KEYWORDS = {
+  ar: ['بول', 'البول', 'التبول', 'مثانة', 'المثانه', 'المسالك'],
+  en: ['urine', 'urinary', 'urination', 'bladder'],
+  fr: ['urine', 'urinaire', 'vessie'],
+};
 
 export interface DetectedMedication {
   id: string;
@@ -269,6 +281,39 @@ function isNegated(text: string, keyword: string): boolean {
 // ---------------------------------------------------------------------------
 // الاستخراج
 // ---------------------------------------------------------------------------
+export function extractSymptomType(text: string): string[] {
+  return Object.entries(SYMPTOM_TYPES)
+    .filter(([, bucket]) => matchAny(text, bucket.keywords))
+    .map(([id]) => id);
+}
+
+export function extractTiming(text: string): string[] {
+  return Object.entries(TIMINGS)
+    .filter(([, bucket]) => matchAny(text, bucket.keywords))
+    .map(([id]) => id);
+}
+
+export function extractContext(text: string): string[] {
+  return Object.entries(CONTEXTS)
+    .filter(([, bucket]) => matchAny(text, bucket.keywords))
+    .map(([id]) => id);
+}
+
+export function extractLocation(text: string, regions: DetectedRegion[] = [], organs: DetectedOrgan[] = []): string | null {
+  if (regions.length > 0) return regions[0].id;
+  if (organs.length > 0) return organs[0].id;
+  if (matchAny(text, URINARY_LOCATION_KEYWORDS)) return 'urinary';
+  return null;
+}
+
+function canonicalSymptomLocation(locationKey: string | null): string | null {
+  if (!locationKey) return null;
+  if (['lower-back', 'upper-back'].includes(locationKey)) return 'back';
+  if (['calves', 'ankles'].includes(locationKey)) return 'legs';
+  if (['forearm', 'wrist'].includes(locationKey)) return 'hands';
+  return locationKey;
+}
+
 export function detectRegions(text: string): DetectedRegion[] {
   const found = new Map<string, DetectedRegion>();
   BODY_REGIONS.forEach((region) => {
@@ -474,6 +519,9 @@ export function scoreConditions(
   organs: DetectedOrgan[] = [],
   locations: DetectedLocation[] = [],
   rawText: string = '',
+  symptomTypes: string[] = [],
+  timings: string[] = [],
+  contexts: string[] = [],
 ): ConditionMatch[] {
   const specificSymptoms = symptoms.filter((s) => !s.generic);
   const symptomBases = new Set(specificSymptoms.map((s) => symBase(s.id)));
@@ -483,11 +531,92 @@ export function scoreConditions(
     specificSymptoms.length > 0 || organs.length > 0 || locations.length > 0;
 
   const queryRegions = new Set(regions.map((r) => r.region));
+  const locationKey = canonicalSymptomLocation(extractLocation(rawText, regions, organs));
+  const primarySymptomType = symptomTypes[0] ?? null;
+  const exactIds = primarySymptomType && locationKey
+    ? (SYMPTOM_CONDITIONS[primarySymptomType]?.[locationKey] ?? [])
+    : [];
+  const filteredExactIds = exactIds.filter((id) => {
+    if (id !== 'local:cervical-zoster') return true;
+    return matchAny(rawText, {
+      ar: ['طفح', 'طفح جلدي', 'حويصلات', 'حبوب مؤلمة'],
+      en: ['rash', 'blister', 'blisters'],
+      fr: ['éruption', 'vésicules'],
+    });
+  });
+  const secondaryIds = new Set<string>();
+  if (primarySymptomType === 'tingling' && locationKey === 'neck' && regions.some((region) => region.id === 'hands')) {
+    secondaryIds.add('doid:13241');
+  }
+  if (primarySymptomType === 'burning' && locationKey === 'neck') {
+    const hasRash = matchAny(rawText, {
+      ar: ['طفح', 'طفح جلدي', 'حويصلات', 'حبوب مؤلمة'],
+      en: ['rash', 'blister', 'blisters'],
+      fr: ['éruption', 'vésicules'],
+    });
+    if (hasRash) secondaryIds.add('local:cervical-zoster');
+  }
+  const generalIds = !locationKey && primarySymptomType
+    ? (SYMPTOM_CONDITIONS[primarySymptomType]?._all ?? [])
+    : [];
+  const allowedIds = new Set(filteredExactIds.length > 0 ? [...filteredExactIds, ...secondaryIds] : generalIds);
+  const hasPreciseRule = filteredExactIds.length > 0;
+
+  const timingBoostIds = new Set<string>();
+  timings.forEach((timing) => {
+    const ids = primarySymptomType ? SYMPTOM_TIMING_BOOSTS[primarySymptomType]?.[timing] ?? [] : [];
+    ids.forEach((id) => timingBoostIds.add(id));
+  });
+  const contextBoostIds = new Set<string>();
+  contexts.forEach((context) => {
+    (CONTEXT_CONDITION_BOOSTS[context] ?? []).forEach((id) => contextBoostIds.add(id));
+  });
 
   const scored: ConditionMatch[] = [];
   const seen = new Set<string>();
 
-  // === 1) البحث الذكي ===
+  // A known location without a curated symptom+location rule must not fall
+  // back to unrelated location-only conditions. Ask for clarification instead.
+  if (primarySymptomType && locationKey && filteredExactIds.length === 0) return [];
+
+  // When a precise symptom+location rule exists, use only that curated set.
+  // This prevents the old location-only search from flooding the answer with
+  // unrelated conditions just because they mention the same body region.
+  if (allowedIds.size > 0) {
+    getAllConditions().forEach((condition) => {
+      if (!allowedIds.has(condition.id)) return;
+      let score = hasPreciseRule ? 1000 : 700;
+      if (timingBoostIds.has(condition.id)) score += 300;
+      if (contextBoostIds.has(condition.id)) score += 150;
+      if (symptomBases.size > 0) {
+        condition.symptoms.forEach((sid) => {
+          if (symptomBases.has(symBase(sid))) score += 40;
+        });
+      }
+      scored.push({
+        id: condition.id,
+        name: condition.name,
+        summary: condition.summary,
+        icd10: condition.icd10,
+        medlinePlusUrl: condition.medlinePlusUrl,
+        score,
+      });
+      seen.add(condition.id);
+    });
+
+    // If the curated IDs are stale or unavailable in the medical library, do
+    // not silently fall back to unrelated location results.
+    if (scored.length > 0) {
+      return scored.sort((a, b) => b.score - a.score).slice(0, 4);
+    }
+  }
+
+  // No exact symptom rule: symptom-only rules get a focused search. If none
+  // exists, preserve the previous smartSearch/location behaviour.
+  if (allowedIds.size > 0) {
+    return [];
+  }
+
   if (rawText && rawText.trim().length >= 2) {
     try {
       const smartResults = smartSearch(rawText, getAllConditions(), 12);
@@ -497,28 +626,20 @@ export function scoreConditions(
           const hasMuscleMatch = r.condition.muscleGroups.some((mg) =>
             regions.some((reg) => reg.id === mg),
           );
-          if (!matchesRegion && !hasMuscleMatch) {
-            return;
-          }
+          if (!matchesRegion && !hasMuscleMatch) return;
         }
 
-        if (r.condition.diffuse && localized) {
-          const boosted = Math.round(r.score * 0.5);
-          if (boosted <= 0) return;
-        }
-
+        if (r.condition.diffuse && localized) return;
         if (seen.has(r.condition.id)) return;
         seen.add(r.condition.id);
 
         let bonus = 0;
         if (queryRegions.size > 0) {
-          const regionMatch = r.condition.regions.some((cr) => queryRegions.has(cr as any));
-          if (regionMatch) bonus += 500;
-          const muscleMatch = r.condition.muscleGroups.some((mg) =>
-            regions.some((reg) => reg.id === mg),
-          );
-          if (muscleMatch) bonus += 300;
+          if (r.condition.regions.some((cr) => queryRegions.has(cr as any))) bonus += 500;
+          if (r.condition.muscleGroups.some((mg) => regions.some((reg) => reg.id === mg))) bonus += 300;
         }
+        if (timingBoostIds.has(r.condition.id)) bonus += 300;
+        if (contextBoostIds.has(r.condition.id)) bonus += 150;
 
         scored.push({
           id: r.condition.id,
@@ -530,48 +651,38 @@ export function scoreConditions(
         });
       });
     } catch {
-      // لو smartSearch فشلت لأي سبب، نكمّل بالمنطق القديم.
+      // Continue with the deterministic matcher below.
     }
   }
 
-  // === 2) منطق المطابقة القديم ===
   getAllConditions().forEach((condition: MedicalCondition) => {
     if (seen.has(condition.id)) return;
-
-    if (organs.length > 0 && !condition.organs?.some((id) => organWeights.has(id))) {
-      if (!hasSpecificEvidence) return;
-      return;
-    }
+    if (organs.length > 0 && !condition.organs?.some((id) => organWeights.has(id))) return;
 
     let score = 0;
-
     regions.forEach((region) => {
       if (condition.regions.includes(region.region) && hasSpecificEvidence) score += 2;
       if (condition.muscleGroups.includes(region.id)) score += 2;
     });
-
     organs.forEach((organ) => {
       if (condition.regions.includes(organ.region)) score += 1;
     });
-
     if (condition.organs) {
       condition.organs.forEach((oid) => {
         const w = organWeights.get(oid);
         if (w) score += w;
       });
     }
-
     condition.symptoms.forEach((sid) => {
       if (symptomBases.has(symBase(sid))) score += 3;
     });
-
     if (condition.diffuse) {
       if (localized) score -= 5;
       if (regions.length <= 1 && organs.length === 0) score -= 3;
     }
-
+    if (timingBoostIds.has(condition.id)) score += 300;
+    if (contextBoostIds.has(condition.id)) score += 150;
     if (!hasSpecificEvidence && score <= 0) return;
-
     if (score > 0) {
       seen.add(condition.id);
       scored.push({
@@ -1082,6 +1193,46 @@ const IMAGE_INTRO: LocalizedText = {
   fr: 'Je vois la photo jointe 📷. L’analyse d’image automatique n’est pas disponible hors ligne ; décrivez brièvement et je vous comprendrai.',
 };
 
+
+const NO_PRECISE_MATCH: LocalizedText = {
+  ar: `الأعراض اللي ذكرتها مش عندي احتمال دقيق ليها في قاعدة البيانات. بس ممكن أساعدك بالخطوات دي:
+
+1. وضّح أكتر: فين بالظبط في المكان اللي بيوجعك (يمين/شمال/ورا/قُدّام)؟
+2. العرض مستمر ولا متقطع؟
+3. فيه أعراض تانية (تنميل اليد، ضعف عضلي، صداع)؟
+4. من إمتى بدأ؟
+
+نصايح عامة:
+✓ ارتاح وابعد عن الوضعيات اللي بتزود الألم
+✓ اشرب ماء كفاية ونم كويس
+✓ لو الأعراض زادت أو ظهر تنميل في اليد، استشر طبيب
+✓ استشارة الطبيب أهم من أي معلومة تقديرية`,
+  en: `I do not have a precise match for the symptoms you described in my database, but I can still help you:
+
+1. Clarify the exact spot (right/left/front/back).
+2. Is the symptom constant or intermittent?
+3. Are there other symptoms such as hand numbness, muscle weakness, or headache?
+4. When did it start?
+
+General steps:
+✓ Rest and avoid positions that make the symptom worse
+✓ Drink enough water and sleep well
+✓ If symptoms worsen or hand numbness appears, seek medical advice
+✓ A clinician’s assessment is more important than any estimated information`,
+  fr: `Je n’ai pas de correspondance précise pour les symptômes décrits dans ma base, mais je peux quand même vous aider :
+
+1. Précisez l’endroit exact (droite/gauche/devant/derrière).
+2. Le symptôme est-il constant ou intermittent ?
+3. Y a-t-il d’autres symptômes comme un engourdissement de la main, une faiblesse musculaire ou un mal de tête ?
+4. Depuis quand a-t-il commencé ?
+
+Conseils généraux :
+✓ Reposez-vous et évitez les positions qui aggravent le symptôme
+✓ Buvez suffisamment et dormez correctement
+✓ Si les symptômes s’aggravent ou si un engourdissement de la main apparaît, consultez un médecin
+✓ L’évaluation d’un professionnel reste plus importante que toute estimation`
+};
+
 const IMAGE_CLARIFY: LocalizedText = {
   ar: 'قوللي: إيه اللي باين في الصورة (طفح/تورم/جرح/لون)، ومكانه فين في الجسم، وبقاله قد إيه؟',
   en: 'Tell me: what does the photo show (rash/swelling/wound/colour), where on the body, and for how long?',
@@ -1117,9 +1268,30 @@ export function analyzeMessage(
     }).filter((entry): entry is readonly [string, { id: string; region: BodyRegionKey; label: LocalizedText }] => entry !== null))].map(([, region]) => region);
   const symptoms = detectSymptoms(text);
   const medications = detectMedications(text);
-  const redFlags = detectRedFlags(text);
   const severity = detectSeverity(text);
   const duration = detectDuration(text);
+  const symptomTypes = extractSymptomType(text);
+  const timings = extractTiming(text);
+  const contexts = extractContext(text);
+  const extractedLocation = extractLocation(text, regions, detectedOrgans);
+
+  const redFlags = [...detectRedFlags(text)];
+  const hasChest = regions.some((region) => region.id === 'chest');
+  const hasHead = regions.some((region) => region.id === 'head');
+  const hasLegs = regions.some((region) => region.id === 'legs' || region.id === 'calves');
+  const hasAbdomen = regions.some((region) => region.id === 'abs');
+  const hasEyes = regions.some((region) => region.id === 'eyes');
+  const hasBreathlessness = matchAny(text, { ar: ['ضيق نفس', 'ضيق في التنفس', 'مش قادر أتنفس', 'كتمة'], en: ['shortness of breath', 'breathless'], fr: ['essoufflement'] });
+  const hasSuddenHeadache = matchAny(text, { ar: ['صداع مفاجئ', 'صداع شديد مفاجئ', 'وجع راس مفاجئ'], en: ['sudden headache', 'sudden severe headache'], fr: ['céphalée soudaine'] });
+  if (hasChest && symptomTypes.includes('burning')) redFlags.push({ id: 'rf:chest-burning', level: 'emergency', label: { ar: 'حرقان في الصدر يحتاج تقييمًا طارئًا', en: 'Chest burning needs emergency assessment', fr: 'Une brûlure thoracique nécessite une évaluation urgente' } });
+  if (hasChest && symptomTypes.includes('tingling') && hasBreathlessness) redFlags.push({ id: 'rf:chest-tingling-breath', level: 'emergency', label: { ar: 'وخز في الصدر مع ضيق نفس', en: 'Chest tingling with shortness of breath', fr: 'Fourmillements thoraciques avec essoufflement' } });
+  if (hasHead && symptomTypes.includes('stabbing') && hasSuddenHeadache) redFlags.push({ id: 'rf:sudden-stabbing-headache', level: 'emergency', label: { ar: 'نغزة أو صداع مفاجئ شديد في الرأس', en: 'Sudden severe stabbing headache', fr: 'Céphalée lancinante soudaine et intense' } });
+  if (hasChest && symptomTypes.includes('pressure')) redFlags.push({ id: 'rf:chest-pressure', level: 'emergency', label: { ar: 'ضغط أو عصر في الصدر يحتاج تقييمًا طارئًا', en: 'Chest pressure or squeezing needs emergency assessment', fr: 'Une pression ou compression thoracique nécessite une évaluation urgente' } });
+  if (hasLegs && symptomTypes.includes('heaviness') && matchAny(text, { ar: ['تورم', 'ورم', 'ساق واحدة', 'رجل واحدة'], en: ['swelling', 'one leg'], fr: ['gonflement', 'une jambe'] })) redFlags.push({ id: 'rf:leg-heaviness-swelling', level: 'urgent', label: { ar: 'ثقل الساق مع تورم يحتاج تقييمًا عاجلًا لاستبعاد جلطة وريدية', en: 'Leg heaviness with swelling needs urgent assessment for possible DVT', fr: 'Lourdeur de jambe avec gonflement : évaluation urgente pour exclure une thrombose' } });
+  if (hasLegs && symptomTypes.includes('heaviness') && !redFlags.some((flag) => flag.id === 'rf:leg-heaviness-swelling')) redFlags.push({ id: 'rf:leg-heaviness', level: 'urgent', label: { ar: 'ثقل جديد أو واضح في الساق يستحسن تقييمه طبيًا، خصوصًا إذا كان في ساق واحدة أو معه تورم', en: 'New or marked leg heaviness should be medically assessed, especially if one-sided or associated with swelling', fr: 'Une lourdeur nouvelle ou importante de la jambe mérite une évaluation médicale, surtout si elle est unilatérale ou accompagnée de gonflement' } });
+  if (hasAbdomen && symptomTypes.includes('throbbing') && matchAny(text, { ar: ['شديد', 'مفاجئ', 'حاد'], en: ['severe', 'sudden'], fr: ['intense', 'soudain'] })) redFlags.push({ id: 'rf:abdominal-throbbing', level: 'emergency', label: { ar: 'نبض أو ألم شديد مفاجئ في البطن يحتاج تقييمًا طارئًا', en: 'Sudden severe abdominal throbbing needs emergency assessment', fr: 'Une douleur abdominale pulsatile brutale et intense nécessite une évaluation urgente' } });
+  if (hasHead && symptomTypes.includes('heaviness') && matchAny(text, { ar: ['ضعف', 'شلل', 'لخبطة كلام', 'صعوبة كلام'], en: ['weakness', 'paralysis', 'speech difficulty'], fr: ['faiblesse', 'paralysie', 'trouble de la parole'] })) redFlags.push({ id: 'rf:head-heaviness-neuro', level: 'emergency', label: { ar: 'ثقل الرأس مع أعراض عصبية مفاجئة يحتاج طوارئ', en: 'Head heaviness with sudden neurological symptoms needs emergency care', fr: 'Lourdeur de la tête avec symptômes neurologiques soudains : urgence' } });
+  if (hasEyes && symptomTypes.includes('pressure') && matchAny(text, { ar: ['تشوش', 'زغللة', 'فقدان نظر', 'رؤية'], en: ['blurred vision', 'vision loss'], fr: ['vision floue', 'perte de vision'] })) redFlags.push({ id: 'rf:eye-pressure-vision', level: 'emergency', label: { ar: 'ضغط العين مع تغير مفاجئ في الرؤية يحتاج طوارئ', en: 'Eye pressure with sudden vision change needs emergency care', fr: 'Pression oculaire avec changement brutal de la vision : urgence' } });
 
   const { forceAnswer = false, askCount = 0, userTurnCount = 0 } = options;
 
@@ -1146,7 +1318,7 @@ export function analyzeMessage(
 
   const organNeedsProtectedMatching = organs.some((organ) => organ.id === 'testicles');
   const conditions = understood && !askForLocation && !organNeedsProtectedMatching
-    ? scoreConditions(regions, symptoms, organs, locations, rawText)
+    ? scoreConditions(regions, symptoms, organs, locations, rawText, symptomTypes, timings, contexts)
     : [];
 
   const understanding: string[] = [];
@@ -1193,6 +1365,43 @@ export function analyzeMessage(
           ar: `أعراض لاحظتها: ${symptoms.map((s) => s.label.ar).join('، ')}.`,
           en: `Symptoms I noticed: ${symptoms.map((s) => s.label.en).join(', ')}.`,
           fr: `Symptômes notés : ${symptoms.map((s) => s.label.fr).join(', ')}.`,
+        },
+        language,
+      ),
+    );
+  }
+
+  if (symptomTypes.length) {
+    understanding.push(
+      localize(
+        {
+          ar: `نوع العرض: ${symptomTypes.map((id) => SYMPTOM_TYPES[id].label.ar).join('، ')}.`,
+          en: `Symptom type: ${symptomTypes.map((id) => SYMPTOM_TYPES[id].label.en).join(', ')}.`,
+          fr: `Type de symptôme : ${symptomTypes.map((id) => SYMPTOM_TYPES[id].label.fr).join(', ')}.`,
+        },
+        language,
+      ),
+    );
+  }
+  if (timings.length) {
+    understanding.push(
+      localize(
+        {
+          ar: `التوقيت: ${timings.map((id) => TIMINGS[id].label.ar).join('، ')}.`,
+          en: `Timing: ${timings.map((id) => TIMINGS[id].label.en).join(', ')}.`,
+          fr: `Moment : ${timings.map((id) => TIMINGS[id].label.fr).join(', ')}.`,
+        },
+        language,
+      ),
+    );
+  }
+  if (contexts.length) {
+    understanding.push(
+      localize(
+        {
+          ar: `السياق: ${contexts.map((id) => CONTEXTS[id].label.ar).join('، ')}.`,
+          en: `Context: ${contexts.map((id) => CONTEXTS[id].label.en).join(', ')}.`,
+          fr: `Contexte : ${contexts.map((id) => CONTEXTS[id].label.fr).join(', ')}.`,
         },
         language,
       ),
@@ -1270,7 +1479,10 @@ export function analyzeMessage(
     clarificationOnly,
     clarifyingQuestion: askForLocation
       ? buildLocationQuestion(regions, language)
-      : (understood && !imageOnly ? null : (imageOnly ? IMAGE_CLARIFY : CLARIFY)),
+      : ((symptomTypes.length > 0 && extractedLocation && conditions.length === 0) ||
+        (!understood && rawText.trim().length > 0 && !imageOnly)
+        ? NO_PRECISE_MATCH
+        : (understood && !imageOnly ? null : (imageOnly ? IMAGE_CLARIFY : CLARIFY))),
     triage,
     redFlags,
     regions,

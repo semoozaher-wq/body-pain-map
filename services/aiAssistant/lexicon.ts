@@ -308,6 +308,16 @@ export const BODY_REGIONS: RegionTerm[] = [
     },
   },
   {
+    id: 'mouth',
+    region: 'head_neck',
+    label: { ar: 'الفم', en: 'Mouth', fr: 'Bouche' },
+    keywords: {
+      ar: ['فمي', 'فمى', 'الفم', 'بوقي', 'بُقي'],
+      en: ['mouth', 'oral'],
+      fr: ['bouche', 'oral'],
+    },
+  },
+  {
     id: 'throat',
     region: 'head_neck',
     label: { ar: 'الحلق', en: 'Throat', fr: 'Gorge' },
@@ -816,7 +826,7 @@ export const SYMPTOM_TERMS: SymptomTerm[] = [
     label: { ar: 'تنميل', en: 'Tingling / numbness', fr: 'Fourmillements' },
     redFlag: false,
     keywords: {
-      ar: ['تنميل', 'نميل', 'خدر', 'خدري', 'نمل', 'بينمل', 'حاسس بتنميل', 'تنمل'],
+      ar: ['تنميل', 'نميل', 'خدر', 'خدري', 'نمل', 'بينمل', 'حاسس بتنميل', 'تنمل', 'وخز', 'نمش', 'نمّل', 'بتنم', 'حس نمش'],
       en: ['tingling', 'numbness', 'pins and needles'],
       fr: ['fourmillements', 'engourdissement'],
     },
@@ -1109,6 +1119,164 @@ export const RED_FLAG_TERMS: RedFlagTerm[] = [
     },
   },
 ];
+
+// ---------------------------------------------------------------------------
+// 3.5) نوع العرض + التوقيت + السياق
+// ---------------------------------------------------------------------------
+export interface LexiconBucket {
+  label: LocalizedText;
+  keywords: Record<Lang, string[]>;
+}
+
+export const SYMPTOM_TYPES: Record<string, LexiconBucket> = {
+  tingling: { label: { ar: 'وخز / تنميل', en: 'Tingling / numbness', fr: 'Fourmillements / engourdissement' }, keywords: { ar: ['وخز', 'تنميل', 'نمش', 'نمّل', 'بتنم', 'حس نمش'], en: ['pins and needles', 'tingling', 'numbness'], fr: ['fourmillements', 'picotements', 'engourdissement'] } },
+  stabbing: { label: { ar: 'نغزة', en: 'Stabbing pain', fr: 'Douleur lancinante' }, keywords: { ar: ['نغزة', 'نغز', 'طعن', 'زي السكينة'], en: ['stab', 'stabbing', 'sharp pain'], fr: ['piqûre', 'lancinante', 'douleur vive'] } },
+  burning: { label: { ar: 'حرقان', en: 'Burning', fr: 'Brûlure' }, keywords: { ar: ['حرقان', 'بيحرق', 'حرق', 'لاسع'], en: ['burning', 'burn'], fr: ['brûlure', 'brûlant'] } },
+  tightness: { label: { ar: 'شد', en: 'Tightness / spasm', fr: 'Tension / spasme' }, keywords: { ar: ['شد', 'تشنج', 'مشدود', 'متشنج'], en: ['tightness', 'spasm', 'cramp'], fr: ['tension', 'spasme', 'crampe'] } },
+  throbbing: { label: { ar: 'نبض', en: 'Throbbing', fr: 'Pulsatile' }, keywords: { ar: ['نبض', 'بينبض', 'زي النبض'], en: ['throbbing', 'pulsating'], fr: ['pulsatile', 'battement'] } },
+  electric: { label: { ar: 'كهربا', en: 'Electric shock', fr: 'Décharge électrique' }, keywords: { ar: ['كهربا', 'صعقة', 'زي الكهربا'], en: ['electric', 'shock'], fr: ['électrique', 'décharge'] } },
+  heaviness: { label: { ar: 'ثقل', en: 'Heaviness', fr: 'Lourdeur' }, keywords: { ar: ['ثقل', 'تقيل', 'وزن'], en: ['heaviness', 'heavy'], fr: ['lourdeur', 'lourd'] } },
+  pressure: { label: { ar: 'ضغط', en: 'Pressure', fr: 'Pression' }, keywords: { ar: ['ضغط', 'ضاغط', 'معصور'], en: ['pressure', 'squeezing'], fr: ['pression', 'compression'] } },
+  dryness: { label: { ar: 'نشفان', en: 'Dryness', fr: 'Sécheresse' }, keywords: { ar: ['نشفان', 'جفاف', 'ناشف'], en: ['dryness', 'dry'], fr: ['sécheresse', 'sec'] } },
+};
+
+export const TIMINGS: Record<string, LexiconBucket> = {
+  sleep: { label: { ar: 'وقت النوم', en: 'At night / during sleep', fr: 'La nuit / pendant le sommeil' }, keywords: { ar: ['وقت النوم', 'أثناء النوم', 'بالليل', 'ليلي'], en: ['at night', 'during sleep', 'nocturnal'], fr: ['la nuit', 'pendant le sommeil', 'nocturne'] } },
+  morning: { label: { ar: 'الصبح', en: 'Morning', fr: 'Matin' }, keywords: { ar: ['الصبح', 'الفجر', 'عند الاستيقاظ'], en: ['morning', 'on waking'], fr: ['matin', 'au réveil'] } },
+  late_night: { label: { ar: 'آخر الليل', en: 'Late night', fr: 'Tard dans la nuit' }, keywords: { ar: ['آخر الليل', 'بعد نص الليل'], en: ['late night'], fr: ['tard dans la nuit'] } },
+  after_eating: { label: { ar: 'بعد الأكل', en: 'After eating', fr: 'Après avoir mangé' }, keywords: { ar: ['بعد الأكل', 'عند الأكل', 'بعد الوجبة'], en: ['after eating', 'postprandial'], fr: ['après avoir mangé', 'postprandial'] } },
+  movement: { label: { ar: 'مع الحركة', en: 'With movement', fr: 'Avec le mouvement' }, keywords: { ar: ['مع الحركة', 'لما أتحرك'], en: ['on movement', 'with movement'], fr: ['avec le mouvement'] } },
+  rest: { label: { ar: 'وقت الراحة', en: 'At rest', fr: 'Au repos' }, keywords: { ar: ['وقت الراحة', 'وأنا قاعد'], en: ['at rest', 'resting'], fr: ['au repos'] } },
+  constant: { label: { ar: 'مستمر', en: 'Constant', fr: 'Constant' }, keywords: { ar: ['مستمر', 'دايمًا', 'طول الوقت'], en: ['constant', 'continuous'], fr: ['constant', 'continu'] } },
+  intermittent: { label: { ar: 'متقطع', en: 'Intermittent', fr: 'Intermittent' }, keywords: { ar: ['متقطع', 'يجي ويروح'], en: ['intermittent', 'comes and goes'], fr: ['intermittent', 'va et vient'] } },
+};
+
+export const CONTEXTS: Record<string, LexiconBucket> = {
+  exercise: { label: { ar: 'بعد الرياضة', en: 'After exercise', fr: 'Après le sport' }, keywords: { ar: ['بعد الرياضة', 'بعد الجيم', 'بعد التمرين'], en: ['after exercise', 'post workout'], fr: ['après le sport', 'après l’exercice'] } },
+  stress: { label: { ar: 'مع التوتر', en: 'With stress', fr: 'Avec le stress' }, keywords: { ar: ['مع التوتر', 'مع القلق', 'مع العصبية'], en: ['with stress', 'anxiety'], fr: ['avec le stress', 'anxiété'] } },
+  prolonged_sitting: { label: { ar: 'بعد الجلوس الطويل', en: 'After prolonged sitting', fr: 'Après une position assise prolongée' }, keywords: { ar: ['بعد الجلوس الطويل', 'بعد القاعدة'], en: ['prolonged sitting'], fr: ['position assise prolongée'] } },
+  cold: { label: { ar: 'مع البرد', en: 'With cold', fr: 'Avec le froid' }, keywords: { ar: ['مع البرد', 'في الشتا'], en: ['with cold'], fr: ['avec le froid'] } },
+  heat: { label: { ar: 'مع الحرارة', en: 'With heat', fr: 'Avec la chaleur' }, keywords: { ar: ['مع الحرارة', 'في الصيف'], en: ['with heat'], fr: ['avec la chaleur'] } },
+};
+
+/**
+ * Exact symptom + location rules. Values are IDs from the existing medical
+ * library, so the assistant never invents a condition that the app cannot
+ * render or source.
+ */
+export const SYMPTOM_CONDITIONS: Record<string, Record<string, string[]>> = {
+  tingling: {
+    _all: ['doid:9350', 'doid:13241', 'local:cervical-radiculopathy'],
+    neck: ['local:cervical-radiculopathy', 'local:cervicobrachial-syndrome', 'doid:9350'],
+    hands: ['doid:13241', 'doid:9350'],
+    abs: ['doid:9350', 'doid:8505'],
+    back: ['doid:10202-ls', 'local:sciatica', 'doid:9350'],
+    feet: ['doid:9350', 'local:tarsal-tunnel'],
+    legs: ['doid:9350', 'local:deep-vein-thrombosis', 'local:sciatica'],
+    chest: ['doid:12353', 'doid:angina', 'doid:9350'],
+  },
+  burning: {
+    _all: ['doid:9350', 'doid:shingles', 'doid:12353'],
+    neck: ['local:cervical-zoster', 'local:cervical-disc-herniation', 'doid:9350'],
+    hands: ['doid:13241', 'doid:9350', 'local:diabetic-neuropathy'],
+    feet: ['doid:9350', 'doid:12353'],
+    eyes: ['local:dry-eye-syndrome', 'local:sjogren-syndrome'],
+    abs: ['doid:12353', 'doid:gastritis', 'doid:peptic-ulcer'],
+    chest: ['doid:12353', 'doid:angina', 'doid:pericarditis'],
+    urinary: ['doid:uti', 'doid:kidney-stone'],
+  },
+  tightness: {
+    _all: ['doid:6713', 'doid:11476-th'],
+    neck: ['doid:6713', 'local:cervicobrachial-syndrome', 'local:torticollis'],
+    chest: ['doid:angina', 'doid:12353', 'doid:6713'],
+    back: ['doid:6713', 'doid:8505', 'doid:10202-ls'],
+    abs: ['doid:6713', 'doid:ibs', 'doid:gastritis'],
+  },
+  stabbing: {
+    _all: ['doid:6713', 'doid:10202', 'doid:9350'],
+    neck: ['local:cervical-disc-herniation', 'local:cervical-radiculopathy', 'doid:6713'],
+    head: ['doid:3311', 'doid:cluster-headache', 'doid:11476-th'],
+    chest: ['doid:angina', 'doid:pericarditis', 'doid:12353'],
+    abs: ['doid:gastritis', 'doid:peptic-ulcer', 'doid:6713'],
+    back: ['doid:10202-ls', 'local:sciatica', 'doid:6713'],
+    feet: ['doid:9350', 'local:tarsal-tunnel', 'doid:6713'],
+  },
+  throbbing: {
+    _all: ['doid:3311', 'doid:cluster-headache', 'doid:10763'],
+    head: ['doid:3311', 'doid:cluster-headache', 'doid:10763'],
+    neck: ['doid:3311', 'doid:11476-th', 'doid:10763'],
+    chest: ['doid:angina', 'doid:pericarditis'],
+    abs: ['local:aortic-aneurysm', 'doid:pancreatitis', 'doid:6713'],
+  },
+  electric: {
+    _all: ['doid:9350', 'doid:10202-ls', 'local:cervical-radiculopathy'],
+    back: ['doid:10202-ls', 'local:sciatica', 'doid:9350'],
+    hands: ['doid:9350', 'doid:13241'],
+    feet: ['doid:9350', 'local:tarsal-tunnel'],
+    neck: ['local:cervical-radiculopathy', 'doid:10202', 'doid:9350'],
+  },
+  heaviness: {
+    _all: ['doid:10763', 'doid:1490', 'doid:9350'],
+    legs: ['local:edema', 'local:deep-vein-thrombosis', 'doid:varicose-veins'],
+    chest: ['doid:angina', 'doid:pericarditis'],
+    head: ['doid:10763', 'doid:11476-th'],
+  },
+  pressure: {
+    _all: ['doid:11476-th', 'doid:10763'],
+    chest: ['doid:angina', 'local:myocardial-infarction', 'doid:pericarditis'],
+    head: ['doid:11476-th', 'doid:10763'],
+    eyes: ['local:glaucoma'],
+  },
+  dryness: {
+    _all: ['local:dry-eye-syndrome', 'local:sjogren-syndrome'],
+    eyes: ['local:dry-eye-syndrome', 'local:sjogren-syndrome'],
+    mouth: ['local:type-2-diabetes', 'local:sjogren-syndrome'],
+    throat: ['doid:12353', 'local:sjogren-syndrome', 'local:allergic-rhinitis'],
+  },
+};
+
+export const SYMPTOM_TIMING_BOOSTS: Record<string, Record<string, string[]>> = {
+  tingling: {
+    sleep: ['local:cervicobrachial-syndrome', 'doid:13241', 'doid:9350'],
+    morning: ['doid:8483', 'doid:9350'],
+    rest: ['doid:9350', 'local:cervical-radiculopathy'],
+  },
+  throbbing: {
+    sleep: ['doid:3311', 'doid:cluster-headache'],
+    stress: ['doid:3311', 'doid:11476-th'],
+    morning: ['doid:10763', 'doid:3311'],
+  },
+  burning: {
+    sleep: ['doid:9350', 'doid:shingles'],
+    rest: ['doid:9350', 'doid:12353'],
+    after_eating: ['doid:12353', 'doid:gastritis', 'doid:peptic-ulcer'],
+  },
+  tightness: {
+    sleep: ['local:cervicobrachial-syndrome', 'doid:6713'],
+    morning: ['doid:8483', 'doid:6713'],
+    rest: ['doid:6713', 'doid:8505'],
+  },
+  pressure: {
+    stress: ['doid:11476-th', 'doid:angina'],
+    sleep: ['doid:angina', 'doid:10763'],
+  },
+  heaviness: {
+    rest: ['local:deep-vein-thrombosis', 'local:edema', 'doid:varicose-veins'],
+    prolonged_sitting: ['local:deep-vein-thrombosis', 'local:edema'],
+  },
+  dryness: {
+    sleep: ['local:dry-eye-syndrome', 'local:sjogren-syndrome'],
+    morning: ['local:dry-eye-syndrome', 'local:sjogren-syndrome'],
+  },
+};
+
+export const CONTEXT_CONDITION_BOOSTS: Record<string, string[]> = {
+  exercise: ['doid:6713', 'doid:8505-doms', 'doid:10202-ls'],
+  stress: ['doid:11476-th', 'doid:6713', 'doid:3311'],
+  prolonged_sitting: ['local:cervicobrachial-syndrome', 'doid:6713', 'local:sciatica'],
+  cold: ['doid:8483', 'local:raynaud', 'doid:6713'],
+  heat: ['doid:3311', 'local:dehydration', 'local:heat-exhaustion'],
+};
 
 // ---------------------------------------------------------------------------
 // 4) كلمات الشدّة
