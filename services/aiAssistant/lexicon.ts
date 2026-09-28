@@ -1166,18 +1166,18 @@ export const CONTEXTS: Record<string, LexiconBucket> = {
  */
 export const SYMPTOM_CONDITIONS: Record<string, Record<string, string[]>> = {
   tingling: {
-    _all: ['doid:9350', 'doid:13241', 'local:cervical-radiculopathy'],
-    neck: ['local:cervical-radiculopathy', 'local:cervicobrachial-syndrome', 'doid:9350'],
+    _all: ['doid:9350', 'doid:13241', 'doid:10202'],
+    neck: ['doid:10202', 'doid:9350', 'doid:6713'],
     hands: ['doid:13241', 'doid:9350'],
     abs: ['doid:9350', 'doid:8505'],
-    back: ['doid:10202-ls', 'local:sciatica', 'doid:9350'],
-    feet: ['doid:9350', 'local:tarsal-tunnel'],
-    legs: ['doid:9350', 'local:deep-vein-thrombosis', 'local:sciatica'],
+    back: ['doid:10202-ls', 'doid:9350', 'doid:6713'],
+    feet: ['doid:9350', 'doid:6713'],
+    legs: ['doid:9350', 'local:deep-vein-thrombosis', 'doid:10202-ls'],
     chest: ['doid:12353', 'doid:angina', 'doid:9350'],
   },
   burning: {
     _all: ['doid:9350', 'doid:shingles', 'doid:12353'],
-    neck: ['local:cervical-zoster', 'local:cervical-disc-herniation', 'doid:9350'],
+    neck: ['doid:shingles', 'doid:10202', 'doid:9350'],
     hands: ['doid:13241', 'doid:9350', 'local:diabetic-neuropathy'],
     feet: ['doid:9350', 'doid:12353'],
     eyes: ['local:dry-eye-syndrome', 'local:sjogren-syndrome'],
@@ -1187,19 +1187,19 @@ export const SYMPTOM_CONDITIONS: Record<string, Record<string, string[]>> = {
   },
   tightness: {
     _all: ['doid:6713', 'doid:11476-th'],
-    neck: ['doid:6713', 'local:cervicobrachial-syndrome', 'local:torticollis'],
+    neck: ['doid:6713', 'doid:10202', 'doid:9350'],
     chest: ['doid:angina', 'doid:12353', 'doid:6713'],
     back: ['doid:6713', 'doid:8505', 'doid:10202-ls'],
     abs: ['doid:6713', 'doid:ibs', 'doid:gastritis'],
   },
   stabbing: {
     _all: ['doid:6713', 'doid:10202', 'doid:9350'],
-    neck: ['local:cervical-disc-herniation', 'local:cervical-radiculopathy', 'doid:6713'],
+    neck: ['doid:10202', 'doid:6713', 'doid:9350'],
     head: ['doid:3311', 'doid:cluster-headache', 'doid:11476-th'],
     chest: ['doid:angina', 'doid:pericarditis', 'doid:12353'],
     abs: ['doid:gastritis', 'doid:peptic-ulcer', 'doid:6713'],
-    back: ['doid:10202-ls', 'local:sciatica', 'doid:6713'],
-    feet: ['doid:9350', 'local:tarsal-tunnel', 'doid:6713'],
+    back: ['doid:10202-ls', 'doid:6713', 'doid:9350'],
+    feet: ['doid:9350', 'doid:6713', 'doid:13241'],
   },
   throbbing: {
     _all: ['doid:3311', 'doid:cluster-headache', 'doid:10763'],
@@ -1209,11 +1209,11 @@ export const SYMPTOM_CONDITIONS: Record<string, Record<string, string[]>> = {
     abs: ['local:aortic-aneurysm', 'doid:pancreatitis', 'doid:6713'],
   },
   electric: {
-    _all: ['doid:9350', 'doid:10202-ls', 'local:cervical-radiculopathy'],
-    back: ['doid:10202-ls', 'local:sciatica', 'doid:9350'],
+    _all: ['doid:9350', 'doid:10202-ls', 'doid:10202'],
+    back: ['doid:10202-ls', 'doid:9350', 'doid:6713'],
     hands: ['doid:9350', 'doid:13241'],
-    feet: ['doid:9350', 'local:tarsal-tunnel'],
-    neck: ['local:cervical-radiculopathy', 'doid:10202', 'doid:9350'],
+    feet: ['doid:9350', 'doid:6713'],
+    neck: ['doid:10202', 'doid:9350', 'doid:6713'],
   },
   heaviness: {
     _all: ['doid:10763', 'doid:1490', 'doid:9350'],
@@ -1237,9 +1237,9 @@ export const SYMPTOM_CONDITIONS: Record<string, Record<string, string[]>> = {
 
 export const SYMPTOM_TIMING_BOOSTS: Record<string, Record<string, string[]>> = {
   tingling: {
-    sleep: ['local:cervicobrachial-syndrome', 'doid:13241', 'doid:9350'],
+    sleep: ['doid:10202', 'doid:13241', 'doid:9350'],
     morning: ['doid:8483', 'doid:9350'],
-    rest: ['doid:9350', 'local:cervical-radiculopathy'],
+    rest: ['doid:9350', 'doid:10202'],
   },
   throbbing: {
     sleep: ['doid:3311', 'doid:cluster-headache'],
@@ -1252,7 +1252,7 @@ export const SYMPTOM_TIMING_BOOSTS: Record<string, Record<string, string[]>> = {
     after_eating: ['doid:12353', 'doid:gastritis', 'doid:peptic-ulcer'],
   },
   tightness: {
-    sleep: ['local:cervicobrachial-syndrome', 'doid:6713'],
+    sleep: ['doid:10202', 'doid:6713'],
     morning: ['doid:8483', 'doid:6713'],
     rest: ['doid:6713', 'doid:8505'],
   },
@@ -1273,7 +1273,7 @@ export const SYMPTOM_TIMING_BOOSTS: Record<string, Record<string, string[]>> = {
 export const CONTEXT_CONDITION_BOOSTS: Record<string, string[]> = {
   exercise: ['doid:6713', 'doid:8505-doms', 'doid:10202-ls'],
   stress: ['doid:11476-th', 'doid:6713', 'doid:3311'],
-  prolonged_sitting: ['local:cervicobrachial-syndrome', 'doid:6713', 'local:sciatica'],
+  prolonged_sitting: ['doid:10202', 'doid:6713', 'doid:10202-ls'],
   cold: ['doid:8483', 'local:raynaud', 'doid:6713'],
   heat: ['doid:3311', 'local:dehydration', 'local:heat-exhaustion'],
 };
