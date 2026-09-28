@@ -153,12 +153,29 @@ export interface AssistantReply {
 // ---------------------------------------------------------------------------
 // تطبيع النص
 // ---------------------------------------------------------------------------
+// Arabic diacritics + tatweel (\u0640). Tatweel is a *letter* used to stretch a
+// word ("\u062c\u0640\u0640\u0645\u0628\u064a"); it must be stripped or the stretched spelling never matches the
+// "\u062c\u0645\u0628\u064a" keyword and the assistant falls back to asking again.
 const AR_DIACRITICS = /[\u064B-\u0652\u0670\u0640]/g;
+
+// Zero-width / bidi control marks that survive copy-paste on mobile keyboards
+// and silently break substring matching.
+const INVISIBLE_MARKS = /[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g;
 
 export function normalize(text: string): string {
   return text
     .toLowerCase()
+    .replace(INVISIBLE_MARKS, '')
     .replace(AR_DIACRITICS, '')
+    // Accent folding for French/Latin input: a phone keyboard writes "cote" as
+    // often as "côté", and both must hit the same keyword.
+    .replace(/[àâäáãå]/g, 'a')
+    .replace(/[èéêë]/g, 'e')
+    .replace(/[ìíîï]/g, 'i')
+    .replace(/[òóôõö]/g, 'o')
+    .replace(/[ùúûü]/g, 'u')
+    .replace(/ç/g, 'c')
+    .replace(/œ/g, 'oe')
     .replace(/[أإآٱ]/g, 'ا')
     .replace(/ى/g, 'ي')
     .replace(/ئ/g, 'ي')
@@ -172,6 +189,66 @@ function containsKeyword(haystack: string, keyword: string): boolean {
   const needle = normalize(keyword);
   if (!needle) return false;
   return haystack.includes(needle);
+}
+
+// Generic body-area nouns the user may give INSTEAD of a precise sub-location
+// ("\u0648\u0633\u0637 \u0627\u0644\u0638\u0647\u0631", "\u0628\u0637\u0646\u064a", "\u062c\u0646\u0628").
+// Rule from the loop-breaker spec: any place word the user offers, even a general
+// one, counts as a *sufficient* answer - it must stop the location question
+// instead of feeding it. Keyed on the normalised form.
+//
+// Words that already resolve to a region ("\u062c\u0646\u0628\u064a" -> obliques, "\u0636\u0647\u0631\u064a" -> lower
+// back) deliberately stay out of this set: those keep the message ambiguous
+// enough to ask once, which is the behaviour the acceptance flow expects.
+// Relative directions ("\u0645\u0646 \u0641\u0648\u0642", "\u0645\u0646 \u062a\u062d\u062a") are not places and stay out too.
+const GENERIC_AREA_WORDS = new Set<string>([
+  // Arabic
+  '\u0645\u0646\u0637\u0642\u0647',
+  '\u0645\u0646\u0627\u0637\u0642',
+  '\u062c\u0647\u0647',
+  '\u0646\u0627\u062d\u064a\u0647',
+  '\u0648\u0633\u0637',
+  '\u0648\u0633\u0637\u0647',
+  // English
+  'area',
+  'region',
+  'zone',
+  'middle',
+  'part',
+  // French
+  'zones',
+  'endroit',
+  'milieu',
+  'partie',
+]);
+
+/**
+ * True when the user literally named a place, even a vague one.
+ * A generic place word is treated as a sufficient location answer so the
+ * assistant answers instead of repeating the location question.
+ *
+ * Note: Arabic has no word boundaries for short clitics such as "\u0648" (and),
+ * so we match either a standalone token or a prefixed one ("\u0648\u0627\u0644\u0645\u0646\u0637\u0642\u0647").
+ */
+export function mentionsGenericArea(text: string): boolean {
+  const haystack = normalize(text);
+  if (!haystack) return false;
+  const tokens = haystack.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  return tokens.some((token) => {
+    // Arabic glues clitics onto the noun: "منطقة" becomes "المنطقة" with the
+    // article and "والمنطقة" with the article plus the conjunction. We never
+    // strip blindly (a bare "و" is also a real letter in "وسط"), we generate the
+    // candidate forms and accept the token if ANY of them matches.
+    const candidates = [token];
+    for (const prefix of ['و', 'ال', 'وال', 'لل', 'بال', 'فال', 'كال']) {
+      if (token.startsWith(prefix)) candidates.push(token.slice(prefix.length));
+    }
+    return candidates.some((candidate) => {
+      if (candidate.length < 2) return false;
+      if (GENERIC_AREA_WORDS.has(candidate)) return true;
+      return [...GENERIC_AREA_WORDS].some((word) => word.length >= 3 && candidate.startsWith(word));
+    });
+  });
 }
 
 function matchAny(text: string, keywords: Record<Lang, string[]>): boolean {
@@ -991,6 +1068,14 @@ const CLARIFY: LocalizedText = {
   fr: 'Dites-m’en plus : où est la douleur, son intensité (0–10) et depuis combien de temps.',
 };
 
+// Shown when the loop breaker fires: the user already answered the location
+// question, so we answer with what we have instead of asking a third time.
+const RESOLVED_INTRO: LocalizedText = {
+  ar: 'تمام — أخدت بالي الموقع اللي ذكرته، ودي القراءة الكاملة على أساس اللي قلته بدون ما أسألك تاني.',
+  en: 'Got it — I’ll go with the area you gave me. Here is the full reading, no more questions.',
+  fr: 'Compris — je m’appuie sur la zone que vous m’avez donnée. Voici la lecture complète, sans autre question.',
+};
+
 const IMAGE_INTRO: LocalizedText = {
   ar: 'شفت الصورة اللي أرفقتها 📷. التحليل البصري الآلي مش متاح من غير إنترنت، فساعدني بوصف بسيط وأنا أفهمك صح.',
   en: 'I see the photo you attached 📷. Automated image analysis isn’t available offline, so help me with a short description and I’ll understand you.',
@@ -1010,7 +1095,14 @@ export function analyzeMessage(
   rawText: string,
   language: Lang,
   hasImage = false,
-  options: { forceAnswer?: boolean } = {},
+  options: {
+    /** User pushed back (or enough turns passed): always answer, never ask again. */
+    forceAnswer?: boolean;
+    /** How many clarifying questions this conversation has already produced. */
+    askCount?: number;
+    /** How many messages the user has sent in this conversation. */
+    userTurnCount?: number;
+  } = {},
 ): AssistantReply {
   const text = normalize(rawText);
   const detectedRegions = detectRegions(text);
@@ -1029,8 +1121,21 @@ export function analyzeMessage(
   const severity = detectSeverity(text);
   const duration = detectDuration(text);
 
+  const { forceAnswer = false, askCount = 0, userTurnCount = 0 } = options;
+
+  // Two independent loop breakers, matching the accepted criteria:
+  //  1. the explicit counter, still tolerant of ONE asked question;
+  //  2. a hard ceiling: from the user's 3rd message onward we always answer,
+  //     whatever the precision of what they gave us.
+  const askedEnough = askCount >= 2 || userTurnCount >= 3;
+
   const organs = mergeLocationOrgans(detectedOrgans, locations);
-  const askForLocation = !options.forceAnswer && needsClarification(regions, regionLocations, locations, redFlags, organs);
+  const missingLocation =
+    needsClarification(regions, regionLocations, locations, redFlags, organs) &&
+    // A named place - even a vague one such as "\u0648\u0633\u0637 \u0627\u0644\u0638\u0647\u0631" - is a sufficient answer.
+    !mentionsGenericArea(rawText);
+  const mustAnswer = forceAnswer || askedEnough;
+  const askForLocation = missingLocation && !mustAnswer;
 
   const hasText =
     regions.length > 0 || organs.length > 0 || symptoms.length > 0 || redFlags.length > 0;
@@ -1152,11 +1257,17 @@ export function analyzeMessage(
   const primaryRegion = regions[0] ?? null;
   const mapOrgan = askForLocation ? null : (organs.find((organ) => organ.onMap) ?? null);
 
+  // The engine only ever *asks* while it is in the location-question state. Once
+  // the user pushes back (a named place, the counter, or the hard ceiling) we
+  // return a full answer instead. `clarificationOnly` therefore collapses to
+  // exactly `askForLocation` - which is what the screen's counter reads.
+  const clarificationOnly = askForLocation;
+
   return {
-    intro: understood ? (imageOnly ? IMAGE_INTRO : INTRO[triage.level]) : INTRO_UNCLEAR,
+    intro: mustAnswer && understood ? RESOLVED_INTRO : (understood ? (imageOnly ? IMAGE_INTRO : INTRO[triage.level]) : INTRO_UNCLEAR),
     understanding,
     understood,
-    clarificationOnly: askForLocation,
+    clarificationOnly,
     clarifyingQuestion: askForLocation
       ? buildLocationQuestion(regions, language)
       : (understood && !imageOnly ? null : (imageOnly ? IMAGE_CLARIFY : CLARIFY)),
