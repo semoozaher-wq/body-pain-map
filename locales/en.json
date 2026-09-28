@@ -68,7 +68,8 @@
     "home": "Home",
     "map": "Body",
     "history": "History",
-    "assistant": "Assistant"
+    "assistant": "Assistant",
+    "healthInfo": "Health"
   },
   "quickLog": {
     "neck": "Neck",
