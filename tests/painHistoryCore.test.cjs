@@ -43,3 +43,22 @@ test('summarizeHistory يُعيد ملخّصًا وصفيًّا فقط (عدد/�
   assert.equal(s.topArea, 'neck');
   assert.equal(s.topAreaCount, 2);
 });
+
+
+test('summarizeHistory لا يعتبر السجلات بلا تاريخ ضمن آخر 7 أيام', () => {
+  const now = Date.parse('2026-06-10T00:00:00Z');
+  const list = [
+    rec('valid', '2026-06-09T00:00:00Z', 4, { partId: 'neck' }),
+    rec('old', '2026-01-01T00:00:00Z', 4, { partId: 'back' }),
+    { id: 'missing-date', intensity: 8, partId: 'arm' },
+  ];
+  const s = h.summarizeHistory(list, now);
+  assert.equal(s.count, 3);
+  assert.equal(s.recentCount, 1);
+  assert.equal(s.topArea, 'neck');
+});
+
+test('mergeHistories يتجاهل العناصر بلا معرّف صالح', () => {
+  const out = h.mergeHistories([rec('a', '2026-01-01T00:00:00Z')], [{ intensity: 9 }, rec('b', '2026-02-01T00:00:00Z')]);
+  assert.deepEqual(out.map((r) => r.id), ['b', 'a']);
+});

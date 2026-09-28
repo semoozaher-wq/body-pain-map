@@ -17,6 +17,8 @@ test('triageCore يحافظ على سلوك الفرز التاريخي دون �
   assert.equal(core.getTriageStatus(10, ['fainting']), 'urgent');
   assert.equal(core.getTriageStatus(0), 'routine');
   assert.equal(core.getTriageStatus(Number.NaN), 'routine');
+  assert.equal(core.getTriageStatus(10, ['']), 'high_reported_intensity');
+  assert.equal(core.getTriageStatus(10, ['  ']), 'high_reported_intensity');
 });
 
 test('services/triage.js مجرّد واجهة رقيقة فوق المصدر الوحيد للحقيقة', () => {
