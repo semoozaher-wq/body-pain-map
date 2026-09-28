@@ -12,6 +12,7 @@ import {
   sanitizeContactList,
 } from '../services/emergencyCore.js';
 import type { MedicalContact } from '../types';
+import { createLocalId } from '../services/id';
 
 export interface UseMedicalContacts {
   contacts: MedicalContact[];
@@ -24,9 +25,6 @@ export interface UseMedicalContacts {
   primaryContact: MedicalContact | null;
 }
 
-function makeId(): string {
-  return `contact-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-}
 
 export function useMedicalContacts(): UseMedicalContacts {
   const [contacts, setContacts] = useState<MedicalContact[]>([]);
@@ -61,7 +59,7 @@ export function useMedicalContacts(): UseMedicalContacts {
     if (!result.ok || !result.contact) return result.error || 'invalid';
     const record: MedicalContact = {
       ...result.contact,
-      id: result.contact.id || input.id || makeId(),
+      id: result.contact.id || input.id || createLocalId('contact'),
     };
     setContacts((list) => {
       const without = list.filter((item) => item.id !== record.id);

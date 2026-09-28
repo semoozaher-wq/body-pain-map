@@ -16,6 +16,7 @@ import {
   summarizeHistory,
   type HistorySummary,
 } from '../services/painHistoryCore.js';
+import { isCheckup, validateCheckupList } from '../services/painHistoryValidation.js';
 
 export interface UsePainHistory {
   /** السجل الحالي (من الأحدث إلى الأقدم). */
@@ -46,7 +47,9 @@ export function usePainHistory(): UsePainHistory {
         if (saved) {
           try {
             const parsed: unknown = JSON.parse(saved);
-            if (Array.isArray(parsed)) setHistory(parsed as Checkup[]);
+            const valid = validateCheckupList(parsed);
+            if (valid.length) setHistory(valid);
+            else if (Array.isArray(parsed) && parsed.length === 0) setHistory([]);
           } catch {
             /* الإبقاء على سجل فارغ إذا كان JSON المحفوظ تالفًا */
           }
@@ -68,11 +71,13 @@ export function usePainHistory(): UsePainHistory {
   }, [history, loaded]);
 
   const addRecord = useCallback((record: Checkup) => {
+    if (!isCheckup(record)) return;
     setHistory((items) => prependRecord(items, record) as Checkup[]);
   }, []);
 
   const importRecords = useCallback((records: Checkup[]) => {
-    setHistory((items) => mergeHistories(items, records) as Checkup[]);
+    const valid = validateCheckupList(records);
+    setHistory((items) => mergeHistories(items, valid) as Checkup[]);
   }, []);
 
   const clearHistory = useCallback(() => setHistory([]), []);
