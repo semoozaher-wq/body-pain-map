@@ -1,7 +1,7 @@
 // MainApp.tsx
 
-import { useState } from 'react';
-import { Alert, Platform, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Alert, BackHandler, Platform, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
@@ -22,6 +22,7 @@ import { DetailsScreen } from './screens/DetailsScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { AssistantScreen } from './screens/AssistantScreen';
+import { HealthInfoScreen } from './screens/HealthInfoScreen';
 import { BrandLogo } from './components/BrandLogo';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -30,6 +31,27 @@ const data = anatomyMap as unknown as AnatomyData;
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('welcome');
+  const [navHistory, setNavHistory] = useState<Screen[]>([]);
+  const [assistantContext, setAssistantContext] = useState<string | undefined>();
+
+  const navigateTo = (next: Screen) => {
+    if (next === screen) return;
+    setNavHistory((prev) => [...prev, screen]);
+    setScreen(next);
+  };
+
+  const goBack = () => {
+    setNavHistory((prev) => {
+      if (prev.length === 0) {
+        setScreen('welcome');
+        return [];
+      }
+      const copy = [...prev];
+      const previous = copy.pop()!;
+      setScreen(previous);
+      return copy;
+    });
+  };
   const [quickRelief, setQuickRelief] = useState(false);
   const [requestedOrgan, setRequestedOrgan] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -50,6 +72,17 @@ export default function App() {
   const { language, direction, setLanguage } = useLanguage();
   const { isDark, colors, toggleTheme } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
+
+  // اعتراض زر الرجوع في Android واستخدام نفس stack الداخلي للتطبيق.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (screen === 'welcome' && navHistory.length === 0) return false;
+      goBack();
+      return true;
+    });
+    return () => subscription.remove();
+  }, [screen, navHistory.length]);
   const quickLogAreas = [
     { id: 'neck-male-back-1', label: t('quickLog.neck') },
     { id: 'deltoids-male-back-1', label: t('quickLog.shoulder') },
@@ -67,7 +100,7 @@ export default function App() {
   const handleNavigateToDetails = (muscleData: Muscle) => {
     setSelectedMuscleData(muscleData);
     setSelectedId(muscleData.id);
-    setScreen('details');
+    navigateTo('details');
   };
 
   // يفتح المنطقة التي اقترحها المساعد الذكي على خريطة الجسم (يعيد استخدام تدفّق التفاصيل).
@@ -78,14 +111,14 @@ export default function App() {
       return;
     }
     setQuickRelief(false);
-    setScreen('body');
+    navigateTo('body');
   };
 
   // يفتح العضو الداخلي الذي ذكره المساعد الذكي على خريطة الأعضاء مباشرة.
   const openOrganFromAssistant = (organId: string) => {
     setRequestedOrgan(organId);
     setQuickRelief(false);
-    setScreen('body');
+    navigateTo('body');
   };
 
   const saveResults = () => {
@@ -111,7 +144,7 @@ export default function App() {
       createdAt: new Date().toLocaleDateString('ar-EG'),
       createdAtIso: new Date().toISOString(),
     });
-    setScreen('results');
+    navigateTo('results');
   };
 
   const saveQuickLog = (record: Checkup) => addRecord(record);
@@ -147,7 +180,7 @@ export default function App() {
     setRedFlags([]);
     setSymptoms([]);
     setAfterIntensity('');
-    setScreen('body');
+    navigateTo('body');
   };
 
   const clearHistory = () => {
@@ -170,6 +203,7 @@ export default function App() {
       results: t('screenTitles.results'),
       history: t('historyTitle'),
       assistant: t('assistant.name'),
+      healthInfo: t('nav.healthInfo'),
     };
     return titles[screen];
   };
@@ -191,7 +225,6 @@ export default function App() {
       {screen !== 'welcome' && (
         <Header
           title={getTitle()}
-          onBack={() => setScreen(screen === 'history' || screen === 'assistant' ? 'welcome' : 'body')}
           rightAction={(
             <View style={styles.headerActions}>
               <LanguageSwitcher language={language} onChange={setLanguage} />
@@ -207,7 +240,19 @@ export default function App() {
           direction={direction}
           onOpenRegion={openRegionFromAssistant}
           onOpenOrgan={openOrganFromAssistant}
+          initialContext={assistantContext}
         />
+      ) : screen === 'healthInfo' ? (
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <HealthInfoScreen
+            language={language}
+            direction={direction}
+            onOpenAssistant={(ctx) => {
+              setAssistantContext(ctx);
+              navigateTo('assistant');
+            }}
+          />
+        </ScrollView>
       ) : (
       <ScrollView
         contentContainerStyle={styles.content}
@@ -215,13 +260,13 @@ export default function App() {
       >
         {screen === 'welcome' && (
           <WelcomeScreen
-            onStart={() => { setRequestedOrgan(null); setQuickRelief(false); setScreen('body'); }}
-            onQuickRelief={() => { setRequestedOrgan(null); setQuickRelief(true); setScreen('body'); }}
+            onStart={() => { setRequestedOrgan(null); setQuickRelief(false); navigateTo('body'); }}
+            onQuickRelief={() => { setRequestedOrgan(null); setQuickRelief(true); navigateTo('body'); }}
             language={language}
             direction={direction}
             history={history}
-            onOpenHistory={() => setScreen('history')}
-            onOpenAssistant={() => setScreen('assistant')}
+            onOpenHistory={() => navigateTo('history')}
+            onOpenAssistant={(ctx) => { setAssistantContext(ctx); navigateTo('assistant'); }}
             quickAreas={quickLogAreas}
             onQuickSave={saveQuickLog}
           />
@@ -262,7 +307,7 @@ export default function App() {
             setSymptoms={setSymptoms}
             afterIntensity={afterIntensity}
             setAfterIntensity={setAfterIntensity}
-            onBack={() => setScreen('body')}
+            onBack={goBack}
             onNext={saveResults}
             language={language}
             direction={direction}
@@ -289,7 +334,7 @@ export default function App() {
         {screen === 'history' && (
           <HistoryScreen
             history={history}
-            onBack={() => setScreen(selected ? 'results' : 'welcome')}
+            onBack={goBack}
             onClear={clearHistory}
             onImport={importRecords}
             language={language}
@@ -298,11 +343,21 @@ export default function App() {
         )}
       </ScrollView>
       )}
+      {screen !== 'welcome' && (
+        <Pressable
+          onPress={goBack}
+          accessibilityRole="button"
+          style={[styles.internalBack, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          <Text style={[styles.internalBackText, { color: colors.primary }]}>{direction === 'rtl' ? '→' : '←'} {t('back')}</Text>
+        </Pressable>
+      )}
       <View style={[styles.bottomNav, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <NavItem icon="⌂" title={t('nav.home')} active={screen === 'welcome'} onPress={() => setScreen('welcome')} colors={colors} />
-        <NavItem icon="◎" title={t('nav.map')} active={screen === 'body' || screen === 'details' || screen === 'results'} onPress={() => { setRequestedOrgan(null); setQuickRelief(false); setScreen('body'); }} colors={colors} />
-        <NavItem icon="✦" title={t('nav.assistant')} active={screen === 'assistant'} onPress={() => setScreen('assistant')} colors={colors} />
-        <NavItem icon="◷" title={t('nav.history')} active={screen === 'history'} onPress={() => setScreen('history')} colors={colors} />
+        <NavItem icon="⌂" title={t('nav.home')} active={screen === 'welcome'} onPress={() => navigateTo('welcome')} colors={colors} />
+        <NavItem icon="◎" title={t('nav.map')} active={screen === 'body' || screen === 'details' || screen === 'results'} onPress={() => { setRequestedOrgan(null); setQuickRelief(false); navigateTo('body'); }} colors={colors} />
+        <NavItem icon="✦" title={t('nav.assistant')} active={screen === 'assistant'} onPress={() => { setAssistantContext(undefined); navigateTo('assistant'); }} colors={colors} />
+        <NavItem icon="♡" title={t('nav.healthInfo')} active={screen === 'healthInfo'} onPress={() => navigateTo('healthInfo')} colors={colors} />
+        <NavItem icon="◷" title={t('nav.history')} active={screen === 'history'} onPress={() => navigateTo('history')} colors={colors} />
       </View>
     </SafeAreaView>
   );
@@ -325,6 +380,8 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 26,
   },
+  internalBack: { alignSelf: 'center', minWidth: 104, borderRadius: Radii.pill, borderWidth: 1, paddingHorizontal: 14, paddingVertical: 7, marginBottom: 6, alignItems: 'center' },
+  internalBackText: { fontSize: 12, fontWeight: '900' },
   bottomNav: { flexDirection: 'row-reverse', justifyContent: 'space-around', alignItems: 'center', marginHorizontal: 14, marginBottom: Platform.OS === 'ios' ? 10 : 12, borderRadius: Radii.xl, borderWidth: 1, paddingVertical: 8, ...Elevation.lg },
   navItem: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3 },
   navPill: { width: 48, height: 30, borderRadius: Radii.pill, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
