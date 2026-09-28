@@ -41,9 +41,9 @@ const styles = StyleSheet.create({
   badge: { backgroundColor: '#E7F5F2', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 6 }, badgeText: { color: '#0B7774', fontSize: 10, fontWeight: '900' },
   imageFrame: { width: '100%', maxWidth: 470, alignSelf: 'center', aspectRatio: 0.67, maxHeight: 760, backgroundColor: '#F9FBFB', borderRadius: 16, position: 'relative', overflow: 'hidden', borderWidth: 1, borderColor: '#E5ECEC' },
   image: { width: '100%', height: '100%' },
-  marker: { position: 'absolute', width: 26, height: 26, marginLeft: -13, marginTop: -13, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.78)', borderWidth: 2, borderColor: '#D94F56', alignItems: 'center', justifyContent: 'center', zIndex: 3 },
-  markerActive: { zIndex: 10, transform: [{ scale: 1.18 }], backgroundColor: '#D94F56' },
-  dot: { width: 9, height: 9, borderRadius: 5, backgroundColor: '#D94F56' }, dotActive: { backgroundColor: '#FFFFFF' },
+  marker: { position: 'absolute', width: 44, height: 44, marginLeft: -22, marginTop: -22, borderRadius: 22, backgroundColor: 'transparent', borderWidth: 0, alignItems: 'center', justifyContent: 'center', zIndex: 3 },
+  markerActive: { zIndex: 10, transform: [{ scale: 1.08 }], backgroundColor: 'rgba(213,78,78,0.18)', borderWidth: 2, borderColor: 'rgba(213,78,78,0.48)', shadowColor: '#D54E4E', shadowOpacity: 0.55, shadowRadius: 12, shadowOffset: { width: 0, height: 0 }, elevation: 5 },
+  dot: { width: 1, height: 1, borderRadius: 1, backgroundColor: 'transparent' }, dotActive: { backgroundColor: 'transparent' },
   markerLabel: { position: 'absolute', top: 28, minWidth: 88, backgroundColor: '#193D45', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 5 }, markerLabelText: { color: '#FFFFFF', textAlign: 'center', fontSize: 10, fontWeight: '800' },
   markerList: { flexDirection: 'row-reverse', gap: 6, paddingVertical: 8 }, markerChip: { borderWidth: 1, borderColor: '#D5E4E5', borderRadius: 13, paddingHorizontal: 10, paddingVertical: 7, backgroundColor: '#F7FBFA' }, markerChipActive: { backgroundColor: '#0B7774', borderColor: '#0B7774' }, markerChipText: { color: '#315A60', fontSize: 10, fontWeight: '800' }, markerChipTextActive: { color: '#FFFFFF' },
   footer: { color: '#697D81', fontSize: 10, lineHeight: 16, textAlign: 'right', marginTop: 8 }, selectedText: { color: '#0B7774', fontWeight: '900', fontSize: 12, textAlign: 'right', marginTop: 4 }
