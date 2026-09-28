@@ -1,6 +1,5 @@
 // App.tsx
 
-import React from 'react';
 import { ThemeProvider } from './hooks/useTheme';
 import MainApp from './MainApp';
 

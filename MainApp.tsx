@@ -1,6 +1,6 @@
 // MainApp.tsx
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Alert, Platform, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
