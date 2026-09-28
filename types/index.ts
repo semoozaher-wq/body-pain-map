@@ -50,3 +50,26 @@ export type Checkup = {
   selfCareGuide?: string;
   selfCarePointId?: string;
 };
+
+/** جهة اتصال طبية محفوظة محليًّا (لا تُرسل لخادم). */
+export type MedicalContact = {
+  id: string;
+  name: string;
+  phone: string;
+  /** الصفة: طبيب / قريب … اختياري. */
+  relation: string;
+  /** جهة الاتصال الأساسية التي تظهر في لوحة الطوارئ. */
+  isPrimary: boolean;
+};
+
+/**
+ * بلد في جدول أرقام الطوارئ.
+ * ملاحظة: كل الأرقام قيم افتراضية تحتاج تأكيدًا — راجع data/emergencyNumbers.json
+ * وservices/emergencyCore.js.
+ */
+export type EmergencyCountry = {
+  code: string;
+  name: { ar: string; en: string; fr: string };
+  needsConfirmation: boolean;
+  numbers: Array<{ key: string; number: string }>;
+};
