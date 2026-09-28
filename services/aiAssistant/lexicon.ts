@@ -149,7 +149,10 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'torso_front',
     label: { ar: 'الخواصر (الجانب)', en: 'Flank / side', fr: 'Flanc / côté' },
     keywords: {
-      ar: ['جنبي', 'خواصري', 'الخاصرة', 'الجانب', 'على جنب', 'جبي', 'جمبي', 'جنبي', 'على جبي', 'على جمبي', 'جنابي', 'الجنب', 'جنبى', 'الجانب'],
+      // 'جنب' is the bare, non-possessive form of 'جنبي' / 'الجانب'. Without it a
+      // message like "في وجع في جنب" matched no region at all and fell through the
+      // location-question state, which the loop-breaker criteria require to accept.
+      ar: ['جنب', 'جنبي', 'خواصري', 'الخاصرة', 'الجانب', 'على جنب', 'جبي', 'جمبي', 'جنبي', 'على جبي', 'على جمبي', 'جنابي', 'الجنب', 'جنبى', 'الجانب'],
       en: ['flank', 'side', 'waist'],
       fr: ['flanc', 'côté', 'taille'],
     },
