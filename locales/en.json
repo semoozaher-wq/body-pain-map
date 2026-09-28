@@ -177,5 +177,36 @@
     "quickSymptoms": "Quick symptoms",
     "medicationsDetected": "Medicines mentioned",
     "followUpReminder": "Is the pain still there? Has it improved or stayed the same?"
+  },
+  "emergency": {
+    "title": "Emergency button",
+    "subtitle": "Emergency numbers by country",
+    "call": "Call",
+    "callConfirm": "This will open your phone app to call {number}. Continue?",
+    "confirmTitle": "Confirm call",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "disclaimer": "Numbers are shown as default values and need your confirmation; emergency numbers differ by country and can change. Verify your local number before calling.",
+    "needsConfirmation": "Default value — needs confirmation",
+    "changeCountry": "Change country",
+    "countryLabel": "Country",
+    "noContacts": "No saved medical contacts yet.",
+    "primaryContact": "Primary contact",
+    "callEmergencyFirst": "In a life-threatening situation, call emergency services first."
+  },
+  "contacts": {
+    "title": "Medical contacts",
+    "subtitle": "Add your doctor or an emergency contact (stored on your device only)",
+    "namePlaceholder": "Name",
+    "phonePlaceholder": "Phone number",
+    "relationPlaceholder": "Relation (doctor/family)",
+    "primaryLabel": "Set as primary contact",
+    "add": "Add contact",
+    "update": "Update",
+    "delete": "Delete",
+    "empty": "No contacts yet. Add one for emergencies.",
+    "invalidName": "Enter a valid name.",
+    "invalidPhone": "Enter a valid phone number.",
+    "localNotice": "All contact data is stored on your device only and is never sent to any server."
   }
 }

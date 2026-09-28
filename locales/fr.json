@@ -177,5 +177,36 @@
     "quickSymptoms": "Symptômes rapides",
     "medicationsDetected": "Médicaments mentionnés",
     "followUpReminder": "La douleur est-elle toujours là ? S’est-elle améliorée ou reste-t-elle la même ?"
+  },
+  "emergency": {
+    "title": "Bouton d'urgence",
+    "subtitle": "Numéros d'urgence par pays",
+    "call": "Appeler",
+    "callConfirm": "Cela ouvrira l'application téléphone pour appeler le {number}. Continuer ?",
+    "confirmTitle": "Confirmer l'appel",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "disclaimer": "Les numéros sont affichés comme valeurs par défaut et nécessitent votre confirmation ; les numéros d'urgence varient selon le pays et peuvent changer. Vérifiez votre numéro local avant d'appeler.",
+    "needsConfirmation": "Valeur par défaut — à confirmer",
+    "changeCountry": "Changer de pays",
+    "countryLabel": "Pays",
+    "noContacts": "Aucun contact médical enregistré.",
+    "primaryContact": "Contact principal",
+    "callEmergencyFirst": "En cas de danger vital, appelez d'abord les urgences."
+  },
+  "contacts": {
+    "title": "Contacts médicaux",
+    "subtitle": "Ajoutez votre médecin ou un contact d'urgence (stocké sur votre appareil uniquement)",
+    "namePlaceholder": "Nom",
+    "phonePlaceholder": "Numéro de téléphone",
+    "relationPlaceholder": "Relation (médecin/famille)",
+    "primaryLabel": "Définir comme contact principal",
+    "add": "Ajouter un contact",
+    "update": "Mettre à jour",
+    "delete": "Supprimer",
+    "empty": "Aucun contact. Ajoutez-en un pour les urgences.",
+    "invalidName": "Saisissez un nom valide.",
+    "invalidPhone": "Saisissez un numéro valide.",
+    "localNotice": "Toutes les données de contact sont stockées uniquement sur votre appareil."
   }
 }
