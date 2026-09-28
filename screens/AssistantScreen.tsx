@@ -390,8 +390,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     const context = initialContext?.trim();
     if (!context || initialContextSentRef.current) return;
     initialContextSentRef.current = true;
-    sendMessage(context);
-  }, [initialContext, sendMessage]);
+    send(context);
+  }, [initialContext, send]);
 
   const scrollToEnd = useCallback(() => {
     requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
