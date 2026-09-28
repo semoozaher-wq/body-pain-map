@@ -168,6 +168,23 @@ const SUPPLEMENTAL_CONDITIONS: MedicalCondition[] = [
     muscleGroups: ['neck', 'shoulder', 'hands'], regions: ['head_neck', 'upper_limb'], symptoms: [],
     redFlags: { ar: 'تورم أو تغير لون الذراع المفاجئ أو ضعف شديد يحتاج تقييمًا عاجلًا.', en: 'Sudden arm swelling, color change, or marked weakness needs urgent assessment.', fr: 'Gonflement soudain du bras, changement de couleur ou faiblesse importante nécessite une évaluation urgente.' }, medlinePlusUrl: '', sources: [],
   },
+
+  {
+    id: 'local:deep-vein-thrombosis', doid: null, doidStatus: 'not-mapped', batch: 'AI', icd10: 'I80.2',
+    name: { ar: 'جلطة وريدية عميقة', en: 'Deep vein thrombosis', fr: 'Thrombose veineuse profonde' },
+    summary: { ar: 'جلطة دموية في وريد عميق، غالبًا بالساق؛ تورم مفاجئ في ساق واحدة أو ضيق نفس يحتاج طوارئ.', en: 'A blood clot in a deep vein, usually in the leg; sudden one-sided swelling or shortness of breath needs emergency care.', fr: 'Caillot sanguin dans une veine profonde, souvent la jambe ; gonflement unilatéral brutal ou essoufflement = urgence.' },
+    muscleGroups: ['calves'], regions: ['lower_limb'], symptoms: ['hpo:0001369','hpo:0003401'],
+    redFlags: { ar: 'تورم مفاجئ في ساق واحدة، أو ألم مع احمرار وسخونة، أو ضيق نفس مفاجئ.', en: 'Sudden one-sided leg swelling, or pain with redness and warmth, or sudden shortness of breath.', fr: 'Gonflement brutal d’une jambe, ou douleur avec rougeur et chaleur, ou essoufflement soudain.' },
+    medlinePlusUrl: 'https://medlineplus.gov/deepveinthrombosis.html', sources: [{ title: 'MedlinePlus — Deep Vein Thrombosis', url: 'https://medlineplus.gov/deepveinthrombosis.html' }],
+  },
+  {
+    id: 'local:raynaud', doid: null, doidStatus: 'not-mapped', batch: 'AI', icd10: 'I73.0',
+    name: { ar: 'ظاهرة رينود', en: 'Raynaud phenomenon', fr: 'Phénomène de Raynaud' },
+    summary: { ar: 'تضيّق الأوعية الدموية في الأصابع عند البرد أو التوتر، مع تغيّر اللون وتنميل.', en: 'Blood vessel narrowing in fingers on cold or stress, with colour change and numbness.', fr: 'Rétrécissement vasculaire des doigts au froid ou stress, avec changement de couleur et engourdissement.' },
+    muscleGroups: ['hands','feet'], regions: ['upper_limb','lower_limb'], symptoms: ['hpo:0003401','hpo:0003474'],
+    redFlags: { ar: 'تغيّر اللون لا يعود لطبيعته، أو ظهور قرحة/جرح في الأصابع أو القدمين، يحتاج تقييمًا طبيًا.', en: 'Color changes that do not return to normal, or sores on the fingers or toes, need medical assessment.', fr: 'Un changement de couleur qui ne revient pas à la normale, ou une plaie aux doigts ou aux orteils, nécessite une évaluation médicale.' },
+    medlinePlusUrl: 'https://medlineplus.gov/raynaudphenomenon.html', sources: [{ title: 'MedlinePlus — Raynaud Phenomenon', url: 'https://medlineplus.gov/raynaudphenomenon.html' }],
+  },
 ];
 
 const DIFFUSE_IDS = new Set(['doid:1490', 'doid:8505', 'doid:8505-doms']);
