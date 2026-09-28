@@ -344,19 +344,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       const hasImg = !!imageUri;
       if ((!text && !hasImg) || thinking) return;
 
-      const previousUserMessage = [...messages]
-        .reverse()
-        .find((m) => m.role === 'user');
-      // Only carry the previous user message forward when the new input is a
-      // short follow-up (for example: "يمين", "من 3 أيام", "فيه تنميل").
-      // A complete new complaint must stand on its own; otherwise an old
-      // HealthInfo context can contaminate the new location/symptom detection.
-      const isFollowUpFragment =
-        text.split(/\s+/).filter(Boolean).length <= 5 &&
-        !/(ضهر|ظهر|بطن|بطن|رقب|كتف|صدر|راس|رأس|يد|ايد|رجل|ركب|قدم|فخذ|جنب|خاصر|معدة|قلب|عين|ورك|كوع|ذراع|ساق|ankle|foot|leg|knee|back|abdomen|neck|shoulder|chest|head|hand|arm|hip|elbow|wrist)/i.test(text);
-      const fullText = isFollowUpFragment && previousUserMessage
-        ? `${previousUserMessage.text} ${text}`.trim()
-        : text;
+      const userMessages = messages
+        .filter((m) => m.role === 'user')
+        .slice(-2)
+        .map((m) => (m.role === 'user' ? m.text : ''))
+        .join(' ');
+
+      const fullText = `${userMessages} ${text}`.trim();
       // Loop breaker: `askCountRef` is the single source of truth for how many
       // clarifying questions we already asked, and `userTurnCount` is the hard
       // ceiling (from the user's 3rd message the engine must always answer).
@@ -396,7 +390,9 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     const context = initialContext?.trim();
     if (!context || initialContextSentRef.current) return;
     initialContextSentRef.current = true;
-    send(context);
+    // Defer one tick so the screen is mounted before the context is submitted.
+    const timer = setTimeout(() => send(context), 0);
+    return () => clearTimeout(timer);
   }, [initialContext, send]);
 
   const scrollToEnd = useCallback(() => {

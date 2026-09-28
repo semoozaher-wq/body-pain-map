@@ -300,7 +300,13 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
             <>
               <Text style={styles.helper}>{t('bodyPicker.anatomyMapHint')}</Text>
               {bodyViewMode === 'illustration' ? <IllustratedBodyMap
-                source={activeView === 'front' ? (gender === 'female' ? require('../assets/anatomy/muscle-front-atlas-female.png') : require('../assets/anatomy/muscle-front-atlas.png')) : (gender === 'female' ? require('../assets/anatomy/muscle-back-atlas-female.png') : require('../assets/anatomy/muscle-back-atlas.png'))}
+                source={activeView === 'front'
+                  ? (gender === 'female'
+                    ? require('../assets/anatomy/muscle-front-atlas-female.png')
+                    : require('../assets/anatomy/muscle-front-realistic.png'))
+                  : (gender === 'female'
+                    ? require('../assets/anatomy/muscle-back-atlas-female.png')
+                    : require('../assets/anatomy/muscle-back-realistic.png'))}
                 markers={visibleMuscleHotspots.map((spot) => { const point = gender === 'female' && activeView === 'front' ? femaleFrontAdjustments[spot.id] : undefined; return { id: spot.id, x: point?.x ?? spot.x, y: point?.y ?? spot.y, label: spot.label }; })}
                 language={language}
                 title={t('bodyPicker.title')}
