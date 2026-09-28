@@ -31,6 +31,7 @@ import { Gradient } from '../components/Gradient';
 import { GlowOrb } from '../components/GlowOrb';
 import { useTheme } from '../hooks/useTheme';
 import { translate } from '../services/i18n';
+import { createLocalId } from '../services/id';
 import {
   analyzeMessage,
   QUICK_PROMPTS,
@@ -147,7 +148,7 @@ function cleanMedicalName(name: string): string {
 }
 
 let msgCounter = 0;
-const nextId = () => `m${Date.now()}-${msgCounter++}`;
+const nextId = () => `${createLocalId('message')}-${msgCounter++}`;
 
 /**
  * Loop breaker: how many clarifying questions the assistant may ask in a row
