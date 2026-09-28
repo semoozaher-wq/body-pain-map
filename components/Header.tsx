@@ -4,7 +4,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Fonts } from '../constants/fonts';
-import { Palette, Radii, Elevation, Type } from '../constants/design';
+import { Radii, Elevation, Type } from '../constants/design';
 import { useTheme } from '../hooks/useTheme';
 
 interface HeaderProps {
@@ -15,7 +15,7 @@ interface HeaderProps {
 }
 
 export function Header({ title, subtitle, onBack, rightAction }: HeaderProps) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <View style={styles.container}>

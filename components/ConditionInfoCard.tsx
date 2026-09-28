@@ -1,6 +1,5 @@
 // components/ConditionInfoCard.tsx
 // بطاقة معلومات حالة مرضية: الاسم، الملخص، الأعراض (HPO)، علامات الخطر، ورابط MedlinePlus.
-import React from 'react';
 import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Language } from '../services/medical/diseaseLibrary';
 import { localize, getSymptomsForCondition, type MedicalCondition } from '../services/medical/diseaseLibrary';

@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { useCallback, useMemo } from 'react';
+import { StyleSheet, View } from 'react-native';
 import Svg, {
-  G, Path, Use, Defs, LinearGradient, Stop, ClipPath,
+  G, Path,
 } from 'react-native-svg';
 // ============================================================================
 // WebBodySilhouette
@@ -46,7 +46,6 @@ export default function WebBodySilhouette({
   view,
   selectedSlugs = [],
   onFragmentPress,
-  numberForSlug,
   width = 360,
 }: WebBodySilhouetteProps) {
   const selectedSet = useMemo(() => new Set(selectedSlugs), [selectedSlugs]);

@@ -2,7 +2,7 @@
 // بطاقة إدارة جهات الاتصال الطبية: إضافة / تعديل / حذف، مع تحديد جهة أساسية
 // تظهر في لوحة الطوارئ. كل البيانات تُحفظ محليًّا على الجهاز (AsyncStorage) — بلا خادم.
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { Fonts } from '../constants/fonts';
 import { Spacing, BorderRadius } from '../constants/spacing';

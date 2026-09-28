@@ -1,7 +1,7 @@
 // components/AnatomyExplorerPanel.tsx
 // مستكشف التشريح: منطقة أساسية → منطقة فرعية → بنية محددة → الأمراض المرتبطة بها (offline).
 // يعرض نطاق الحجم التقديري لكل بنية، ويربط كل بنية بالأمراض التي تحمل taxonomy.structures مطابقًا.
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Language } from '../services/medical/diseaseLibrary';
 import { localize } from '../services/medical/diseaseLibrary';

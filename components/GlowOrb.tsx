@@ -1,7 +1,7 @@
 // components/GlowOrb.tsx
 // هالة ضوئية ناعمة (radial glow) تُستخدم لعمق الخلفية والهيرو.
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Defs, RadialGradient, Stop, Circle } from 'react-native-svg';
 

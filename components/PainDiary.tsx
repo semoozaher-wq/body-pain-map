@@ -1,4 +1,3 @@
-import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 type Entry = { intensity: number; createdAt: string; partId: string };
 export function PainDiary({ entries }: { entries: Entry[] }) { const recent = entries.slice(0, 7).reverse(); const avg = entries.length ? (entries.reduce((a, e) => a + e.intensity, 0) / entries.length).toFixed(1) : '—'; return <View style={styles.card}><Text style={styles.title}>دفتر الألم عبر الزمن</Text><Text style={styles.meta}>متوسط الشدة: {avg} · عدد السجلات: {entries.length}</Text>{recent.length ? <View style={styles.chart}>{recent.map((e, i) => <View key={`${e.createdAt}-${i}`} style={styles.barWrap}><View style={[styles.bar, { height: Math.max(8, e.intensity * 10) }]} /><Text style={styles.label}>{e.intensity}</Text></View>)}</View> : <Text style={styles.empty}>أضف فحوصات متعددة لرؤية الاتجاه.</Text>}<Text style={styles.disclaimer}>المخطط وصفي وليس أداة تشخيص.</Text></View>; }

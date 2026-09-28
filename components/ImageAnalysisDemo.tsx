@@ -3,7 +3,6 @@
 // نسخة محدّثة: تستدعي طبقة التحليل السريري (فحص الجودة + الفرز القائم على القواعد)
 // قبل أي استدعاء لنموذج ذكي، وتستخدم الأسئلة الديناميكية.
 
-import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ClinicalAnalysisPanel } from './ClinicalAnalysisPanel';
 

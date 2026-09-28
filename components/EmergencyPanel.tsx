@@ -7,7 +7,7 @@
 //
 // تخزين محلي فقط: اختيار البلد وجهات الاتصال تُحفظ على الجهاز عبر AsyncStorage.
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Alert, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Fonts } from '../constants/fonts';

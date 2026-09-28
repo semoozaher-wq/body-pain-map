@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Image, LayoutChangeEvent, Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
 import { Colors } from '../constants/colors';
 import { BorderRadius, Spacing } from '../constants/spacing';

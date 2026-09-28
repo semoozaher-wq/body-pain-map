@@ -1,6 +1,6 @@
 // components/MedicalLibraryTabsPanel.tsx
 // تبويبان في نفس اللوحة: قائمة الأمراض (المكتبة) و مستكشف التشريح الهرمي (منطقة → منطقة فرعية → بنية → أمراض).
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Language } from '../services/medical/diseaseLibrary';
 import { MedicalLibraryPanel } from './MedicalLibraryPanel';

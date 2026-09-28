@@ -1,6 +1,6 @@
 // components/MedicalLibraryPanel.tsx
 // لوحة المكتبة الطبية: تصفّح الأمراض حسب منطقة الجسم + بحث نصي (offline بالكامل).
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { Language } from '../services/medical/diseaseLibrary';
 import {

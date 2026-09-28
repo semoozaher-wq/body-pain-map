@@ -1,7 +1,7 @@
 // components/DrugLookupPanel.tsx
 // لوحة البحث عن الأدوية: RxNorm (توحيد الأسماء) + openFDA (الملصق والتحذيرات).
 // ملاحظة: النتائج مرجعية تعليمية فقط، وليست توصية أو وصفة.
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import type { Language } from '../services/medical/diseaseLibrary';
 import { useDrugLookup } from '../hooks/useDrugLookup';

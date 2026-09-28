@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import reliefData from '../data/naturalRelief.json';
 import type { Language } from '../services/i18n';

@@ -1,9 +1,8 @@
 // components/BrandLogo.tsx
 // شعار العلامة: مربّع بتدرّج + نبضة + اسم التطبيق.
 
-import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Palette, Gradients, Radii, Elevation, Type } from '../constants/design';
+import { Palette, Gradients, Elevation } from '../constants/design';
 import { Gradient } from './Gradient';
 
 export function BrandLogo({ compact = false }: { compact?: boolean }) {

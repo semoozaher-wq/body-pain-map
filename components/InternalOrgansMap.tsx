@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Ellipse, G, Line, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Rect } from 'react-native-svg';
 import type { Language } from '../services/i18n';
 
 type OrganId = 'heart' | 'lungs' | 'stomach' | 'liver' | 'kidneys' | 'thyroid';
