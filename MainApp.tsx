@@ -1,14 +1,13 @@
 // MainApp.tsx
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Alert, Platform, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
+import { usePainHistory } from './hooks/usePainHistory';
 import { translate } from './services/i18n';
 import { Screen, AnatomyData, Checkup, Muscle } from './types';
-import { DATA } from './constants/appConstants';
 import { Colors } from './constants/colors';
 import { Palette, Gradients, Radii, Elevation } from './constants/design';
 import { Gradient } from './components/Gradient';
@@ -41,13 +40,12 @@ export default function App() {
   const [redFlags, setRedFlags] = useState<string[]>([]);
   const [symptoms, setSymptoms] = useState<string[]>([]);
   const [afterIntensity, setAfterIntensity] = useState('');
-  const [history, setHistory] = useState<Checkup[]>([]);
-  const [historyLoaded, setHistoryLoaded] = useState(false);
   const [medication, setMedication] = useState('');
   const [triggers, setTriggers] = useState('');
   const [sleepHours, setSleepHours] = useState('');
   const [activity, setActivity] = useState('');
 
+  const { history, addRecord, importRecords, clearHistory: clearHistoryRecords } = usePainHistory();
   const { language, direction, setLanguage } = useLanguage();
   const { isDark, colors, toggleTheme } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
@@ -62,25 +60,7 @@ export default function App() {
   const selected = selectedMuscleData || (selectedId ? data.muscles[selectedId] : null);
   const group = selected ? data.groups[selected.group] : undefined;
 
-  // تحميل وحفظ السجل
-  useEffect(() => {
-    let mounted = true;
-    AsyncStorage.getItem(DATA.HISTORY_STORAGE_KEY).then((saved) => {
-      if (!mounted) return;
-      if (saved) {
-        try {
-          const parsed: unknown = JSON.parse(saved);
-          if (Array.isArray(parsed)) setHistory(parsed as Checkup[]);
-        } catch { /* keep an empty local history if stored JSON is damaged */ }
-      }
-    }).catch(() => undefined).finally(() => { if (mounted) setHistoryLoaded(true); });
-    return () => { mounted = false; };
-  }, []);
-
-  useEffect(() => {
-    if (!historyLoaded) return;
-    AsyncStorage.setItem(DATA.HISTORY_STORAGE_KEY, JSON.stringify(history)).catch(() => undefined);
-  }, [history, historyLoaded]);
+  // السجل المحلي الآن عبر hook موحّد (usePainHistory) — تخزين محلي فقط عبر AsyncStorage، بلا خادم.
 
   // الانتقال إلى شاشة التفاصيل مع الاحتفاظ ببيانات العضلة المختارة
   const handleNavigateToDetails = (muscleData: Muscle) => {
@@ -111,35 +91,32 @@ export default function App() {
     if (!selected) return;
     const triageStatus = getTriageStatus(intensity, redFlags);
     const urgent = triageStatus === 'urgent';
-    setHistory((items) => [
-      {
-        id: `${Date.now()}`,
-        partId: selected.id,
-        intensity,
-        painType,
-        duration,
-        note: note.trim(),
-        medication: medication.trim(),
-        triggers: triggers.trim(),
-        sleepHours: sleepHours.trim() ? Number(sleepHours) : undefined,
-        activity: activity.trim(),
-        urgent,
-        triageStatus,
-        redFlags: [...redFlags],
-        symptoms: [...symptoms],
-        afterIntensity: afterIntensity.trim() ? Number(afterIntensity) : undefined,
-        createdAt: new Date().toLocaleDateString('ar-EG'),
-        createdAtIso: new Date().toISOString(),
-      },
-      ...items,
-    ].slice(0, 1000));
+    addRecord({
+      id: `${Date.now()}`,
+      partId: selected.id,
+      intensity,
+      painType,
+      duration,
+      note: note.trim(),
+      medication: medication.trim(),
+      triggers: triggers.trim(),
+      sleepHours: sleepHours.trim() ? Number(sleepHours) : undefined,
+      activity: activity.trim(),
+      urgent,
+      triageStatus,
+      redFlags: [...redFlags],
+      symptoms: [...symptoms],
+      afterIntensity: afterIntensity.trim() ? Number(afterIntensity) : undefined,
+      createdAt: new Date().toLocaleDateString('ar-EG'),
+      createdAtIso: new Date().toISOString(),
+    });
     setScreen('results');
   };
 
-  const saveQuickLog = (record: Checkup) => setHistory((items) => [record, ...items].slice(0, 1000));
+  const saveQuickLog = (record: Checkup) => addRecord(record);
 
   const saveSelfCareResult = (result: { guideKey: string; pointId?: string; before: number; after: number }) => {
-    setHistory((items) => [{
+    addRecord({
       id: `self-care-${Date.now()}`,
       partId: `self-care:${result.guideKey}`,
       intensity: result.before,
@@ -152,7 +129,7 @@ export default function App() {
       urgent: false,
       createdAt: new Date().toLocaleDateString('ar-EG'),
       createdAtIso: new Date().toISOString(),
-    }, ...items].slice(0, 1000));
+    });
   };
 
   const startOver = () => {
@@ -173,7 +150,7 @@ export default function App() {
   };
 
   const clearHistory = () => {
-    const clear = () => setHistory([]);
+    const clear = () => clearHistoryRecords();
     if (Platform.OS === 'web') {
       if (window.confirm('حذف كل تسجيلات الألم المحفوظة على هذا الجهاز؟ لا يمكن التراجع عن الحذف.')) clear();
       return;
@@ -182,14 +159,6 @@ export default function App() {
       { text: 'إلغاء', style: 'cancel' },
       { text: 'حذف السجل', style: 'destructive', onPress: clear },
     ]);
-  };
-
-  const importHistory = (records: Checkup[]) => {
-    setHistory((current) => {
-      const byId = new Map(current.map((entry) => [entry.id, entry]));
-      records.forEach((entry) => byId.set(entry.id, entry));
-      return [...byId.values()].sort((a, b) => (b.createdAtIso ?? '').localeCompare(a.createdAtIso ?? '')).slice(0, 1000);
-    });
   };
 
   const getTitle = (): string => {
@@ -321,8 +290,9 @@ export default function App() {
             history={history}
             onBack={() => setScreen(selected ? 'results' : 'welcome')}
             onClear={clearHistory}
-            onImport={importHistory}
+            onImport={importRecords}
             language={language}
+            direction={direction}
           />
         )}
       </ScrollView>
