@@ -1,16 +1,16 @@
 // services/visionAnalysis.ts
 //
-// جسر اختياري لتحليل الصور عبر نماذج الرؤية/اللغة الطبية متعددة الوسائط.
-// معطّل افتراضيًا ولا يعمل إلا عند توفير مفتاح وعنوان نقطة نهاية عبر متغيّرات البيئة.
-// لا يوجد أي مفتاح مكتوب داخل الشيفرة، ولا تُرفع الصور تلقائيًا.
+// جسر اختياري لتحليل الصور عبر نقطة نهاية موثوقة/خادم وسيط.
+// معطّل افتراضيًا. لا تُضع أسرار API داخل تطبيق Expo؛ أي اعتماد سري يجب أن
+// يبقى في الخادم الوسيط الذي يحدده EXPO_PUBLIC_MEDICAL_VISION_ENDPOINT.
 
 import { mergeWithModelPossibilities, runRuleBasedTriage } from './clinicalAnalysis';
 import type { MergedPossibility, TriageInput } from './clinicalAnalysis';
 
-const endpoint = String(process.env.EXPO_PUBLIC_MEDICAL_VISION_ENDPOINT ?? '');
-const apiKey = String(process.env.EXPO_PUBLIC_MEDICAL_VISION_KEY ?? '');
+const endpoint = String(process.env.EXPO_PUBLIC_MEDICAL_VISION_ENDPOINT ?? '').trim();
 
-export const isVisionConfigured = Boolean(endpoint && apiKey);
+// لا نقرأ EXPO_PUBLIC_* كمفتاح سري. متغيرات Expo العامة قد تدخل حزمة العميل.
+export const isVisionConfigured = Boolean(endpoint);
 
 export const MEDICAL_SYSTEM_PROMPT = [
   'أنت مساعد توعية صحية تعليمي، ولست طبيبًا ولا تقدّم تشخيصًا.',
@@ -29,7 +29,8 @@ export type VisionResponse = MergedPossibility & { configured: boolean; noteAr: 
 
 /**
  * يبني الطلب ثم يستدعي نقطة النهاية إن كانت مُهيّأة.
- * عند غياب التهيئة يعيد نتيجة الفرز القائمة على القواعد فقط، دون تلفيق أي احتمالات.
+ * نقطة النهاية يجب أن تكون خادمًا وسيطًا موثوقًا إذا كان مزود الرؤية يحتاج
+ * مفتاحًا سريًا؛ لا تُرسل أسرار المزود من تطبيق العميل.
  */
 export async function analyseImageWithPossibilities(request: VisionRequest): Promise<VisionResponse> {
   const triage = runRuleBasedTriage(request.triage);
@@ -47,14 +48,14 @@ export async function analyseImageWithPossibilities(request: VisionRequest): Pro
     return {
       ...mergeWithModelPossibilities(triage, []),
       configured: false,
-      noteAr: 'تحليل الصورة الآلي غير مُهيّأ في هذه النسخة. تُعرض احتمالات إرشادية عامة فقط. لتفعيله، اضبط متغيّرات البيئة: EXPO_PUBLIC_MEDICAL_VISION_ENDPOINT و EXPO_PUBLIC_MEDICAL_VISION_KEY. لا تضع أي مفتاح داخل الشيفرة.',
+      noteAr: 'تحليل الصورة الآلي غير مُهيّأ في هذه النسخة. تُعرض احتمالات إرشادية عامة فقط. لتفعيله، اضبط EXPO_PUBLIC_MEDICAL_VISION_ENDPOINT على خادم وسيط موثوق. لا تضع مفتاح مزود الخدمة داخل تطبيق العميل.',
     };
   }
 
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         system: MEDICAL_SYSTEM_PROMPT,
         image: request.imageDataUrl,
