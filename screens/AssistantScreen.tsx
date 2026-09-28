@@ -49,6 +49,7 @@ interface AssistantScreenProps {
   direction: 'rtl' | 'ltr';
   onOpenRegion: (regionId: string) => void;
   onOpenOrgan: (organId: string) => void;
+  initialContext?: string;
 }
 
 const TRIAGE_COLORS: Record<TriageLevel, { bg: string; fg: string; accent: string }> = {
@@ -177,7 +178,7 @@ function replyToSpeech(reply: AssistantReply): string {
   return parts.filter(Boolean).join('. ');
 }
 
-export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, direction, onOpenRegion, onOpenOrgan }) => {
+export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, direction, onOpenRegion, onOpenOrgan, initialContext }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const rtl = direction === 'rtl';
@@ -200,6 +201,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // Mirror of `askCount` so two sends in the same tick can never both read a
   // stale counter (this is what previously made the question repeat forever).
   const askCountRef = useRef(0);
+  const initialContextSentRef = useRef(false);
 
   useEffect(() => {
     AsyncStorage.getItem('bodymap.lastAssistantVisit').then((value) => {
@@ -383,6 +385,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     },
     [language, thinking, autoSpeak, speak, t, messages],
   );
+
+  useEffect(() => {
+    const context = initialContext?.trim();
+    if (!context || initialContextSentRef.current) return;
+    initialContextSentRef.current = true;
+    sendMessage(context);
+  }, [initialContext, sendMessage]);
 
   const scrollToEnd = useCallback(() => {
     requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
