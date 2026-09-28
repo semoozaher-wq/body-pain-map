@@ -1,2 +1,8 @@
-export type TriageStatus = 'routine' | 'high_reported_intensity' | 'urgent';
-export function getTriageStatus(intensity: number, redFlags?: string[]): TriageStatus;
+// services/triage.d.ts — يُعيد تصدير الأنواع من المصدر الوحيد للحقيقة.
+export type { TriageStatus } from './triageCore';
+export {
+  getTriageStatus,
+  isTriageStatus,
+  TRIAGE_STATUSES,
+  HIGH_INTENSITY_THRESHOLD,
+} from './triageCore';
