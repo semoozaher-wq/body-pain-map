@@ -23,7 +23,7 @@ import {
 import * as Speech from 'expo-speech';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
+import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services/speechRecognition';
 import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
 import { Palette, Gradients, Radii, Elevation, Type } from '../constants/design';
@@ -212,16 +212,16 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // ------------------------------------------------------------------
   // التعرّف على الكلام (إدخال صوتي)
   // ------------------------------------------------------------------
-  useSpeechRecognitionEvent('start', () => setListening(true));
-  useSpeechRecognitionEvent('end', () => {
+  useSpeechRecognitionEvents('start', () => setListening(true));
+  useSpeechRecognitionEvents('end', () => {
     setListening(false);
     setInterim('');
   });
-  useSpeechRecognitionEvent('error', () => {
+  useSpeechRecognitionEvents('error', () => {
     setListening(false);
     setInterim('');
   });
-  useSpeechRecognitionEvent('result', (event: any) => {
+  useSpeechRecognitionEvents('result', (event: any) => {
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
     if (event?.isFinal) {
@@ -268,13 +268,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
         return;
       }
       if (listening) {
-        ExpoSpeechRecognitionModule.stop();
+        SpeechRecognitionModule?.stop?.();
         return;
       }
-      const perm = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
       if (!perm?.granted) return;
       setInterim('');
-      ExpoSpeechRecognitionModule.start({
+      SpeechRecognitionModule?.start?.({
         lang: speechLang(language),
         interimResults: true,
         continuous: false,
@@ -309,7 +309,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     try {
       Speech.stop();
       webRecognitionRef.current?.abort?.();
-      ExpoSpeechRecognitionModule.abort?.();
+      SpeechRecognitionModule?.abort?.();
     } catch {}
   }, []);
 
