@@ -202,11 +202,21 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // stale counter (this is what previously made the question repeat forever).
   const askCountRef = useRef(0);
   const initialContextSentRef = useRef(false);
+  const mountedRef = useRef(true);
+  const replyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    mountedRef.current = true;
     AsyncStorage.getItem('bodymap.lastAssistantVisit').then((value) => {
-      if (value && Date.now() - Number(value) > 24 * 60 * 60 * 1000) setReturningReminder(true);
+      if (value && Date.now() - Number(value) > 24 * 60 * 60 * 1000 && mountedRef.current) setReturningReminder(true);
     }).catch(() => {});
+    return () => {
+      mountedRef.current = false;
+      if (replyTimerRef.current) {
+        clearTimeout(replyTimerRef.current);
+        replyTimerRef.current = null;
+      }
+    };
   }, []);
 
   // ------------------------------------------------------------------
@@ -366,21 +376,30 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       setInput('');
       setPendingImage(null);
       setThinking(true);
-      setTimeout(() => {
-        const reply = analyzeMessage(fullText, language as Lang, hasImg, {
-          forceAnswer,
-          askCount: askedSoFar,
-          userTurnCount,
-        });
-        // A clarifying question raises the counter; a real answer (conditions +
-        // self-care) resets it, because the user clearly gave something we understood.
-        const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
-        askCountRef.current = nextAskCount;
-        setAskCount(nextAskCount);
-        const id = nextId();
-        setMessages((prev) => [...prev, { id, role: 'assistant', reply }]);
-        setThinking(false);
-        if (autoSpeak) speak(replyToSpeech(reply), id);
+      if (replyTimerRef.current) clearTimeout(replyTimerRef.current);
+      replyTimerRef.current = setTimeout(() => {
+        replyTimerRef.current = null;
+        if (!mountedRef.current) return;
+        try {
+          const reply = analyzeMessage(fullText, language as Lang, hasImg, {
+            forceAnswer,
+            askCount: askedSoFar,
+            userTurnCount,
+          });
+          if (!mountedRef.current) return;
+          // A clarifying question raises the counter; a real answer (conditions +
+          // self-care) resets it, because the user clearly gave something we understood.
+          const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
+          askCountRef.current = nextAskCount;
+          setAskCount(nextAskCount);
+          const id = nextId();
+          setMessages((prev) => [...prev, { id, role: 'assistant', reply }]);
+          setThinking(false);
+          if (autoSpeak) speak(replyToSpeech(reply), id);
+        } catch (error) {
+          console.error('[BodyMap Pain] assistant analysis error', error);
+          if (mountedRef.current) setThinking(false);
+        }
       }, 650);
     },
     [language, thinking, autoSpeak, speak, t, messages],
