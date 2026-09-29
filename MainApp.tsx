@@ -449,6 +449,8 @@ export default function App() {
           onOpenRegion={openRegionFromAssistant}
           onOpenOrgan={openOrganFromAssistant}
           initialContext={assistantContext}
+          appState={appState}
+          onAction={handleAssistantAction}
         />
       ) : screen === 'healthInfo' ? (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
