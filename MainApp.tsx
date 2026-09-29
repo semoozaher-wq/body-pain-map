@@ -267,7 +267,7 @@ export default function App() {
             direction={direction}
             history={history}
             onOpenHistory={() => navigateTo('history')}
-            onOpenAssistant={(ctx) => { setAssistantContext(ctx); navigateTo('assistant'); }}
+            onOpenAssistant={() => { setAssistantContext(undefined); navigateTo('assistant'); }}
             quickAreas={quickLogAreas}
             onQuickSave={saveQuickLog}
           />
