@@ -391,6 +391,32 @@ export function detectRegions(text: string): DetectedRegion[] {
 const BACK_REGION_IDS = ['upper-back', 'mid-back', 'lower-back'];
 
 /**
+ * Broad / limb-level regions. Naming ONLY one of these (a whole leg, the head,
+ * the chest, a back segment, a whole arm segment) is genuinely ambiguous: the
+ * anatomy map splits each into several distinct sub-parts. The spec requires the
+ * assistant to open a short natural location dialogue first instead of dumping a
+ * full medical report on the very first message.
+ *
+ * Regions that are already a single actionable structure (eye, ear, jaw, tooth,
+ * throat, breast, groin, abdomen, knee, ankle, foot) are deliberately NOT here:
+ * they answer immediately, exactly as the existing acceptance criteria demand.
+ */
+const BROAD_REGION_IDS = new Set<string>([
+  'legs',        // الرجل والساق -> فخذ / ركبة / سمانة / كاحل / قدم
+  'head',        // الرأس -> مقدمة / مؤخرة / جنب / قمة
+  'neck',        // الرقبة -> أمام / خلف / يمين / شمال
+  'chest',       // الصدر -> يمين / شمال / نص / تحت الضلوع
+  'upper-back',  // أعلى الظهر
+  'mid-back',    // وسط الظهر
+  'lower-back',  // أسفل الظهر
+]);
+
+/** True when the region names a whole limb/segment with several distinct parts. */
+export function isBroadRegion(regionId: string): boolean {
+  return BROAD_REGION_IDS.has(regionId);
+}
+
+/**
  * Detects an explicit user correction ("لا، قصدي فوق", "مش كده، أنا أقصد تحت").
  * A correction means the NEW information wins and the old interpretation is
  * dropped (spec #2).
@@ -530,6 +556,26 @@ export function needsClarification(
 function buildLocationQuestion(regions: DetectedRegion[], language: Lang): LocalizedText {
   if (regions.length === 0) return CLARIFY;
   const primary = regions[0];
+
+  // For a broad / limb-level region we name the *distinct parts of the same
+  // limb* (its sibling regions), which reads like a real clinician asking
+  // "the leg — do you mean the thigh, the knee, the calf, the ankle, or the
+  // foot?". For a narrow region (e.g. the flank) we fall back to the fine
+  // sub-locations of that region.
+  if (isBroadRegion(primary.id)) {
+    const siblings = BODY_REGIONS
+      .filter((region) => region.region === primary.region && region.id !== primary.id)
+      .map((region) => region.label[language]);
+    if (siblings.length >= 2) {
+      const list = siblings.join('، ');
+      return {
+        ar: `تقصد فين بالظبط في ${primary.label.ar}؟ ${list}؟`,
+        en: `Where exactly in the ${primary.label.en}? The ${list}?`,
+        fr: `Où exactement dans ${primary.label.fr} ? ${list} ?`,
+      };
+    }
+  }
+
   const locations = REGION_LOCATIONS.filter((l) => l.parent === primary.id);
   if (locations.length === 0) return CLARIFY;
   const list = locations.map((l) => l.label[language]).join('، ');
@@ -1407,11 +1453,13 @@ function buildSmartFollowUp(ctx: PainContext): LocalizedText | null {
   if (!ctx.painLocation) {
     return { ar: 'تقدر تحدد لي مكان الألم بالتحديد فين؟', en: 'Can you point to exactly where the pain is?', fr: 'Pouvez-vous préciser exactement où se situe la douleur ?' };
   }
-  if (!ctx.painDuration) {
-    return { ar: 'الألم بدأ من إمتى؟ (ساعات / أيام / أسابيع)', en: 'When did the pain start? (hours / days / weeks)', fr: 'Quand la douleur a-t-elle commencé ? (heures / jours / semaines)' };
-  }
+  // Severity first, then duration: the natural clinical intake order and the
+  // order the acceptance dialogue expects ("في الساق" -> follow-up -> "شدته 7").
   if (ctx.painSeverity === null) {
     return { ar: 'قيّم شدة الألم من 1 لـ 10، كام؟', en: 'On a scale of 1 to 10, how intense is the pain?', fr: 'Sur une échelle de 1 à 10, quelle est l\u2019intensité ?' };
+  }
+  if (!ctx.painDuration) {
+    return { ar: 'الألم بدأ من إمتى؟ (ساعات / أيام / أسابيع)', en: 'When did the pain start? (hours / days / weeks)', fr: 'Quand la douleur a-t-elle commencé ? (heures / jours / semaines)' };
   }
   if (ctx.painQuality.length === 0) {
     return { ar: 'الألم شكله إيه؟ (شد / حرقان / نغز / تنميل / تقل)', en: 'What does the pain feel like? (tight / burning / stabbing / tingling / heaviness)', fr: 'À quoi ressemble la douleur ? (tension / brûlure / élancement / fourmillement / lourdeur)' };
@@ -1525,8 +1573,32 @@ export function analyzeMessage(
   const askedEnough = askCount >= 2 || userTurnCount >= 3;
 
   const organs = mergeLocationOrgans(detectedOrgans, locations);
+
+  // ROOT-CAUSE FIX (spec #2, #3): a first pain message that names ONLY a broad,
+  // limb-level region ("my leg from below", "my head", "my chest") must open a
+  // short natural location dialogue instead of jumping straight to the medical
+  // report. We only treat it as ambiguous while the message is a *bare*
+  // complaint - no severity, no duration, no medication, no radiation, no
+  // symptom type, no generic place word, no second region, no sub-location and
+  // no organ/red-flag. Anything richer is already precise enough to answer.
+  const bareComplaint =
+    duration === null &&
+    severity === null &&
+    medications.length === 0 &&
+    symptomTypes.length === 0 &&
+    !matchAny(text, RADIATION_KEYWORDS) &&
+    !mentionsGenericArea(rawText);
+  const broadOnlyComplaint =
+    bareComplaint &&
+    regions.length === 1 &&
+    isBroadRegion(regions[0].id) &&
+    regionLocations.length === 0 &&
+    locations.length === 0 &&
+    organs.length === 0 &&
+    redFlags.length === 0;
+
   const missingLocation =
-    needsClarification(regions, regionLocations, locations, redFlags, organs) &&
+    (needsClarification(regions, regionLocations, locations, redFlags, organs) || broadOnlyComplaint) &&
     // A named place - even a vague one such as "\u0648\u0633\u0637 \u0627\u0644\u0638\u0647\u0631" - is a sufficient answer.
     !mentionsGenericArea(rawText);
   const mustAnswer = forceAnswer || askedEnough;
