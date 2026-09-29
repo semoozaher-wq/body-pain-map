@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Animated, Easing, Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Language } from '../services/i18n';
 
 export type IllustratedMarker = { id: string; x: number; y: number; label: string };
@@ -10,11 +10,24 @@ type Props = {
   title: string;
   hint: string;
   onSelect: (marker: IllustratedMarker) => void;
+  /** عنصر يُبرَز بصريًا (حلقة نابضة) بأمر من المساعد المركزي. */
+  highlight?: { id: string; x: number; y: number; label: string } | null;
 };
 
-export function IllustratedBodyMap({ source, markers, language, title, hint, onSelect }: Props) {
+export function IllustratedBodyMap({ source, markers, language, title, hint, onSelect, highlight }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const markerMap = useMemo(() => new Map(markers.map((marker) => [marker.id, marker])), [markers]);
+  const pulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (!highlight) return;
+    pulse.setValue(0);
+    const loop = Animated.loop(Animated.sequence([
+      Animated.timing(pulse, { toValue: 1, duration: 900, easing: Easing.out(Easing.ease), useNativeDriver: false }),
+      Animated.timing(pulse, { toValue: 0, duration: 900, easing: Easing.in(Easing.ease), useNativeDriver: false })
+    ]));
+    loop.start();
+    return () => loop.stop();
+  }, [highlight?.id, pulse]);
   return <View style={styles.card}>
     <View style={styles.heading}><View style={styles.texts}><Text style={styles.title}>{title}</Text><Text style={styles.hint}>{hint}</Text></View><View style={styles.badge}><Text style={styles.badgeText}>{language === 'ar' ? 'خريطة بصرية' : language === 'fr' ? 'Vue visuelle' : 'Visual map'}</Text></View></View>
     <View style={styles.imageFrame}>
@@ -26,6 +39,14 @@ export function IllustratedBodyMap({ source, markers, language, title, hint, onS
           {active && <View style={styles.markerLabel}><Text style={styles.markerLabelText}>{marker.label}</Text></View>}
         </Pressable>;
       })}
+      {highlight && <View pointerEvents="none" style={[styles.highlightWrap, { left: `${highlight.x}%`, top: `${highlight.y}%` }]}>
+        <Animated.View style={[styles.highlightRing, {
+          opacity: pulse.interpolate({ inputRange: [0, 1], outputRange: [0.9, 0.25] }),
+          transform: [{ scale: pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.7] }) }]
+        }]} />
+        <View style={styles.highlightCore} />
+        <View style={styles.highlightLabel}><Text style={styles.highlightLabelText}>{highlight.label}</Text></View>
+      </View>}
     </View>
     {markers.length <= 8 && <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.markerList}>{markers.map((marker) => <Pressable key={marker.id} onPress={() => { setSelected(marker.id); onSelect(marker); }} accessibilityRole="button" accessibilityLabel={marker.label} accessibilityState={{ selected: selected === marker.id }} style={[styles.markerChip, selected === marker.id && styles.markerChipActive]}><Text style={[styles.markerChipText, selected === marker.id && styles.markerChipTextActive]}>{marker.label}</Text></Pressable>)}</ScrollView>}
     <Text style={styles.footer}>{hint}</Text>
@@ -46,5 +67,9 @@ const styles = StyleSheet.create({
   dot: { width: 1, height: 1, borderRadius: 1, backgroundColor: 'transparent' }, dotActive: { backgroundColor: 'transparent' },
   markerLabel: { position: 'absolute', top: 28, minWidth: 88, backgroundColor: '#193D45', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 5 }, markerLabelText: { color: '#FFFFFF', textAlign: 'center', fontSize: 10, fontWeight: '800' },
   markerList: { flexDirection: 'row-reverse', gap: 6, paddingVertical: 8 }, markerChip: { borderWidth: 1, borderColor: '#D5E4E5', borderRadius: 13, paddingHorizontal: 10, paddingVertical: 7, backgroundColor: '#F7FBFA' }, markerChipActive: { backgroundColor: '#0B7774', borderColor: '#0B7774' }, markerChipText: { color: '#315A60', fontSize: 10, fontWeight: '800' }, markerChipTextActive: { color: '#FFFFFF' },
-  footer: { color: '#697D81', fontSize: 10, lineHeight: 16, textAlign: 'right', marginTop: 8 }, selectedText: { color: '#0B7774', fontWeight: '900', fontSize: 12, textAlign: 'right', marginTop: 4 }
+  footer: { color: '#697D81', fontSize: 10, lineHeight: 16, textAlign: 'right', marginTop: 8 }, selectedText: { color: '#0B7774', fontWeight: '900', fontSize: 12, textAlign: 'right', marginTop: 4 },
+  highlightWrap: { position: 'absolute', width: 54, height: 54, marginLeft: -27, marginTop: -27, alignItems: 'center', justifyContent: 'center', zIndex: 20 },
+  highlightRing: { position: 'absolute', width: 54, height: 54, borderRadius: 27, borderWidth: 3, borderColor: '#F2A93B', backgroundColor: 'rgba(242,169,59,0.20)' },
+  highlightCore: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#F2A93B', borderWidth: 2, borderColor: '#FFFFFF', shadowColor: '#F2A93B', shadowOpacity: 0.9, shadowRadius: 10, shadowOffset: { width: 0, height: 0 }, elevation: 8 },
+  highlightLabel: { position: 'absolute', top: 34, minWidth: 92, backgroundColor: '#B4711A', borderRadius: 9, paddingHorizontal: 8, paddingVertical: 5, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 6 }, highlightLabelText: { color: '#FFFFFF', textAlign: 'center', fontSize: 11, fontWeight: '900' }
 });

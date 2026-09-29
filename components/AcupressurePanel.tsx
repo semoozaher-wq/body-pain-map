@@ -1,16 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Ellipse, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 import pointData from '../data/acupressurePoints.json';
 import type { Language } from '../services/i18n';
 
 type Point = (typeof pointData.points)[number];
-type Props = { language: Language };
+type Props = {
+  language: Language;
+  /** نقطة مطلوب إبرازها/فتحها بأمر من المساعد المركزي (معرّف النقطة أو كودها مثل LI4). */
+  highlightId?: string | null;
+};
 const text = (value: { ar: string; en: string; fr: string }, language: Language) => value[language] ?? value.ar;
 
-export function AcupressurePanel({ language }: Props) {
+export function AcupressurePanel({ language, highlightId }: Props) {
   const [selectedId, setSelectedId] = useState(pointData.points[0].id);
   const point = pointData.points.find((candidate) => candidate.id === selectedId) ?? pointData.points[0];
+  // فتح/إبراز النقطة المطلوبة من المساعد المركزي (بالكود أو المعرّف).
+  useEffect(() => {
+    if (!highlightId) return;
+    const match = pointData.points.find((candidate) => candidate.id === highlightId || candidate.code.toUpperCase() === highlightId.toUpperCase());
+    if (match) setSelectedId(match.id);
+  }, [highlightId]);
   const ar = language === 'ar';
   return (
     <View style={styles.container}>
