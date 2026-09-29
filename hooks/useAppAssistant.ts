@@ -60,6 +60,15 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   const [error, setError] = useState<string | null>(null);
 
   const webRecognitionRef = useRef<any>(null);
+  const silenceTimerRef = useRef<any>(null);
+  const turnBufferRef = useRef('');
+  const startListeningRef = useRef<() => void>(() => {});
+  const stopListeningRef = useRef<() => void>(() => {});
+  const interimRef = useRef('');
+  const lastResultIndexRef = useRef(0);
+  const resultsLengthRef = useRef(0);
+  // مهلة الصمت التي نعتبرها نهاية جولة المستخدم (تمنحه وقتًا طبيعيًا للكلام قبل الرد).
+  const TURN_SILENCE_MS = 1500;
   const languageRef = useRef(language);
   languageRef.current = language;
   const mutedRef = useRef(muted);
@@ -73,24 +82,36 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   const listeningRef = useRef(listening);
   listeningRef.current = listening;
 
+  // --- نهاية النطق: نعود للاستماع داخل المكالمة، أو للخمول خارجها ---
+  const finishSpeech = useCallback(() => {
+    setSpeakingId(null);
+    const next = afterSpeechEnd(callActiveRef.current);
+    setVoiceState(next);
+    // متابعة تلقائية: بعد انتهاء الرد نرجع للاستماع (فقط إن لم يكن الميكروفون يعمل بالفعل).
+    if (next === 'listening') {
+      setTimeout(() => {
+        if (callActiveRef.current && !listeningRef.current) startListeningRef.current();
+      }, 200);
+    }
+  }, []);
+
   // --- نطق الردود (يحترم الكتم) ---
   const speak = useCallback((text: string, id?: string) => {
-    if (mutedRef.current || !speakerRef.current) return;
+    if (mutedRef.current || !speakerRef.current) { finishSpeech(); return; }
     try {
       Speech.stop();
       if (id) setSpeakingId(id);
       setVoiceState('speaking');
       Speech.speak(text, {
         language: ttsLang(languageRef.current),
-        onDone: () => { setSpeakingId(null); setVoiceState(afterSpeechEnd(callActiveRef.current)); },
-        onStopped: () => { setSpeakingId(null); setVoiceState(afterSpeechEnd(callActiveRef.current)); },
-        onError: () => { setSpeakingId(null); setVoiceState(afterSpeechEnd(callActiveRef.current)); },
+        onDone: finishSpeech,
+        onStopped: finishSpeech,
+        onError: finishSpeech,
       });
     } catch {
-      setSpeakingId(null);
-      setVoiceState(afterSpeechEnd(callActiveRef.current));
+      finishSpeech();
     }
-  }, []);
+  }, [finishSpeech]);
 
   // --- تنفيذ إجراءات جولة ---
   const runTurn = useCallback(
@@ -122,6 +143,28 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     },
     [getState, runTurn, onTurn, autoSpeak, speak],
   );
+
+  // --- نهاية جولة المستخدم: نُرسل النص المتراكم بعد صمت كافٍ (منع القطع المبكر) ---
+  const commitTurn = useCallback(() => {
+    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+    const text = `${turnBufferRef.current} ${interimRef.current}`.trim();
+    turnBufferRef.current = '';
+    interimRef.current = '';
+    setInterim('');
+    // نتجاهل أي نتائج نهائية متأخرة تخصّ الجولة المُرسلة.
+    lastResultIndexRef.current = resultsLengthRef.current;
+    if (text) {
+      send(text);
+      if (!callActiveRef.current) stopListeningRef.current?.();
+    } else if (!callActiveRef.current) {
+      stopListeningRef.current?.();
+    }
+  }, [send]);
+
+  const scheduleTurnSend = useCallback(() => {
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    silenceTimerRef.current = setTimeout(commitTurn, TURN_SILENCE_MS);
+  }, [commitTurn]);
 
   // --- تأكيد الإجراءات الحسّاسة المعلّقة ---
   const confirmPending = useCallback(() => {
@@ -172,23 +215,41 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
         const Recognition = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition;
         if (!Recognition) { setError('no-speech-api'); return; }
         if (listeningRef.current) return;
+        // جولة جديدة: نصفّر المخزن والمؤشرات.
+        turnBufferRef.current = '';
+        interimRef.current = '';
+        lastResultIndexRef.current = 0;
+        resultsLengthRef.current = 0;
         const recognition = new Recognition();
         webRecognitionRef.current = recognition;
         recognition.lang = speechLang(languageRef.current);
         recognition.interimResults = true;
-        // في وضع المكالمة نستخدم الاستماع المستمر للمتابعة التلقائية.
-        recognition.continuous = callActiveRef.current;
+        // نستمع باستمرار حتى لا نقطع المستخدم بعد كلمة أو جملة قصيرة.
+        recognition.continuous = true;
         recognition.onstart = () => { setListening(true); setVoiceState('listening'); };
         recognition.onresult = (event: any) => {
-          const result = event?.results?.[event.results.length - 1];
-          const transcript = result?.[0]?.transcript ?? '';
-          if (!transcript) return;
+          resultsLengthRef.current = event?.results?.length ?? 0;
+          // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
           if (voiceStateRef.current === 'speaking') {
             try { Speech.stop(); } catch {}
             setSpeakingId(null);
           }
-          if (result.isFinal) { setInterim(''); send(transcript); }
-          else setInterim(transcript);
+          let newFinal = '';
+          let interimText = '';
+          let lastFinalIdx = lastResultIndexRef.current - 1;
+          for (let i = lastResultIndexRef.current; i < event.results.length; i++) {
+            const r = event.results[i];
+            if (r.isFinal) { newFinal += `${r[0].transcript} `; lastFinalIdx = i; }
+            else interimText += r[0].transcript;
+          }
+          if (newFinal) {
+            turnBufferRef.current = `${turnBufferRef.current} ${newFinal}`.trim();
+            lastResultIndexRef.current = lastFinalIdx + 1;
+          }
+          interimRef.current = interimText;
+          setInterim(interimText);
+          // لا نرسل فورًا: ننتظر صمتًا كافيًا حتى يكمل المستخدم كلامه.
+          scheduleTurnSend();
         };
         recognition.onerror = (event: any) => {
           setListening(false);
@@ -202,7 +263,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
           webRecognitionRef.current = null;
           // متابعة تلقائية: نعيد الاستماع ما دامت المكالمة شغّالة.
           if (callActiveRef.current) {
-            setTimeout(() => { if (callActiveRef.current && !listeningRef.current) startListening(); }, 250);
+            setTimeout(() => { if (callActiveRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
           } else {
             setVoiceState('idle');
           }
@@ -214,14 +275,15 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
       if (!perm?.granted) { setError('mic-permission'); return; }
       setInterim('');
-      SpeechRecognitionModule?.start?.({ lang: speechLang(languageRef.current), interimResults: true, continuous: callActiveRef.current });
+      SpeechRecognitionModule?.start?.({ lang: speechLang(languageRef.current), interimResults: true, continuous: true });
     } catch {
       setListening(false);
       setError('mic-error');
     }
-  }, [send]);
+  }, [scheduleTurnSend]);
 
   const stopListening = useCallback(() => {
+    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
     try {
       if (Platform.OS === 'web') webRecognitionRef.current?.stop?.();
       else SpeechRecognitionModule?.stop?.();
@@ -229,6 +291,10 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     setListening(false);
     setInterim('');
   }, []);
+
+  // نربط المراجع بالدوال الفعلية لاستخدامها داخل الـ callbacks المستقرة.
+  stopListeningRef.current = stopListening;
+  startListeningRef.current = startListening;
 
   // --- زر الميكروفون (وضع فردي) ---
   const toggleMic = useCallback(async () => {
