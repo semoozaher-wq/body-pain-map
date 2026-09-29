@@ -40,12 +40,14 @@ export interface UseAppAssistantOptions {
   getState: () => AppState;
   /** ينفّذ إجراءً واحدًا على التطبيق. */
   onAction: (action: AssistantAction) => void;
+  /** يُبلّغ المضيف بكل جولة مكتملة (لتتبّع النمط/السياق دون تغيير السلوك). */
+  onTurn?: (turn: AssistantTurn) => void;
   language: Lang;
   /** نطق الردود تلقائيًا. */
   autoSpeak?: boolean;
 }
 
-export function useAppAssistant({ getState, onAction, language, autoSpeak = false }: UseAppAssistantOptions) {
+export function useAppAssistant({ getState, onAction, onTurn, language, autoSpeak = false }: UseAppAssistantOptions) {
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState('');
@@ -113,11 +115,12 @@ export function useAppAssistant({ getState, onAction, language, autoSpeak = fals
       const botMsg: AssistantMessage = { id: nextId(), role: 'assistant', text: turn.reply[state.language], turn };
       setMessages((prev) => [...prev, userMsg, botMsg]);
       runTurn(turn);
+      onTurn?.(turn);
       if (autoSpeak || callActiveRef.current) speak(turn.reply[state.language], botMsg.id);
       else setVoiceState(afterSpeechEnd(callActiveRef.current));
       return turn;
     },
-    [getState, runTurn, autoSpeak, speak],
+    [getState, runTurn, onTurn, autoSpeak, speak],
   );
 
   // --- تأكيد الإجراءات الحسّاسة المعلّقة ---
