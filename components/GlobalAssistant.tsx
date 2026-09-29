@@ -5,6 +5,8 @@
 // زر عائم (FAB) متاح في كل شاشات التطبيق، يفتح لوحة حوار تدعم الكتابة والصوت.
 // يعرض ردود المحرّك المركزي، وينفّذ الإجراءات المنظّمة عبر onAction، ويطلب
 // تأكيدًا صريحًا قبل الإجراءات الحسّاسة (حفظ/مسح).
+// يدعم محادثة صوتية حقيقية متواصلة: استماع → تفكير → تحدّث → استماع، مع مقاطعة
+// (barge-in)، كتم، مكبّر صوت، إنهاء المكالمة، وحالات Listening/Thinking/Speaking.
 // ============================================================================
 
 import { useCallback, useRef, useState } from 'react';
@@ -38,14 +40,26 @@ const LABELS: Record<Lang, Record<string, string>> = {
     fab: 'المساعد',
     title: 'المساعد المركزي',
     subtitle: 'يتحكّم في كل التطبيق',
-    placeholder: 'قول: روح للأعضاء… وريني القلب… اللي فوقه إيه؟',
+    placeholder: 'قوّل: روح للأعضاء… وريني القلب… اللي فوقه إيه؟',
     listening: 'أستمع… تكلّم الآن',
+    thinking: 'أفكّر…',
+    speaking: 'بتكلّم…',
     send: 'إرسال',
     close: 'إغلاق',
     confirmTitle: 'هذا الإجراء يحتاج تأكيدًا',
     confirm: 'تأكيد',
     cancel: 'إلغاء',
     empty: 'اسألني عن أي حاجة في التطبيق: تنقّل، إبراز عنصر، أو مكان نسبي.',
+    startCall: 'ابدأ محادثة صوتية',
+    endCall: 'إنهاء المكالمة',
+    mute: 'كتم',
+    unmute: 'إلغاء الكتم',
+    speaker: 'مكبّر الصوت',
+    speakerOff: 'إيقاف الصوت',
+    errNoApi: 'المتصفح لا يدعم التعرّف على الصوت. استخدم الكتابة.',
+    errPermission: 'لم يتم السماح باستخدام الميكروفون.',
+    errMic: 'تعذّر الوصول للميكروفون.',
+    errSpeech: 'حدث خطأ في الصوت. حاول مرة أخرى.',
   },
   en: {
     fab: 'Assistant',
@@ -53,12 +67,24 @@ const LABELS: Record<Lang, Record<string, string>> = {
     subtitle: 'Controls the whole app',
     placeholder: 'Try: open the organs… show me the heart… what’s above it?',
     listening: 'Listening… speak now',
+    thinking: 'Thinking…',
+    speaking: 'Speaking…',
     send: 'Send',
     close: 'Close',
     confirmTitle: 'This action needs confirmation',
     confirm: 'Confirm',
     cancel: 'Cancel',
     empty: 'Ask me anything in the app: navigate, highlight, or relative location.',
+    startCall: 'Start voice chat',
+    endCall: 'End call',
+    mute: 'Mute',
+    unmute: 'Unmute',
+    speaker: 'Speaker',
+    speakerOff: 'Speaker off',
+    errNoApi: 'This browser does not support speech recognition. Use typing.',
+    errPermission: 'Microphone permission was denied.',
+    errMic: 'Could not access the microphone.',
+    errSpeech: 'A speech error occurred. Please try again.',
   },
   fr: {
     fab: 'Assistant',
@@ -66,12 +92,24 @@ const LABELS: Record<Lang, Record<string, string>> = {
     subtitle: 'Contrôle toute l’app',
     placeholder: 'Essayez : ouvre les organes… montre le cœur… qu’y a-t-il au-dessus ?',
     listening: 'Écoute… parlez maintenant',
+    thinking: 'Réflexion…',
+    speaking: 'Parle…',
     send: 'Envoyer',
     close: 'Fermer',
     confirmTitle: 'Cette action nécessite une confirmation',
     confirm: 'Confirmer',
     cancel: 'Annuler',
     empty: 'Demandez-moi tout dans l’app : naviguer, mettre en évidence, position.',
+    startCall: 'Démarrer le chat vocal',
+    endCall: 'Terminer l’appel',
+    mute: 'Couper',
+    unmute: 'Réactiver',
+    speaker: 'Haut-parleur',
+    speakerOff: 'Son coupé',
+    errNoApi: 'Ce navigateur ne prend pas en charge la reconnaissance vocale.',
+    errPermission: 'Autorisation du microphone refusée.',
+    errMic: 'Impossible d’accéder au microphone.',
+    errSpeech: 'Une erreur vocale est survenue. Réessayez.',
   },
 };
 
@@ -82,7 +120,25 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
   const scrollRef = useRef<ScrollView>(null);
   const rtl = direction === 'rtl';
 
-  const { messages, listening, interim, pending, send, toggleMic, confirmPending, cancelPending } = useAppAssistant({
+  const {
+    messages,
+    listening,
+    interim,
+    pending,
+    voiceState,
+    callActive,
+    muted,
+    speakerOn,
+    error,
+    send,
+    toggleMic,
+    startCall,
+    endCall,
+    toggleMute,
+    toggleSpeaker,
+    confirmPending,
+    cancelPending,
+  } = useAppAssistant({
     getState: () => appState,
     onAction,
     language,
@@ -94,6 +150,29 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
     setInput('');
     setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 60);
   }, [input, send]);
+
+  const handleMic = useCallback(() => {
+    toggleMic();
+  }, [toggleMic]);
+
+  const handleCallToggle = useCallback(() => {
+    if (callActive) endCall();
+    else startCall();
+  }, [callActive, endCall, startCall]);
+
+  const errorText =
+    error === 'no-speech-api'
+      ? t.errNoApi
+      : error === 'mic-permission'
+      ? t.errPermission
+      : error === 'mic-error'
+      ? t.errMic
+      : error
+      ? t.errSpeech
+      : null;
+
+  const stateLabel =
+    voiceState === 'listening' ? t.listening : voiceState === 'thinking' ? t.thinking : voiceState === 'speaking' ? t.speaking : '';
 
   return (
     <>
@@ -117,12 +196,38 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
             <View style={[styles.header, { flexDirection: rtl ? 'row-reverse' : 'row' }]}>
               <View style={styles.headerText}>
                 <Text style={styles.title}>{t.title}</Text>
-                <Text style={styles.subtitle}>{t.subtitle}</Text>
+                <Text style={styles.subtitle}>{stateLabel || t.subtitle}</Text>
               </View>
               <Pressable onPress={() => setOpen(false)} accessibilityRole="button" accessibilityLabel={t.close} style={styles.closeBtn}>
                 <Text style={styles.closeGlyph}>✕</Text>
               </Pressable>
             </View>
+
+            {/* شريط الحالة الصوتية */}
+            {callActive && (
+              <View style={[styles.callBar, { flexDirection: rtl ? 'row-reverse' : 'row' }]}>
+                <View style={styles.callState}>
+                  <View
+                    style={[
+                      styles.dot,
+                      voiceState === 'listening' ? styles.dotListen : voiceState === 'thinking' ? styles.dotThink : styles.dotSpeak,
+                    ]}
+                  />
+                  <Text style={styles.callStateText}>{stateLabel}</Text>
+                </View>
+                <View style={[styles.callControls, { flexDirection: rtl ? 'row-reverse' : 'row' }]}>
+                  <Pressable onPress={toggleMute} style={[styles.callCtl, muted && styles.callCtlActive]} accessibilityRole="button" accessibilityLabel={muted ? t.unmute : t.mute}>
+                    <Text style={styles.callCtlGlyph}>{muted ? '🔇' : '🎙'}</Text>
+                  </Pressable>
+                  <Pressable onPress={toggleSpeaker} style={[styles.callCtl, !speakerOn && styles.callCtlActive]} accessibilityRole="button" accessibilityLabel={speakerOn ? t.speaker : t.speakerOff}>
+                    <Text style={styles.callCtlGlyph}>{speakerOn ? '🔊' : '🔈'}</Text>
+                  </Pressable>
+                  <Pressable onPress={handleCallToggle} style={[styles.callCtl, styles.endCall]} accessibilityRole="button" accessibilityLabel={t.endCall}>
+                    <Text style={styles.callCtlGlyph}>⏹</Text>
+                  </Pressable>
+                </View>
+              </View>
+            )}
 
             {/* الرسائل */}
             <ScrollView ref={scrollRef} style={styles.messages} contentContainerStyle={styles.messagesContent}>
@@ -151,7 +256,11 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
                   </View>
                 ))
               )}
+              {listening && interim ? <Text style={styles.interim}>{interim}</Text> : null}
             </ScrollView>
+
+            {/* رسالة الخطأ */}
+            {errorText ? <Text style={styles.errorText}>{errorText}</Text> : null}
 
             {/* شريط التأكيد */}
             {pending.length > 0 && (
@@ -180,10 +289,15 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
                 onSubmitEditing={handleSend}
                 returnKeyType="send"
               />
-              <Pressable onPress={toggleMic} style={[styles.micBtn, listening && styles.micActive]} accessibilityRole="button">
+              <Pressable onPress={handleMic} style={[styles.micBtn, listening && styles.micActive]} accessibilityRole="button" accessibilityLabel={t.fab}>
                 <Text style={styles.micGlyph}>{listening ? '⏹' : '🎤'}</Text>
               </Pressable>
-              <Pressable onPress={handleSend} style={styles.sendBtn} accessibilityRole="button">
+              {!callActive && (
+                <Pressable onPress={handleCallToggle} style={styles.callBtn} accessibilityRole="button" accessibilityLabel={t.startCall}>
+                  <Text style={styles.callBtnGlyph}>📞</Text>
+                </Pressable>
+              )}
+              <Pressable onPress={handleSend} style={styles.sendBtn} accessibilityRole="button" accessibilityLabel={t.send}>
                 <Text style={styles.sendGlyph}>➤</Text>
               </Pressable>
             </View>
@@ -222,9 +336,30 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 11, color: Palette.slate500, marginTop: 2 },
   closeBtn: { width: 34, height: 34, borderRadius: Radii.pill, backgroundColor: Palette.slate100, alignItems: 'center', justifyContent: 'center' },
   closeGlyph: { fontSize: 15, color: Palette.slate600, fontWeight: '800' },
+  callBar: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: Palette.teal50,
+    borderBottomWidth: 1,
+    borderBottomColor: Palette.teal100,
+  },
+  callState: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  dot: { width: 10, height: 10, borderRadius: Radii.pill },
+  dotListen: { backgroundColor: Palette.teal500 },
+  dotThink: { backgroundColor: Palette.amber },
+  dotSpeak: { backgroundColor: Palette.coral },
+  callStateText: { fontSize: 12, fontWeight: '800', color: Palette.teal700 },
+  callControls: { alignItems: 'center', gap: 8 },
+  callCtl: { width: 34, height: 34, borderRadius: Radii.pill, backgroundColor: Palette.white, borderWidth: 1, borderColor: Palette.slate200, alignItems: 'center', justifyContent: 'center' },
+  callCtlActive: { backgroundColor: Palette.amberSoft, borderColor: Palette.amber },
+  callCtlGlyph: { fontSize: 15 },
+  endCall: { backgroundColor: Palette.rose, borderColor: Palette.rose },
   messages: { paddingHorizontal: 14 },
   messagesContent: { paddingVertical: 14, gap: 10 },
   empty: { color: Palette.slate500, fontSize: 13, textAlign: 'center', paddingVertical: 20, lineHeight: 20 },
+  interim: { color: Palette.slate500, fontSize: 13, fontStyle: 'italic', alignSelf: 'center', paddingVertical: 4 },
   bubble: { maxWidth: '86%', borderRadius: Radii.lg, paddingHorizontal: 13, paddingVertical: 10 },
   userBubble: { backgroundColor: Palette.teal600 },
   botBubble: { backgroundColor: Palette.teal50, borderWidth: 1, borderColor: Palette.teal100 },
@@ -233,6 +368,7 @@ const styles = StyleSheet.create({
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
   chip: { backgroundColor: Palette.white, borderRadius: Radii.pill, borderWidth: 1, borderColor: Palette.teal300, paddingHorizontal: 10, paddingVertical: 4 },
   chipText: { color: Palette.teal700, fontSize: 11, fontWeight: '700' },
+  errorText: { color: Palette.rose, fontSize: 12, fontWeight: '700', textAlign: 'center', paddingHorizontal: 16, paddingBottom: 6 },
   confirmBar: { marginHorizontal: 14, marginBottom: 8, backgroundColor: Palette.amberSoft, borderRadius: Radii.md, padding: 12, gap: 8 },
   confirmText: { color: '#92400E', fontSize: 12, fontWeight: '800' },
   confirmActions: { flexDirection: 'row', gap: 8, justifyContent: 'flex-end' },
@@ -246,6 +382,8 @@ const styles = StyleSheet.create({
   micBtn: { width: 42, height: 42, borderRadius: Radii.pill, backgroundColor: Palette.slate100, alignItems: 'center', justifyContent: 'center' },
   micActive: { backgroundColor: Palette.coral },
   micGlyph: { fontSize: 17 },
+  callBtn: { width: 42, height: 42, borderRadius: Radii.pill, backgroundColor: Palette.teal100, alignItems: 'center', justifyContent: 'center' },
+  callBtnGlyph: { fontSize: 17 },
   sendBtn: { width: 42, height: 42, borderRadius: Radii.pill, backgroundColor: Palette.teal600, alignItems: 'center', justifyContent: 'center' },
   sendGlyph: { color: Palette.white, fontSize: 17, fontWeight: '900' },
 });

@@ -12,9 +12,11 @@ type Props = {
   onSelect: (marker: IllustratedMarker) => void;
   /** عنصر يُبرَز بصريًا (حلقة نابضة) بأمر من المساعد المركزي. */
   highlight?: { id: string; x: number; y: number; label: string } | null;
+  /** علامة ألم وضعها المساعد المركزي على الخريطة (دبوس أحمر). */
+  painMarker?: { x: number; y: number } | null;
 };
 
-export function IllustratedBodyMap({ source, markers, language, title, hint, onSelect, highlight }: Props) {
+export function IllustratedBodyMap({ source, markers, language, title, hint, onSelect, highlight, painMarker }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const markerMap = useMemo(() => new Map(markers.map((marker) => [marker.id, marker])), [markers]);
   const pulse = useRef(new Animated.Value(0)).current;
@@ -47,6 +49,10 @@ export function IllustratedBodyMap({ source, markers, language, title, hint, onS
         <View style={styles.highlightCore} />
         <View style={styles.highlightLabel}><Text style={styles.highlightLabelText}>{highlight.label}</Text></View>
       </View>}
+      {painMarker && <View pointerEvents="none" style={[styles.painMarkerWrap, { left: `${painMarker.x}%`, top: `${painMarker.y}%` }]}>
+        <View style={styles.painMarkerPin} />
+        <View style={styles.painMarkerLabel}><Text style={styles.painMarkerLabelText}>{language === 'ar' ? 'مكان الألم' : language === 'fr' ? 'Douleur' : 'Pain'}</Text></View>
+      </View>}
     </View>
     {markers.length <= 8 && <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.markerList}>{markers.map((marker) => <Pressable key={marker.id} onPress={() => { setSelected(marker.id); onSelect(marker); }} accessibilityRole="button" accessibilityLabel={marker.label} accessibilityState={{ selected: selected === marker.id }} style={[styles.markerChip, selected === marker.id && styles.markerChipActive]}><Text style={[styles.markerChipText, selected === marker.id && styles.markerChipTextActive]}>{marker.label}</Text></Pressable>)}</ScrollView>}
     <Text style={styles.footer}>{hint}</Text>
@@ -71,5 +77,9 @@ const styles = StyleSheet.create({
   highlightWrap: { position: 'absolute', width: 54, height: 54, marginLeft: -27, marginTop: -27, alignItems: 'center', justifyContent: 'center', zIndex: 20 },
   highlightRing: { position: 'absolute', width: 54, height: 54, borderRadius: 27, borderWidth: 3, borderColor: '#F2A93B', backgroundColor: 'rgba(242,169,59,0.20)' },
   highlightCore: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#F2A93B', borderWidth: 2, borderColor: '#FFFFFF', shadowColor: '#F2A93B', shadowOpacity: 0.9, shadowRadius: 10, shadowOffset: { width: 0, height: 0 }, elevation: 8 },
-  highlightLabel: { position: 'absolute', top: 34, minWidth: 92, backgroundColor: '#B4711A', borderRadius: 9, paddingHorizontal: 8, paddingVertical: 5, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 6 }, highlightLabelText: { color: '#FFFFFF', textAlign: 'center', fontSize: 11, fontWeight: '900' }
+  highlightLabel: { position: 'absolute', top: 34, minWidth: 92, backgroundColor: '#B4711A', borderRadius: 9, paddingHorizontal: 8, paddingVertical: 5, shadowColor: '#000', shadowOpacity: 0.25, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 6 }, highlightLabelText: { color: '#FFFFFF', textAlign: 'center', fontSize: 11, fontWeight: '900' },
+  painMarkerWrap: { position: 'absolute', width: 40, height: 40, marginLeft: -20, marginTop: -20, alignItems: 'center', justifyContent: 'center', zIndex: 25 },
+  painMarkerPin: { width: 18, height: 18, borderRadius: 9, backgroundColor: '#E23D3D', borderWidth: 3, borderColor: '#FFFFFF', shadowColor: '#E23D3D', shadowOpacity: 0.9, shadowRadius: 10, shadowOffset: { width: 0, height: 0 }, elevation: 9 },
+  painMarkerLabel: { position: 'absolute', top: 22, minWidth: 80, backgroundColor: '#B91C1C', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 4 },
+  painMarkerLabelText: { color: '#FFFFFF', textAlign: 'center', fontSize: 10, fontWeight: '900' },
 });
