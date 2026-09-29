@@ -359,7 +359,9 @@ export function parseIntents(
   const hasMarkerVerb = hasAny(text, MARKER_VERBS);
   if (isPainComplaint || hasMarkerVerb) {
     const target = stripVerbs(text);
-    intents.push({ kind: 'locate_pain', targetTerm: target || undefined, refersToContext, value: severity, raw: utterance });
+    // نحمل الاتجاه المذكور داخل الجملة ("تحت صدري بشوية"، "جنب القلب ناحية الشمال")
+    // حتى تزيح طبقة المحرّك العلامة عن إحداثيات الهدف الحقيقية بدل تجاهله.
+    intents.push({ kind: 'locate_pain', targetTerm: target || undefined, direction, refersToContext, value: severity, raw: utterance });
   }
 
   // --- تحريك علامة الألم الحالية ("تحت شوية"، "ناحية اليمين") ---
@@ -369,7 +371,7 @@ export function parseIntents(
     !hasWhere &&
     !text.includes('اللي') &&
     (refersToContext || hasMarkerVerb || hasBase || text.includes('شويه') || text.includes('شوية') || text.includes('بتاع') || text.includes('علامه') || text.includes('علامة') || text.includes('ناحيه') || text.includes('ناحية') || text.includes('جنب') || text.includes('جوه'));
-  if (isDirectionalOnly) {
+  if (isDirectionalOnly && !intents.some((i) => i.kind === 'locate_pain')) {
     intents.push({ kind: 'move_marker', direction, refersToContext: true, raw: utterance });
   }
 

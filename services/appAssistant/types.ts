@@ -113,6 +113,8 @@ export interface AppState {
   visibleStructures: string[];
   conversationContext: ConversationContext;
   language: Lang;
+  /** نمط الحوار الحالي (اختياري للتوافق مع الاستدعاءات القديمة). */
+  conversationMode?: ConversationMode;
 }
 
 /** الإجراءات المنظّمة الآمنة التي ينفّذها التطبيق. */
@@ -139,7 +141,8 @@ export type AssistantActionType =
   | 'open_last_entry'
   | 'doctor_summary'
   | 'set_severity'
-  | 'close';
+  | 'close'
+  | 'reset_context';
 
 export interface AssistantAction {
   type: AssistantActionType;
@@ -161,6 +164,12 @@ export interface ResolvedTarget {
   coords?: Coords;
 }
 
+/**
+ * نمط الحوار الحالي (لطبقات المساعد الثلاث). يُحفظ بين الجولات حتى يبقى السياق
+ * محفوظًا عند التبديل بين الكلام العام والطبي والتحكّم.
+ */
+export type ConversationMode = 'idle' | 'general' | 'medical' | 'app';
+
 /** نتيجة جولة واحدة من الحوار. */
 export interface AssistantTurn {
   understood: boolean;
@@ -172,6 +181,8 @@ export interface AssistantTurn {
   pendingConfirmation: AssistantAction[];
   /** اقتراحات جاهزة (أزرار سريعة). */
   suggestions: LocalizedText[];
+  /** الطبقة التي عالجت هذه الجملة (للتتبّع؛ لا تُغيّر السلوك). */
+  mode?: ConversationMode;
 }
 
 /**

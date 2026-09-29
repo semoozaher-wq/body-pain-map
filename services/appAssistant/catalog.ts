@@ -98,7 +98,7 @@ const ORGAN_NAMES_FR: Record<string, string> = {
 
 // كلمات مفتاحية إضافية للأعضاء (عربي/إنجليزي/فرنسي) — تُدمج مع الاسم الرسمي.
 const ORGAN_ALIASES: Record<string, string[]> = {
-  heart: ['قلب', 'القلب', 'heart', 'coeur', 'cœur'],
+  heart: ['قلب', 'القلب', 'قلبي', 'قلبى', 'heart', 'coeur', 'cœur'],
   lungs: ['رئه', 'الرئه', 'رئتين', 'الرئتين', 'lung', 'lungs', 'poumon', 'poumons'],
   stomach: ['معدة', 'المعده', 'معدتك', 'stomach', 'estomac'],
   liver: ['كبد', 'الكبد', 'liver', 'foie'],
@@ -357,6 +357,13 @@ const MUSCLE_GROUP_LABELS: Record<string, LocalizedText> = {
 const seenGroups = new Set<string>();
 // مرادفات عامة لمنطقة الظهر (تساعد «ضهري بيوجعني» على تحديد منطقة ظهر حقيقية).
 const BACK_ALIASES = ['ضهر', 'ضهري', 'الظهر', 'ظهرى', 'back', 'dos'];
+// مرادفات إضافية لكل مجموعة عضلية: تسمح بالضمائر والأشكال الشائعة داخل الجملة
+// («تحت صدري بشوية» → «صدر»/«صدري») دون اختراع إحداثيات، اعتمادًا على إحداثيات المجموعة الحقيقية.
+const GROUP_EXTRA_ALIASES: Record<string, string[]> = {
+  upper: BACK_ALIASES,
+  lower: BACK_ALIASES,
+  chest: ['صدر', 'صدري', 'صدرى', 'chest', 'poitrine'],
+};
 for (const spot of HOTSPOTS) {
   if (spot.type !== 'muscle' || !spot.muscleId) continue;
   const group = spot.muscleId.split('-')[0];
@@ -364,7 +371,7 @@ for (const spot of HOTSPOTS) {
   seenGroups.add(`${group}-${spot.view}`);
   const label = MUSCLE_GROUP_LABELS[group];
   if (!label) continue;
-  const extra = group === 'upper' || group === 'lower' ? BACK_ALIASES : [];
+  const extra = GROUP_EXTRA_ALIASES[group] ?? [];
   entries.push({
     id: `region:${group}:${spot.view}`,
     kind: 'region',

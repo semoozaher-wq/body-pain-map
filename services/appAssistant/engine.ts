@@ -19,6 +19,7 @@ import {
 } from './catalog';
 import { splitBySafety, withLabel } from './actions';
 import { parseIntents, type RawIntent } from './intents';
+import { classifyGeneralChat, generalChatReply } from './generalChat';
 import { analyzeMessage, type AssistantReply } from '../aiAssistant/engine';
 import {
   describePoint,
@@ -28,6 +29,7 @@ import {
   nearestBetweenTwo,
   offsetPoint,
   DIRECTION_LABELS,
+  type Direction,
 } from './spatial';
 import type {
   AppState,
@@ -65,6 +67,23 @@ function contextCandidates(state: AppState, kinds: CatalogEntry['kind'][]): Cata
   const visible = visibleEntries(state).filter((e) => kinds.includes(e.kind));
   if (visible.length) return visible;
   return entriesByKind('organ').concat(entriesByKind('region')).filter((e) => kinds.includes(e.kind));
+}
+
+/**
+ * يحدّد مقدار الإزاحة على الخريطة من صيغة الجملة:
+ *   «شوية/قليل» → إزاحة صغيرة، «أبعد/بعيد» → كبيرة، «أقرب/قريب» → صغيرة جدًا، وإلا الافتراضي.
+ * يعتمد على النص فقط، والإحداثيات الناتجة تبقى مشتقّة من إحداثيات حقيقية (لا اختراع).
+ */
+function moveAmount(rawText: string): number {
+  const t = rawText
+    .replace(/[\u064B-\u0652\u0670\u0640]/g, '')
+    .replace(/[\u0623\u0625\u0622\u0671]/g, '\u0627')
+    .replace(/\u0649/g, '\u064a')
+    .replace(/\u0629/g, '\u0647');
+  if (t.includes('\u0628\u0639\u064a\u062f') || t.includes('\u0627\u0628\u0639\u062f')) return 16;
+  if (t.includes('\u0642\u0631\u064a\u0628') || t.includes('\u0627\u0642\u0631\u0628')) return 4;
+  if (t.includes('\u0634\u0648\u064a') || t.includes('\u0642\u0644\u064a\u0644') || t.includes('\u0628\u0633\u064a\u0637')) return 6;
+  return 8;
 }
 
 // ---------------------------------------------------------------------------
@@ -341,14 +360,30 @@ export function interpret(
         if (target && target.coords) {
           if (target.tab) actions.push({ type: 'open_tab', targetId: `tab:${target.tab}` });
           if (target.view) actions.push({ type: 'set_view', targetId: target.view });
-          actions.push({ type: 'set_marker', targetId: target.id, value: `${target.coords.x},${target.coords.y},${target.coords.view}` });
+          // فهم مكاني داخل الجملة: لو المستخدم قال "تحت صدري بشوية" أو "جنب القلب ناحية الشمال"،
+          // نزيح العلامة عن إحداثيات الهدف الحقيقية في الاتجاه المذكور (لا إحداثيات مُختلقة).
+          const dir: Direction | undefined = intent.direction;
+          const hasDir = !!dir && dir !== 'between' && dir !== 'between_two';
+          const placed = hasDir
+            ? offsetPoint({ x: target.coords.x, y: target.coords.y, view: target.coords.view }, dir as Direction, moveAmount(utterance))
+            : { x: target.coords.x, y: target.coords.y, view: target.coords.view };
+          actions.push({ type: 'set_marker', targetId: target.id, value: `${placed.x},${placed.y},${placed.view}` });
           actions.push({ type: 'highlight', targetId: target.id, label: target.label });
           resolved.push(toResolved(target));
-          replyParts.push(L(
-            `تمام، علّمت ${labelFor(target, lang)} على الخريطة. فين بالظبط؟ فوق، تحت، يمين، شمال، ولا جنب حاجة تانية؟`,
-            `Okay, I marked ${labelFor(target, lang)} on the map. Where exactly? Above, below, left, right, or next to something?`,
-            `D’accord, j’ai marqué ${labelFor(target, lang)} sur la carte. Où exactement ? Au-dessus, en dessous, à gauche, à droite ?`,
-          ));
+          if (hasDir) {
+            const dirWord = DIRECTION_LABELS[dir as Direction][lang];
+            replyParts.push(L(
+              `تمام، علّمت المنطقة ${dirWord} ${labelFor(target, lang)} على الخريطة. لو عايز أدقّ قول «فوق شوية» أو «تحت شوية».`,
+              `Okay, I marked the area ${dirWord} ${labelFor(target, lang)} on the map. Say “a bit up” or “a bit down” to fine-tune.`,
+              `D’accord, j’ai marqué la zone ${dirWord} ${labelFor(target, lang)} sur la carte. Dites « un peu plus haut » ou « plus bas » pour ajuster.`,
+            ));
+          } else {
+            replyParts.push(L(
+              `تمام، علّمت ${labelFor(target, lang)} على الخريطة. فين بالظبط؟ فوق، تحت، يمين، شمال، ولا جنب حاجة تانية؟`,
+              `Okay, I marked ${labelFor(target, lang)} on the map. Where exactly? Above, below, left, right, or next to something?`,
+              `D’accord, j’ai marqué ${labelFor(target, lang)} sur la carte. Où exactement ? Au-dessus, en dessous, à gauche, à droite ?`,
+            ));
+          }
         } else {
           replyParts.push(L(
             'تمام، فتحت خريطة الجسم. اضغط على مكان الألم أو قول لي المنطقة (مثلاً: أسفل الظهر، الركبة، البطن).',
@@ -363,7 +398,7 @@ export function interpret(
         // تحريك علامة الألم الحالية بالنسبة لموقعها السابق ("تحت شوية").
         const base = state.selectedPainLocation ?? state.conversationContext.lastReferencedCoords;
         if (base && intent.direction) {
-          const moved = offsetPoint({ x: base.x, y: base.y, view: base.view }, intent.direction);
+          const moved = offsetPoint({ x: base.x, y: base.y, view: base.view }, intent.direction, moveAmount(utterance));
           actions.push({ type: 'move_marker', targetId: 'pain_marker', value: `${moved.x},${moved.y},${moved.view}` });
           const dirWord = DIRECTION_LABELS[intent.direction][lang];
           replyParts.push(L(
@@ -490,7 +525,22 @@ export function interpret(
     aiReply = null;
   }
 
-  if (!wantsClose && aiReply && aiReply.understood) {
+  // تصنيف المحادثة العامة مرّة واحدة. «تغيير الموضوع» أمر صريح له أولوية قصوى في أي وقت،
+  // حتى لو التقط المحرّك الطبي كلمة عرض داخل الجملة (مثال: «غير الموضوع» → sym:general-pain).
+  const generalKind = !wantsClose ? classifyGeneralChat(utterance) : null;
+  const isTopicChange = generalKind === 'topic_change';
+
+  let mode: 'idle' | 'general' | 'medical' | 'app' = understood ? 'app' : (state.conversationMode ?? 'idle');
+
+  if (isTopicChange && generalKind) {
+    understood = true;
+    mode = 'general';
+    replyParts.push(generalChatReply(generalKind, utterance));
+    // تغيير الموضوع: نطلب من طبقة الإجراءات تفريغ سياق الحوار (آمن، بلا تأكيد).
+    actions.push({ type: 'reset_context' });
+  }
+
+  if (!wantsClose && !isTopicChange && aiReply && aiReply.understood) {
     if (!understood) {
       // محرّك التحكّم لم يفهم الأمر، لكنه كلام طبيعي مفهوم → نردّ طبيعيًا
       // ونشتقّ إجراءات التطبيق (فتح الخريطة + العلامة + الإبراز) إن وُجد عنصر حقيقي.
@@ -500,14 +550,44 @@ export function interpret(
       const derived = actionsFromAiReply(aiReply);
       actions.push(...derived.actions);
       if (derived.entry) resolved.push(toResolved(derived.entry));
+      if (mode !== 'app') mode = 'medical';
     } else {
       // محرّك التحكّم فهم الأمر → نُثري الرد بسؤال طبيعي متابعة إن لم يكن الرد يسأل بالفعل.
       const alreadyAsks = replyParts.some((p) => /[؟?]/.test(p.ar));
-      if (!alreadyAsks) {
+      // لا نكرّر سؤال «مكان الألم فين؟» لو وضعنا العلامة بالفعل (سؤال توضيحي متناقض مع «علّمت المنطقة…»).
+      const controlMarked = actions.some((a) => a.type === 'set_marker');
+      const naturalIsClarify = !!aiReply.clarifyingQuestion && !aiReply.followUpQuestion;
+      if (!alreadyAsks && !(controlMarked && naturalIsClarify)) {
         const natural = aiNaturalParts(aiReply);
         if (natural) replyParts.push(natural);
       }
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // طبقة المحادثة العامة: كلام حرّ لا يخصّ الألم ولا التحكّم (تحيّة، حال، مشاعر،
+  // تغيير موضوع، شكر، وداع، هوية، قدرات). نصنّفه هنا بدل الردّ الافتراضي الفاشل.
+  // ---------------------------------------------------------------------------
+  if (!wantsClose && !understood && generalKind) {
+    understood = true;
+    mode = 'general';
+    replyParts.push(generalChatReply(generalKind, utterance));
+  }
+
+  // ضبط الوضع النهائي: الجولات الطبية (شكوى ألم / تحريك العلامة / الشدّة) تُصنَّف «طبي» لا «تحكّم»،
+  // لأن إجراءاتها المشتقّة (فتح الخريطة + العلامة + الإبراز) نتيجة الفهم الطبي لا أمر تنقّل مباشر.
+  if (understood && mode === 'app') {
+    const medicalish = intents.some(
+      (i) => i.kind === 'locate_pain' || i.kind === 'record_pain' || i.kind === 'move_marker',
+    );
+    const appish = intents.some(
+      (i) =>
+        i.kind === 'navigate_screen' || i.kind === 'open_tab' || i.kind === 'highlight' ||
+        i.kind === 'select' || i.kind === 'filter' || i.kind === 'search' || i.kind === 'set_view' ||
+        i.kind === 'set_sex' || i.kind === 'zoom' || i.kind === 'back' || i.kind === 'home' ||
+        i.kind === 'save' || i.kind === 'show_details' || i.kind === 'clear_history' || i.kind === 'clear_highlight',
+    );
+    if (medicalish && !appish) mode = 'medical';
   }
 
   // إزالة التكرار: قد تنتج أكثر من نيّة عن نفس الإجراء/الرد (مثل «روح للأعضاء»).
@@ -534,12 +614,14 @@ export function interpret(
 
   const { safe, pending } = splitBySafety(dedupedActions.map((a) => withLabel(a, lang)));
 
+  // الردّ الافتراضي عند عدم الفهم ليس «معليش، مفهمتش الطلب»، بل سؤال توضيحي يوجّه
+  // المستخدم للطبقات الثلاث (عام/طبي/تحكّم) — التصنيف يسبق الرفض.
   const reply = dedupedReplies.length
     ? combine(dedupedReplies)
     : L(
-        'معلش، مفهمتش الطلب. تقدر تقول مثلاً: «روح للأعضاء»، «وريني القلب»، «اللي فوقه إيه؟».',
-        'Sorry, I didn’t catch that. Try: “open the organs”, “show me the heart”, “what’s above it?”.',
-        'Désolé, je n’ai pas compris. Essayez : « ouvre les organes », « montre le cœur », « qu’y a-t-il au-dessus ? ».',
+        'مش متأكد إني فهمت صح. تقصد تسألني عن ألم أو عرض، ولا عايز تتحكّم في التطبيق (تنقّل/إبراز/تسجيل)، ولا مجرد كلام عام؟',
+        'I’m not sure I got that. Do you mean to ask about a pain or symptom, control the app (navigate/highlight/log), or just chat?',
+        'Je ne suis pas sûr d’avoir compris. Veux-tu parler d’une douleur, contrôler l’app (naviguer/surligner), ou discuter ?',
       );
 
   return {
@@ -550,6 +632,7 @@ export function interpret(
     needsConfirmation: pending.length > 0,
     pendingConfirmation: pending,
     suggestions: suggestionsFor(state),
+    mode,
   };
 }
 

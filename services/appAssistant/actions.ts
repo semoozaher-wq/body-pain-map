@@ -33,6 +33,7 @@ export const ACTION_SAFETY: Record<AssistantActionType, 'safe' | 'confirm'> = {
   doctor_summary: 'safe',
   set_severity: 'safe',
   close: 'safe',
+  reset_context: 'safe',
   save: 'confirm',
   confirm: 'safe',
 };
@@ -59,6 +60,7 @@ const ACTION_LABELS: Record<AssistantActionType, LocalizedText> = {
   doctor_summary: { ar: 'توليد ملخص للطبيب', en: 'Generate doctor summary', fr: 'Générer le résumé médecin' },
   set_severity: { ar: 'تسجيل شدة الألم', en: 'Set pain severity', fr: 'Définir l’intensité' },
   close: { ar: 'إغلاق المساعد', en: 'Close the assistant', fr: 'Fermer l’assistant' },
+  reset_context: { ar: 'تفريغ سياق الحوار', en: 'Reset conversation context', fr: 'Réinitialiser le contexte' },
   save: { ar: 'حفظ', en: 'Save', fr: 'Enregistrer' },
   confirm: { ar: 'تأكيد', en: 'Confirm', fr: 'Confirmer' },
 };
