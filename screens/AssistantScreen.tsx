@@ -201,6 +201,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // Mirror of `askCount` so two sends in the same tick can never both read a
   // stale counter (this is what previously made the question repeat forever).
   const askCountRef = useRef(0);
+  // يحمل الصورة السريرية المتراكمة (PainContext) بين الأدوار حتى يبني السياق تدريجيًا.
+  const painContextRef = useRef<any>(null);
   const initialContextSentRef = useRef(false);
   const mountedRef = useRef(true);
   const replyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -385,8 +387,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             forceAnswer,
             askCount: askedSoFar,
             userTurnCount,
+            previousContext: painContextRef.current ?? undefined,
           });
           if (!mountedRef.current) return;
+          // نبني السياق تدريجيًا: نحفظ PainContext الناتج لنمرّره في الدور التالي.
+          if (reply.painContext) painContextRef.current = reply.painContext;
           // A clarifying question raises the counter; a real answer (conditions +
           // self-care) resets it, because the user clearly gave something we understood.
           const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
