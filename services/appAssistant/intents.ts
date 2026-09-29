@@ -40,6 +40,7 @@ export type IntentKind =
   | 'open_last_entry'
   | 'doctor_summary'
   | 'medications'
+  | 'close'
   | 'unknown';
 
 export interface RawIntent {
@@ -53,6 +54,8 @@ export interface RawIntent {
   value?: number;
   /** يشير إلى العنصر المرجعي في السياق (ضمير). */
   refersToContext?: boolean;
+  /** طلب صريح (مثل «سجّل») يحتاج تأكيدًا، مقابل استكمال محادثة (مثل «شدته 7»). */
+  explicit?: boolean;
   raw: string;
 }
 
@@ -79,6 +82,7 @@ const VERBS = {
   clearHistory: ['امسح', 'احذف', 'مسح', 'حذف', 'الغي', 'delete', 'clear', 'efface', 'supprime'],
   showDetails: ['التفاصيل', 'تفاصيل', 'details', 'detail'],
   clearHighlight: ['شيل', 'ازال', 'الغي الابراز', 'اقفل الابراز', 'remove highlight', 'clear highlight', 'enleve'],
+  close: ['اقفل', 'اقفلي', 'اغلق', 'غلق', 'اقفل المساعد', 'اقفل اللوحه', 'اقفل اللوحة', 'اقفل الشات', 'اقفل المحادثه', 'اقفل المحادثة', 'اطلع', 'خروج', 'close', 'ferme', 'quit', 'exit'],
   zoom: ['زوم', 'كبر', 'صغر', 'تكبير', 'تصغير', 'zoom', 'agrandir', 'reduire'],
 };
 
@@ -173,7 +177,7 @@ function findDirection(text: string): Direction | undefined {
 function findSeverity(text: string): number | undefined {
   const m =
     text.match(/(\d+)\s*(?:\/|من|out of|sur)\s*10/) ||
-    text.match(/شده\s*(?:الالم\s*)?(\d+)/) ||
+    text.match(/شد[ته][^\s\d]*\s*(?:الالم\s*)?(\d+)/) ||
     text.match(/severity\s*(\d+)/) ||
     text.match(/(\d+)\s*\/\s*10/);
   if (m) {
@@ -209,7 +213,11 @@ function stripVerbs(text: string): string {
 // ---------------------------------------------------------------------------
 // المحلّل الرئيسي
 // ---------------------------------------------------------------------------
-export function parseIntents(utterance: string, _lang: Lang): RawIntent[] {
+export function parseIntents(
+  utterance: string,
+  _lang: Lang,
+  ctx: { hasBase?: boolean } = {},
+): RawIntent[] {
   const text = normalize(utterance);
   if (!text) return [{ kind: 'unknown', raw: utterance }];
 
@@ -218,6 +226,15 @@ export function parseIntents(utterance: string, _lang: Lang): RawIntent[] {
   const direction = findDirection(text);
   const severity = findSeverity(text);
   const refersToContext = CONTEXT_REFERENTS.some((r) => text.includes(normalize(r)));
+  const hasBase = !!ctx.hasBase;
+
+  // --- إغلاق المساعد (أولوية قصوى: «اقفل» / «اقفل المساعد») ---
+  // نستثني «اقفل الإبراز» لأنها تعني إزالة الإبراز لا إغلاق اللوحة.
+  const wantsCloseHighlight =
+    text.includes('الابراز') || text.includes('highlight') || text.includes('العلامه') || text.includes('العلامة');
+  if (hasAny(text, VERBS.close) && !wantsCloseHighlight) {
+    return [{ kind: 'close', raw: utterance }];
+  }
 
   const isQuestion = tokens.some((t) => VERBS.what.includes(t) || VERBS.where.includes(t)) || text.includes('?') || text.includes('؟');
   const hasWhere = hasAny(text, VERBS.where);
@@ -308,7 +325,7 @@ export function parseIntents(utterance: string, _lang: Lang): RawIntent[] {
   // --- تسجيل ألم بشدّة محدّدة (متعدد الخطوات) ---
   if (severity !== undefined) {
     const target = stripVerbs(text);
-    intents.push({ kind: 'record_pain', value: severity, targetTerm: target || undefined, refersToContext, raw: utterance });
+    intents.push({ kind: 'record_pain', value: severity, targetTerm: target || undefined, refersToContext, explicit: hasAny(text, VERBS.save), raw: utterance });
   } else if (
     hasAny(text, VERBS.save) &&
     (text.includes('الم') || text.includes('وجع') || text.includes('pain') || text.includes('mal')) &&
@@ -351,7 +368,7 @@ export function parseIntents(utterance: string, _lang: Lang): RawIntent[] {
     !isQuestion &&
     !hasWhere &&
     !text.includes('اللي') &&
-    (refersToContext || hasMarkerVerb || text.includes('شويه') || text.includes('شوية') || text.includes('بتاع') || text.includes('علامه') || text.includes('علامة') || text.includes('ناحيه') || text.includes('ناحية') || text.includes('جنب') || text.includes('جوه'));
+    (refersToContext || hasMarkerVerb || hasBase || text.includes('شويه') || text.includes('شوية') || text.includes('بتاع') || text.includes('علامه') || text.includes('علامة') || text.includes('ناحيه') || text.includes('ناحية') || text.includes('جنب') || text.includes('جوه'));
   if (isDirectionalOnly) {
     intents.push({ kind: 'move_marker', direction, refersToContext: true, raw: utterance });
   }

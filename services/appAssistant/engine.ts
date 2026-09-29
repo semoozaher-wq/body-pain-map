@@ -19,6 +19,7 @@ import {
 } from './catalog';
 import { splitBySafety, withLabel } from './actions';
 import { parseIntents, type RawIntent } from './intents';
+import { analyzeMessage, type AssistantReply } from '../aiAssistant/engine';
 import {
   describePoint,
   describePosition,
@@ -131,15 +132,24 @@ export function interpret(
   _options: InterpretOptions = {},
 ): AssistantTurn {
   const lang: Lang = state.language;
-  const intents = parseIntents(utterance, lang);
+  const hasBase = !!(state.selectedPainLocation || state.conversationContext.lastReferencedCoords);
+  const intents = parseIntents(utterance, lang, { hasBase });
 
   const actions: AssistantAction[] = [];
   const resolved: ResolvedTarget[] = [];
   const replyParts: LocalizedText[] = [];
   let understood = false;
+  let wantsClose = false;
 
   for (const intent of intents) {
     switch (intent.kind) {
+      case 'close': {
+        actions.push({ type: 'close' });
+        replyParts.push(L('تمام، قفلت المساعد.', 'Okay, closing the assistant.', 'D’accord, je ferme l’assistant.'));
+        understood = true;
+        wantsClose = true;
+        break;
+      }
       case 'back': {
         actions.push({ type: 'back' });
         replyParts.push(L('حاضر، رجعت.', 'Okay, going back.', 'D’accord, retour.'));
@@ -413,6 +423,18 @@ export function interpret(
         break;
       }
       case 'record_pain': {
+        // استكمال محادثة: «شدته 7» بدون فعل حفظ صريح → نحدّث الشدة على العلامة الحالية
+        // بدل بدء تسجيل جديد أو طلب تأكيد. الطلب الصريح («سجّل ألم شدته 7») يبقى كما هو.
+        if (intent.value !== undefined && !intent.explicit) {
+          actions.push({ type: 'set_severity', value: intent.value });
+          replyParts.push(L(
+            `تمام، سجّلت الشدة ${intent.value} من 10. بقاله قد إيه؟ ولو تحب تعدّل المكان قول لي «فوق شوية» أو «تحت شوية».`,
+            `Okay, noted severity ${intent.value}/10. How long has it been? Say “a bit up” or “a bit down” to adjust the spot.`,
+            `Noté : intensité ${intent.value}/10. Depuis combien de temps ? Dites « un peu plus haut » ou « plus bas » pour ajuster.`,
+          ));
+          understood = true;
+          break;
+        }
         actions.push({ type: 'navigate', targetId: 'screen:body' });
         actions.push({ type: 'open_tab', targetId: 'tab:muscles' });
         if (intent.value !== undefined) {
@@ -453,6 +475,38 @@ export function interpret(
       }
       default:
         break;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // دمج المرحلة الثانية والثالثة: نفس المساعد يفهم الكلام الطبيعي وينفّذ إجراءات التطبيق.
+  // نستدعي محرّك الفهم الطبي الطبيعي (aiAssistant) جنبًا إلى جنب مع محرّك التحكّم،
+  // فلا يستبدل أحدهما الآخر: التحكّم يفتح/يبرز، والفهم الطبيعي يكمل الحوار.
+  // ---------------------------------------------------------------------------
+  let aiReply: AssistantReply | null = null;
+  try {
+    aiReply = analyzeMessage(utterance, lang, false);
+  } catch {
+    aiReply = null;
+  }
+
+  if (!wantsClose && aiReply && aiReply.understood) {
+    if (!understood) {
+      // محرّك التحكّم لم يفهم الأمر، لكنه كلام طبيعي مفهوم → نردّ طبيعيًا
+      // ونشتقّ إجراءات التطبيق (فتح الخريطة + العلامة + الإبراز) إن وُجد عنصر حقيقي.
+      understood = true;
+      const natural = aiNaturalParts(aiReply);
+      if (natural) replyParts.push(natural);
+      const derived = actionsFromAiReply(aiReply);
+      actions.push(...derived.actions);
+      if (derived.entry) resolved.push(toResolved(derived.entry));
+    } else {
+      // محرّك التحكّم فهم الأمر → نُثري الرد بسؤال طبيعي متابعة إن لم يكن الرد يسأل بالفعل.
+      const alreadyAsks = replyParts.some((p) => /[؟?]/.test(p.ar));
+      if (!alreadyAsks) {
+        const natural = aiNaturalParts(aiReply);
+        if (natural) replyParts.push(natural);
+      }
     }
   }
 
@@ -499,8 +553,49 @@ export function interpret(
   };
 }
 
-function combine(parts: LocalizedText[]): LocalizedText {
-  return {
+/**
+ * يبني جملة طبيعية من رد محرّك الفهم الطبي (سؤال توضيحي أو سؤال متابعة أو مقدّمة).
+ * تُستخدم لدمج المحادثة الطبيعية مع إجراءات التطبيق في رد واحد.
+ */
+function aiNaturalParts(reply: AssistantReply): LocalizedText | null {
+  const q = reply.clarifyingQuestion ?? reply.followUpQuestion;
+  const pick = (l: Lang): string => (q ? q[l] : reply.intro[l]);
+  const ar = pick('ar');
+  const en = pick('en');
+  const fr = pick('fr');
+  if (!ar && !en && !fr) return null;
+  return L(ar, en, fr);
+}
+
+/**
+ * يشتقّ إجراءات التطبيق من رد الفهم الطبيعي: يحوّل المنطقة/العضو المفهوم إلى عنصر
+ * حقيقي في الكتالوج (بلا اختراع معرّفات)، ثم يفتح الخريطة ويضع العلامة ويبرز العنصر.
+ */
+function actionsFromAiReply(reply: AssistantReply): { entry?: CatalogEntry; actions: AssistantAction[] } {
+  const candidates: Array<[string, CatalogEntry['kind'][]]> = [];
+  if (reply.organs[0]) candidates.push([reply.organs[0].label.ar, ['organ']]);
+  if (reply.regions[0]) candidates.push([reply.regions[0].label.ar, ['region']]);
+  if (reply.suggestedOrganLabel) candidates.push([reply.suggestedOrganLabel.ar, ['organ']]);
+  if (reply.suggestedRegionLabel) candidates.push([reply.suggestedRegionLabel.ar, ['region']]);
+
+  let entry: CatalogEntry | undefined;
+  for (const [term, kinds] of candidates) {
+    const found = findTarget(term, kinds);
+    if (found) { entry = found; break; }
+  }
+  if (!entry) return { actions: [] };
+
+  const actions: AssistantAction[] = [{ type: 'navigate', targetId: 'screen:body' }];
+  if (entry.tab) actions.push({ type: 'open_tab', targetId: `tab:${entry.tab}` });
+  if (entry.view) actions.push({ type: 'set_view', targetId: entry.view });
+  if (entry.coords) {
+    actions.push({ type: 'set_marker', targetId: entry.id, value: `${entry.coords.x},${entry.coords.y},${entry.coords.view}` });
+  }
+  actions.push({ type: 'highlight', targetId: entry.id, label: entry.label });
+  return { entry, actions };
+}
+
+function combine(parts: LocalizedText[]): LocalizedText {  return {
     ar: parts.map((p) => p.ar).join(' '),
     en: parts.map((p) => p.en).join(' '),
     fr: parts.map((p) => p.fr).join(' '),

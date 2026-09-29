@@ -137,7 +137,9 @@ export type AssistantActionType =
   | 'set_marker'
   | 'move_marker'
   | 'open_last_entry'
-  | 'doctor_summary';
+  | 'doctor_summary'
+  | 'set_severity'
+  | 'close';
 
 export interface AssistantAction {
   type: AssistantActionType;
