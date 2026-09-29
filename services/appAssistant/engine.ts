@@ -14,6 +14,7 @@ import {
   entriesByKind,
   findTarget,
   getEntry,
+  isMidBackTerm,
   labelFor,
   visibleEntries,
 } from './catalog';
@@ -356,7 +357,11 @@ export function interpret(
       case 'locate_pain': {
         // شكوى ألم أو طلب وضع علامة: نفتح الخريطة، نحدّد أقرب منطقة حقيقية، ونطلب الدقة.
         actions.push({ type: 'navigate', targetId: 'screen:body' });
-        const target = intent.targetTerm ? findTarget(intent.targetTerm, ['region', 'organ', 'point']) : undefined;
+        const target = intent.targetTerm
+          ? (isMidBackTerm(intent.targetTerm)
+              ? getEntry('region:mid:back') ?? findTarget(intent.targetTerm, ['region', 'organ', 'point'])
+              : findTarget(intent.targetTerm, ['region', 'organ', 'point']))
+          : undefined;
         if (target && target.coords) {
           if (target.tab) actions.push({ type: 'open_tab', targetId: `tab:${target.tab}` });
           if (target.view) actions.push({ type: 'set_view', targetId: target.view });

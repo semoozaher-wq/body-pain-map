@@ -12,7 +12,7 @@
 //   • الضمائر المرجعية ("ده"، "دي"، "هنا"، "اللي اخترناه").
 // ============================================================================
 
-import { normalize } from './catalog';
+import { normalize, isMidBackTerm } from './catalog';
 import type { Direction } from './spatial';
 import type { Lang } from './types';
 
@@ -174,7 +174,11 @@ function hasPainWord(text: string): boolean {
 }
 
 function findDirection(text: string): Direction | undefined {
+  // «الفرق بين X و Y» سؤال معرفة عامة، وليس سؤالًا مكانيًّا. كلمة «بين» هنا ليست اتجاهًا.
+  const isDifferenceQuestion =
+    text.includes('الفرق') || text.includes('difference') || text.includes('difference');
   for (const { dir, words } of DIRECTION_WORDS) {
+    if (dir === 'between' && isDifferenceQuestion) continue;
     if (hasAny(text, words)) return dir;
   }
   return undefined;
@@ -370,7 +374,10 @@ export function parseIntents(
 
   // --- تحديد/وضع علامة الألم على الخريطة (شكوى ألم أو طلب صريح) ---
   const hasMarkerVerb = hasAny(text, MARKER_VERBS);
-  if (isPainComplaint || hasMarkerVerb) {
+  // «وسط الظهر/نص الظهر/في النص/وسط» تُعدّ تحديدًا لمكان الألم (وسط الظهر) حتى بلا كلمة ألم،
+  // لأن المستخدم غالبًا يذكر الموقع مباشرة بعد شكوى سابقة («عندي وجع في ظهري» → «وسط الظهر»).
+  const mentionsMidBack = isMidBackTerm(text);
+  if (isPainComplaint || hasMarkerVerb || mentionsMidBack) {
     const target = stripVerbs(text);
     // نحمل الاتجاه المذكور داخل الجملة ("تحت صدري بشوية"، "جنب القلب ناحية الشمال")
     // حتى تزيح طبقة المحرّك العلامة عن إحداثيات الهدف الحقيقية بدل تجاهله.

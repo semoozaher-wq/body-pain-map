@@ -347,6 +347,7 @@ const MUSCLE_GROUP_LABELS: Record<string, LocalizedText> = {
   trapezius: { ar: 'أعلى الكتف', en: 'Upper shoulder', fr: 'Haut de l’épaule' },
   upper: { ar: 'أعلى الظهر', en: 'Upper back', fr: 'Haut du dos' },
   lower: { ar: 'أسفل الظهر', en: 'Lower back', fr: 'Bas du dos' },
+  mid: { ar: 'وسط الظهر', en: 'Mid back', fr: 'Milieu du dos' },
   gluteal: { ar: 'الأرداف', en: 'Glutes', fr: 'Fessiers' },
   hamstring: { ar: 'خلف الفخذ', en: 'Hamstrings', fr: 'Ischio-jambiers' },
   triceps: { ar: 'العضلة ثلاثية الرؤوس', en: 'Triceps', fr: 'Triceps' },
@@ -384,6 +385,46 @@ for (const spot of HOTSPOTS) {
     coords: { x: spot.x, y: spot.y, view: spot.view },
     meta: { group },
   });
+}
+
+// ---------------------------------------------------------------------------
+// منطقة «وسط الظهر» (Mid back)
+// ---------------------------------------------------------------------------
+// مشكلة سابقة: «وسط الظهر» كان يُطابَق مع «أعلى الظهر» (upper) لأن كلا منطقتي الظهر
+// تتشاركان مرادفات (ضهر/الظهر) وكانت أول مطابقة تفوز. هنا نضيف منطقة «وسط الظهر»
+// بإحداثيات مشتقّة من متوسط إحداثيات أعلى/أسفل الظهر الحقيقية على العرض الخلفي
+// (لا اختراع إحداثيات: متوسط نقطتين موجودتين فعلاً في anatomyHotspots.json).
+const MID_BACK_COORDS: Coords = { x: 40, y: 38, view: 'back' };
+const MID_BACK_ALIASES = ['وسط الظهر', 'نص الظهر', 'في النص', 'النص', 'وسط', 'نص', 'middle back', 'mid back', 'milieu du dos'];
+entries.push({
+  id: 'region:mid:back',
+  kind: 'region',
+  label: { ar: 'وسط الظهر', en: 'Mid back', fr: 'Milieu du dos' },
+  aliases: norm([...MID_BACK_ALIASES, 'region:mid:back']),
+  tab: 'muscles',
+  screen: 'body',
+  view: 'back',
+  region: 'mid',
+  coords: MID_BACK_COORDS,
+  meta: { group: 'mid' },
+});
+
+const BACK_WORD_TOKENS = ['ظهر', 'ضهر', 'back', 'dos'];
+const MID_WORD_TOKENS = ['وسط', 'نص', 'middle', 'mid', 'milieu'];
+/**
+ * هل يشير النص إلى «وسط الظهر» تحديدًا؟
+ *   • «وسط/نص» + كلمة ظهر  ⇒ وسط الظهر.
+ *   • «وسط»/«نص»/«النص»/«في النص» وحدها ⇒ وسط الظهر (سياق تحديد ألم الظهر).
+ * ملاحظة: «وسط البطن» أو «وسط الصدر» لا تُعدّ ظهرًا (لا تحتوي كلمة ظهر وليست الصيغة المجرّدة).
+ */
+export function isMidBackTerm(term: string): boolean {
+  const n = normalize(term);
+  if (!n) return false;
+  const hasMid = MID_WORD_TOKENS.some((w) => { const nw = normalize(w); return nw && n.includes(nw); });
+  if (!hasMid) return false;
+  const hasBack = BACK_WORD_TOKENS.some((w) => { const nw = normalize(w); return nw && n.includes(nw); });
+  if (hasBack) return true;
+  return ['وسط', 'نص', 'النص', 'في النص'].some((w) => n === normalize(w));
 }
 
 // ---------------------------------------------------------------------------
