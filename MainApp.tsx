@@ -339,6 +339,11 @@ export default function App() {
       case 'zoom':
         setZoomLevel((prev) => Math.max(0.5, Math.min(3, prev + Number(action.value ?? 0))));
         break;
+      case 'set_severity': {
+        const value = Number(action.value);
+        if (!Number.isNaN(value)) setIntensity(Math.max(0, Math.min(10, value)));
+        break;
+      }
       case 'back':
         goBack();
         break;
