@@ -95,6 +95,8 @@ export default function App() {
   const [lastAssistantAction, setLastAssistantAction] = useState<AssistantAction['type'] | null>(null);
   const [lastUserReference, setLastUserReference] = useState<string | null>(null);
   const [conversationState, setConversationState] = useState<AppState['conversationState']>('idle');
+  // نمط الحوار الحالي (عام/طبي/تحكّم) — يُحدّثه المساعد كل جولة، ويُحفظ بين الجولات.
+  const [conversationMode, setConversationMode] = useState<AppState['conversationMode']>('idle');
   // إشارة تركيز لشاشة سجل الألم (فتح آخر تسجيل / إنشاء ملخص للطبيب) قادمة من المساعد المركزي.
   const [historyFocus, setHistoryFocus] = useState<{ kind: 'last' | 'summary'; nonce: number } | null>(null);
 
@@ -344,6 +346,17 @@ export default function App() {
         if (!Number.isNaN(value)) setIntensity(Math.max(0, Math.min(10, value)));
         break;
       }
+      case 'reset_context': {
+        // تغيير الموضوع: نفرّغ سياق الحوار المرجعي (آخر عنصر/إحداثيات) ونعيد الحالة لخامل.
+        conversationContext.current.lastReferencedId = null;
+        conversationContext.current.lastReferencedKind = null;
+        conversationContext.current.lastReferencedLabel = null;
+        conversationContext.current.lastReferencedCoords = null;
+        conversationContext.current.previousReferencedId = null;
+        conversationContext.current.previousReferencedCoords = null;
+        setConversationState('idle');
+        break;
+      }
       case 'back':
         goBack();
         break;
@@ -386,7 +399,8 @@ export default function App() {
     visibleStructures: [],
     conversationContext: conversationContext.current,
     language: language as Lang,
-  }), [screen, bodyState, selected, intensity, symptoms, painMarker, lastAssistantAction, lastUserReference, conversationState, zoomLevel, language]);
+    conversationMode,
+  }), [screen, bodyState, selected, intensity, symptoms, painMarker, lastAssistantAction, lastUserReference, conversationState, zoomLevel, language, conversationMode]);
 
   const getTitle = (): string => {
     const titles: Record<Screen, string> = {
@@ -561,6 +575,7 @@ export default function App() {
       <GlobalAssistant
         appState={appState}
         onAction={handleAssistantAction}
+        onTurn={(turn) => { if (turn.mode) setConversationMode(turn.mode); }}
         language={language as Lang}
         direction={direction}
         bottomOffset={92}
