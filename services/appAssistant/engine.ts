@@ -641,6 +641,9 @@ export function interpret(
     pendingConfirmation: pending,
     suggestions: suggestionsFor(state),
     mode,
+    // الردّ الطبي الكامل (إن وُجد) يُمرَّر مع الجولة حتى تعرضه شاشة «المساعد الذكي»
+    // كبطاقة غنية دون استدعاء محرّك ثانٍ متناقض.
+    medical: aiReply ?? undefined,
   };
 }
 
