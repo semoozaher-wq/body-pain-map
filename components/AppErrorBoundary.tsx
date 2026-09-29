@@ -1,53 +1,91 @@
 import React from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, View } from 'react-native';
 
-type Props = { children: React.ReactNode };
-type State = { error: Error | null };
+type Props = {
+  children: React.ReactNode;
+};
 
-export class AppErrorBoundary extends React.Component<Props, State> {
-  state: State = { error: null };
+type State = {
+  hasError: boolean;
+  message: string;
+};
 
-  static getDerivedStateFromError(error: Error): State {
-    return { error };
+/**
+ * Prevents an uncaught render error from turning the whole app into a blank
+ * screen. Keep this component dependency-free so it works in Expo Go and web.
+ */
+export default class AppErrorBoundary extends React.Component<Props, State> {
+  state: State = {
+    hasError: false,
+    message: '',
+  };
+
+  static getDerivedStateFromError(error: unknown): State {
+    const message =
+      error instanceof Error ? error.message : 'حدث خطأ غير متوقع داخل التطبيق.';
+
+    return {
+      hasError: true,
+      message,
+    };
   }
 
-  componentDidCatch(error: Error, info: React.ErrorInfo) {
-    console.error('[BodyMap Pain] runtime render error', error, info.componentStack);
+  componentDidCatch(error: unknown, info: React.ErrorInfo) {
+    // Keep the original error available in Metro/production logs.
+    console.error('[AppErrorBoundary]', error, info.componentStack);
   }
 
-  private recover = () => {
-    if (Platform.OS === 'web' && typeof window !== 'undefined') {
-      window.location.reload();
-      return;
-    }
-    this.setState({ error: null });
+  handleReload = () => {
+    this.setState({ hasError: false, message: '' });
   };
 
   render() {
-    if (!this.state.error) return this.props.children;
+    if (!this.state.hasError) {
+      return this.props.children;
+    }
 
-    const message = this.state.error.message || 'حدث خطأ غير متوقع.';
     return (
       <View style={styles.container}>
-        <View style={styles.card}>
-          <Text style={styles.title}>حصل خطأ أثناء تشغيل التطبيق</Text>
-          <Text style={styles.body}>التطبيق ما انهارش بصمت. جرّب إعادة فتحه، ولو الخطأ اتكرر ابعت رسالة الخطأ الظاهرة تحت.</Text>
-          <Text selectable style={styles.error}>{message}</Text>
-          <Pressable accessibilityRole="button" onPress={this.recover} style={styles.button}>
-            <Text style={styles.buttonText}>إعادة فتح التطبيق</Text>
-          </Pressable>
-        </View>
+        <Text style={styles.title}>حصل خطأ في التطبيق</Text>
+        <Text style={styles.message}>
+          التطبيق منع الشاشة البيضاء. جرّب إعادة فتح الشاشة مرة تانية.
+        </Text>
+        {this.state.message ? (
+          <Text selectable style={styles.error}>
+            {this.state.message}
+          </Text>
+        ) : null}
+        <Button title="إعادة المحاولة" onPress={this.handleReload} />
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20, backgroundColor: '#F5FAFA' },
-  card: { width: '100%', maxWidth: 620, borderRadius: 20, padding: 20, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#D9E7E6', gap: 12 },
-  title: { fontSize: 20, fontWeight: '900', color: '#143A40', textAlign: 'right' },
-  body: { fontSize: 14, lineHeight: 22, color: '#52676A', textAlign: 'right' },
-  error: { fontSize: 12, lineHeight: 18, color: '#8A3737', backgroundColor: '#FFF3F1', borderRadius: 10, padding: 10, textAlign: 'left' },
-  button: { minHeight: 46, borderRadius: 12, backgroundColor: '#0B7774', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 },
-  buttonText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    backgroundColor: '#fff',
+  },
+  title: {
+    marginBottom: 12,
+    fontSize: 22,
+    fontWeight: '700',
+    textAlign: 'center',
+  },
+  message: {
+    marginBottom: 16,
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: 'center',
+  },
+  error: {
+    marginBottom: 20,
+    maxWidth: 600,
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: 'center',
+  },
 });
