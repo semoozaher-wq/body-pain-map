@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.white,
     borderTopLeftRadius: Radii.xxl,
     borderTopRightRadius: Radii.xxl,
-    maxHeight: '82%',
+    maxHeight: '60%',
     paddingBottom: Platform.OS === 'ios' ? 26 : 16,
     ...Elevation.lg,
   },
