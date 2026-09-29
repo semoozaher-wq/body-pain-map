@@ -10,6 +10,7 @@
 // ============================================================================
 
 import { useCallback, useRef, useState } from 'react';
+import * as Speech from 'expo-speech';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -120,6 +121,24 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
   const scrollRef = useRef<ScrollView>(null);
   const rtl = direction === 'rtl';
 
+  // مرجع لإنهاء المكالمة الصوتية من داخل معالج الإغلاق (قبل تهيئة الـhook).
+  const endCallRef = useRef<() => void>(() => {});
+
+  // اعتراض إجراء «الإغلاق» القادم من المحرّك: نقفل اللوحة فورًا بلا تأخير أو رد غريب،
+  // ونوقف أي نطق جارٍ وننهي المكالمة الصوتية إن كانت مفعّلة.
+  const handleAction = useCallback(
+    (action: AssistantAction) => {
+      if (action.type === 'close') {
+        endCallRef.current?.();
+        try { Speech.stop(); } catch {}
+        setOpen(false);
+        return;
+      }
+      onAction(action);
+    },
+    [onAction],
+  );
+
   const {
     messages,
     listening,
@@ -140,9 +159,17 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
     cancelPending,
   } = useAppAssistant({
     getState: () => appState,
-    onAction,
+    onAction: handleAction,
     language,
   });
+  endCallRef.current = endCall;
+
+  // إغلاق فوري ونظيف: إيقاف النطق + إنهاء المكالمة + إخفاء اللوحة.
+  const handleClose = useCallback(() => {
+    endCallRef.current?.();
+    try { Speech.stop(); } catch {}
+    setOpen(false);
+  }, []);
 
   const handleSend = useCallback(() => {
     if (!input.trim()) return;
@@ -189,7 +216,7 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
         </Pressable>
       )}
 
-      <Modal visible={open} animationType="slide" transparent onRequestClose={() => setOpen(false)}>
+      <Modal visible={open} animationType="slide" transparent onRequestClose={handleClose}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.overlay}>
           <View style={styles.sheet}>
             {/* الرأس */}
@@ -198,7 +225,7 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
                 <Text style={styles.title}>{t.title}</Text>
                 <Text style={styles.subtitle}>{stateLabel || t.subtitle}</Text>
               </View>
-              <Pressable onPress={() => setOpen(false)} accessibilityRole="button" accessibilityLabel={t.close} style={styles.closeBtn}>
+              <Pressable onPress={handleClose} accessibilityRole="button" accessibilityLabel={t.close} style={styles.closeBtn}>
                 <Text style={styles.closeGlyph}>✕</Text>
               </Pressable>
             </View>
