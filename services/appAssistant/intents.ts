@@ -105,16 +105,23 @@ const VIEW_WORDS = {
   back: ['الظهر', 'ظهر', 'الخلف', 'back', 'dos', 'arriere'],
 };
 
-const SEX_WORDS = {
-  male: ['رجل', 'ذكر', 'ذكري', 'الذكري', 'ذكوري', 'male', 'homme'],
-  female: ['انثى', 'انثي', 'انثوي', 'الانثوي', 'انثويه', 'ست', 'female', 'femme'],
+// أفعال تغيير العرض/النموذج: لا نُفعّل «تغيير العرض» بمجرّد ورود اسم عضو مثل «الظهر» (لأنه عضو في الجسم أيضًا).
+const VIEW_VERBS = ['عرض', 'اعرض', 'أعرض', 'وريني', 'ورينى', 'شوف', 'اظهر', 'أظهر', 'front view', 'back view', 'affiche'];
+// كلمات سياق النموذج (بدون «رجل» لأنها تعني العضو أيضًا).
+const SEX_VERBS = {
+  male: ['نموذج', 'ذكر', 'ذكري', 'الذكري', 'ذكوري', 'male', 'homme'],
+  female: ['نموذج', 'انثى', 'انثي', 'انثوي', 'الانثوي', 'انثويه', 'ست', 'female', 'femme'],
 };
 
 // ضمائر/إشارات مرجعية إلى السياق
 const CONTEXT_REFERENTS = [
   'ده', 'دي', 'دا', 'هنا', 'هذا', 'هذه', 'ده', 'اللي اخترناه', 'اللي اخترناه', 'المحدد',
-  'اللي قبلها', 'اللي قبل كده', 'السابق', 'this', 'it', 'here', 'ceci', 'cela', 'ici',
+  'اللي قبلها', 'اللي قبل كده', 'السابق', 'عليه', 'عليها', 'عليا', 'عليهو', 'عليهما',
+  'this', 'it', 'here', 'ceci', 'cela', 'ici',
 ];
+
+// صيغ «شيله/امسحه» المرجعية لإزالة الإبراز بدون ذكر كلمة «الإبراز» صراحةً.
+const CLEAR_HIGHLIGHT_REFERENTS = ['شيله', 'شيلي', 'شيلها', 'شيلو', 'امسحه', 'امسحي', 'امسحها', 'ازاله', 'أزيله'];
 
 // كلمات الشكوى من الألم (تضع علامة على الخريطة وتطلب الدقة)
 const PAIN_WORDS = [
@@ -227,6 +234,7 @@ export function parseIntents(
   const severity = findSeverity(text);
   const refersToContext = CONTEXT_REFERENTS.some((r) => text.includes(normalize(r)));
   const hasBase = !!ctx.hasBase;
+  const hasViewVerb = hasAny(text, VIEW_VERBS);
 
   // --- إغلاق المساعد (أولوية قصوى: «اقفل» / «اقفل المساعد») ---
   // نستثني «اقفل الإبراز» لأنها تعني إزالة الإبراز لا إغلاق اللوحة.
@@ -269,15 +277,27 @@ export function parseIntents(
   }
 
   // --- إزالة الإبراز ---
-  if (hasAny(text, VERBS.clearHighlight) && (text.includes('الابراز') || text.includes('highlight') || text.includes('العلامه') || text.includes('العلامة'))) {
+  // نسمح بصيغ مرجعية مثل «شيله»/«امسحه» عندما يكون هناك سياق/علامة حالية، بدل اشتراط كلمة «الإبراز» صراحةً.
+  const wantsClearHighlightWord = text.includes('الابراز') || text.includes('highlight') || text.includes('العلامه') || text.includes('العلامة');
+  const clearHighlightReferent = refersToContext || hasBase || CLEAR_HIGHLIGHT_REFERENTS.some((w) => text.includes(normalize(w)));
+  if (hasAny(text, VERBS.clearHighlight) && (wantsClearHighlightWord || clearHighlightReferent)) {
     intents.push({ kind: 'clear_highlight', raw: utterance });
   }
 
   // --- العرض (أمام/ظهر) والنموذج (رجل/امرأة) ---
-  if (hasAny(text, VIEW_WORDS.front)) intents.push({ kind: 'set_view', value: 0, targetTerm: 'front', raw: utterance });
-  if (hasAny(text, VIEW_WORDS.back)) intents.push({ kind: 'set_view', value: 0, targetTerm: 'back', raw: utterance });
-  if (hasAny(text, SEX_WORDS.male)) intents.push({ kind: 'set_sex', targetTerm: 'male', raw: utterance });
-  if (hasAny(text, SEX_WORDS.female)) intents.push({ kind: 'set_sex', targetTerm: 'female', raw: utterance });
+  // ملاحظة مهمة: «ظهر» اسم عضوٍ في الجسم أيضًا، فلا نعتبره أمر تغيير عرضٍ إلا إذا لم تكن الجملة شكوى ألم.
+  // (شكوى مثل «عندي وجع في ظهري» يجب أن تُصنَّف طبية، لا أمر تحكّم.)
+  const isPainComplaint =
+    hasPainWord(text) &&
+    !hasAny(text, VERBS.save) &&
+    !hasAny(text, VERBS.navigate) &&
+    !text.includes('سجل') &&
+    !text.includes('history') &&
+    !wantsHistory;
+  if (hasAny(text, VIEW_WORDS.front) && hasViewVerb && !isPainComplaint) intents.push({ kind: 'set_view', value: 0, targetTerm: 'front', raw: utterance });
+  if (hasAny(text, VIEW_WORDS.back) && hasViewVerb && !isPainComplaint) intents.push({ kind: 'set_view', value: 0, targetTerm: 'back', raw: utterance });
+  if (hasAny(text, SEX_VERBS.male) && !isPainComplaint) intents.push({ kind: 'set_sex', targetTerm: 'male', raw: utterance });
+  if (hasAny(text, SEX_VERBS.female) && !isPainComplaint) intents.push({ kind: 'set_sex', targetTerm: 'female', raw: utterance });
 
   // --- تكبير ---
   if (hasAny(text, VERBS.zoom)) {
@@ -349,13 +369,6 @@ export function parseIntents(
   if (hasAny(text, VERBS.showDetails)) intents.push({ kind: 'show_details', raw: utterance });
 
   // --- تحديد/وضع علامة الألم على الخريطة (شكوى ألم أو طلب صريح) ---
-  const isPainComplaint =
-    hasPainWord(text) &&
-    !hasAny(text, VERBS.save) &&
-    !hasAny(text, VERBS.navigate) &&
-    !text.includes('سجل') &&
-    !text.includes('history') &&
-    !wantsHistory;
   const hasMarkerVerb = hasAny(text, MARKER_VERBS);
   if (isPainComplaint || hasMarkerVerb) {
     const target = stripVerbs(text);

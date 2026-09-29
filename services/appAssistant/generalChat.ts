@@ -30,7 +30,9 @@ export type GeneralChatKind =
   | 'thanks'
   | 'farewell'
   | 'identity'
-  | 'help';
+  | 'help'
+  | 'chat_request'
+  | 'knowledge_question';
 
 // ---------------------------------------------------------------------------
 // مفردات التصنيف (مُطبّعة عبر normalize: توحيد الهمزات والياء والتاء المربوطة)
@@ -79,6 +81,20 @@ const PHRASES: Record<GeneralChatKind, string[]> = {
     'ايه اللي تعرفه', 'ايه قدراتك', 'help', 'what can you do', "what can you do",
     'aide moi', 'que peux tu faire',
   ],
+  chat_request: [
+    'خلينا نتكلم', 'خلينا نتكلم في اي حاجه', 'خلينا نتكلم في أي حاجة', 'نتكلم في اي حاجه', 'نتكلم في أي حاجة',
+    'عايز اتكلم', 'عاوز اتكلم', 'عايزه اتكلم', 'اتكلم معايا', 'اتكلم معي', 'تعالى نتكلم', 'تعال نتكلم',
+    'احكيلي حاجه', 'احكي لي حاجه', 'احكيلي حاجة', 'احكيلي', 'قولي حاجه', 'قولي حاجة', 'قولي حكمه', 'قولي حكمة',
+    'هات حكمه', 'هات حكمة', 'قولي نكته', 'قولي نكتة', 'هات نكته', 'هات نكتة', 'قولي معلومه', 'قولي معلومة',
+    'tell me something', 'let us talk', "let's talk", 'talk to me', 'say something',
+    'raconte moi', 'parlons', 'dis moi quelque chose',
+  ],
+  knowledge_question: [
+    'الفرق بين', 'ايه الفرق', 'إيه الفرق', 'يعني ايه', 'يعني إيه', 'اشرحلي', 'اشرح لي', 'اشرحلي ازاي',
+    'عرفني', 'ايه هو', 'إيه هو', 'ايه هي', 'إيه هي', 'ممكن تشرح', 'عايز افهم', 'عاوز افهم', 'افهمني',
+    'what is the difference', 'what is', 'explain', 'tell me about',
+    'quelle est la difference', 'explique', 'c est quoi',
+  ],
 };
 
 // ---------------------------------------------------------------------------
@@ -125,6 +141,11 @@ export function classifyGeneralChat(rawText: string): GeneralChatKind | null {
   if (matches(text, PHRASES.thanks)) return 'thanks';
   // الوداع (بعد التحيّة حتى لا يتعارض "سلام")
   if (matches(text, PHRASES.farewell)) return 'farewell';
+
+  // طلب محادثة عامة («خلينا نتكلم»، «احكيلي حاجة»). لا يسرق جملًا تحمل شكوى ألم.
+  if (!painHint && matches(text, PHRASES.chat_request)) return 'chat_request';
+  // سؤال معرفة عامة غير طبي («إيه الفرق بين...؟») — نردّ بصراحة أنه خارج نطاق المساعد القائم على القواعد.
+  if (!painHint && matches(text, PHRASES.knowledge_question)) return 'knowledge_question';
 
   return null;
 }
@@ -196,6 +217,19 @@ const RESPONSES: Record<GeneralChatKind, LocalizedText[]> = {
     L('أقدر أساعدك في ٣ حاجات: نتكلم بشكل عام، أسألك عن الألم وأفهمه، أو أتحكم في التطبيق (تنقّل، إبراز، تسجيل ألم). قولّي تحب نبدأ بإيه.',
       'I can help with three things: general chat, understanding your pain, or controlling the app (navigate, highlight, log pain). Where shall we start?',
       'Je peux t’aider sur trois plans : discuter, comprendre ta douleur, ou contrôler l’app (naviguer, surligner, enregistrer). On commence par quoi ?'),
+  ],
+  chat_request: [
+    L('تحت أمرك. بس خليني أكون صريح معاك: أنا مساعد قائم على قواعد (Rule-Based) ومش نموذج لغوي كبير، فمش هقدر أحكي قصة طويلة من عندي. أقدر أسمعك وأتكلم معاك في الألم والجسم أو أتحكم في التطبيق. تحب نبدأ بإيه؟',
+      'At your service. But let me be honest: I’m a rule-based assistant, not a large language model, so I can’t improvise long stories. I can chat about pain and the body, or control the app. Where shall we start?',
+      'À ton service. Mais soyons clairs : je suis un assistant à base de règles, pas un grand modèle de langage, donc je ne peux pas inventer de longues histoires. On peut parler douleur et corps, ou contrôler l’app. On commence par quoi ?'),
+    L('أنا معاك. خد بالك إني مساعد بسيط قائم على قواعد، فمش عندي معرفة عامة واسعة زي الـLLM. بس أقدر أساعدك تفهم جسمك أو أتحكم في التطبيق. تحب نتكلم في إيه؟',
+      'I’m here. Note that I’m a simple rule-based assistant, not a general LLM, so I don’t have broad general knowledge. But I can help you understand your body or control the app. What shall we talk about?',
+      'Je suis là. Note que je suis un assistant simple à base de règles, pas un LLM général, donc je n’ai pas de connaissances générales étendues. Mais je peux t’aider à comprendre ton corps ou contrôler l’app. On parle de quoi ?'),
+  ],
+  knowledge_question: [
+    L('ده سؤال معرفة عامة، وأنا حاليًا مساعد Rule-Based متخصّص في الألم والجسم — مش عندي نموذج لغوي كبير (LLM) أجاوب بيه على أسئلة المعرفة العامة زي دي. لو عايز إجابة دقيقة على أسئلة عامة، لازم يتوصل بموديل LLM/API. لكن أقدر أساعدك في وصف الألم أو التحكّم في التطبيق.',
+      'That’s a general-knowledge question. I’m a rule-based assistant focused on pain and the body — I don’t have a large language model (LLM) to answer general knowledge like this. For accurate general answers, an LLM/API would need to be connected. Meanwhile, I can help with pain description or app control.',
+      'C’est une question de culture générale. Je suis un assistant à base de règles centré sur la douleur et le corps — je n’ai pas de grand modèle de langage (LLM) pour y répondre. Pour des réponses générales précises, il faudrait connecter un LLM/API. En attendant, je peux aider sur la douleur ou le contrôle de l’app.'),
   ],
 };
 

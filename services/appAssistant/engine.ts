@@ -555,9 +555,12 @@ export function interpret(
       // محرّك التحكّم فهم الأمر → نُثري الرد بسؤال طبيعي متابعة إن لم يكن الرد يسأل بالفعل.
       const alreadyAsks = replyParts.some((p) => /[؟?]/.test(p.ar));
       // لا نكرّر سؤال «مكان الألم فين؟» لو وضعنا العلامة بالفعل (سؤال توضيحي متناقض مع «علّمت المنطقة…»).
+      // لا نُثري ردّ أوامر التحكّم الصريحة (مثل «وريني القلب») ولا تحريك العلامة («تحت شوية») بسؤال طبي متابِع؛
+      // نُثري فقط عندما تكون الجملة شكوى ألم جديدة (locate_pain) لنطلب التوضيح/المتابعة الطبيعية.
+      const complaint = intents.some((i) => i.kind === 'locate_pain');
       const controlMarked = actions.some((a) => a.type === 'set_marker');
       const naturalIsClarify = !!aiReply.clarifyingQuestion && !aiReply.followUpQuestion;
-      if (!alreadyAsks && !(controlMarked && naturalIsClarify)) {
+      if (complaint && !alreadyAsks && !(controlMarked && naturalIsClarify)) {
         const natural = aiNaturalParts(aiReply);
         if (natural) replyParts.push(natural);
       }
