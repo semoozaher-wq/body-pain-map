@@ -82,7 +82,21 @@ export default function App() {
   const [bodyState, setBodyState] = useState<BodyScreenState>({ tab: 'muscles', view: 'front', sex: 'male', organId: null, pointId: null });
   const [zoomLevel, setZoomLevel] = useState(1);
   const controlNonce = useRef(0);
-  const conversationContext = useRef<ConversationContext>({ lastReferencedId: null, lastReferencedKind: null, lastReferencedLabel: null, lastReferencedCoords: null });
+  const conversationContext = useRef<ConversationContext>({
+    lastReferencedId: null,
+    lastReferencedKind: null,
+    lastReferencedLabel: null,
+    lastReferencedCoords: null,
+    previousReferencedId: null,
+    previousReferencedCoords: null,
+  });
+  // ---- حالة إضافية للمساعد المركزي (بدون تخمين) ----
+  const [painMarker, setPainMarker] = useState<{ x: number; y: number; view: 'front' | 'back' } | null>(null);
+  const [lastAssistantAction, setLastAssistantAction] = useState<AssistantAction['type'] | null>(null);
+  const [lastUserReference, setLastUserReference] = useState<string | null>(null);
+  const [conversationState, setConversationState] = useState<AppState['conversationState']>('idle');
+  // إشارة تركيز لشاشة سجل الألم (فتح آخر تسجيل / إنشاء ملخص للطبيب) قادمة من المساعد المركزي.
+  const [historyFocus, setHistoryFocus] = useState<{ kind: 'last' | 'summary'; nonce: number } | null>(null);
 
   const { history, addRecord, importRecords, clearHistory: clearHistoryRecords } = usePainHistory();
   const { language, direction, setLanguage } = useLanguage();
@@ -231,6 +245,8 @@ export default function App() {
   // ---------------------------------------------------------------------------
   const handleAssistantAction = (action: AssistantAction) => {
     const targetId = action.targetId ?? '';
+    setLastAssistantAction(action.type);
+    if (targetId) setLastUserReference(targetId);
     switch (action.type) {
       case 'navigate': {
         const screenId = stripPrefix(targetId) as Screen;
@@ -250,6 +266,8 @@ export default function App() {
         issueBodyControl({ sex: targetId === 'female' ? 'female' : 'male' });
         break;
       case 'highlight': {
+        conversationContext.current.previousReferencedId = conversationContext.current.lastReferencedId;
+        conversationContext.current.previousReferencedCoords = conversationContext.current.lastReferencedCoords;
         if (targetId.startsWith('organ:')) {
           const organId = stripPrefix(targetId);
           issueBodyControl({ organId, highlightId: organId });
@@ -289,6 +307,35 @@ export default function App() {
       case 'search':
         issueBodyControl({ search: String(action.value ?? '') });
         break;
+      case 'set_marker': {
+        const raw = String(action.value ?? '');
+        const [mx, my, mv] = raw.split(',');
+        if (!Number.isNaN(Number(mx)) && !Number.isNaN(Number(my))) {
+          setPainMarker({ x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' });
+          issueBodyControl({ painMarker: { x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' } });
+          conversationContext.current.lastReferencedCoords = { x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' };
+          setConversationState('awaiting_location');
+        }
+        break;
+      }
+      case 'move_marker': {
+        const raw = String(action.value ?? '');
+        const [mx, my, mv] = raw.split(',');
+        if (!Number.isNaN(Number(mx)) && !Number.isNaN(Number(my))) {
+          setPainMarker({ x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' });
+          issueBodyControl({ painMarker: { x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' } });
+          conversationContext.current.lastReferencedCoords = { x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' };
+        }
+        break;
+      }
+      case 'open_last_entry':
+        setHistoryFocus({ kind: 'last', nonce: Date.now() });
+        navigateTo('history');
+        break;
+      case 'doctor_summary':
+        setHistoryFocus({ kind: 'summary', nonce: Date.now() });
+        navigateTo('history');
+        break;
       case 'zoom':
         setZoomLevel((prev) => Math.max(0.5, Math.min(3, prev + Number(action.value ?? 0))));
         break;
@@ -324,12 +371,17 @@ export default function App() {
     selectedBodyRegion: bodyState.tab === 'muscles' ? (selected?.group ?? null) : null,
     selectedAnatomyStructure: bodyState.organId,
     selectedPoint: bodyState.pointId,
-    selectedPainLocation: null,
+    selectedPainLocation: painMarker ? { x: painMarker.x, y: painMarker.y, view: painMarker.view } : null,
+    painSeverity: selected ? intensity : null,
+    symptoms,
+    lastAssistantAction,
+    lastUserReference,
+    conversationState,
     zoomLevel,
     visibleStructures: [],
     conversationContext: conversationContext.current,
     language: language as Lang,
-  }), [screen, bodyState, selected, zoomLevel, language]);
+  }), [screen, bodyState, selected, intensity, symptoms, painMarker, lastAssistantAction, lastUserReference, conversationState, zoomLevel, language]);
 
   const getTitle = (): string => {
     const titles: Record<Screen, string> = {
@@ -478,6 +530,7 @@ export default function App() {
             onImport={importRecords}
             language={language}
             direction={direction}
+            focus={historyFocus}
           />
         )}
       </ScrollView>
