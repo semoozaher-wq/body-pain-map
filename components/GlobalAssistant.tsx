@@ -25,11 +25,13 @@ import {
 import { Gradient } from './Gradient';
 import { Palette, Gradients, Radii, Elevation } from '../constants/design';
 import { useAppAssistant } from '../hooks/useAppAssistant';
-import type { AppState, AssistantAction, Lang } from '../services/appAssistant/types';
+import type { AppState, AssistantAction, AssistantTurn, Lang } from '../services/appAssistant/types';
 
 interface GlobalAssistantProps {
   appState: AppState;
   onAction: (action: AssistantAction) => void;
+  /** يُبلّغ المضيف بكل جولة (لتتبّع النمط/السياق). */
+  onTurn?: (turn: AssistantTurn) => void;
   language: Lang;
   direction: 'rtl' | 'ltr';
   /** موضع الزر العائم أسفل الشاشة (لتجنّب شريط التنقّل). */
@@ -114,7 +116,7 @@ const LABELS: Record<Lang, Record<string, string>> = {
   },
 };
 
-export function GlobalAssistant({ appState, onAction, language, direction, bottomOffset = 92 }: GlobalAssistantProps) {
+export function GlobalAssistant({ appState, onAction, onTurn, language, direction, bottomOffset = 92 }: GlobalAssistantProps) {
   const t = LABELS[language] ?? LABELS.ar;
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -160,6 +162,7 @@ export function GlobalAssistant({ appState, onAction, language, direction, botto
   } = useAppAssistant({
     getState: () => appState,
     onAction: handleAction,
+    onTurn,
     language,
   });
   endCallRef.current = endCall;
