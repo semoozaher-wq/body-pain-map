@@ -36,7 +36,7 @@ const SW_SCRIPT = `
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
-          navigator.serviceWorker.register('./service-worker.js').catch(function () {});
+          navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).then(function (registration) { return registration.update(); }).catch(function () {});
         });
       }
     </script>`;
