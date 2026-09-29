@@ -24,6 +24,8 @@ import {
   describePosition,
   describeSpatialRelation,
   nearestInDirection,
+  nearestBetweenTwo,
+  offsetPoint,
   DIRECTION_LABELS,
 } from './spatial';
 import type {
@@ -78,10 +80,18 @@ export function describeScreenState(state: AppState): LocalizedText {
 
   if (state.currentScreen === 'body') {
     const tab = tabLabel ? tabLabel[state.language] : '';
+    const painBits: string[] = [];
+    if (state.selectedPainLocation) {
+      painBits.push(state.language === 'ar' ? 'في علامة ألم محدّدة على الخريطة' : state.language === 'fr' ? 'un repère de douleur est placé' : 'a pain marker is placed');
+    }
+    if (state.painSeverity != null) {
+      painBits.push(state.language === 'ar' ? `شدّتها ${state.painSeverity}/10` : state.language === 'fr' ? `intensité ${state.painSeverity}/10` : `severity ${state.painSeverity}/10`);
+    }
+    const pain = painBits.length ? ` ${painBits.join('، ')}.` : '';
     return L(
-      `إنت في ${base} — قسم «${tab}». العناصر الظاهرة: ${list || 'لا يوجد'}.`,
-      `You are on ${base} — the “${tab}” section. Visible items: ${list || 'none'}.`,
-      `Vous êtes sur ${base} — section « ${tab} ». Éléments visibles : ${list || 'aucun'}.`,
+      `إنت في ${base} — قسم «${tab}». العناصر الظاهرة: ${list || 'لا يوجد'}.${pain}`,
+      `You are on ${base} — the “${tab}” section. Visible items: ${list || 'none'}.${pain}`,
+      `Vous êtes sur ${base} — section « ${tab} ». Éléments visibles : ${list || 'aucun'}.${pain}`,
     );
   }
   return L(
@@ -204,11 +214,17 @@ export function interpret(
         actions.push({ type: 'navigate', targetId: 'screen:body' });
         actions.push({ type: 'open_tab', targetId: 'tab:acupressure' });
         actions.push({ type: 'filter', value: query });
-        replyParts.push(L(
-          `فلترت نقاط الضغط حسب «${query}».`,
-          `Filtered acupressure points by “${query}”.`,
-          `Points d’acupression filtrés par « ${query} ».`,
-        ));
+        replyParts.push(query
+          ? L(
+              `فلترت نقاط الضغط حسب «${query}».`,
+              `Filtered acupressure points by “${query}”.`,
+              `Points d’acupression filtrés par « ${query} ».`,
+            )
+          : L(
+              'فتحت نقاط الضغط. اكتب المنطقة لعرض النقاط الخاصة بها.',
+              'Opened acupressure points. Type an area to filter.',
+              'Points d’acupression ouverts. Saisissez une zone pour filtrer.',
+            ));
         understood = true;
         break;
       }
@@ -263,17 +279,39 @@ export function interpret(
         const reference = resolveReference(intent, state);
         if (reference && intent.direction) {
           const candidates = contextCandidates(state, ['organ', 'region', 'point']);
-          const found = nearestInDirection(reference, candidates, intent.direction);
+          let found: CatalogEntry | null = null;
+          if (
+            intent.direction === 'between_two' &&
+            reference.coords &&
+            state.conversationContext.previousReferencedCoords
+          ) {
+            found = nearestBetweenTwo(reference.coords, state.conversationContext.previousReferencedCoords, candidates);
+          }
+          if (!found) found = nearestInDirection(reference, candidates, intent.direction);
           if (found) {
             const relation = describeSpatialRelation(found, reference, lang);
             actions.push({ type: 'highlight', targetId: found.id, label: found.label });
             resolved.push(toResolved(found));
             const dirWord = DIRECTION_LABELS[intent.direction][lang];
-            replyParts.push(L(
-              `${relation?.ar ?? ''} يعني ${labelFor(found, lang)} ${dirWord} ${labelFor(reference, lang)}.`,
-              `${relation?.en ?? ''} So ${labelFor(found, lang)} is ${dirWord} ${labelFor(reference, lang)}.`,
-              `${relation?.fr ?? ''} Donc ${labelFor(found, lang)} est ${dirWord} ${labelFor(reference, lang)}.`,
-            ));
+            if (intent.direction === 'between_two') {
+              const prevEntry = state.conversationContext.previousReferencedId
+                ? getEntry(state.conversationContext.previousReferencedId)
+                : null;
+              const otherLabel = prevEntry
+                ? labelFor(prevEntry, lang)
+                : L('العنصر السابق', 'the previous item', 'l’élément précédent')[lang];
+              replyParts.push(L(
+                `${relation?.ar ?? ''} يعني ${labelFor(found, lang)} بين ${labelFor(reference, lang)} و${otherLabel}.`,
+                `${relation?.en ?? ''} So ${labelFor(found, lang)} is between ${labelFor(reference, lang)} and ${otherLabel}.`,
+                `${relation?.fr ?? ''} Donc ${labelFor(found, lang)} est entre ${labelFor(reference, lang)} et ${otherLabel}.`,
+              ));
+            } else {
+              replyParts.push(L(
+                `${relation?.ar ?? ''} يعني ${labelFor(found, lang)} ${dirWord} ${labelFor(reference, lang)}.`,
+                `${relation?.en ?? ''} So ${labelFor(found, lang)} is ${dirWord} ${labelFor(reference, lang)}.`,
+                `${relation?.fr ?? ''} Donc ${labelFor(found, lang)} est ${dirWord} ${labelFor(reference, lang)}.`,
+              ));
+            }
             understood = true;
           } else {
             replyParts.push(L(
@@ -284,6 +322,94 @@ export function interpret(
             understood = true;
           }
         }
+        break;
+      }
+      case 'locate_pain': {
+        // شكوى ألم أو طلب وضع علامة: نفتح الخريطة، نحدّد أقرب منطقة حقيقية، ونطلب الدقة.
+        actions.push({ type: 'navigate', targetId: 'screen:body' });
+        const target = intent.targetTerm ? findTarget(intent.targetTerm, ['region', 'organ', 'point']) : undefined;
+        if (target && target.coords) {
+          if (target.tab) actions.push({ type: 'open_tab', targetId: `tab:${target.tab}` });
+          if (target.view) actions.push({ type: 'set_view', targetId: target.view });
+          actions.push({ type: 'set_marker', targetId: target.id, value: `${target.coords.x},${target.coords.y},${target.coords.view}` });
+          actions.push({ type: 'highlight', targetId: target.id, label: target.label });
+          resolved.push(toResolved(target));
+          replyParts.push(L(
+            `تمام، علّمت ${labelFor(target, lang)} على الخريطة. فين بالظبط؟ فوق، تحت، يمين، شمال، ولا جنب حاجة تانية؟`,
+            `Okay, I marked ${labelFor(target, lang)} on the map. Where exactly? Above, below, left, right, or next to something?`,
+            `D’accord, j’ai marqué ${labelFor(target, lang)} sur la carte. Où exactement ? Au-dessus, en dessous, à gauche, à droite ?`,
+          ));
+        } else {
+          replyParts.push(L(
+            'تمام، فتحت خريطة الجسم. اضغط على مكان الألم أو قول لي المنطقة (مثلاً: أسفل الظهر، الركبة، البطن).',
+            'Okay, I opened the body map. Tap where it hurts, or tell me the area (e.g. lower back, knee, abdomen).',
+            'D’accord, j’ai ouvert la carte. Touchez l’endroit ou nommez la zone (bas du dos, genou, abdomen).',
+          ));
+        }
+        understood = true;
+        break;
+      }
+      case 'move_marker': {
+        // تحريك علامة الألم الحالية بالنسبة لموقعها السابق ("تحت شوية").
+        const base = state.selectedPainLocation ?? state.conversationContext.lastReferencedCoords;
+        if (base && intent.direction) {
+          const moved = offsetPoint({ x: base.x, y: base.y, view: base.view }, intent.direction);
+          actions.push({ type: 'move_marker', targetId: 'pain_marker', value: `${moved.x},${moved.y},${moved.view}` });
+          const dirWord = DIRECTION_LABELS[intent.direction][lang];
+          replyParts.push(L(
+            `حرّكت العلامة ${dirWord} المكان اللي قبل كده. لو عايز أدقّ أكتر قول لي «فوق شوية» أو «ناحية اليمين».`,
+            `I moved the marker ${dirWord} its previous spot. Say “a bit up” or “to the right” to fine-tune.`,
+            `J’ai déplacé le repère ${dirWord} sa position précédente. Dites « un peu plus haut » ou « à droite ».`,
+          ));
+          understood = true;
+        } else {
+          replyParts.push(L(
+            'محتاج أعرف مكان الألم الأول. قول لي المنطقة أو اضغط على الخريطة.',
+            'I need the pain location first. Tell me the area or tap the map.',
+            'J’ai d’abord besoin de l’emplacement. Nommez la zone ou touchez la carte.',
+          ));
+          understood = true;
+        }
+        break;
+      }
+      case 'open_last_entry': {
+        actions.push({ type: 'navigate', targetId: 'screen:history' });
+        actions.push({ type: 'open_last_entry' });
+        replyParts.push(L(
+          'فتحت آخر تسجيل في سجل الألم.',
+          'Opened the latest pain history entry.',
+          'J’ai ouvert la dernière entrée de l’historique.',
+        ));
+        understood = true;
+        break;
+      }
+      case 'doctor_summary': {
+        actions.push({ type: 'navigate', targetId: 'screen:history' });
+        actions.push({ type: 'doctor_summary' });
+        replyParts.push(L(
+          'تمام، هجهّز ملخص لطبيبك من سجل الألم.',
+          'Okay, I’ll prepare a summary for your doctor from the pain history.',
+          'D’accord, je prépare un résumé pour votre médecin.',
+        ));
+        understood = true;
+        break;
+      }
+      case 'medications': {
+        actions.push({ type: 'navigate', targetId: 'screen:body' });
+        actions.push({ type: 'open_tab', targetId: 'tab:drugLookup' });
+        if (intent.query) actions.push({ type: 'search', value: intent.query });
+        replyParts.push(intent.query
+          ? L(
+              `فتحت الأدوية وببحث عن «${intent.query}». ملاحظة: ده للاطّلاع فقط ومش نظام وصف علاج.`,
+              `Opened medications and searching “${intent.query}”. Note: this is for reference only, not a prescribing system.`,
+              `Médicaments ouverts, recherche « ${intent.query} ». À titre indicatif uniquement, pas de prescription.`,
+            )
+          : L(
+              'فتحت قسم الأدوية. اكتب اسم الدواء للبحث. ملاحظة: للاطّلاع فقط.',
+              'Opened the medications section. Type a drug name to search. Reference only.',
+              'Section médicaments ouverte. Saisissez un nom pour rechercher. À titre indicatif.',
+            ));
+        understood = true;
         break;
       }
       case 'record_pain': {
@@ -330,10 +456,32 @@ export function interpret(
     }
   }
 
-  const { safe, pending } = splitBySafety(actions.map((a) => withLabel(a, lang)));
+  // إزالة التكرار: قد تنتج أكثر من نيّة عن نفس الإجراء/الرد (مثل «روح للأعضاء»).
+  const seenActions = new Set<string>();
+  const dedupedActions = actions.filter((a) => {
+    const key = `${a.type}|${a.targetId ?? ''}|${String(a.value ?? '')}`;
+    if (seenActions.has(key)) return false;
+    seenActions.add(key);
+    return true;
+  });
+  const seenReplies = new Set<string>();
+  const dedupedReplies = replyParts.filter((p) => {
+    if (seenReplies.has(p.ar)) return false;
+    seenReplies.add(p.ar);
+    return true;
+  });
 
-  const reply = replyParts.length
-    ? combine(replyParts)
+  const seenResolved = new Set<string>();
+  const dedupedResolved = resolved.filter((r) => {
+    if (seenResolved.has(r.id)) return false;
+    seenResolved.add(r.id);
+    return true;
+  });
+
+  const { safe, pending } = splitBySafety(dedupedActions.map((a) => withLabel(a, lang)));
+
+  const reply = dedupedReplies.length
+    ? combine(dedupedReplies)
     : L(
         'معلش، مفهمتش الطلب. تقدر تقول مثلاً: «روح للأعضاء»، «وريني القلب»، «اللي فوقه إيه؟».',
         'Sorry, I didn’t catch that. Try: “open the organs”, “show me the heart”, “what’s above it?”.',
@@ -344,7 +492,7 @@ export function interpret(
     understood,
     reply,
     actions: safe,
-    resolved,
+    resolved: dedupedResolved,
     needsConfirmation: pending.length > 0,
     pendingConfirmation: pending,
     suggestions: suggestionsFor(state),

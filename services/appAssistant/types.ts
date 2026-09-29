@@ -72,7 +72,19 @@ export interface ConversationContext {
   lastReferencedKind: TargetKind | null;
   lastReferencedLabel: LocalizedText | null;
   lastReferencedCoords: Coords | null;
+  /** العنصر المرجعي قبل الأخير — لأسئلة "بين الاتنين" (بين ده وده). */
+  previousReferencedId: string | null;
+  previousReferencedCoords: Coords | null;
 }
+
+/** مرحلة الحوار الحالية (تستخدمها آلة حالة الصوت والواجهة). */
+export type ConversationState =
+  | 'idle'
+  | 'listening'
+  | 'thinking'
+  | 'speaking'
+  | 'awaiting_location'
+  | 'awaiting_confirmation';
 
 /**
  * حالة التطبيق التي يراها المساعد (آمنة ومنظّمة).
@@ -87,6 +99,16 @@ export interface AppState {
   selectedAnatomyStructure: string | null;
   selectedPoint: string | null;
   selectedPainLocation: SelectedPainLocation | null;
+  /** شدّة الألم الحالية (0..10) إن وُجدت. */
+  painSeverity: number | null;
+  /** الأعراض التي ذكرها المستخدم (نصوص مُطبّعة). */
+  symptoms: string[];
+  /** آخر إجراء نفّذه المساعد (نوعه) — لتفادي التكرار وفهم السياق. */
+  lastAssistantAction: AssistantActionType | null;
+  /** آخر مرجع صريح من المستخدم (نص أو id) — للضمائر والإحالات. */
+  lastUserReference: string | null;
+  /** مرحلة الحوار الحالية (خاملة/استماع/تفكير/تحدّث/انتظار موقع/انتظار تأكيد). */
+  conversationState: ConversationState;
   zoomLevel: number;
   visibleStructures: string[];
   conversationContext: ConversationContext;
@@ -111,7 +133,11 @@ export type AssistantActionType =
   | 'zoom'
   | 'show_details'
   | 'confirm'
-  | 'speak';
+  | 'speak'
+  | 'set_marker'
+  | 'move_marker'
+  | 'open_last_entry'
+  | 'doctor_summary';
 
 export interface AssistantAction {
   type: AssistantActionType;
@@ -161,6 +187,8 @@ export interface BodyControlCommand {
   filter?: string;
   search?: string;
   openDetails?: boolean;
+  /** علامة ألم على الخريطة (null لإزالتها). */
+  painMarker?: { x: number; y: number; view: BodyView } | null;
 }
 
 /** حالة شاشة الخريطة التي تُبلَّغ للمساعد (للفهم البصري). */

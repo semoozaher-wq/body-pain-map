@@ -12,7 +12,18 @@
 import { labelFor } from './catalog';
 import type { CatalogEntry, Coords, Lang, LocalizedText } from './types';
 
-export type Direction = 'above' | 'below' | 'left' | 'right' | 'near' | 'between';
+export type Direction =
+  | 'above'
+  | 'below'
+  | 'left'
+  | 'right'
+  | 'near'
+  | 'far'
+  | 'between'
+  | 'between_two'
+  | 'diagonal'
+  | 'in_front'
+  | 'behind';
 
 const DIRECTION_LABELS: Record<Direction, LocalizedText> = {
   above: { ar: 'فوق', en: 'above', fr: 'au-dessus de' },
@@ -20,7 +31,12 @@ const DIRECTION_LABELS: Record<Direction, LocalizedText> = {
   left: { ar: 'على شمال', en: 'to the left of', fr: 'à gauche de' },
   right: { ar: 'على يمين', en: 'to the right of', fr: 'à droite de' },
   near: { ar: 'قريب من', en: 'near', fr: 'près de' },
+  far: { ar: 'بعيد عن', en: 'far from', fr: 'loin de' },
   between: { ar: 'بين', en: 'between', fr: 'entre' },
+  between_two: { ar: 'بين الاتنين', en: 'between the two', fr: 'entre les deux' },
+  diagonal: { ar: 'قطريًا من', en: 'diagonally from', fr: 'en diagonale de' },
+  in_front: { ar: 'قدام', en: 'in front of', fr: 'devant' },
+  behind: { ar: 'ورا', en: 'behind', fr: 'derrière' },
 };
 
 /** المسافة الإقليدية بين إحداثيين. */
@@ -71,6 +87,29 @@ export function candidatesInDirection(
         break;
       case 'near':
       case 'between':
+        primary = distance(reference, c);
+        secondary = 0;
+        break;
+      case 'far':
+        primary = -distance(reference, c);
+        secondary = 0;
+        break;
+      case 'diagonal':
+        primary = distance(reference, c);
+        secondary = 0;
+        valid = Math.abs(dx) > 5 && Math.abs(dy) > 5;
+        break;
+      case 'in_front':
+        primary = distance(reference, c);
+        secondary = 0;
+        valid = c.view === 'front';
+        break;
+      case 'behind':
+        primary = distance(reference, c);
+        secondary = 0;
+        valid = c.view === 'back';
+        break;
+      case 'between_two':
         primary = distance(reference, c);
         secondary = 0;
         break;
@@ -190,6 +229,50 @@ export function describePoint(point: Coords, _lang: Lang): LocalizedText {
     en: `The point is in the ${V[vBand].en} ${view.en}, ${H[hBand].en}.`,
     fr: `Le point se situe dans la partie ${V[vBand].fr} ${view.fr}, ${H[hBand].fr}.`,
   };
+}
+
+/**
+ * أقرب عنصر إلى منتصف المسافة بين عنصرين مرجعيين ("بين ده وده").
+ * يعتمد فقط على إحداثيات حقيقية مخزّنة.
+ */
+export function nearestBetweenTwo(
+  a: Coords,
+  b: Coords,
+  candidates: CatalogEntry[],
+): CatalogEntry | null {
+  const mid: Coords = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, view: a.view };
+  const pool = candidates.filter((c) => c.coords && c.coords.view === a.view);
+  if (!pool.length) return null;
+  return candidatesInDirection(mid, pool, 'near')[0] ?? null;
+}
+
+/**
+ * يحرّك نقطة بمقدار محدود في اتجاه معيّن ("تحت شوية"، "ناحية اليمين").
+ * يعيد إحداثيات جديدة داخل حدود الخريطة (0..100). لا يخترع مواقع تشريحية،
+ * بل يزيح النقطة الحقيقية التي اختارها المستخدم.
+ */
+export function offsetPoint(point: Coords, direction: Direction, amount = 8): Coords {
+  const clamp = (v: number) => Math.max(0, Math.min(100, v));
+  switch (direction) {
+    case 'above':
+      return { ...point, y: clamp(point.y - amount) };
+    case 'below':
+      return { ...point, y: clamp(point.y + amount) };
+    case 'left':
+      return { ...point, x: clamp(point.x - amount) };
+    case 'right':
+      return { ...point, x: clamp(point.x + amount) };
+    case 'diagonal':
+      return { ...point, x: clamp(point.x + amount / 2), y: clamp(point.y + amount / 2) };
+    case 'near':
+    case 'between':
+    case 'between_two':
+    case 'far':
+    case 'in_front':
+    case 'behind':
+    default:
+      return { ...point };
+  }
 }
 
 export { DIRECTION_LABELS };

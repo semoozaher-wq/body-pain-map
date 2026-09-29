@@ -355,6 +355,8 @@ const MUSCLE_GROUP_LABELS: Record<string, LocalizedText> = {
 };
 
 const seenGroups = new Set<string>();
+// مرادفات عامة لمنطقة الظهر (تساعد «ضهري بيوجعني» على تحديد منطقة ظهر حقيقية).
+const BACK_ALIASES = ['ضهر', 'ضهري', 'الظهر', 'ظهرى', 'back', 'dos'];
 for (const spot of HOTSPOTS) {
   if (spot.type !== 'muscle' || !spot.muscleId) continue;
   const group = spot.muscleId.split('-')[0];
@@ -362,11 +364,12 @@ for (const spot of HOTSPOTS) {
   seenGroups.add(`${group}-${spot.view}`);
   const label = MUSCLE_GROUP_LABELS[group];
   if (!label) continue;
+  const extra = group === 'upper' || group === 'lower' ? BACK_ALIASES : [];
   entries.push({
     id: `region:${group}:${spot.view}`,
     kind: 'region',
     label,
-    aliases: norm([label.ar, label.en, label.fr, group]),
+    aliases: norm([label.ar, label.en, label.fr, group, ...extra]),
     tab: 'muscles',
     screen: 'body',
     view: spot.view,

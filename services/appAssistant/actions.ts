@@ -27,6 +27,10 @@ export const ACTION_SAFETY: Record<AssistantActionType, 'safe' | 'confirm'> = {
   zoom: 'safe',
   show_details: 'safe',
   speak: 'safe',
+  set_marker: 'safe',
+  move_marker: 'safe',
+  open_last_entry: 'safe',
+  doctor_summary: 'safe',
   save: 'confirm',
   confirm: 'safe',
 };
@@ -47,6 +51,10 @@ const ACTION_LABELS: Record<AssistantActionType, LocalizedText> = {
   zoom: { ar: 'تكبير', en: 'Zoom', fr: 'Zoom' },
   show_details: { ar: 'عرض التفاصيل', en: 'Show details', fr: 'Afficher les détails' },
   speak: { ar: 'نطق', en: 'Speak', fr: 'Parler' },
+  set_marker: { ar: 'تحديد مكان الألم', en: 'Set pain marker', fr: 'Placer le repère de douleur' },
+  move_marker: { ar: 'تحريك علامة الألم', en: 'Move pain marker', fr: 'Déplacer le repère' },
+  open_last_entry: { ar: 'فتح آخر تسجيل', en: 'Open last entry', fr: 'Ouvrir la dernière entrée' },
+  doctor_summary: { ar: 'توليد ملخص للطبيب', en: 'Generate doctor summary', fr: 'Générer le résumé médecin' },
   save: { ar: 'حفظ', en: 'Save', fr: 'Enregistrer' },
   confirm: { ar: 'تأكيد', en: 'Confirm', fr: 'Confirmer' },
 };
