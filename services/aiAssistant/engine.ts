@@ -397,6 +397,7 @@ export function detectRegionLocations(text: string): RegionLocation[] {
 }
 
 export function needsClarification(
+  regions: DetectedRegion[],
   regionLocations: RegionLocation[],
   abdomenLocations: DetectedLocation[],
   redFlags: DetectedRedFlag[],
@@ -406,12 +407,12 @@ export function needsClarification(
   if (regionLocations.length > 0) return false;
   if (abdomenLocations.length > 0) return false;
   if (organs.length > 0) return false;
-  // A broad body-region mention (for example "ضهري" / "ظهري") is not
-  // enough to produce disease results. The assistant must first establish the
-  // actual pain spot. Precise sub-locations (right/left/front/back/center) are
-  // already actionable.
-  // A detected region without a precise sub-location is still ambiguous.
-  return true;
+  // Only a genuinely ambiguous spot keeps the location question alive. The
+  // flank ("my side") can mean muscle, kidney, rib, or bowel, so it is worth one
+  // question. Specific regions such as the eye, ear, jaw, tooth, throat,
+  // breast, groin, abdomen, or foot are already actionable and must answer
+  // immediately instead of looping on the same question.
+  return regions.length === 0 || regions.some((region) => region.id === 'obliques');
 }
 
 function buildLocationQuestion(regions: DetectedRegion[], language: Lang): LocalizedText {
@@ -847,6 +848,9 @@ const SELF_CARE_BY_REGION: Record<string, LocalizedText[]> = {
   ],
   ears: [
     { ar: 'لا تدخل أعوادًا أو أدوات داخل الأذن، وراقب الحرارة أو الإفرازات أو ضعف السمع.', en: 'Do not put cotton buds or objects into the ear; watch for fever, discharge, or hearing loss.', fr: 'N’introduisez pas d’objet dans l’oreille ; surveillez fièvre, écoulement ou baisse de l’audition.' },
+  ],
+  jaw: [
+    { ar: 'لو في ألم أو طقطقة في الفك أو صعوبة في فتح الفم، تجنّب الأكل الصلب والمضغ العنيف، واستخدم كمادة دافئة، وراجع طبيب أسنان أو طبيبًا لو استمر الألم أو صاحبته حرارة.', en: 'If the jaw is painful, clicking, or hard to open, avoid hard food and forceful chewing, use a warm compress, and see a dentist or doctor if pain persists or fever appears.', fr: 'Si la mâchoire est douloureuse, craque ou s’ouvre difficilement, évitez les aliments durs et la mastication forcée, appliquez une compresse chaude et consultez un dentiste ou un médecin si la douleur persiste ou si une fièvre apparaît.' },
   ],
   teeth: [
     { ar: 'نظّف المنطقة بلطف وتجنّب شديد السخونة أو البرودة، واحجز موعدًا مع طبيب أسنان إذا استمر الألم أو ظهر تورّم.', en: 'Clean gently, avoid very hot or cold foods, and arrange a dental visit if pain persists or swelling appears.', fr: 'Nettoyez doucement, évitez le très chaud ou très froid, et consultez un dentiste si la douleur persiste ou si un gonflement apparaît.' },
@@ -1304,7 +1308,7 @@ export function analyzeMessage(
 
   const organs = mergeLocationOrgans(detectedOrgans, locations);
   const missingLocation =
-    needsClarification(regionLocations, locations, redFlags, organs) &&
+    needsClarification(regions, regionLocations, locations, redFlags, organs) &&
     // A named place - even a vague one such as "\u0648\u0633\u0637 \u0627\u0644\u0638\u0647\u0631" - is a sufficient answer.
     !mentionsGenericArea(rawText);
   const mustAnswer = forceAnswer || askedEnough;
