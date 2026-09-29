@@ -109,9 +109,19 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'back',
     label: { ar: 'أعلى الظهر', en: 'Upper back', fr: 'Haut du dos' },
     keywords: {
-      ar: ['اعلى ضهري', 'أعلى الظهر', 'بين كتافي', 'بين الكتفين', 'الظهر العلوي', 'ضهري من فوق'],
-      en: ['upper back', 'between the shoulders', 'thoracic'],
+      ar: ['اعلى ضهري', 'أعلى ضهري', 'اعلى ظهري', 'أعلى ظهري', 'أعلى الظهر', 'بين كتافي', 'بين الكتفين', 'بين لوح الكتف', 'بين لوحي الكتف', 'الظهر العلوي', 'ضهري من فوق', 'ظهري من فوق', 'فوق ضهري', 'فوق ظهري', 'اعلي ضهري', 'اعلي ظهري'],
+      en: ['upper back', 'between the shoulders', 'between shoulder blades', 'thoracic'],
       fr: ['haut du dos', 'entre les omoplates', 'thoracique'],
+    },
+  },
+  {
+    id: 'mid-back',
+    region: 'back',
+    label: { ar: 'وسط الظهر', en: 'Mid back', fr: 'Milieu du dos' },
+    keywords: {
+      ar: ['وسط ضهري', 'وسط ظهري', 'نص ضهري', 'نص ظهري', 'منتصف ضهري', 'منتصف ظهري', 'وسط الظهر', 'نص الظهر', 'منتصف الظهر', 'في نص ضهري', 'في نص ظهري', 'في وسط ضهري', 'في وسط ظهري'],
+      en: ['mid back', 'middle back', 'middle of the back'],
+      fr: ['milieu du dos', 'centre du dos'],
     },
   },
   {
@@ -119,7 +129,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'back',
     label: { ar: 'أسفل الظهر', en: 'Lower back', fr: 'Bas du dos' },
     keywords: {
-      ar: ['اسفل ضهري', 'أسفل الظهر', 'وسط ضهري', 'قطني', 'القطنية', 'ضهري', 'ظهري', 'ضهرى', 'ظهرى', 'الظهر', 'اسفل الظهر', 'الفقرات', 'الحرقفة', 'حقوي'],
+      ar: ['اسفل ضهري', 'أسفل الظهر', 'اسفل الظهر', 'قطني', 'القطنية', 'ضهري', 'ظهري', 'ضهرى', 'ظهرى', 'الظهر', 'تحت الخصر', 'الفقرات', 'العمود الفقري', 'عمودي الفقري', 'الحرقفة', 'حقوي'],
       en: ['lower back', 'low back', 'lumbar', 'lumbago'],
       fr: ['bas du dos', 'lombaire', 'lombalgie'],
     },
@@ -129,7 +139,7 @@ export const BODY_REGIONS: RegionTerm[] = [
     region: 'torso_front',
     label: { ar: 'الصدر', en: 'Chest', fr: 'Poitrine' },
     keywords: {
-      ar: ['صدري', 'صدرى', 'الصدر', 'قلبي', 'القلب', 'منطقة القلب', 'قص', 'القص'],
+      ar: ['صدري', 'صدرى', 'الصدر', 'قلبي', 'القلب', 'منطقة القلب', 'القص'],
       en: ['chest', 'sternum', 'heart area'],
       fr: ['poitrine', 'thorax', 'sternum', 'cœur'],
     },
@@ -1135,7 +1145,7 @@ export const SYMPTOM_TYPES: Record<string, LexiconBucket> = {
   tightness: { label: { ar: 'شد', en: 'Tightness / spasm', fr: 'Tension / spasme' }, keywords: { ar: ['شد', 'تشنج', 'مشدود', 'متشنج'], en: ['tightness', 'spasm', 'cramp'], fr: ['tension', 'spasme', 'crampe'] } },
   throbbing: { label: { ar: 'نبض', en: 'Throbbing', fr: 'Pulsatile' }, keywords: { ar: ['نبض', 'بينبض', 'زي النبض'], en: ['throbbing', 'pulsating'], fr: ['pulsatile', 'battement'] } },
   electric: { label: { ar: 'كهربا', en: 'Electric shock', fr: 'Décharge électrique' }, keywords: { ar: ['كهربا', 'صعقة', 'زي الكهربا'], en: ['electric', 'shock'], fr: ['électrique', 'décharge'] } },
-  heaviness: { label: { ar: 'ثقل', en: 'Heaviness', fr: 'Lourdeur' }, keywords: { ar: ['ثقل', 'تقيل', 'وزن'], en: ['heaviness', 'heavy'], fr: ['lourdeur', 'lourd'] } },
+  heaviness: { label: { ar: 'ثقل', en: 'Heaviness', fr: 'Lourdeur' }, keywords: { ar: ['ثقل', 'تقل', 'تقيل', 'وزن'], en: ['heaviness', 'heavy'], fr: ['lourdeur', 'lourd'] } },
   pressure: { label: { ar: 'ضغط', en: 'Pressure', fr: 'Pression' }, keywords: { ar: ['ضغط', 'ضاغط', 'معصور'], en: ['pressure', 'squeezing'], fr: ['pression', 'compression'] } },
   dryness: { label: { ar: 'نشفان', en: 'Dryness', fr: 'Sécheresse' }, keywords: { ar: ['نشفان', 'جفاف', 'ناشف'], en: ['dryness', 'dry'], fr: ['sécheresse', 'sec'] } },
 };
@@ -1365,14 +1375,14 @@ export const REGION_LOCATIONS: RegionLocation[] = [
   { id: 'upper-back-between', parent: 'upper-back', label: { ar: 'بين الكتفين', en: 'Between shoulders', fr: 'Entre les omoplates' }, keywords: { ar: ['بين الكتفين','بين لوح الكتف'], en: ['between shoulder blades'], fr: ['entre les omoplates'] } },
 
   // وسط الظهر
-  { id: 'mid-back-right', parent: 'lower-back', label: { ar: 'وسط الظهر يمين', en: 'Mid back right', fr: 'Milieu dos droite' }, keywords: { ar: ['وسط ضهري يمين','نص ضهري يمين'], en: ['mid back right'], fr: ['milieu dos droite'] } },
-  { id: 'mid-back-left', parent: 'lower-back', label: { ar: 'وسط الظهر شمال', en: 'Mid back left', fr: 'Milieu dos gauche' }, keywords: { ar: ['وسط ضهري شمال','نص ضهري شمال'], en: ['mid back left'], fr: ['milieu dos gauche'] } },
-  { id: 'mid-back-center', parent: 'lower-back', label: { ar: 'نص وسط الظهر', en: 'Mid back center', fr: 'Centre milieu dos' }, keywords: { ar: ['وسط ضهري','نص ضهري'], en: ['mid back'], fr: ['milieu du dos'] } },
+  { id: 'mid-back-right', parent: 'mid-back', label: { ar: 'وسط الظهر يمين', en: 'Mid back right', fr: 'Milieu dos droite' }, keywords: { ar: ['وسط ضهري يمين','نص ضهري يمين'], en: ['mid back right'], fr: ['milieu dos droite'] } },
+  { id: 'mid-back-left', parent: 'mid-back', label: { ar: 'وسط الظهر شمال', en: 'Mid back left', fr: 'Milieu dos gauche' }, keywords: { ar: ['وسط ضهري شمال','نص ضهري شمال'], en: ['mid back left'], fr: ['milieu dos gauche'] } },
+  { id: 'mid-back-center', parent: 'mid-back', label: { ar: 'نص وسط الظهر', en: 'Mid back center', fr: 'Centre milieu dos' }, keywords: { ar: ['وسط ضهري','نص ضهري','منتصف ضهري','منتصف الظهر'], en: ['mid back'], fr: ['milieu du dos'] } },
 
   // أسفل الظهر
   { id: 'lower-back-right', parent: 'lower-back', label: { ar: 'أسفل الظهر يمين', en: 'Lower back right', fr: 'Bas dos droite' }, keywords: { ar: ['اسفل ضهري يمين','قطني يمين'], en: ['lower back right'], fr: ['bas dos droite'] } },
   { id: 'lower-back-left', parent: 'lower-back', label: { ar: 'أسفل الظهر شمال', en: 'Lower back left', fr: 'Bas dos gauche' }, keywords: { ar: ['اسفل ضهري شمال','قطني شمال'], en: ['lower back left'], fr: ['bas dos gauche'] } },
-  { id: 'lower-back-center', parent: 'lower-back', label: { ar: 'نص أسفل الظهر', en: 'Center of lower back', fr: 'Centre du bas du dos' }, keywords: { ar: ['وسط ضهري', 'نص ضهري', 'نص اسفل ضهري', 'وسط اسفل ضهري', 'منتصف ضهري', 'منتصف الظهر'], en: ['center of lower back', 'middle of lower back', 'mid back'], fr: ['centre du bas du dos', 'milieu du bas du dos'] } },
+  { id: 'lower-back-center', parent: 'lower-back', label: { ar: 'نص أسفل الظهر', en: 'Center of lower back', fr: 'Centre du bas du dos' }, keywords: { ar: ['نص اسفل ضهري', 'وسط اسفل ضهري', 'منتصف اسفل ضهري'], en: ['center of lower back', 'middle of lower back'], fr: ['centre du bas du dos', 'milieu du bas du dos'] } },
 
   // الصدر
   { id: 'chest-right', parent: 'chest', label: { ar: 'الصدر يمين', en: 'Right chest', fr: 'Poitrine droite' }, keywords: { ar: ['صدري يمين'], en: ['right chest'], fr: ['poitrine droite'] } },
