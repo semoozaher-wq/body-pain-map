@@ -6,7 +6,7 @@
  * كل المسارات نسبية (base) حتى يعمل التطبيق تحت أي مسار فرعي.
  */
 const BASE = self.location.pathname.replace(/service-worker\.js$/, '');
-const CACHE = 'bodymap-pain-v3';
+const CACHE = 'bodymap-pain-v4';
 const INDEX = BASE + 'index.html';
 const CORE = [BASE, INDEX, BASE + 'manifest.json'];
 
@@ -37,6 +37,7 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => {
+          if (!res.ok) throw new Error(`navigation failed: ${res.status}`);
           const copy = res.clone();
           caches.open(CACHE).then((cache) => cache.put(INDEX, copy)).catch(() => undefined);
           return res;
@@ -51,7 +52,7 @@ self.addEventListener('fetch', (event) => {
     caches.match(req).then((cached) => {
       const network = fetch(req)
         .then((res) => {
-          if (res && res.status === 200 && res.type === 'basic') {
+          if (res && res.ok && res.status === 200 && res.type === 'basic') {
             const copy = res.clone();
             caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => undefined);
           }
