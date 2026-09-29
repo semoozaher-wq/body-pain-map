@@ -39,10 +39,19 @@ import {
   type Lang,
   type TriageLevel,
 } from '../services/aiAssistant';
+import { interpret } from '../services/appAssistant/engine';
+import type { AppState, AssistantAction } from '../services/appAssistant/types';
 
 type ChatMessage =
   | { id: string; role: 'user'; text: string; imageUri?: string }
-  | { id: string; role: 'assistant'; reply: AssistantReply };
+  | { id: string; role: 'assistant'; kind: 'rich'; reply: AssistantReply }
+  | { id: string; role: 'assistant'; kind: 'text'; text: string };
+
+// Keep the conversation alive across screen unmounts (e.g. when a pain message
+// navigates to the map). This mirrors GlobalAssistant, which stays mounted while
+// the underlying screen changes, so multi-turn location refinement keeps working.
+let persistedMessages: ChatMessage[] = [];
+let persistedAskCount = 0;
 
 interface AssistantScreenProps {
   language: Parameters<typeof translate>[0];
@@ -50,6 +59,10 @@ interface AssistantScreenProps {
   onOpenRegion: (regionId: string) => void;
   onOpenOrgan: (organId: string) => void;
   initialContext?: string;
+  /** حالة التطبيق الحالية (نفس مصدر GlobalAssistant) — لتوحيد المحرّك. */
+  appState?: AppState;
+  /** ينفّذ أوامر التحكّم في التطبيق (تنقّل/إبراز/علامة ألم) من داخل الشاشة. */
+  onAction?: (action: AssistantAction) => void;
 }
 
 const TRIAGE_COLORS: Record<TriageLevel, { bg: string; fg: string; accent: string }> = {
@@ -178,14 +191,45 @@ function replyToSpeech(reply: AssistantReply): string {
   return parts.filter(Boolean).join('. ');
 }
 
-export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, direction, onOpenRegion, onOpenOrgan, initialContext }) => {
+/** حالة تطبيق احتياطية إن لم تُمرَّر من المضيف (نادر). */
+function fallbackState(language: Lang): AppState {
+  return {
+    currentScreen: 'assistant',
+    currentTab: 'muscles',
+    currentBodyView: 'front',
+    currentSex: 'male',
+    selectedBodyRegion: null,
+    selectedAnatomyStructure: null,
+    selectedPoint: null,
+    selectedPainLocation: null,
+    painSeverity: null,
+    symptoms: [],
+    lastAssistantAction: null,
+    lastUserReference: null,
+    conversationState: 'idle',
+    zoomLevel: 1,
+    visibleStructures: [],
+    conversationContext: {
+      lastReferencedId: null,
+      lastReferencedKind: null,
+      lastReferencedLabel: null,
+      lastReferencedCoords: null,
+      previousReferencedId: null,
+      previousReferencedCoords: null,
+    },
+    language,
+    conversationMode: 'idle',
+  };
+}
+
+export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, direction, onOpenRegion, onOpenOrgan, initialContext, appState, onAction }) => {
   const { colors } = useTheme();
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const rtl = direction === 'rtl';
   const align = rtl ? 'right' : 'left';
   const row = rtl ? 'row-reverse' : 'row';
 
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(persistedMessages);
   const [input, setInput] = useState('');
   const [thinking, setThinking] = useState(false);
   const [listening, setListening] = useState(false);
@@ -195,17 +239,42 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [returningReminder, setReturningReminder] = useState(false);
   /** How many clarifying questions were asked in a row (shown in the status line). */
-  const [askCount, setAskCount] = useState(0);
+  const [askCount, setAskCount] = useState(persistedAskCount);
   const scrollRef = useRef<ScrollView>(null);
   const webRecognitionRef = useRef<any>(null);
   // Mirror of `askCount` so two sends in the same tick can never both read a
   // stale counter (this is what previously made the question repeat forever).
-  const askCountRef = useRef(0);
+  const askCountRef = useRef(persistedAskCount);
   // يحمل الصورة السريرية المتراكمة (PainContext) بين الأدوار حتى يبني السياق تدريجيًا.
   const painContextRef = useRef<any>(null);
   const initialContextSentRef = useRef(false);
   const mountedRef = useRef(true);
   const replyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ------------------------------------------------------------------
+  // المحرّك الموحّد + أوامر التحكّم (نفس مصدر GlobalAssistant)
+  // ------------------------------------------------------------------
+  const appStateRef = useRef<AppState | undefined>(appState);
+  appStateRef.current = appState;
+  const onActionRef = useRef<((action: AssistantAction) => void) | undefined>(onAction);
+  onActionRef.current = onAction;
+
+  // ------------------------------------------------------------------
+  // تبادل الأدوار الصوتي (نفس سلوك GlobalAssistant): استماع مستمر + مهلة صمت
+  // ------------------------------------------------------------------
+  const silenceTimerRef = useRef<any>(null);
+  const turnBufferRef = useRef('');
+  const interimRef = useRef('');
+  const lastResultIndexRef = useRef(0);
+  const resultsLengthRef = useRef(0);
+  const startListeningRef = useRef<() => void>(() => {});
+  const stopListeningRef = useRef<() => void>(() => {});
+  const sendRef = useRef<(text: string, imageUri?: string | null) => void>(() => {});
+  const listeningRef = useRef(false);
+  listeningRef.current = listening;
+  const voiceSessionRef = useRef(false);
+  const speakingRef = useRef(false);
+  const TURN_SILENCE_MS = 1500;
 
   useEffect(() => {
     mountedRef.current = true;
@@ -221,18 +290,16 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     };
   }, []);
 
+  // \u0646\u062d\u0641\u0637 \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0629 \u062e\u0627\u0631\u062c \u0627\u0644\u0645\u0643\u0648\u0651\u0646 \u0644\u062a\u0628\u0642\u0649 \u0628\u0639\u062f \u0627\u0644\u062a\u0646\u0642\u0651\u0644 (\u0645\u062b\u0644 GlobalAssistant \u0627\u0644\u0630\u064a \u064a\u0628\u0642\u0649 \u0645\u0648\u062c\u0648\u062f\u064b\u0627).
+  useEffect(() => { persistedMessages = messages; }, [messages]);
+  useEffect(() => { persistedAskCount = askCount; }, [askCount]);
+
   // ------------------------------------------------------------------
-  // التعرّف على الكلام (إدخال صوتي)
+  // التعرّف على الكلام (الإدخال الصوتي) — تبادل أدوار طبيعي
   // ------------------------------------------------------------------
   useSpeechRecognitionEvents('start', () => setListening(true));
-  useSpeechRecognitionEvents('end', () => {
-    setListening(false);
-    setInterim('');
-  });
-  useSpeechRecognitionEvents('error', () => {
-    setListening(false);
-    setInterim('');
-  });
+  useSpeechRecognitionEvents('end', () => setListening(false));
+  useSpeechRecognitionEvents('error', () => setListening(false));
   useSpeechRecognitionEvents('result', (event: any) => {
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
@@ -244,7 +311,38 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     }
   });
 
-  const toggleMic = useCallback(async () => {
+  // نهاية جولة المستخدم: نُرسل النص المتراكم بعد صمت كافٍ (منع القطع المبكر).
+  const commitTurn = useCallback(() => {
+    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+    const text = `${turnBufferRef.current} ${interimRef.current}`.trim();
+    turnBufferRef.current = '';
+    interimRef.current = '';
+    setInterim('');
+    lastResultIndexRef.current = resultsLengthRef.current;
+    if (text) {
+      sendRef.current(text);
+      if (!voiceSessionRef.current) stopListeningRef.current?.();
+    } else if (!voiceSessionRef.current) {
+      stopListeningRef.current?.();
+    }
+  }, []);
+
+  const scheduleTurnSend = useCallback(() => {
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+    silenceTimerRef.current = setTimeout(commitTurn, TURN_SILENCE_MS);
+  }, [commitTurn]);
+
+  const stopListening = useCallback(() => {
+    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+    try {
+      if (Platform.OS === 'web') webRecognitionRef.current?.stop?.();
+      else SpeechRecognitionModule?.stop?.();
+    } catch {}
+    setListening(false);
+    setInterim('');
+  }, []);
+
+  const startListening = useCallback(async () => {
     try {
       // expo-speech-recognition is native-first and does not reliably expose
       // a permission flow on Expo Web/Vercel. Use the browser Web Speech API
@@ -253,34 +351,51 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
         const browserWindow = globalThis as any;
         const Recognition = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition;
         if (!Recognition) return;
-        if (listening) {
-          webRecognitionRef.current?.stop?.();
-          return;
-        }
+        if (listening) return;
+        // جولة جديدة: نصفّر المخزن والمؤشرات.
+        turnBufferRef.current = '';
+        interimRef.current = '';
+        lastResultIndexRef.current = 0;
+        resultsLengthRef.current = 0;
         const recognition = new Recognition();
         webRecognitionRef.current = recognition;
         recognition.lang = speechLang(language);
         recognition.interimResults = true;
-        recognition.continuous = false;
+        // نستمع باستمرار حتى لا نقطع المستخدم بعد كلمة أو جملة قصيرة.
+        recognition.continuous = true;
         recognition.onstart = () => setListening(true);
         recognition.onresult = (event: any) => {
-          const result = event?.results?.[event.results.length - 1];
-          const transcript = result?.[0]?.transcript ?? '';
-          if (!transcript) return;
-          if (result.isFinal) {
-            setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
-            setInterim('');
-          } else {
-            setInterim(transcript);
+          resultsLengthRef.current = event?.results?.length ?? 0;
+          // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
+          if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
+          let newFinal = '';
+          let interimText = '';
+          let lastFinalIdx = lastResultIndexRef.current - 1;
+          for (let i = lastResultIndexRef.current; i < event.results.length; i++) {
+            const r = event.results[i];
+            if (r.isFinal) { newFinal += `${r[0].transcript} `; lastFinalIdx = i; }
+            else interimText += r[0].transcript;
           }
+          if (newFinal) {
+            turnBufferRef.current = `${turnBufferRef.current} ${newFinal}`.trim();
+            lastResultIndexRef.current = lastFinalIdx + 1;
+          }
+          interimRef.current = interimText;
+          setInterim(interimText);
+          // لا نرسل فورًا: ننتظر صمتًا كافيًا حتى يكمل المستخدم كلامه.
+          scheduleTurnSend();
         };
         recognition.onerror = () => { setListening(false); setInterim(''); };
-        recognition.onend = () => { setListening(false); setInterim(''); webRecognitionRef.current = null; };
+        recognition.onend = () => {
+          setListening(false);
+          setInterim('');
+          webRecognitionRef.current = null;
+          // متابعة تلقائية: نعيد الاستماع ما دامت الجلسة الصوتية شغّالة.
+          if (voiceSessionRef.current) {
+            setTimeout(() => { if (voiceSessionRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
+          }
+        };
         recognition.start();
-        return;
-      }
-      if (listening) {
-        SpeechRecognitionModule?.stop?.();
         return;
       }
       const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
@@ -289,36 +404,63 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       SpeechRecognitionModule?.start?.({
         lang: speechLang(language),
         interimResults: true,
-        continuous: false,
+        continuous: true,
       });
     } catch {
       setListening(false);
     }
-  }, [listening, language]);
+  }, [listening, language, scheduleTurnSend]);
+
+  // نربط المراجع بالدوال الفعلية لاستخدامها داخل الـ callbacks المستقرة.
+  stopListeningRef.current = stopListening;
+  startListeningRef.current = startListening;
+
+  const toggleMic = useCallback(async () => {
+    // جلسة صوتية مستمرة: نقرة للبدء، ونقرة أخرى للإنهاء.
+    if (voiceSessionRef.current) {
+      voiceSessionRef.current = false;
+      stopListening();
+      return;
+    }
+    voiceSessionRef.current = true;
+    await startListening();
+  }, [startListening, stopListening]);
 
   // ------------------------------------------------------------------
   // نطق الردود (إخراج صوتي)
   // ------------------------------------------------------------------
+  const finishSpeech = useCallback(() => {
+    setSpeakingId(null);
+    speakingRef.current = false;
+    // متابعة تلقائية: بعد الرد نرجع للاستماع إن كانت الجلسة الصوتية شغّالة.
+    if (voiceSessionRef.current) {
+      setTimeout(() => { if (voiceSessionRef.current && !listeningRef.current) startListeningRef.current(); }, 200);
+    }
+  }, []);
+
   const speak = useCallback(
     (text: string, id?: string) => {
       try {
         Speech.stop();
         if (id) setSpeakingId(id);
+        speakingRef.current = true;
         Speech.speak(text, {
           language: ttsLang(language),
-          onDone: () => setSpeakingId(null),
-          onStopped: () => setSpeakingId(null),
-          onError: () => setSpeakingId(null),
+          onDone: finishSpeech,
+          onStopped: finishSpeech,
+          onError: finishSpeech,
         });
       } catch {
-        setSpeakingId(null);
+        finishSpeech();
       }
     },
-    [language],
+    [language, finishSpeech],
   );
 
   useEffect(() => () => {
     try {
+      voiceSessionRef.current = false;
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       Speech.stop();
       webRecognitionRef.current?.abort?.();
       SpeechRecognitionModule?.abort?.();
@@ -383,24 +525,58 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
         replyTimerRef.current = null;
         if (!mountedRef.current) return;
         try {
-          const reply = analyzeMessage(fullText, language as Lang, hasImg, {
-            forceAnswer,
-            askCount: askedSoFar,
-            userTurnCount,
-            previousContext: painContextRef.current ?? undefined,
-          });
-          if (!mountedRef.current) return;
-          // نبني السياق تدريجيًا: نحفظ PainContext الناتج لنمرّره في الدور التالي.
-          if (reply.painContext) painContextRef.current = reply.painContext;
-          // A clarifying question raises the counter; a real answer (conditions +
-          // self-care) resets it, because the user clearly gave something we understood.
-          const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
-          askCountRef.current = nextAskCount;
-          setAskCount(nextAskCount);
+          if (hasImg) {
+            // مسار الصورة: فهم طبي مباشر (نفس محرّك الفرز المحلي).
+            const reply = analyzeMessage(fullText, language as Lang, true, {
+              forceAnswer,
+              askCount: askedSoFar,
+              userTurnCount,
+              previousContext: painContextRef.current ?? undefined,
+            });
+            if (!mountedRef.current) return;
+            if (reply.painContext) painContextRef.current = reply.painContext;
+            const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
+            askCountRef.current = nextAskCount;
+            setAskCount(nextAskCount);
+            const id = nextId();
+            setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'rich', reply }]);
+            setThinking(false);
+            if (autoSpeak) speak(replyToSpeech(reply), id);
+            return;
+          }
+
+          // المحرّك الموحّد: نفس محرّك GlobalAssistant (محادثة عامة + ألم + تحديد مكان + تحكّم).
+          const state = appStateRef.current ?? fallbackState(language as Lang);
+          // \u0646\u064f\u0645\u0631\u0651\u0631 \u0627\u0644\u062c\u0645\u0644\u0629 \u0627\u0644\u062d\u0627\u0644\u064a\u0629 \u0641\u0642\u0637 (\u0645\u062b\u0644 GlobalAssistant) \u0648\u0646\u062a\u0631\u0643 \u0627\u0644\u0633\u064a\u0627\u0642 \u0644\u0640 state.
+          const turn = interpret(text, state);
+          for (const action of turn.actions) onActionRef.current?.(action);
+
+          const medical = turn.medical;
+          const isMedical =
+            turn.mode === 'medical' &&
+            !!medical &&
+            (medical.understood || medical.clarificationOnly ||
+              medical.conditions.length > 0 || medical.organDetails.length > 0);
           const id = nextId();
-          setMessages((prev) => [...prev, { id, role: 'assistant', reply }]);
-          setThinking(false);
-          if (autoSpeak) speak(replyToSpeech(reply), id);
+          if (isMedical && medical) {
+            // نعرض الردّ الموحّد في مقدّمة البطاقة + التفاصيل الطبية الغنية.
+            const reply: AssistantReply = { ...medical, intro: turn.reply };
+            if (reply.painContext) painContextRef.current = reply.painContext;
+            const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
+            askCountRef.current = nextAskCount;
+            setAskCount(nextAskCount);
+            setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'rich', reply }]);
+            setThinking(false);
+            if (autoSpeak) speak(replyToSpeech(reply), id);
+          } else {
+            // محادثة عامة / تحكّم: فقاعة نصية بسيطة (نفس سلوك GlobalAssistant).
+            const replyText = turn.reply[language as Lang] ?? turn.reply.ar;
+            askCountRef.current = 0;
+            setAskCount(0);
+            setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'text', text: replyText }]);
+            setThinking(false);
+            if (autoSpeak) speak(replyText, id);
+          }
         } catch (error) {
           console.error('[BodyMap Pain] assistant analysis error', error);
           if (mountedRef.current) setThinking(false);
@@ -409,6 +585,9 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     },
     [language, thinking, autoSpeak, speak, t, messages],
   );
+
+  // نربط مرجع الإرسال بالدالة الفعلية لاستخدامه داخل مسار الصوت.
+  sendRef.current = send;
 
   useEffect(() => {
     const context = initialContext?.trim();
@@ -506,33 +685,39 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           </View>
         )}
 
-        {messages.map((message) =>
-          message.role === 'user' ? (
-            <View key={message.id} style={[styles.userRow, { justifyContent: rtl ? 'flex-start' : 'flex-end' }]}>
-              <View style={styles.userBubble}>
-                <Gradient colors={Gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-                {message.imageUri && (
-                  <Image source={{ uri: message.imageUri }} style={styles.userImage} resizeMode="cover" />
-                )}
-                <Text style={[styles.userText, { textAlign: align }]}>{message.text}</Text>
+        {messages.map((message) => {
+          if (message.role === 'user') {
+            return (
+              <View key={message.id} style={[styles.userRow, { justifyContent: rtl ? 'flex-start' : 'flex-end' }]}>
+                <View style={styles.userBubble}>
+                  <Gradient colors={Gradients.brand} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+                  {message.imageUri && (
+                    <Image source={{ uri: message.imageUri }} style={styles.userImage} resizeMode="cover" />
+                  )}
+                  <Text style={[styles.userText, { textAlign: align }]}>{message.text}</Text>
+                </View>
               </View>
-            </View>
-          ) : (
-            <AssistantBubble
-              key={message.id}
-              reply={message.reply}
-              align={align}
-              row={row}
-              onOpenRegion={onOpenRegion}
-              onOpenOrgan={onOpenOrgan}
-              onSend={send}
-              onSpeak={() => speak(replyToSpeech(message.reply), message.id)}
-              speaking={speakingId === message.id}
-              colors={colors}
-              t={t}
-            />
-          ),
-        )}
+            );
+          }
+          if (message.kind === 'rich') {
+            return (
+              <AssistantBubble
+                key={message.id}
+                reply={message.reply}
+                align={align}
+                row={row}
+                onOpenRegion={onOpenRegion}
+                onOpenOrgan={onOpenOrgan}
+                onSend={send}
+                onSpeak={() => speak(replyToSpeech(message.reply), message.id)}
+                speaking={speakingId === message.id}
+                colors={colors}
+                t={t}
+              />
+            );
+          }
+          return <SimpleBubble key={message.id} text={message.text} row={row} colors={colors} />;
+        })}
 
         {messages.length > 0 && !thinking && (
           <View style={styles.quickWrap}>
@@ -852,6 +1037,27 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
     </View>
   );
 };
+
+// ---------------------------------------------------------------------------
+// فقاعة ردّ نصية بسيطة (محادثة عامة / أوامر تحكّم) — نفس شكل GlobalAssistant
+// ---------------------------------------------------------------------------
+interface SimpleBubbleProps {
+  text: string;
+  row: 'row' | 'row-reverse';
+  colors: typeof Colors;
+}
+
+const SimpleBubble: React.FC<SimpleBubbleProps> = ({ text, row, colors }) => (
+  <View style={[styles.agentRow, { flexDirection: row }]}>
+    <View style={styles.agentMini}>
+      <Gradient colors={Gradients.brandSoft} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+      <Text style={styles.agentMiniGlyph}>✦</Text>
+    </View>
+    <View style={[styles.bubble, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+      <Text style={[styles.intro, { color: colors.textPrimary }]}>{text}</Text>
+    </View>
+  </View>
+);
 
 /**
  * اختيار لغة نص الرد — نستخدم لغة الواجهة الحالية.
