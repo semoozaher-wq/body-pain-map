@@ -26,9 +26,11 @@ interface HistoryScreenProps {
   onImport: (records: Checkup[]) => void;
   language: Language;
   direction?: 'rtl' | 'ltr';
+  /** إشارة تركيز من المساعد المركزي: فتح آخر تسجيل أو إبراز ملخص الطبيب. */
+  focus?: { kind: 'last' | 'summary'; nonce: number } | null;
 }
 
-export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, onClear, onImport, language, direction = 'rtl' }) => {
+export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, onClear, onImport, language, direction = 'rtl', focus = null }) => {
   const { colors } = useTheme();
   const average = history.length
     ? (history.reduce((sum, item) => sum + item.intensity, 0) / history.length).toFixed(1)
@@ -41,6 +43,8 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
     return counts;
   }, {});
   const topArea = Object.entries(areaCounts).sort((a, b) => b[1] - a[1])[0];
+  const focusLast = focus?.kind === 'last';
+  const focusSummary = focus?.kind === 'summary';
 
   return (
     <View style={styles.container}>
@@ -48,7 +52,14 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
         السجل محفوظ على الجهاز. استخدم التصدير لمشاركة نسخة بنفسك؛ لا نرفع بياناتك تلقائيًا.
       </Text>
       <PainDashboard history={history} language={language} />
-      <DoctorReport records={history} language={language} />
+      <View style={focusSummary ? styles.focusWrap : undefined}>
+        {focusSummary && (
+          <Text style={[styles.focusBadge, { color: colors.primary }]}>
+            {language === 'en' ? 'Clinician summary' : language === 'fr' ? 'Résumé clinicien' : 'ملخص الطبيب'}
+          </Text>
+        )}
+        <DoctorReport records={history} language={language} />
+      </View>
       <MedicalContactsCard language={language} direction={direction} />
       <LocalDataTools records={history} onImport={onImport} />
 
@@ -87,8 +98,14 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>لا توجد فحوصات محفوظة</Text>
         </Card>
       ) : (
-        history.map((item) => (
-          <Card key={item.id} style={styles.historyCard}>
+        history.map((item, index) => (
+          <View key={item.id} style={focusLast && index === 0 ? styles.historyCardFocus : undefined}>
+            {focusLast && index === 0 && (
+              <Text style={[styles.focusBadge, { color: colors.primary }]}>
+                {language === 'en' ? 'Latest entry' : language === 'fr' ? 'Dernière entrée' : 'آخر تسجيل'}
+              </Text>
+            )}
+          <Card style={styles.historyCard}>
             <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
               {item.selfCareGuide ? `خطة تخفيف ذاتي — ${item.selfCareGuide}` : item.areaLabel ?? `#${data.muscles[item.partId]?.partNumber} — ${data.muscles[item.partId]?.labelAr ?? item.partId}`}
             </Text>
@@ -106,6 +123,7 @@ export const HistoryScreen: React.FC<HistoryScreenProps> = ({ history, onBack, o
             {item.triageStatus === 'high_reported_intensity' && <Text style={[styles.note, { color: colors.warning }]}>شدة مرتفعة مُبلّغ عنها؛ الرقم وحده لا يحدد سبب الألم أو خطورته.</Text>}
             {item.urgent && <Text accessibilityRole="alert" style={[styles.urgentText, { color: colors.danger }]}>علامة إنذار مُسجّلة — اتبع إرشادات الطوارئ المحلية؛ التطبيق لا يشخّص الحالة.</Text>}
           </Card>
+          </View>
         ))
       )}
 
@@ -157,6 +175,23 @@ const styles = StyleSheet.create({
   },
   historyCard: {
     marginBottom: Spacing.sm,
+  },
+  historyCardFocus: {
+    borderWidth: 2,
+    borderColor: '#0E7C86',
+  },
+  focusWrap: {
+    borderWidth: 2,
+    borderColor: '#0E7C86',
+    borderRadius: BorderRadius.md,
+    padding: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  focusBadge: {
+    fontFamily: Fonts.arabic.bold,
+    fontSize: Fonts.sizes.xs,
+    textAlign: 'right',
+    marginBottom: Spacing.xs,
   },
   analyticsCard: { marginBottom: Spacing.md, borderWidth: 1, borderColor: '#CFE4E5' },
   analyticsText: { textAlign: 'right', fontFamily: Fonts.arabic.regular, fontSize: Fonts.sizes.sm, lineHeight: 22, marginBottom: Spacing.xs },

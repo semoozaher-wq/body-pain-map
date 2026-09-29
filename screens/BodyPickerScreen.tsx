@@ -124,6 +124,8 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   const [quickGuide, setQuickGuide] = useState<(typeof quickGuides)[number]>('neck');
   // عنصر مُبرَز بصريًا بأمر من المساعد المركزي (حلقة نابضة تبقى حتى يُطلب إزالتها).
   const [highlightId, setHighlightId] = useState<string | null>(null);
+  // علامة الألم التي يضعها/يحرّكها المساعد المركزي على الخريطة.
+  const [painMarker, setPainMarker] = useState<{ x: number; y: number; view: 'front' | 'back' } | null>(null);
   // معرّف العضو الداخلي المحدَّد حاليًا (للإبلاغ عن الحالة البصرية للمساعد).
   const [selectedOrganId, setSelectedOrganId] = useState<string | null>(null);
   const lastControlNonce = useRef<number>(-1);
@@ -150,6 +152,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
     if (control.pointId) setHighlightId(control.pointId);
     if (control.search !== undefined) setSearch(control.search);
     if (control.filter !== undefined) setSearch(control.filter);
+    if (control.painMarker !== undefined) setPainMarker(control.painMarker);
     if (control.organId) {
       const spot = hotspots.find((item) => item.type === 'organ' && item.organId === control.organId);
       if (spot) {
@@ -375,6 +378,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 hint={t('bodyPicker.organImageHint')}
                 onSelect={(marker) => { const markerId = marker.id === 'organ-ovaries-right' ? 'organ-ovaries' : marker.id; const spot = visibleHotspots.find((item) => item.id === markerId); if (spot) handleHotspotPress(spot); }}
                 highlight={organHighlight}
+                painMarker={painMarker && painMarker.view === activeView ? painMarker : null}
               />
             </>
           ) : (
@@ -394,6 +398,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 hint={t('bodyPicker.visualHintText')}
                 onSelect={(marker) => { const spot = visibleMuscleHotspots.find((item) => item.id === marker.id); if (spot) handleHotspotPress(spot); }}
                 highlight={muscleHighlight}
+                painMarker={painMarker && painMarker.view === activeView ? painMarker : null}
               /> : Platform.OS === 'web' ? <WebBodySilhouette
                 view={activeView}
                 selectedSlugs={muscleSelection.selectedIds}
