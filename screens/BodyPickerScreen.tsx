@@ -120,7 +120,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   // On the web build the precise 317-part SVG map is the clearest, fully
   // interactive view, so it becomes the default there. Native keeps the
   // illustrated atlas first.
-  const [bodyViewMode, setBodyViewMode] = useState<'illustration' | 'detailed'>(Platform.OS === 'web' ? 'detailed' : 'illustration');
+  const [bodyViewMode, setBodyViewMode] = useState<'illustration' | 'detailed'>('illustration');
   const [quickGuide, setQuickGuide] = useState<(typeof quickGuides)[number]>('neck');
   // عنصر مُبرَز بصريًا بأمر من المساعد المركزي (حلقة نابضة تبقى حتى يُطلب إزالتها).
   const [highlightId, setHighlightId] = useState<string | null>(null);
