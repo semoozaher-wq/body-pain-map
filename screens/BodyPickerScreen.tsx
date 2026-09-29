@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { BodySilhouette, type BodyView as MuscleMapView, type Gender, type GroupLabelOverrides } from 'react-native-body-parts-anatomy';
@@ -16,6 +16,7 @@ import type { BodyView, Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
 import cleanData from '../data/cleanData';
 import { useMuscleSelection } from '../hooks/useMuscleSelection';
+import type { BodyControlCommand, BodyScreenState, BodyTab } from '../services/appAssistant/types';
 import {
   BODY_REGION_LABELS,
   getMuscleById,
@@ -74,6 +75,10 @@ type BodyPickerScreenProps = {
   quickRelief: boolean;
   /** عضو داخلي مطلوب فتحه تلقائيًا (قادم من المساعد الذكي). */
   initialOrgan?: string | null;
+  /** أمر تحكّم منظّم قادم من المساعد المركزي (فتح تبويب/عرض/عضو/نقطة/إبراز...). */
+  control?: BodyControlCommand | null;
+  /** يُبلّغ المساعد بحالة الشاشة الحالية (للتفكير البصري والمكاني). */
+  onStateChange?: (state: BodyScreenState) => void;
 };
 
 const quickGuides = ['neck', 'upper-back', 'lower-back', 'forearm'] as const;
@@ -94,6 +99,8 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   direction,
   quickRelief,
   initialOrgan,
+  control,
+  onStateChange,
 }) => {
   const t = (key: Parameters<typeof translate>[1]) => translate(language, key);
   const [activeView, setActiveView] = useState<Exclude<BodyView, 'organs'>>('front');
@@ -115,6 +122,58 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   // illustrated atlas first.
   const [bodyViewMode, setBodyViewMode] = useState<'illustration' | 'detailed'>(Platform.OS === 'web' ? 'detailed' : 'illustration');
   const [quickGuide, setQuickGuide] = useState<(typeof quickGuides)[number]>('neck');
+  // عنصر مُبرَز بصريًا بأمر من المساعد المركزي (حلقة نابضة تبقى حتى يُطلب إزالتها).
+  const [highlightId, setHighlightId] = useState<string | null>(null);
+  // معرّف العضو الداخلي المحدَّد حاليًا (للإبلاغ عن الحالة البصرية للمساعد).
+  const [selectedOrganId, setSelectedOrganId] = useState<string | null>(null);
+  const lastControlNonce = useRef<number>(-1);
+
+  // التبويب الحالي مشتقًّا من أعلام الأوضاع (مصدر حقيقة واحد للحالة المُبلَّغة).
+  const currentTab: BodyTab = showMedicalLibraryMode ? 'medicalLibrary' : showDrugLookupMode ? 'drugLookup' : showAcupressureMode ? 'acupressure' : showNaturalReliefMode ? 'naturalRelief' : showOrganMode ? 'organs' : 'muscles';
+
+  const applyTab = (tab: BodyTab) => {
+    setShowOrganMode(tab === 'organs');
+    setShowAcupressureMode(tab === 'acupressure');
+    setShowNaturalReliefMode(tab === 'naturalRelief');
+    setShowMedicalLibraryMode(tab === 'medicalLibrary');
+    setShowDrugLookupMode(tab === 'drugLookup');
+  };
+
+  // تنفيذ أمر تحكّم منظّم قادم من المساعد المركزي.
+  useEffect(() => {
+    if (!control || control.nonce === lastControlNonce.current) return;
+    lastControlNonce.current = control.nonce;
+    if (control.tab) applyTab(control.tab);
+    if (control.view) setActiveView(control.view);
+    if (control.sex) setGender(control.sex);
+    if (control.highlightId !== undefined) setHighlightId(control.highlightId || null);
+    if (control.pointId) setHighlightId(control.pointId);
+    if (control.search !== undefined) setSearch(control.search);
+    if (control.filter !== undefined) setSearch(control.filter);
+    if (control.organId) {
+      const spot = hotspots.find((item) => item.type === 'organ' && item.organId === control.organId);
+      if (spot) {
+        setShowOrganMode(true);
+        setShowAcupressureMode(false);
+        setShowNaturalReliefMode(false);
+        setShowMedicalLibraryMode(false);
+        setShowDrugLookupMode(false);
+        setActiveView(spot.view);
+        if (spot.gender) setGender(spot.gender);
+        setHighlightId(control.highlightId ?? spot.id);
+        setSelectedOrganId(control.organId);
+        if (control.openDetails) {
+          const organ = organs[control.organId];
+          if (organ) { setSelectedItem({ kind: 'organ', label: spot.label, organ }); setShowDetails(true); }
+        }
+      }
+    }
+  }, [control]);
+
+  // إبلاغ المساعد بحالة الشاشة (للتفكير البصري والمكاني: "هنا/ده/فوقها").
+  useEffect(() => {
+    onStateChange?.({ tab: currentTab, view: activeView as 'front' | 'back', sex: gender as 'male' | 'female', organId: selectedOrganId, pointId: null });
+  }, [currentTab, activeView, gender, selectedOrganId, onStateChange]);
 
   useEffect(() => {
     let active = true;
@@ -141,6 +200,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
     if (spot.gender) setGender(spot.gender);
     const organ = organs[initialOrgan];
     if (organ) {
+      setSelectedOrganId(initialOrgan);
       setSelectedItem({ kind: 'organ', label: spot.label, organ });
       setShowDetails(true);
     }
@@ -168,6 +228,25 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
         .includes(query);
     }).slice(0, 12);
   }, [activeView, gender, search]);
+
+  // إبراز بصري للعضو المطلوب من المساعد المركزي (حلقة نابضة على الخريطة).
+  const organHighlight = useMemo(() => {
+    if (!highlightId) return null;
+    const spot = visibleHotspots.find((item) => item.id === highlightId || item.organId === highlightId);
+    if (!spot) return null;
+    const point = gender === 'female' ? femaleOrganAdjustments[spot.id] : undefined;
+    const label = language === 'ar' ? spot.label : localizedOrganNames[language][spot.organId ?? ''] ?? spot.label;
+    return { id: spot.id, x: point?.x ?? spot.x, y: point?.y ?? spot.y, label };
+  }, [highlightId, visibleHotspots, gender, language]);
+
+  // إبراز بصري للمنطقة العضلية المطلوبة من المساعد المركزي.
+  const muscleHighlight = useMemo(() => {
+    if (!highlightId) return null;
+    const spot = visibleMuscleHotspots.find((item) => item.id === highlightId || (item.muscleId ? item.muscleId.split('-')[0] === highlightId : false));
+    if (!spot) return null;
+    const point = gender === 'female' && activeView === 'front' ? femaleFrontAdjustments[spot.id] : undefined;
+    return { id: spot.id, x: point?.x ?? spot.x, y: point?.y ?? spot.y, label: spot.label };
+  }, [highlightId, visibleMuscleHotspots, gender, activeView]);
 
   const showMuscle = (muscle: Muscle) => {
     muscleSelection.selectMuscle(muscle.id);
@@ -198,6 +277,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
     if (hotspot.type === 'organ' && hotspot.organId) {
       const organ = organs[hotspot.organId];
       if (organ) {
+        setSelectedOrganId(hotspot.organId);
         setSelectedItem({ kind: 'organ', label: hotspot.label, organ });
         setShowDetails(true);
       }
@@ -278,7 +358,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
             ><Text style={[styles.toggleText, activeView === 'back' && styles.activeToggleText]}>{t('bodyPicker.backView')}</Text></Pressable>
           </View>}
 
-          {showMedicalLibraryMode ? <MedicalLibraryTabsPanel language={language} /> : showDrugLookupMode ? <DrugLookupPanel language={language} /> : showAcupressureMode ? <AcupressurePanel language={language} /> : showNaturalReliefMode ? <NaturalReliefPanel language={language} /> : showOrganMode ? (
+          {showMedicalLibraryMode ? <MedicalLibraryTabsPanel language={language} /> : showDrugLookupMode ? <DrugLookupPanel language={language} /> : showAcupressureMode ? <AcupressurePanel language={language} highlightId={highlightId} /> : showNaturalReliefMode ? <NaturalReliefPanel language={language} /> : showOrganMode ? (
             <>
               <Text style={styles.helper}>{t('bodyPicker.organHint')}</Text>
               <Text style={styles.organNotice}>{t('bodyPicker.organPainNotice')}</Text>
@@ -294,6 +374,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 title={t('bodyPicker.organs')}
                 hint={t('bodyPicker.organImageHint')}
                 onSelect={(marker) => { const markerId = marker.id === 'organ-ovaries-right' ? 'organ-ovaries' : marker.id; const spot = visibleHotspots.find((item) => item.id === markerId); if (spot) handleHotspotPress(spot); }}
+                highlight={organHighlight}
               />
             </>
           ) : (
@@ -312,6 +393,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 title={t('bodyPicker.title')}
                 hint={t('bodyPicker.visualHintText')}
                 onSelect={(marker) => { const spot = visibleMuscleHotspots.find((item) => item.id === marker.id); if (spot) handleHotspotPress(spot); }}
+                highlight={muscleHighlight}
               /> : Platform.OS === 'web' ? <WebBodySilhouette
                 view={activeView}
                 selectedSlugs={muscleSelection.selectedIds}
