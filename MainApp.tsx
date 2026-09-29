@@ -1,6 +1,6 @@
 // MainApp.tsx
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, BackHandler, Platform, Pressable, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 import anatomyMap from './data/anatomyPainMap.json';
 import { useLanguage } from './hooks/useLanguage';
@@ -26,6 +26,15 @@ import { HealthInfoScreen } from './screens/HealthInfoScreen';
 import { BrandLogo } from './components/BrandLogo';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeToggle } from './components/ThemeToggle';
+import { GlobalAssistant } from './components/GlobalAssistant';
+import type {
+  AppState,
+  AssistantAction,
+  BodyControlCommand,
+  BodyScreenState,
+  ConversationContext,
+  Lang,
+} from './services/appAssistant/types';
 
 const data = anatomyMap as unknown as AnatomyData;
 
@@ -67,6 +76,13 @@ export default function App() {
   const [triggers, setTriggers] = useState('');
   const [sleepHours, setSleepHours] = useState('');
   const [activity, setActivity] = useState('');
+
+  // ---- المساعد المركزي: حالة الشاشة + أوامر التحكّم المنظّمة ----
+  const [bodyControl, setBodyControl] = useState<BodyControlCommand | null>(null);
+  const [bodyState, setBodyState] = useState<BodyScreenState>({ tab: 'muscles', view: 'front', sex: 'male', organId: null, pointId: null });
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const controlNonce = useRef(0);
+  const conversationContext = useRef<ConversationContext>({ lastReferencedId: null, lastReferencedKind: null, lastReferencedLabel: null, lastReferencedCoords: null });
 
   const { history, addRecord, importRecords, clearHistory: clearHistoryRecords } = usePainHistory();
   const { language, direction, setLanguage } = useLanguage();
@@ -195,6 +211,126 @@ export default function App() {
     ]);
   };
 
+  // ---------------------------------------------------------------------------
+  // المساعد المركزي: إصدار أوامر تحكّم منظّمة لشاشة الخريطة (مع دمج التعديلات في أمر واحد).
+  // ---------------------------------------------------------------------------
+  const issueBodyControl = (patch: Partial<BodyControlCommand>) => {
+    controlNonce.current += 1;
+    const nonce = controlNonce.current;
+    setBodyControl((prev) => ({ ...(prev ?? {}), ...patch, nonce }));
+  };
+
+  // استخراج المعرّف الأساسي من معرّف الكتالوج (organ:heart → heart، point:li4-hegu → li4-hegu).
+  const stripPrefix = (id: string) => {
+    const idx = id.indexOf(':');
+    return idx >= 0 ? id.slice(idx + 1) : id;
+  };
+
+  // ---------------------------------------------------------------------------
+  // المساعد المركزي: تنفيذ الإجراءات المنظّمة القادمة من المحرّك (لا تحكّم بنص عشوائي).
+  // ---------------------------------------------------------------------------
+  const handleAssistantAction = (action: AssistantAction) => {
+    const targetId = action.targetId ?? '';
+    switch (action.type) {
+      case 'navigate': {
+        const screenId = stripPrefix(targetId) as Screen;
+        if (screenId === 'body') { setRequestedOrgan(null); setQuickRelief(false); }
+        navigateTo(screenId);
+        break;
+      }
+      case 'open_tab': {
+        const tab = stripPrefix(targetId) as BodyControlCommand['tab'];
+        issueBodyControl({ tab });
+        break;
+      }
+      case 'set_view':
+        issueBodyControl({ view: targetId === 'back' ? 'back' : 'front' });
+        break;
+      case 'set_sex':
+        issueBodyControl({ sex: targetId === 'female' ? 'female' : 'male' });
+        break;
+      case 'highlight': {
+        if (targetId.startsWith('organ:')) {
+          const organId = stripPrefix(targetId);
+          issueBodyControl({ organId, highlightId: organId });
+          conversationContext.current.lastReferencedId = targetId;
+        } else if (targetId.startsWith('point:')) {
+          const pointId = stripPrefix(targetId);
+          issueBodyControl({ pointId, highlightId: pointId });
+          conversationContext.current.lastReferencedId = targetId;
+        } else if (targetId.startsWith('region:')) {
+          const parts = targetId.split(':');
+          issueBodyControl({ highlightId: parts[1], view: parts[2] === 'back' ? 'back' : 'front' });
+          conversationContext.current.lastReferencedId = targetId;
+        } else {
+          issueBodyControl({ highlightId: targetId });
+          conversationContext.current.lastReferencedId = targetId;
+        }
+        conversationContext.current.lastReferencedKind = action.type === 'highlight' ? 'organ' : null;
+        break;
+      }
+      case 'clear_highlight':
+        issueBodyControl({ highlightId: '' });
+        conversationContext.current.lastReferencedId = null;
+        break;
+      case 'select': {
+        if (targetId.startsWith('organ:')) issueBodyControl({ organId: stripPrefix(targetId) });
+        else if (targetId.startsWith('point:')) issueBodyControl({ pointId: stripPrefix(targetId) });
+        else if (targetId.startsWith('region:')) issueBodyControl({ highlightId: targetId.split(':')[1] });
+        conversationContext.current.lastReferencedId = targetId;
+        break;
+      }
+      case 'show_details':
+        if (targetId.startsWith('organ:')) issueBodyControl({ organId: stripPrefix(targetId), openDetails: true });
+        break;
+      case 'filter':
+        issueBodyControl({ filter: String(action.value ?? '') });
+        break;
+      case 'search':
+        issueBodyControl({ search: String(action.value ?? '') });
+        break;
+      case 'zoom':
+        setZoomLevel((prev) => Math.max(0.5, Math.min(3, prev + Number(action.value ?? 0))));
+        break;
+      case 'back':
+        goBack();
+        break;
+      case 'save': {
+        if (targetId === 'clear_history') { clearHistory(); break; }
+        if (targetId === 'pain_entry') {
+          const value = Number(action.value);
+          if (!Number.isNaN(value)) setIntensity(value);
+          if (selected) saveResults();
+          else { setRequestedOrgan(null); setQuickRelief(false); navigateTo('body'); }
+          break;
+        }
+        // حفظ التسجيل الحالي
+        saveResults();
+        break;
+      }
+      default:
+        break;
+    }
+  };
+
+  // ---------------------------------------------------------------------------
+  // المساعد المركزي: بناء حالة التطبيق التي يراها المحرّك عند كل جولة.
+  // ---------------------------------------------------------------------------
+  const appState: AppState = useMemo(() => ({
+    currentScreen: screen,
+    currentTab: bodyState.tab,
+    currentBodyView: bodyState.view,
+    currentSex: bodyState.sex,
+    selectedBodyRegion: bodyState.tab === 'muscles' ? (selected?.group ?? null) : null,
+    selectedAnatomyStructure: bodyState.organId,
+    selectedPoint: bodyState.pointId,
+    selectedPainLocation: null,
+    zoomLevel,
+    visibleStructures: [],
+    conversationContext: conversationContext.current,
+    language: language as Lang,
+  }), [screen, bodyState, selected, zoomLevel, language]);
+
   const getTitle = (): string => {
     const titles: Record<Screen, string> = {
       welcome: t('appName'),
@@ -281,6 +417,8 @@ export default function App() {
             direction={direction}
             quickRelief={quickRelief}
             initialOrgan={requestedOrgan}
+            control={bodyControl}
+            onStateChange={setBodyState}
           />
         )}
 
@@ -360,6 +498,15 @@ export default function App() {
         <NavItem icon="♡" title={t('nav.healthInfo')} active={screen === 'healthInfo'} onPress={() => navigateTo('healthInfo')} colors={colors} />
         <NavItem icon="◷" title={t('nav.history')} active={screen === 'history'} onPress={() => navigateTo('history')} colors={colors} />
       </View>
+
+      {/* المساعد المركزي العائم — متاح في كل الشاشات ويتحكّم في التطبيق بأوامر منظّمة. */}
+      <GlobalAssistant
+        appState={appState}
+        onAction={handleAssistantAction}
+        language={language as Lang}
+        direction={direction}
+        bottomOffset={92}
+      />
     </SafeAreaView>
   );
 }
