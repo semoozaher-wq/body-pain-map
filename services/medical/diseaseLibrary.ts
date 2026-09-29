@@ -189,7 +189,7 @@ const SUPPLEMENTAL_CONDITIONS: MedicalCondition[] = [
 
 const DIFFUSE_IDS = new Set(['doid:1490', 'doid:8505', 'doid:8505-doms']);
 
-const CONDITIONS: MedicalCondition[] = [
+export const CONDITIONS: MedicalCondition[] = [
   ...BASE_CONDITIONS,
   ...ORGAN_CONDITIONS,
   ...REGIONAL_CONDITIONS,
