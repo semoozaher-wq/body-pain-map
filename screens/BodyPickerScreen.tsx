@@ -56,7 +56,7 @@ const femaleFrontAdjustments: Record<string, { x: number; y: number }> = {
   'hotspot-oblique-left-front': { x: 32, y: 40 }, 'hotspot-oblique-right-front': { x: 68, y: 40 },
 };
 const femaleOrganAdjustments: Record<string, { x: number; y: number }> = {
-  'organ-thyroid': { x: 50, y: 19 }, 'organ-lungs': { x: 50, y: 28 }, 'organ-heart': { x: 51, y: 28 },
+  'organ-thyroid': { x: 50, y: 17 }, 'organ-lungs': { x: 50, y: 28 }, 'organ-heart': { x: 51, y: 28 },
   'organ-liver': { x: 45, y: 35 }, 'organ-stomach': { x: 53, y: 36 }, 'organ-uterus': { x: 50, y: 48 },
   'organ-ovaries': { x: 44, y: 48 },
 };
@@ -317,14 +317,14 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
         </View>
       ) : (
         <>
-          <View style={styles.modeToggle}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.modeToggle} style={styles.modeToggleScroll}>
             <ModeButton title={t('bodyPicker.muscles')} selected={!showOrganMode && !showAcupressureMode && !showNaturalReliefMode && !showMedicalLibraryMode && !showDrugLookupMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(false); setShowDrugLookupMode(false); }} />
             <ModeButton title={t('bodyPicker.organs')} selected={showOrganMode} onPress={() => { setShowOrganMode(true); setShowAcupressureMode(false); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(false); setShowDrugLookupMode(false); }} />
             <ModeButton title={t('bodyPicker.acupressure')} selected={showAcupressureMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(true); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(false); setShowDrugLookupMode(false); }} />
             <ModeButton title={t('bodyPicker.naturalRelief')} selected={showNaturalReliefMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(true); setShowMedicalLibraryMode(false); setShowDrugLookupMode(false); }} />
             <ModeButton title={t('bodyPicker.medicalLibrary')} selected={showMedicalLibraryMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(true); setShowDrugLookupMode(false); }} />
             <ModeButton title={t('bodyPicker.drugLookup')} selected={showDrugLookupMode} onPress={() => { setShowOrganMode(false); setShowAcupressureMode(false); setShowNaturalReliefMode(false); setShowMedicalLibraryMode(false); setShowDrugLookupMode(true); }} />
-          </View>
+          </ScrollView>
 
           {!showAcupressureMode && !showNaturalReliefMode && !showOrganMode && !showMedicalLibraryMode && !showDrugLookupMode && <View style={styles.toggleRow}>
             <Pressable style={[styles.toggleButton, bodyViewMode === 'illustration' && styles.activeToggle]} onPress={() => setBodyViewMode('illustration')} accessibilityRole="button" accessibilityState={{ selected: bodyViewMode === 'illustration' }}><Text style={[styles.toggleText, bodyViewMode === 'illustration' && styles.activeToggleText]}>{t('bodyPicker.visualImage')}</Text></Pressable>
@@ -379,6 +379,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 onSelect={(marker) => { const markerId = marker.id === 'organ-ovaries-right' ? 'organ-ovaries' : marker.id; const spot = visibleHotspots.find((item) => item.id === markerId); if (spot) handleHotspotPress(spot); }}
                 highlight={organHighlight}
                 painMarker={painMarker && painMarker.view === activeView ? painMarker : null}
+                onPainMarkerChange={(pos) => setPainMarker({ x: pos.x, y: pos.y, view: activeView })}
               />
             </>
           ) : (
@@ -513,8 +514,9 @@ function Info({ title, text, warning = false }: { title: string; text: string; w
 const styles = StyleSheet.create({
   container: { padding: 16 },
   heading: { color: '#123B42', fontSize: 20, fontWeight: '900', textAlign: 'right', marginBottom: 6 },
-  modeToggle: { flexDirection: 'row', flexWrap: 'wrap', gap: 7, marginBottom: 12 },
-  modeButton: { flexGrow: 1, flexBasis: '45%', borderRadius: 10, borderWidth: 1, borderColor: '#CCD9DC', backgroundColor: '#FFF', padding: 11, alignItems: 'center' },
+  modeToggle: { flexDirection: 'row', gap: 7, paddingHorizontal: 2, paddingBottom: 2 },
+  modeToggleScroll: { flexGrow: 0, marginBottom: 12 },
+  modeButton: { borderRadius: 10, borderWidth: 1, borderColor: '#CCD9DC', backgroundColor: '#FFF', paddingVertical: 10, paddingHorizontal: 14, alignItems: 'center' },
   modeActive: { backgroundColor: '#0E6972', borderColor: '#0E6972' },
   modeText: { color: '#40545B', fontWeight: '700' },
   modeTextActive: { color: '#FFF' },

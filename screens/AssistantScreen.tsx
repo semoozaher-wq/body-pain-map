@@ -298,17 +298,32 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // التعرّف على الكلام (الإدخال الصوتي) — تبادل أدوار طبيعي
   // ------------------------------------------------------------------
   useSpeechRecognitionEvents('start', () => setListening(true));
-  useSpeechRecognitionEvents('end', () => setListening(false));
+  useSpeechRecognitionEvents('end', () => {
+    setListening(false);
+    // متابعة تلقائية على الأندرويد: بعض محرّكات الكلام تُنهي الجلسة بعد صمت،
+    // فنعيد الاستماع ما دامت الجلسة الصوتية شغّالة (نفس سلوك مسار الويب).
+    if (voiceSessionRef.current) {
+      setTimeout(() => { if (voiceSessionRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
+    }
+  });
   useSpeechRecognitionEvents('error', () => setListening(false));
   useSpeechRecognitionEvents('result', (event: any) => {
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
+    // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
+    if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
     if (event?.isFinal) {
-      setInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      // النتيجة النهائية = جملة جديدة (تُضاف للمخزن)، والجزئية = الجملة الحالية.
+      turnBufferRef.current = `${turnBufferRef.current} ${transcript}`.trim();
+      interimRef.current = '';
       setInterim('');
     } else {
+      interimRef.current = transcript;
       setInterim(transcript);
     }
+    // تبادل أدوار حقيقي على الأندرويد: لا نرسل فورًا — ننتظر صمتًا كافيًا
+    // حتى يكمل المستخدم كلامه ثم نرسل الجولة (نفس منطق مسار الويب).
+    scheduleTurnSend();
   });
 
   // نهاية جولة المستخدم: نُرسل النص المتراكم بعد صمت كافٍ (منع القطع المبكر).
@@ -425,6 +440,30 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     voiceSessionRef.current = true;
     await startListening();
   }, [startListening, stopListening]);
+
+  // ------------------------------------------------------------------
+  // محادثة جديدة (spec #4b): نفرّغ الرسائل والسياق الطبي معًا، ونوقف أي
+  // استماع/نطق جارٍ، حتى لا يتسرّب سياق المحادثة القديمة إلى الجديدة.
+  // ------------------------------------------------------------------
+  const newConversation = useCallback(() => {
+    voiceSessionRef.current = false;
+    stopListening();
+    try { Speech.stop(); } catch {}
+    speakingRef.current = false;
+    setSpeakingId(null);
+    painContextRef.current = null;
+    askCountRef.current = 0;
+    setAskCount(0);
+    persistedMessages = [];
+    persistedAskCount = 0;
+    turnBufferRef.current = '';
+    interimRef.current = '';
+    lastResultIndexRef.current = 0;
+    resultsLengthRef.current = 0;
+    setInterim('');
+    setInput('');
+    setMessages([]);
+  }, [stopListening]);
 
   // ------------------------------------------------------------------
   // نطق الردود (إخراج صوتي)
@@ -548,8 +587,12 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           // المحرّك الموحّد: نفس محرّك GlobalAssistant (محادثة عامة + ألم + تحديد مكان + تحكّم).
           const state = appStateRef.current ?? fallbackState(language as Lang);
           // \u0646\u064f\u0645\u0631\u0651\u0631 \u0627\u0644\u062c\u0645\u0644\u0629 \u0627\u0644\u062d\u0627\u0644\u064a\u0629 \u0641\u0642\u0637 (\u0645\u062b\u0644 GlobalAssistant) \u0648\u0646\u062a\u0631\u0643 \u0627\u0644\u0633\u064a\u0627\u0642 \u0644\u0640 state.
-          const turn = interpret(text, state);
-          for (const action of turn.actions) onActionRef.current?.(action);
+          const turn = interpret(text, state, { previousContext: painContextRef.current ?? undefined });
+          for (const action of turn.actions) {
+            if (action.type === 'reset_context') painContextRef.current = null;
+            onActionRef.current?.(action);
+          }
+          if (turn.mode === 'medical' && turn.medical?.painContext) painContextRef.current = turn.medical.painContext;
 
           const medical = turn.medical;
           const isMedical =
@@ -626,6 +669,14 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             </Text>
           </View>
         </View>
+        <Pressable
+          onPress={newConversation}
+          accessibilityRole="button"
+          accessibilityLabel={t('assistant.newConversation')}
+          style={[styles.speakToggle, { borderColor: colors.border, backgroundColor: colors.backgroundAlt, marginEnd: 8 }]}
+        >
+          <Text style={styles.speakToggleGlyph}>✚</Text>
+        </Pressable>
         <Pressable
           onPress={() => {
             const next = !autoSpeak;
