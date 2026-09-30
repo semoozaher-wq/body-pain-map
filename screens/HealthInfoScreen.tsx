@@ -4,6 +4,7 @@ import { CONDITIONS, smartSearch, type MedicalCondition } from '../services/medi
 import organDetails from '../data/organDetails.json';
 import type { Language } from '../services/i18n';
 import { useTheme } from '../hooks/useTheme';
+import { LocalAIChat } from '../components/LocalAIChat';
 
 type Props = { language: Language; direction: 'rtl' | 'ltr'; onOpenAssistant: (context?: string) => void };
 type Guide = { title: Record<Language,string>; text: Record<Language,string> };
@@ -43,6 +44,7 @@ export const HealthInfoScreen: React.FC<Props> = ({ language, direction, onOpenA
     </View>
 
     <Pressable onPress={() => onOpenAssistant(query.trim() || undefined)} style={[styles.aiButton, { backgroundColor: colors.primary }]} accessibilityRole="button"><Text style={styles.aiText}>{t('✦ اسأل المساعد الذكي عن حالتك', '✦ Ask the AI assistant about your case', '✦ Demander à l’assistant IA')}</Text></Pressable>
+    <LocalAIChat language={language} />
     <Text style={[styles.disclaimer, { color: colors.textLight }]}>{t('المحتوى تعليمي عام، ولا يشخّص الحالة ولا يغيّر علاجًا موصوفًا. عند علامات الخطر اطلب رعاية عاجلة.', 'Educational information only. It does not diagnose or replace prescribed care. Seek urgent care for red flags.', 'Informations éducatives uniquement. Elles ne posent pas de diagnostic et ne remplacent pas un traitement prescrit. En cas de signe d’alerte, consultez en urgence.')}</Text>
   </View>;
 };
