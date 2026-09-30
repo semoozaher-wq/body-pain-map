@@ -1,0 +1,3054 @@
+{
+  "source": {
+    "title": "List of acupuncture points (WHO standard nomenclature)",
+    "url": "https://en.wikipedia.org/wiki/List_of_acupuncture_points",
+    "whoReference": "WHO, A Proposed Standard International Acupuncture Nomenclature Report (1991/2014); Standard Acupuncture Nomenclature (1993)",
+    "note": "Point codes, Chinese names, transliterations, English names, pinyin and Korean are taken verbatim from the source tables. No data invented."
+  },
+  "meridianOrder": [
+    "LU",
+    "LI",
+    "ST",
+    "SP",
+    "HT",
+    "SI",
+    "BL",
+    "KI",
+    "PC",
+    "TE",
+    "GB",
+    "LR",
+    "GV",
+    "CV"
+  ],
+  "meridians": [
+    {
+      "code": "LU",
+      "chinese": "手太阴肺经",
+      "pinyin": "shǒu tàiyīn fèi jīng",
+      "english": "Lung",
+      "korean": "수태음폐경",
+      "pointCount": 11,
+      "points": [
+        {
+          "code": "LU1",
+          "chinese": "中府",
+          "transliteration": "Zhongfu",
+          "english": "Middle Assembly",
+          "pinyin": "zhōng fǔ",
+          "korean": "jung bu 중부"
+        },
+        {
+          "code": "LU2",
+          "chinese": "雲門",
+          "transliteration": "Yunmen",
+          "english": "Cloud Gate",
+          "pinyin": "yún mén",
+          "korean": "un mun 운문"
+        },
+        {
+          "code": "LU3",
+          "chinese": "天府",
+          "transliteration": "Tianfu",
+          "english": "Upper Arm Assembly",
+          "pinyin": "tiān fǔ",
+          "korean": "cheon bu 천부"
+        },
+        {
+          "code": "LU4",
+          "chinese": "俠白",
+          "transliteration": "Xiabai",
+          "english": "Supporting the Lung",
+          "pinyin": "xiá bái",
+          "korean": "hyeop baek 협백"
+        },
+        {
+          "code": "LU5",
+          "chinese": "尺澤",
+          "transliteration": "Chize",
+          "english": "Cubit Marsh",
+          "pinyin": "chǐ zé",
+          "korean": "cheok taek 척택"
+        },
+        {
+          "code": "LU6",
+          "chinese": "孔最",
+          "transliteration": "Kongzui",
+          "english": "Collection Hole",
+          "pinyin": "kǒng zuì",
+          "korean": "gong choe 공최"
+        },
+        {
+          "code": "LU7",
+          "chinese": "列缺",
+          "transliteration": "Lieque",
+          "english": "Interrupted Sequence",
+          "pinyin": "liè quē",
+          "korean": "yeol gyeol 열결"
+        },
+        {
+          "code": "LU8",
+          "chinese": "經渠",
+          "transliteration": "Jingqu",
+          "english": "Channel Ditch",
+          "pinyin": "jīng qú",
+          "korean": "gyeong geo 경거"
+        },
+        {
+          "code": "LU9",
+          "chinese": "太淵",
+          "transliteration": "Taiyuan",
+          "english": "Great Deep Pool",
+          "pinyin": "tài yuān",
+          "korean": "tae yeon 태연"
+        },
+        {
+          "code": "LU10",
+          "chinese": "魚際",
+          "transliteration": "Yuji",
+          "english": "Fish Border",
+          "pinyin": "yú jì",
+          "korean": "eo je 어제"
+        },
+        {
+          "code": "LU11",
+          "chinese": "少商",
+          "transliteration": "Shaoshang",
+          "english": "Lesser Metal",
+          "pinyin": "shào shāng",
+          "korean": "so sang 소상"
+        }
+      ]
+    },
+    {
+      "code": "LI",
+      "chinese": "手阳明大肠经",
+      "pinyin": "shǒu yángmíng dàcháng jīng",
+      "english": "Large Intestine",
+      "korean": "수양명대장경",
+      "pointCount": 20,
+      "points": [
+        {
+          "code": "LI1",
+          "chinese": "商陽",
+          "transliteration": "Shangyang",
+          "english": "Metal Yang",
+          "pinyin": "shāng yáng",
+          "korean": "sang yang 상양"
+        },
+        {
+          "code": "LI2",
+          "chinese": "二間",
+          "transliteration": "Erjian",
+          "english": "Second Point",
+          "pinyin": "èr jiān",
+          "korean": "i gan 이간"
+        },
+        {
+          "code": "LI3",
+          "chinese": "三間",
+          "transliteration": "Sanjian",
+          "english": "Third Point",
+          "pinyin": "sān jiān",
+          "korean": "sam gan 삼간"
+        },
+        {
+          "code": "LI4",
+          "chinese": "合谷",
+          "transliteration": "He Gu",
+          "english": "Junction Valley",
+          "pinyin": "hé gǔ",
+          "korean": "hap gok 합곡"
+        },
+        {
+          "code": "LI5",
+          "chinese": "陽谿",
+          "transliteration": "Yangxi",
+          "english": "Yang Stream",
+          "pinyin": "yáng xī",
+          "korean": "yang gye 양계"
+        },
+        {
+          "code": "LI6",
+          "chinese": "偏歴",
+          "transliteration": "Pianli",
+          "english": "Diverging Passage",
+          "pinyin": "piān lì",
+          "korean": "pyeon ryeok 편력"
+        },
+        {
+          "code": "LI7",
+          "chinese": "溫溜",
+          "transliteration": "Wenliu",
+          "english": "Warm Flow",
+          "pinyin": "wēn liū",
+          "korean": "ol lyu 온류"
+        },
+        {
+          "code": "LI8",
+          "chinese": "下廉",
+          "transliteration": "Xialian",
+          "english": "Lower Point at the Border",
+          "pinyin": "xià lián",
+          "korean": "ha ryeom 하렴"
+        },
+        {
+          "code": "LI9",
+          "chinese": "上廉",
+          "transliteration": "Shanglian",
+          "english": "Upper Point at the Border",
+          "pinyin": "shàng lián",
+          "korean": "sang nyeom 상렴"
+        },
+        {
+          "code": "LI10",
+          "chinese": "手三里",
+          "transliteration": "Shousanli",
+          "english": "Arm Three Miles",
+          "pinyin": "shǒu sān lǐ",
+          "korean": "[su] sam ni [수] 삼리"
+        },
+        {
+          "code": "LI11",
+          "chinese": "曲池",
+          "transliteration": "Quchi",
+          "english": "Pool at the Bend",
+          "pinyin": "qū chí",
+          "korean": "gok ji 곡지"
+        },
+        {
+          "code": "LI12",
+          "chinese": "肘髎",
+          "transliteration": "Zhouliao",
+          "english": "Elbow Bone Hole",
+          "pinyin": "zhǒu liáo",
+          "korean": "ju ryo 주료"
+        },
+        {
+          "code": "LI13",
+          "chinese": "手五里",
+          "transliteration": "Shouwuli",
+          "english": "Arm Five Miles",
+          "pinyin": "shǒu wǔ lǐ",
+          "korean": "[su] o ri [수] 오리"
+        },
+        {
+          "code": "LI14",
+          "chinese": "臂臑",
+          "transliteration": "Binao",
+          "english": "Upper Arm",
+          "pinyin": "bì nào",
+          "korean": "bi no 비노"
+        },
+        {
+          "code": "LI15",
+          "chinese": "肩髃",
+          "transliteration": "Jianyu",
+          "english": "Shoulder and Clavicle",
+          "pinyin": "jiān yú",
+          "korean": "gyeon u 견우"
+        },
+        {
+          "code": "LI16",
+          "chinese": "巨骨",
+          "transliteration": "Jugu",
+          "english": "Large Bone",
+          "pinyin": "jù gǔ",
+          "korean": "geo gol 거골"
+        },
+        {
+          "code": "LI17",
+          "chinese": "天鼎",
+          "transliteration": "Tianding",
+          "english": "Head's Tripod",
+          "pinyin": "tiān dǐng",
+          "korean": "cheon jeong 천정"
+        },
+        {
+          "code": "LI18",
+          "chinese": "扶突",
+          "transliteration": "Futu",
+          "english": "Beside the Prominence",
+          "pinyin": "fú tū",
+          "korean": "bu dol 부돌"
+        },
+        {
+          "code": "LI19",
+          "chinese": "口禾髎",
+          "transliteration": "Kouheliao",
+          "english": "Mouth Grain Hole",
+          "pinyin": "kǒu hé liáo",
+          "korean": "hwa ryo 화료"
+        },
+        {
+          "code": "LI20",
+          "chinese": "迎香",
+          "transliteration": "Yingxiang",
+          "english": "Receiving Fragrance",
+          "pinyin": "yíng xiāng",
+          "korean": "yeong hyang 영향"
+        }
+      ]
+    },
+    {
+      "code": "ST",
+      "chinese": "足阳明胃经",
+      "pinyin": "zú yángmíng wèi jīng",
+      "english": "Stomach",
+      "korean": "족양명위경",
+      "pointCount": 45,
+      "points": [
+        {
+          "code": "ST1",
+          "chinese": "承泣",
+          "transliteration": "Chengqi",
+          "english": "Tears Container",
+          "pinyin": "chéng qì",
+          "korean": "seung eup 승읍"
+        },
+        {
+          "code": "ST2",
+          "chinese": "四白",
+          "transliteration": "Sibai",
+          "english": "Four Directions Brightness",
+          "pinyin": "sì bái",
+          "korean": "sa baek 사백"
+        },
+        {
+          "code": "ST3",
+          "chinese": "巨髎",
+          "transliteration": "Juliao",
+          "english": "Large Bone Hole",
+          "pinyin": "jù liáo",
+          "korean": "geo ryo 거료"
+        },
+        {
+          "code": "ST4",
+          "chinese": "地倉",
+          "transliteration": "Dicang",
+          "english": "Earth Granary",
+          "pinyin": "dì cāng",
+          "korean": "ji chang 지창"
+        },
+        {
+          "code": "ST5",
+          "chinese": "大迎",
+          "transliteration": "Daying",
+          "english": "Large Receptacle (Facial Artery)",
+          "pinyin": "dà yíng",
+          "korean": "dae yeong 대영"
+        },
+        {
+          "code": "ST6",
+          "chinese": "頰車",
+          "transliteration": "Jiache",
+          "english": "Jaw Bone",
+          "pinyin": "jiá chē",
+          "korean": "hyeop geo 협거"
+        },
+        {
+          "code": "ST7",
+          "chinese": "下關",
+          "transliteration": "Xiaguan",
+          "english": "Below the Arch",
+          "pinyin": "xià guān",
+          "korean": "ha gwan 하관"
+        },
+        {
+          "code": "ST8",
+          "chinese": "頭維",
+          "transliteration": "Touwei",
+          "english": "Head's Corner",
+          "pinyin": "tóu wéi",
+          "korean": "du yu 두유"
+        },
+        {
+          "code": "ST9",
+          "chinese": "人迎",
+          "transliteration": "Renying",
+          "english": "Man'sPrognosis (Carotid Artery)",
+          "pinyin": "rén yíng",
+          "korean": "in yeong 인영"
+        },
+        {
+          "code": "ST10",
+          "chinese": "水突",
+          "transliteration": "Shuitu",
+          "english": "Liquid Passage",
+          "pinyin": "shǔi tū",
+          "korean": "su dol 수돌"
+        },
+        {
+          "code": "ST11",
+          "chinese": "氣舍",
+          "transliteration": "Qishe",
+          "english": "Residence of Breath Qi",
+          "pinyin": "qì shè",
+          "korean": "gi sa 기사"
+        },
+        {
+          "code": "ST12",
+          "chinese": "缺盆",
+          "transliteration": "Quepen",
+          "english": "Empty Basin",
+          "pinyin": "quē pén",
+          "korean": "gyeol bun 결분"
+        },
+        {
+          "code": "ST13",
+          "chinese": "氣戶",
+          "transliteration": "Qihu",
+          "english": "Door of Breath",
+          "pinyin": "qì hù",
+          "korean": "gi ho 기호"
+        },
+        {
+          "code": "ST14",
+          "chinese": "庫房",
+          "transliteration": "Kufang",
+          "english": "Breath Storeroom",
+          "pinyin": "kù fáng",
+          "korean": "go bang 고방"
+        },
+        {
+          "code": "ST15",
+          "chinese": "屋翳",
+          "transliteration": "Wuyi",
+          "english": "Hiding the Breath",
+          "pinyin": "wū yì",
+          "korean": "ok ye 옥예"
+        },
+        {
+          "code": "ST16",
+          "chinese": "膺窗",
+          "transliteration": "Yingchuang",
+          "english": "Breast Window",
+          "pinyin": "yìng chuāng",
+          "korean": "eung chang 응창"
+        },
+        {
+          "code": "ST17",
+          "chinese": "乳中",
+          "transliteration": "Ruzhong",
+          "english": "Breast Centre (Nipple)",
+          "pinyin": "rǔ zhōng",
+          "korean": "yu jung 유중"
+        },
+        {
+          "code": "ST18",
+          "chinese": "乳根",
+          "transliteration": "Rugen",
+          "english": "Breast Root",
+          "pinyin": "rǔ gēn",
+          "korean": "yu geun 유근"
+        },
+        {
+          "code": "ST19",
+          "chinese": "不容",
+          "transliteration": "Burong",
+          "english": "Not Contained",
+          "pinyin": "bù róng",
+          "korean": "bul yong 불용"
+        },
+        {
+          "code": "ST20",
+          "chinese": "承滿",
+          "transliteration": "Chengman",
+          "english": "Receiving Fullness",
+          "pinyin": "chéng mǎn",
+          "korean": "seng man 승만"
+        },
+        {
+          "code": "ST21",
+          "chinese": "梁門",
+          "transliteration": "Liangmen",
+          "english": "Beam Gate",
+          "pinyin": "liáng mén",
+          "korean": "yang mun 양문"
+        },
+        {
+          "code": "ST22",
+          "chinese": "關門",
+          "transliteration": "Guanmen",
+          "english": "Shutting the Gate",
+          "pinyin": "guān mén",
+          "korean": "gwan mun 관문"
+        },
+        {
+          "code": "ST23",
+          "chinese": "太乙",
+          "transliteration": "Taiyi",
+          "english": "Great Unity",
+          "pinyin": "tài yǐ",
+          "korean": "tae eul 태을"
+        },
+        {
+          "code": "ST24",
+          "chinese": "滑肉門",
+          "transliteration": "Huaroumen",
+          "english": "Chime Gate",
+          "pinyin": "huá ròu mén",
+          "korean": "hwal yung mun 활육문"
+        },
+        {
+          "code": "ST25",
+          "chinese": "天樞",
+          "transliteration": "Tianshu",
+          "english": "Heavenly Pivot",
+          "pinyin": "tiān shū",
+          "korean": "cheon chu 천추"
+        },
+        {
+          "code": "ST26",
+          "chinese": "外陵",
+          "transliteration": "Wailing",
+          "english": "Outer Mound",
+          "pinyin": "wài líng",
+          "korean": "woe neung 외릉"
+        },
+        {
+          "code": "ST27",
+          "chinese": "大巨",
+          "transliteration": "Daju",
+          "english": "Great Bulge",
+          "pinyin": "dà jù",
+          "korean": "dae geo 대거"
+        },
+        {
+          "code": "ST28",
+          "chinese": "水道",
+          "transliteration": "Shuidao",
+          "english": "Waterway",
+          "pinyin": "shuǐ dào",
+          "korean": "su do 수도"
+        },
+        {
+          "code": "ST29",
+          "chinese": "歸來 (归来)",
+          "transliteration": "Guilai",
+          "english": "Restoring Position",
+          "pinyin": "guī lái",
+          "korean": "gui rae 귀래"
+        },
+        {
+          "code": "ST30",
+          "chinese": "氣沖",
+          "transliteration": "Qichong",
+          "english": "Qi Surge",
+          "pinyin": "qì chōng",
+          "korean": "gi chung 기충"
+        },
+        {
+          "code": "ST31",
+          "chinese": "髀關",
+          "transliteration": "Biguan",
+          "english": "Thigh Gate",
+          "pinyin": "bì guān",
+          "korean": "bi gwan 비관"
+        },
+        {
+          "code": "ST32",
+          "chinese": "伏兔",
+          "transliteration": "Futu",
+          "english": "Crouching Rabbit",
+          "pinyin": "fú tù",
+          "korean": "bok to 복토"
+        },
+        {
+          "code": "ST33",
+          "chinese": "陰市",
+          "transliteration": "Yinshi",
+          "english": "Yin Market",
+          "pinyin": "yīn shì",
+          "korean": "eum si 음시"
+        },
+        {
+          "code": "ST34",
+          "chinese": "梁丘",
+          "transliteration": "Liangqiu",
+          "english": "Ridge Mound",
+          "pinyin": "liáng qīu",
+          "korean": "yang gu 양구"
+        },
+        {
+          "code": "ST35",
+          "chinese": "犢鼻",
+          "transliteration": "Dubi",
+          "english": "Calf's Nose",
+          "pinyin": "dú bí",
+          "korean": "dok bi 독비"
+        },
+        {
+          "code": "ST36",
+          "chinese": "足三里",
+          "transliteration": "Zusanli",
+          "english": "Leg Three Miles",
+          "pinyin": "zú sān lǐ",
+          "korean": "[jok] sam ni [족] 삼리"
+        },
+        {
+          "code": "ST37",
+          "chinese": "上巨虛",
+          "transliteration": "Shangjuxu",
+          "english": "Upper Great Void",
+          "pinyin": "shàng jù xū",
+          "korean": "sang geo heo 상거허"
+        },
+        {
+          "code": "ST38",
+          "chinese": "條口",
+          "transliteration": "Tiaokou",
+          "english": "Ribbon Opening",
+          "pinyin": "tiáo kǒu",
+          "korean": "jo gu 조구"
+        },
+        {
+          "code": "ST39",
+          "chinese": "下巨虛",
+          "transliteration": "Xiajuxu",
+          "english": "Lower Large Hollow",
+          "pinyin": "xià jù xū",
+          "korean": "ha geo heo 하거허"
+        },
+        {
+          "code": "ST40",
+          "chinese": "豐隆",
+          "transliteration": "Fenglong",
+          "english": "Abundant Bulge",
+          "pinyin": "fēng lóng",
+          "korean": "pung nyung 풍륭"
+        },
+        {
+          "code": "ST41",
+          "chinese": "解谿",
+          "transliteration": "Jiexi",
+          "english": "Dividing Cleft",
+          "pinyin": "jiě xī",
+          "korean": "hae gye 해계"
+        },
+        {
+          "code": "ST42",
+          "chinese": "沖陽",
+          "transliteration": "Chongyang",
+          "english": "Surging Yang",
+          "pinyin": "chōng yáng",
+          "korean": "chung yang 충양"
+        },
+        {
+          "code": "ST43",
+          "chinese": "陷谷",
+          "transliteration": "Xiangu",
+          "english": "Sunken Valley",
+          "pinyin": "xiàn gǔ",
+          "korean": "ham gok 함곡"
+        },
+        {
+          "code": "ST44",
+          "chinese": "内庭",
+          "transliteration": "Neiting",
+          "english": "Inner Court",
+          "pinyin": "nèi tíng",
+          "korean": "nae jeong 내정"
+        },
+        {
+          "code": "ST45",
+          "chinese": "厲兌",
+          "transliteration": "Lidui",
+          "english": "Running Point",
+          "pinyin": "lì duì",
+          "korean": "ye tae 예태"
+        }
+      ]
+    },
+    {
+      "code": "SP",
+      "chinese": "足太阴脾经",
+      "pinyin": "zú tàiyīn pí jīng",
+      "english": "Spleen",
+      "korean": "족태음비경",
+      "pointCount": 21,
+      "points": [
+        {
+          "code": "SP1",
+          "chinese": "隱白",
+          "transliteration": "Yinbai",
+          "english": "Hidden White",
+          "pinyin": "yǐn bái",
+          "korean": "eun baek 은백"
+        },
+        {
+          "code": "SP2",
+          "chinese": "大都",
+          "transliteration": "Dadu",
+          "english": "Great Pool",
+          "pinyin": "dà dū",
+          "korean": "dae do 대도"
+        },
+        {
+          "code": "SP3",
+          "chinese": "太白",
+          "transliteration": "Taibai",
+          "english": "Great White",
+          "pinyin": "taì bái",
+          "korean": "tae baek 태백"
+        },
+        {
+          "code": "SP4",
+          "chinese": "公孫",
+          "transliteration": "Gongsun",
+          "english": "Grandfather Grandson",
+          "pinyin": "gōng sūn",
+          "korean": "gong son 공손"
+        },
+        {
+          "code": "SP5",
+          "chinese": "商丘",
+          "transliteration": "Shangqiu",
+          "english": "Metal Mound",
+          "pinyin": "shāng qiū",
+          "korean": "sang gu 상구"
+        },
+        {
+          "code": "SP6",
+          "chinese": "三陰交",
+          "transliteration": "Sanyinjiao",
+          "english": "Three Yin Intersection",
+          "pinyin": "sān yīn jiāo",
+          "korean": "sam eum gyo 삼음교"
+        },
+        {
+          "code": "SP7",
+          "chinese": "漏谷",
+          "transliteration": "Lougu",
+          "english": "Leaking Valley",
+          "pinyin": "loù gǔ",
+          "korean": "nu gok 루곡"
+        },
+        {
+          "code": "SP8",
+          "chinese": "地機",
+          "transliteration": "Diji",
+          "english": "Earth Cure",
+          "pinyin": "dì jī",
+          "korean": "ji gi 지기"
+        },
+        {
+          "code": "SP9",
+          "chinese": "陰陵泉",
+          "transliteration": "Yinlingquan",
+          "english": "Yin Mound Spring",
+          "pinyin": "yīn líng qúan",
+          "korean": "eum neung cheon 음릉천"
+        },
+        {
+          "code": "SP10",
+          "chinese": "血海",
+          "transliteration": "Xuehai",
+          "english": "Sea of Blood",
+          "pinyin": "xuè hǎi",
+          "korean": "hyeol hae 혈해"
+        },
+        {
+          "code": "SP11",
+          "chinese": "箕門",
+          "transliteration": "Jimen",
+          "english": "Separation Gate",
+          "pinyin": "jī mén",
+          "korean": "gi mun 기문"
+        },
+        {
+          "code": "SP12",
+          "chinese": "衝門",
+          "transliteration": "Chongmen",
+          "english": "Surging Gate",
+          "pinyin": "chōng mén",
+          "korean": "chung mun 충문"
+        },
+        {
+          "code": "SP13",
+          "chinese": "府舍",
+          "transliteration": "Fushe",
+          "english": "Bpwel Abode",
+          "pinyin": "fǔ shè",
+          "korean": "bu sa 부사"
+        },
+        {
+          "code": "SP14",
+          "chinese": "腹結",
+          "transliteration": "Fujie",
+          "english": "Abdomen Stagnation",
+          "pinyin": "fù jié",
+          "korean": "bok gyeol 복결"
+        },
+        {
+          "code": "SP15",
+          "chinese": "大横",
+          "transliteration": "Da heng",
+          "english": "Great Horizontal",
+          "pinyin": "dà héng",
+          "korean": "dae hoeng 대횡"
+        },
+        {
+          "code": "SP16",
+          "chinese": "腹哀",
+          "transliteration": "Fuai",
+          "english": "Abdomen Suffering",
+          "pinyin": "fù āi",
+          "korean": "bok ae 복애"
+        },
+        {
+          "code": "SP17",
+          "chinese": "食竇",
+          "transliteration": "Shidou",
+          "english": "Food Cavity",
+          "pinyin": "shí dòu",
+          "korean": "sik du 식두"
+        },
+        {
+          "code": "SP18",
+          "chinese": "天谿",
+          "transliteration": "Tianxi",
+          "english": "Celestial Cleft",
+          "pinyin": "tiān xī",
+          "korean": "cheon gye 천계"
+        },
+        {
+          "code": "SP19",
+          "chinese": "胸鄉",
+          "transliteration": "Xiongxiang",
+          "english": "Chest Village",
+          "pinyin": "xiōng xiāng",
+          "korean": "hyung hyang 흉향"
+        },
+        {
+          "code": "SP20",
+          "chinese": "周榮",
+          "transliteration": "Zhourong",
+          "english": "Complete Nourishment",
+          "pinyin": "zhōu róng",
+          "korean": "ju yeong 주영"
+        },
+        {
+          "code": "SP21",
+          "chinese": "大包",
+          "transliteration": "Dabao",
+          "english": "Great Embrace",
+          "pinyin": "dà bāo",
+          "korean": "dae po 대포"
+        }
+      ]
+    },
+    {
+      "code": "HT",
+      "chinese": "手少阴心经",
+      "pinyin": "shǒu shàoyīn xīnjīng",
+      "english": "Heart",
+      "korean": "수소음심경",
+      "pointCount": 9,
+      "points": [
+        {
+          "code": "HE1",
+          "chinese": "極泉",
+          "transliteration": "Jiquan",
+          "english": "Highest Spring",
+          "pinyin": "jí quán",
+          "korean": "geuk cheon 극천"
+        },
+        {
+          "code": "HE2",
+          "chinese": "青靈",
+          "transliteration": "Qingling",
+          "english": "Green Spirit",
+          "pinyin": "qīng líng",
+          "korean": "cheong nyeong 청령"
+        },
+        {
+          "code": "HE3",
+          "chinese": "少海",
+          "transliteration": "Shaohai",
+          "english": "Lesser Sea",
+          "pinyin": "shào hǎi",
+          "korean": "so hae 소해"
+        },
+        {
+          "code": "HE4",
+          "chinese": "靈道",
+          "transliteration": "Lingdao",
+          "english": "Spirit Path",
+          "pinyin": "líng dào",
+          "korean": "young do 영도"
+        },
+        {
+          "code": "HE5",
+          "chinese": "通里",
+          "transliteration": "Tongli",
+          "english": "Inward Connection",
+          "pinyin": "tōng lǐ",
+          "korean": "tong ni 통리"
+        },
+        {
+          "code": "HE6",
+          "chinese": "陰郄",
+          "transliteration": "Yinxi",
+          "english": "Yin Cleft",
+          "pinyin": "yīn xī",
+          "korean": "eum geuk 음극"
+        },
+        {
+          "code": "HE7",
+          "chinese": "神門",
+          "transliteration": "Shenmen",
+          "english": "Spirit Gate",
+          "pinyin": "shén mén",
+          "korean": "sin mun 신문"
+        },
+        {
+          "code": "HE8",
+          "chinese": "少府",
+          "transliteration": "Shaofu",
+          "english": "Lesser Mansion",
+          "pinyin": "shào fǔ",
+          "korean": "so bu 소부"
+        },
+        {
+          "code": "HE9",
+          "chinese": "少沖",
+          "transliteration": "Shaochong",
+          "english": "Lesser Surge",
+          "pinyin": "shào chōng",
+          "korean": "so chung 소충"
+        }
+      ]
+    },
+    {
+      "code": "SI",
+      "chinese": "手太阳小肠经",
+      "pinyin": "shǒu tàiyáng xiǎocháng jīng",
+      "english": "Small Intestine",
+      "korean": "수태양소장경",
+      "pointCount": 19,
+      "points": [
+        {
+          "code": "SI1",
+          "chinese": "少澤",
+          "transliteration": "Shaoze",
+          "english": "Lesser Marsh",
+          "pinyin": "shào zé",
+          "korean": "so taek 소택"
+        },
+        {
+          "code": "SI2",
+          "chinese": "前谷",
+          "transliteration": "Qiangu",
+          "english": "Front Valley",
+          "pinyin": "qián gǔ",
+          "korean": "jeon gok 전곡"
+        },
+        {
+          "code": "SI3",
+          "chinese": "後谿",
+          "transliteration": "Houxi",
+          "english": "Back Stream",
+          "pinyin": "hòu xī",
+          "korean": "hu gye 후계"
+        },
+        {
+          "code": "SI4",
+          "chinese": "腕骨",
+          "transliteration": "Wangu",
+          "english": "Wrist Bone",
+          "pinyin": "wàn gǔ",
+          "korean": "wan gol 완골"
+        },
+        {
+          "code": "SI5",
+          "chinese": "陽谷",
+          "transliteration": "Yanggu",
+          "english": "Yang Valley",
+          "pinyin": "yáng gǔ",
+          "korean": "yang gok 양곡"
+        },
+        {
+          "code": "SI6",
+          "chinese": "養老",
+          "transliteration": "Yanglao",
+          "english": "Support the Aged",
+          "pinyin": "yǎng lǎo",
+          "korean": "yang no 양노"
+        },
+        {
+          "code": "SI7",
+          "chinese": "支正",
+          "transliteration": "Zhizheng",
+          "english": "Branch of Upright",
+          "pinyin": "zhī zhèng",
+          "korean": "ji jeong 지정"
+        },
+        {
+          "code": "SI8",
+          "chinese": "小海",
+          "transliteration": "Xiaohai",
+          "english": "Small Sea",
+          "pinyin": "xiǎo hǎi",
+          "korean": "so hae 소해"
+        },
+        {
+          "code": "SI9",
+          "chinese": "肩貞",
+          "transliteration": "Jianzhen",
+          "english": "True Shoulder",
+          "pinyin": "jiān zhēn",
+          "korean": "gyeon jeong 견정"
+        },
+        {
+          "code": "SI10",
+          "chinese": "臑俞",
+          "transliteration": "Naoshu",
+          "english": "Upper arm transporter",
+          "pinyin": "nāo shū",
+          "korean": "no yu(su) 노유(수)"
+        },
+        {
+          "code": "SI11",
+          "chinese": "天宗",
+          "transliteration": "Tianzong",
+          "english": "Heavenly Gathering",
+          "pinyin": "tiān zōng",
+          "korean": "cheon jong 천종"
+        },
+        {
+          "code": "SI12",
+          "chinese": "秉風",
+          "transliteration": "Bingfeng",
+          "english": "Grasping the Wind",
+          "pinyin": "bǐng fēng",
+          "korean": "byeong pung 병풍"
+        },
+        {
+          "code": "SI13",
+          "chinese": "曲垣",
+          "transliteration": "Quyuan",
+          "english": "Crooked Wall",
+          "pinyin": "qū yuán",
+          "korean": "gok won 곡원"
+        },
+        {
+          "code": "SI14",
+          "chinese": "肩外俞",
+          "transliteration": "Jianwaishu",
+          "english": "Outer Shoulder Transporter",
+          "pinyin": "jiān wài shū",
+          "korean": "gyeon oe yu 견외유"
+        },
+        {
+          "code": "SI15",
+          "chinese": "肩中俞",
+          "transliteration": "Jianzhongshu",
+          "english": "Middle Shoulder Transporter",
+          "pinyin": "jiān zhōng shū",
+          "korean": "gyeon jung yu 견중유"
+        },
+        {
+          "code": "SI16",
+          "chinese": "天窗",
+          "transliteration": "Tianchuang",
+          "english": "Heavenly Window",
+          "pinyin": "tiān chuāng",
+          "korean": "cheon chang 천창"
+        },
+        {
+          "code": "SI17",
+          "chinese": "天容",
+          "transliteration": "Tianrong",
+          "english": "Heavenly Appearance",
+          "pinyin": "tiān róng",
+          "korean": "cheon yong 천용"
+        },
+        {
+          "code": "SI18",
+          "chinese": "顴髎",
+          "transliteration": "Quanliao",
+          "english": "Cheek Bone Crevice",
+          "pinyin": "quán liáo",
+          "korean": "gwal lyo 관료"
+        },
+        {
+          "code": "SI19",
+          "chinese": "聽宮",
+          "transliteration": "Tinggong",
+          "english": "Palace of Hearing",
+          "pinyin": "tīng gōng",
+          "korean": "cheong gung 청궁"
+        }
+      ]
+    },
+    {
+      "code": "BL",
+      "chinese": "足太阳膀胱经",
+      "pinyin": "zú tàiyáng pángguāng jīng",
+      "english": "Bladder",
+      "korean": "족태양방광경",
+      "pointCount": 67,
+      "points": [
+        {
+          "code": "BL1",
+          "chinese": "睛明",
+          "transliteration": "Jingming",
+          "english": "Bright Eyes",
+          "pinyin": "jīng míng",
+          "korean": "jeong myeong 정명"
+        },
+        {
+          "code": "BL2",
+          "chinese": "攢竹",
+          "transliteration": "Zanzhu",
+          "english": "Gathered Bamboo",
+          "pinyin": "cuán zhú",
+          "korean": "chan juk 찬죽"
+        },
+        {
+          "code": "BL3",
+          "chinese": "眉衝",
+          "transliteration": "Meichong",
+          "english": "Eyebrows' Ascension",
+          "pinyin": "méi chōng",
+          "korean": "mi chung 미충"
+        },
+        {
+          "code": "BL4",
+          "chinese": "曲差",
+          "transliteration": "Quchai",
+          "english": "Deviating Curve",
+          "pinyin": "qǔ chāi",
+          "korean": "gok cha 곡차"
+        },
+        {
+          "code": "BL5",
+          "chinese": "五處",
+          "transliteration": "Wuchu",
+          "english": "Fifth Position",
+          "pinyin": "wǔ chǔ",
+          "korean": "o cheo 오처"
+        },
+        {
+          "code": "BL6",
+          "chinese": "承光",
+          "transliteration": "Chengguang",
+          "english": "Receiving Light",
+          "pinyin": "chéng guāng",
+          "korean": "seung gwang 승광"
+        },
+        {
+          "code": "BL7",
+          "chinese": "通天",
+          "transliteration": "Tongtian",
+          "english": "Reaching Upward",
+          "pinyin": "tōng tiān",
+          "korean": "tong cheon 통천"
+        },
+        {
+          "code": "BL8",
+          "chinese": "絡卻",
+          "transliteration": "Luoque",
+          "english": "Declining Connection",
+          "pinyin": "luò què",
+          "korean": "nak gak 락각"
+        },
+        {
+          "code": "BL9",
+          "chinese": "玉枕",
+          "transliteration": "Yuzhen",
+          "english": "Jade Pillow",
+          "pinyin": "yù zhěn",
+          "korean": "ok chim 옥침"
+        },
+        {
+          "code": "BL10",
+          "chinese": "天柱",
+          "transliteration": "Tianzhu",
+          "english": "Upper Pillar",
+          "pinyin": "tiān zhù",
+          "korean": "cheon ju 천주"
+        },
+        {
+          "code": "BL11",
+          "chinese": "大杼",
+          "transliteration": "Dazhu",
+          "english": "Great Vertebra",
+          "pinyin": "dà zhù",
+          "korean": "dae jeo 대저"
+        },
+        {
+          "code": "BL12",
+          "chinese": "風門",
+          "transliteration": "Fengmen",
+          "english": "Wind Gate",
+          "pinyin": "fēng mén",
+          "korean": "pung mun 풍문"
+        },
+        {
+          "code": "BL13",
+          "chinese": "肺俞",
+          "transliteration": "Feishu",
+          "english": "Lung Transporter",
+          "pinyin": "fèi shū",
+          "korean": "pye yu 폐유"
+        },
+        {
+          "code": "BL14",
+          "chinese": "厥陰俞",
+          "transliteration": "Jueyinshu",
+          "english": "Absolute yin Transporter",
+          "pinyin": "jué yīn shū",
+          "korean": "gweor eum yu 궐음유"
+        },
+        {
+          "code": "BL15",
+          "chinese": "心俞",
+          "transliteration": "Xinshu",
+          "english": "Heart Transporter",
+          "pinyin": "xīn shū",
+          "korean": "sim yu 심유"
+        },
+        {
+          "code": "BL16",
+          "chinese": "督俞",
+          "transliteration": "Dushu",
+          "english": "Governor Transporter",
+          "pinyin": "dū shū",
+          "korean": "dok yu 독유"
+        },
+        {
+          "code": "BL17",
+          "chinese": "膈俞",
+          "transliteration": "Geshu",
+          "english": "Diaphragm Transporter",
+          "pinyin": "gé shū",
+          "korean": "gyeok yu 격유"
+        },
+        {
+          "code": "BL18",
+          "chinese": "肝俞",
+          "transliteration": "Ganshu",
+          "english": "Liver Transporter",
+          "pinyin": "gān shū",
+          "korean": "gan yu 간유"
+        },
+        {
+          "code": "BL19",
+          "chinese": "膽俞",
+          "transliteration": "Danshu",
+          "english": "Gallbladder Transporter",
+          "pinyin": "dǎn shū",
+          "korean": "dam yu 담유"
+        },
+        {
+          "code": "BL20",
+          "chinese": "脾俞",
+          "transliteration": "Pishu",
+          "english": "Spleen Transporter",
+          "pinyin": "pí shū",
+          "korean": "bi yu 비유"
+        },
+        {
+          "code": "BL21",
+          "chinese": "胃俞",
+          "transliteration": "Weishu",
+          "english": "Stomach Transporter",
+          "pinyin": "wèi shū",
+          "korean": "wi yu 위유"
+        },
+        {
+          "code": "BL22",
+          "chinese": "三焦俞",
+          "transliteration": "Sanjiaoshu",
+          "english": "Sanjiao Transporter",
+          "pinyin": "sān jiāo shū",
+          "korean": "sam cho yu 삼초유"
+        },
+        {
+          "code": "BL23",
+          "chinese": "腎俞",
+          "transliteration": "Shenshu",
+          "english": "Kidney Transporter",
+          "pinyin": "shèn shū",
+          "korean": "sim yu 신유"
+        },
+        {
+          "code": "BL24",
+          "chinese": "氣海俞",
+          "transliteration": "Qihaishu",
+          "english": "Sea of Qi Transporter",
+          "pinyin": "qì hǎi shū",
+          "korean": "gi hae yu 기해유"
+        },
+        {
+          "code": "BL25",
+          "chinese": "大腸俞",
+          "transliteration": "Dachangshu",
+          "english": "Large Intestine Transporter",
+          "pinyin": "dà cháng shū",
+          "korean": "dae jang yu 대장유"
+        },
+        {
+          "code": "BL26",
+          "chinese": "關元俞",
+          "transliteration": "Guanyuanshu",
+          "english": "Gate of Origin Transporter",
+          "pinyin": "guān yuán shū",
+          "korean": "gwan won yu 관원유"
+        },
+        {
+          "code": "BL27",
+          "chinese": "小腸俞",
+          "transliteration": "Xiaochangshu",
+          "english": "Small Intestine Transporter",
+          "pinyin": "xiǎo cháng shū",
+          "korean": "so jang yu 소장유"
+        },
+        {
+          "code": "BL28",
+          "chinese": "膀胱俞",
+          "transliteration": "Pangguangshu",
+          "english": "Bladder Transporter",
+          "pinyin": "páng guāng shū",
+          "korean": "bang wang yu 방광유"
+        },
+        {
+          "code": "BL29",
+          "chinese": "中膂俞",
+          "transliteration": "Zhonglushu",
+          "english": "Mid-Spine Transporter",
+          "pinyin": "zhōng lǚ shū",
+          "korean": "jung nyeo nae yu 중려내유"
+        },
+        {
+          "code": "BL30",
+          "chinese": "白環俞",
+          "transliteration": "Baihuanshu",
+          "english": "White Ring Transporter",
+          "pinyin": "bái huán shū",
+          "korean": "baek hwan yu 백환유"
+        },
+        {
+          "code": "BL31",
+          "chinese": "上髎",
+          "transliteration": "Shangliao",
+          "english": "Upper Bone Hole",
+          "pinyin": "shàng liáo",
+          "korean": "sang nyo 상료"
+        },
+        {
+          "code": "BL32",
+          "chinese": "次髎",
+          "transliteration": "Ciliao",
+          "english": "Second Bone Hole",
+          "pinyin": "cì liáo",
+          "korean": "cha ryo 차료"
+        },
+        {
+          "code": "BL33",
+          "chinese": "中髎",
+          "transliteration": "Zhongliao",
+          "english": "Middle Bone Hole",
+          "pinyin": "zhōng liáo",
+          "korean": "jung nyo 중료"
+        },
+        {
+          "code": "BL34",
+          "chinese": "下髎",
+          "transliteration": "Xialiao",
+          "english": "Lower Bone Hole",
+          "pinyin": "xià liáo",
+          "korean": "ha ryo 하료"
+        },
+        {
+          "code": "BL35",
+          "chinese": "會陽",
+          "transliteration": "Huiyang",
+          "english": "Meeting of Yang",
+          "pinyin": "huì yáng",
+          "korean": "hoe yang 회양"
+        },
+        {
+          "code": "BL36",
+          "chinese": "承扶",
+          "transliteration": "Chengfu",
+          "english": "Hold and Support",
+          "pinyin": "chéng fú",
+          "korean": "seung bu 승부"
+        },
+        {
+          "code": "BL37",
+          "chinese": "殷門",
+          "transliteration": "Yinmen",
+          "english": "Hanstring Gate",
+          "pinyin": "yīn mén",
+          "korean": "eun mun 은문"
+        },
+        {
+          "code": "BL38",
+          "chinese": "浮郄",
+          "transliteration": "Fuxi",
+          "english": "Superficial Cleft",
+          "pinyin": "fú xī",
+          "korean": "bu geuk 부극"
+        },
+        {
+          "code": "BL39",
+          "chinese": "委陽",
+          "transliteration": "Weiyang",
+          "english": "Lateral End of the Crease",
+          "pinyin": "wěi yáng",
+          "korean": "wi yang 위양"
+        },
+        {
+          "code": "BL40",
+          "chinese": "委中",
+          "transliteration": "Weizhong",
+          "english": "Middle of the Crease",
+          "pinyin": "wěi zhōng",
+          "korean": "wi jung 위중"
+        },
+        {
+          "code": "BL41",
+          "chinese": "附分",
+          "transliteration": "Fufen",
+          "english": "Outer Branch",
+          "pinyin": "fù fēn",
+          "korean": "bu bun 부분"
+        },
+        {
+          "code": "BL42",
+          "chinese": "魄戶",
+          "transliteration": "Pohu",
+          "english": "Door of the Corporeal Soul",
+          "pinyin": "pò hù",
+          "korean": "baek ho 백호"
+        },
+        {
+          "code": "BL43",
+          "chinese": "膏肓俞",
+          "transliteration": "Gaohuangshu",
+          "english": "Vital Region Shu",
+          "pinyin": "gāo huāng shū",
+          "korean": "go hwang [yu] 고황[유]"
+        },
+        {
+          "code": "BL44",
+          "chinese": "神堂",
+          "transliteration": "Shentang",
+          "english": "Spirit Hall",
+          "pinyin": "shén táng",
+          "korean": "sin dang 신당"
+        },
+        {
+          "code": "BL45",
+          "chinese": "譩譆",
+          "transliteration": "Yixi",
+          "english": "That Hurt",
+          "pinyin": "yì xǐ",
+          "korean": "ui hoe 의회"
+        },
+        {
+          "code": "BL46",
+          "chinese": "膈關",
+          "transliteration": "Geguan",
+          "english": "Diaphragm Gate",
+          "pinyin": "gé guān",
+          "korean": "gyeok gwan 격관"
+        },
+        {
+          "code": "BL47",
+          "chinese": "魂門",
+          "transliteration": "Hunmen",
+          "english": "Ethereal Soul Gate",
+          "pinyin": "hún mén",
+          "korean": "hon mun 혼문"
+        },
+        {
+          "code": "BL48",
+          "chinese": "陽綱",
+          "transliteration": "Yanggang",
+          "english": "Linking to Gall Bladder",
+          "pinyin": "yáng gāng",
+          "korean": "yang gang 양강"
+        },
+        {
+          "code": "BL49",
+          "chinese": "意舍",
+          "transliteration": "Yishe",
+          "english": "Abode of Thought",
+          "pinyin": "yì shě",
+          "korean": "ui sa 의사"
+        },
+        {
+          "code": "BL50",
+          "chinese": "胃倉",
+          "transliteration": "Weicang",
+          "english": "Stomach Granary",
+          "pinyin": "wèi cāng",
+          "korean": "wi chang 위창"
+        },
+        {
+          "code": "BL51",
+          "chinese": "肓門",
+          "transliteration": "Huangmen",
+          "english": "Vitals Gate",
+          "pinyin": "huāng mén",
+          "korean": "hwang mun 황문"
+        },
+        {
+          "code": "BL52",
+          "chinese": "志室",
+          "transliteration": "Zhishi",
+          "english": "Willpower Room",
+          "pinyin": "zhì shì",
+          "korean": "ji sil 지실"
+        },
+        {
+          "code": "BL53",
+          "chinese": "胞肓",
+          "transliteration": "Baohuang",
+          "english": "Bladder's Vitals",
+          "pinyin": "bāo huāng",
+          "korean": "po hwang 포황"
+        },
+        {
+          "code": "BL54",
+          "chinese": "秩邊",
+          "transliteration": "Zhibian",
+          "english": "Lowermost in Order",
+          "pinyin": "zhì biān",
+          "korean": "jil byeon 질변"
+        },
+        {
+          "code": "BL55",
+          "chinese": "合陽",
+          "transliteration": "Heyang",
+          "english": "Yang Confluence",
+          "pinyin": "hé yáng",
+          "korean": "hap yang 합양"
+        },
+        {
+          "code": "BL56",
+          "chinese": "承筋",
+          "transliteration": "Chengjin",
+          "english": "Sinews Support",
+          "pinyin": "chéng jīn",
+          "korean": "seung geun 승근"
+        },
+        {
+          "code": "BL57",
+          "chinese": "承山",
+          "transliteration": "Chengshan",
+          "english": "Mountain Support",
+          "pinyin": "chéng shān",
+          "korean": "seung san 승산"
+        },
+        {
+          "code": "BL58",
+          "chinese": "飛陽",
+          "transliteration": "Feiyang",
+          "english": "Taking Flight",
+          "pinyin": "fēi yáng",
+          "korean": "bi yang 비양"
+        },
+        {
+          "code": "BL59",
+          "chinese": "跗陽",
+          "transliteration": "Fuyang",
+          "english": "Tarsus Yang",
+          "pinyin": "fū yáng",
+          "korean": "bu yang 부양"
+        },
+        {
+          "code": "BL60",
+          "chinese": "昆侖; 崑崙",
+          "transliteration": "Kunlun",
+          "english": "Kunlun Mountains",
+          "pinyin": "kūn lún",
+          "korean": "gol lyun 곤륜"
+        },
+        {
+          "code": "BL61",
+          "chinese": "僕參",
+          "transliteration": "Pucan",
+          "english": "Subservient Visitor",
+          "pinyin": "pú cān",
+          "korean": "bok cham 복참"
+        },
+        {
+          "code": "BL62",
+          "chinese": "申脈",
+          "transliteration": "Shenmai",
+          "english": "Extending Vessel",
+          "pinyin": "shēn mài",
+          "korean": "sin maek 신맥"
+        },
+        {
+          "code": "BL63",
+          "chinese": "金門",
+          "transliteration": "Jinmen",
+          "english": "Golden Gate",
+          "pinyin": "jīn mén",
+          "korean": "geum mun 금문"
+        },
+        {
+          "code": "BL64",
+          "chinese": "京骨",
+          "transliteration": "Jinggu",
+          "english": "Metatarsal Tuberosity",
+          "pinyin": "jīng gǔ",
+          "korean": "gyeong gol 경골"
+        },
+        {
+          "code": "BL65",
+          "chinese": "束骨",
+          "transliteration": "Shugu",
+          "english": "Metatarsal Head",
+          "pinyin": "shù gǔ",
+          "korean": "sok gol 속골"
+        },
+        {
+          "code": "BL66",
+          "chinese": "足通谷",
+          "transliteration": "Zutonggu",
+          "english": "Foot Valley Passage",
+          "pinyin": "zú tōng gǔ",
+          "korean": "[jok] tong gok [족]통곡"
+        },
+        {
+          "code": "BL67",
+          "chinese": "至陰",
+          "transliteration": "Zhiyin",
+          "english": "Reaching Yin",
+          "pinyin": "zhì yīn",
+          "korean": "ji eum 지음"
+        }
+      ]
+    },
+    {
+      "code": "KI",
+      "chinese": "足少阴肾经",
+      "pinyin": "zú shàoyīn shèn jīng",
+      "english": "Kidney",
+      "korean": "족소음신경",
+      "pointCount": 27,
+      "points": [
+        {
+          "code": "KI1",
+          "chinese": "湧泉",
+          "transliteration": "Yong Quan",
+          "english": "Bubbling Well",
+          "pinyin": "yǒng quán",
+          "korean": "yong cheon 용천"
+        },
+        {
+          "code": "KI2",
+          "chinese": "然谷",
+          "transliteration": "Rangu",
+          "english": "Blazing Valley",
+          "pinyin": "rán gǔ",
+          "korean": "yeon gok 연곡"
+        },
+        {
+          "code": "KI3",
+          "chinese": "太谿",
+          "transliteration": "Taixi",
+          "english": "Great Stream",
+          "pinyin": "taì xī",
+          "korean": "tae yeon 태계"
+        },
+        {
+          "code": "KI4",
+          "chinese": "大鐘",
+          "transliteration": "Dazhong",
+          "english": "Large Bell",
+          "pinyin": "dà zhōng",
+          "korean": "dae jong 대종"
+        },
+        {
+          "code": "KI5",
+          "chinese": "水泉",
+          "transliteration": "Shuiquan",
+          "english": "Water Spring",
+          "pinyin": "shuǐ quán",
+          "korean": "su cheon 수천"
+        },
+        {
+          "code": "KI6",
+          "chinese": "照海",
+          "transliteration": "Zhaohai",
+          "english": "Shining Sea",
+          "pinyin": "zhào hǎi",
+          "korean": "joh hae 조해"
+        },
+        {
+          "code": "KI7",
+          "chinese": "復溜",
+          "transliteration": "Fuliu",
+          "english": "Continuing Flow",
+          "pinyin": "fù liū",
+          "korean": "bong nyu 복류"
+        },
+        {
+          "code": "KI8",
+          "chinese": "交信",
+          "transliteration": "Jiaoxin",
+          "english": "Intersecting with Spleen",
+          "pinyin": "jiāo xìn",
+          "korean": "gyo sin 교신"
+        },
+        {
+          "code": "KI9",
+          "chinese": "築賓",
+          "transliteration": "Zhubin",
+          "english": "Strong Knees",
+          "pinyin": "zhú bīn",
+          "korean": "chuk bin 축빈"
+        },
+        {
+          "code": "KI10",
+          "chinese": "陰谷",
+          "transliteration": "Yingu",
+          "english": "Yin Valley",
+          "pinyin": "yīn gǔ",
+          "korean": "eum gok 음곡"
+        },
+        {
+          "code": "KI11",
+          "chinese": "橫骨",
+          "transliteration": "Henggu",
+          "english": "Pubic Bone",
+          "pinyin": "héng gǔ",
+          "korean": "hoeng gol 횡골"
+        },
+        {
+          "code": "KI12",
+          "chinese": "大赫",
+          "transliteration": "Dahe",
+          "english": "Big Plentifulness",
+          "pinyin": "dà hè",
+          "korean": "dae hyeok 대혁"
+        },
+        {
+          "code": "KI13",
+          "chinese": "氣穴",
+          "transliteration": "Qixue",
+          "english": "Kidney Qi Cave",
+          "pinyin": "qì xué",
+          "korean": "gi hyeol 기혈"
+        },
+        {
+          "code": "KI14",
+          "chinese": "四滿",
+          "transliteration": "Siman",
+          "english": "Fourth for Fullnesses",
+          "pinyin": "sì mǎn",
+          "korean": "sa man 사만"
+        },
+        {
+          "code": "KI15",
+          "chinese": "中注",
+          "transliteration": "Zhongzhu",
+          "english": "Pouring into the Middle",
+          "pinyin": "zhōng zhù",
+          "korean": "jung ju 중주"
+        },
+        {
+          "code": "KI16",
+          "chinese": "肓俞",
+          "transliteration": "Huangshu",
+          "english": "Vitals Tissues Shu",
+          "pinyin": "huāng shū",
+          "korean": "hwang yu 황유"
+        },
+        {
+          "code": "KI17",
+          "chinese": "商曲",
+          "transliteration": "Shangqu",
+          "english": "Metal Bend",
+          "pinyin": "shāng qū",
+          "korean": "sang gok 상곡"
+        },
+        {
+          "code": "KI18",
+          "chinese": "石關",
+          "transliteration": "Shiguan",
+          "english": "Stone Gate",
+          "pinyin": "shí guān",
+          "korean": "seok gwan 석관"
+        },
+        {
+          "code": "KI19",
+          "chinese": "陰都",
+          "transliteration": "Yindu",
+          "english": "Yin Metropolis",
+          "pinyin": "yīn dū",
+          "korean": "eum do 음도"
+        },
+        {
+          "code": "KI20",
+          "chinese": "腹通谷",
+          "transliteration": "Futonggu",
+          "english": "Abdominal Food Passage",
+          "pinyin": "fù tōng gǔ",
+          "korean": "tong gok 통곡"
+        },
+        {
+          "code": "KI21",
+          "chinese": "幽門",
+          "transliteration": "Youmen",
+          "english": "Hidden Gate",
+          "pinyin": "yōu mén",
+          "korean": "yu mun 유문"
+        },
+        {
+          "code": "KI22",
+          "chinese": "步廊",
+          "transliteration": "Bulang",
+          "english": "Stepping Upwards",
+          "pinyin": "bù láng",
+          "korean": "bo rang 보랑"
+        },
+        {
+          "code": "KI23",
+          "chinese": "神封",
+          "transliteration": "Shenfeng",
+          "english": "Spirit Manor",
+          "pinyin": "shén fēng",
+          "korean": "sin bong 신봉"
+        },
+        {
+          "code": "KI24",
+          "chinese": "靈墟",
+          "transliteration": "Lingxu",
+          "english": "Spirit Ruin",
+          "pinyin": "líng xū",
+          "korean": "yeong heo 영허"
+        },
+        {
+          "code": "KI25",
+          "chinese": "神藏",
+          "transliteration": "Shencang",
+          "english": "Spirit Storehouse",
+          "pinyin": "shén cáng",
+          "korean": "sin jang 신장"
+        },
+        {
+          "code": "KI26",
+          "chinese": "彧中",
+          "transliteration": "Yuzhong",
+          "english": "Refined Chest",
+          "pinyin": "yù zhōng",
+          "korean": "uk jung 욱중"
+        },
+        {
+          "code": "KI27",
+          "chinese": "俞府",
+          "transliteration": "Shufu",
+          "english": "Shu Mansion",
+          "pinyin": "shū fǔ",
+          "korean": "yu bu 유부"
+        }
+      ]
+    },
+    {
+      "code": "PC",
+      "chinese": "手厥阴心包经",
+      "pinyin": "shǒu juéyīn xīnbāo jīng",
+      "english": "Pericardium",
+      "korean": "수궐음심포경",
+      "pointCount": 9,
+      "points": [
+        {
+          "code": "PC1",
+          "chinese": "天池",
+          "transliteration": "Tianchi",
+          "english": "Heavenly Pool",
+          "pinyin": "tiān chí",
+          "korean": "cheon ji 천지"
+        },
+        {
+          "code": "PC2",
+          "chinese": "天泉",
+          "transliteration": "Tianquan",
+          "english": "Heavenly Spring",
+          "pinyin": "tiān quán",
+          "korean": "cheon cheon 천천"
+        },
+        {
+          "code": "PC3",
+          "chinese": "曲澤",
+          "transliteration": "Quze",
+          "english": "Marsh at the Crook",
+          "pinyin": "qū zé",
+          "korean": "gok taek 곡택"
+        },
+        {
+          "code": "PC4",
+          "chinese": "郄門",
+          "transliteration": "Ximen",
+          "english": "Xi-Cleft Gate",
+          "pinyin": "xī mén",
+          "korean": "geung mun 극문"
+        },
+        {
+          "code": "PC5",
+          "chinese": "間使",
+          "transliteration": "Jianshi",
+          "english": "Intermediate Messenger",
+          "pinyin": "jiān shǐ",
+          "korean": "gan sa 간사"
+        },
+        {
+          "code": "PC6",
+          "chinese": "內關",
+          "transliteration": "Neiguan",
+          "english": "Inner Pass",
+          "pinyin": "nèi guān",
+          "korean": "nae gwan 내관"
+        },
+        {
+          "code": "PC7",
+          "chinese": "大陵",
+          "transliteration": "Daling",
+          "english": "Great Mound",
+          "pinyin": "dà líng",
+          "korean": "dae reung 대릉"
+        },
+        {
+          "code": "PC8",
+          "chinese": "勞宮",
+          "transliteration": "Laogong",
+          "english": "Palace of Toil",
+          "pinyin": "láo gōng",
+          "korean": "no gung 노궁"
+        },
+        {
+          "code": "PC9",
+          "chinese": "中衝",
+          "transliteration": "Zhongchong",
+          "english": "Middle Rushing",
+          "pinyin": "zhōng chōng",
+          "korean": "jung chung 중충"
+        }
+      ]
+    },
+    {
+      "code": "TE",
+      "chinese": "手少阳三焦经",
+      "pinyin": "shǒu shàoyáng sān jiāo jīng",
+      "english": "Triple Energizer",
+      "korean": "수소양삼초경",
+      "pointCount": 23,
+      "points": [
+        {
+          "code": "TE1",
+          "chinese": "關衝",
+          "transliteration": "Guanchong",
+          "english": "Surge Gate",
+          "pinyin": "guān chōng",
+          "korean": "gwan chung 관충"
+        },
+        {
+          "code": "TE2",
+          "chinese": "液門",
+          "transliteration": "Yemen",
+          "english": "Fluid Gate",
+          "pinyin": "yè mén",
+          "korean": "aeng mun 액문"
+        },
+        {
+          "code": "TE3",
+          "chinese": "中渚",
+          "transliteration": "Zhongzhu",
+          "english": "Central Islet",
+          "pinyin": "zhōng zhǔ",
+          "korean": "jung jeo 중저"
+        },
+        {
+          "code": "TE4",
+          "chinese": "陽池",
+          "transliteration": "Yangchi",
+          "english": "Yang Pool",
+          "pinyin": "yáng chí",
+          "korean": "yang ji 양지"
+        },
+        {
+          "code": "TE5",
+          "chinese": "外關",
+          "transliteration": "Waiguan",
+          "english": "Outer Pass",
+          "pinyin": "wài guān",
+          "korean": "oe gwan 외관"
+        },
+        {
+          "code": "TE6",
+          "chinese": "支溝",
+          "transliteration": "Zhigou",
+          "english": "Branch Ditch",
+          "pinyin": "zhī gōu",
+          "korean": "ji gu 지구"
+        },
+        {
+          "code": "TE7",
+          "chinese": "會宗",
+          "transliteration": "Huizong",
+          "english": "Convergence and Gathering",
+          "pinyin": "huì zōng",
+          "korean": "hui jung 회종"
+        },
+        {
+          "code": "TE8",
+          "chinese": "三陽絡",
+          "transliteration": "Sanyangluo",
+          "english": "Three Yang Connection",
+          "pinyin": "sān yáng luò",
+          "korean": "sam yang nak 삼양락"
+        },
+        {
+          "code": "TE9",
+          "chinese": "四瀆",
+          "transliteration": "Sidu",
+          "english": "Four Rivers",
+          "pinyin": "sì dú",
+          "korean": "sa dok 사독"
+        },
+        {
+          "code": "TE10",
+          "chinese": "天井",
+          "transliteration": "Tianjing",
+          "english": "Upper Well",
+          "pinyin": "tiān jǐng",
+          "korean": "cheon jeong 천정"
+        },
+        {
+          "code": "TE11",
+          "chinese": "清冷淵",
+          "transliteration": "Qinglengyuan",
+          "english": "Cooling Deep Pool",
+          "pinyin": "qīng lěng yuān",
+          "korean": "cheong naeng yeon 청랭연"
+        },
+        {
+          "code": "TE12",
+          "chinese": "消濼",
+          "transliteration": "Xiaoluo",
+          "english": "Draining Marsh",
+          "pinyin": "xiāo luò",
+          "korean": "so rak 소락"
+        },
+        {
+          "code": "TE13",
+          "chinese": "臑會",
+          "transliteration": "Naohui",
+          "english": "Upper Arm Intersection",
+          "pinyin": "nào huì",
+          "korean": "noe hui 뇌회"
+        },
+        {
+          "code": "TE14",
+          "chinese": "肩髎",
+          "transliteration": "Jianliao",
+          "english": "Shoulder Bone Hole",
+          "pinyin": "jiān liáo",
+          "korean": "gyeol lyo 견료"
+        },
+        {
+          "code": "TE15",
+          "chinese": "天髎",
+          "transliteration": "Tianliao",
+          "english": "Upper Arm Hole",
+          "pinyin": "tiān liáo",
+          "korean": "cheol lyo 천료"
+        },
+        {
+          "code": "TE16",
+          "chinese": "天牖",
+          "transliteration": "Tianyou",
+          "english": "Sky Window",
+          "pinyin": "tiān yǒu",
+          "korean": "cheon yong 천용"
+        },
+        {
+          "code": "TE17",
+          "chinese": "翳風",
+          "transliteration": "Yifeng",
+          "english": "Wind Screen",
+          "pinyin": "yì fēng",
+          "korean": "ye pung 예풍"
+        },
+        {
+          "code": "TE18",
+          "chinese": "契脈",
+          "transliteration": "Qimai",
+          "english": "Convulsion Vessel",
+          "pinyin": "qì mài",
+          "korean": "gye maek 계맥"
+        },
+        {
+          "code": "TE19",
+          "chinese": "顱息",
+          "transliteration": "Luxi",
+          "english": "Head's Tranquility",
+          "pinyin": "lú xī",
+          "korean": "no sik 노식"
+        },
+        {
+          "code": "TE20",
+          "chinese": "角孫",
+          "transliteration": "Jiaosun",
+          "english": "Angle Vertex",
+          "pinyin": "jiǎo sūn",
+          "korean": "gak son 각손"
+        },
+        {
+          "code": "TE21",
+          "chinese": "耳門",
+          "transliteration": "Ermen",
+          "english": "Ear Gate",
+          "pinyin": "ěr mén",
+          "korean": "i mun 이문"
+        },
+        {
+          "code": "TE22",
+          "chinese": "耳和髎",
+          "transliteration": "Erheliao",
+          "english": "Ear Harmonising Foramen",
+          "pinyin": "ěr hé liáo",
+          "korean": "hwa ryo 화료"
+        },
+        {
+          "code": "TE23",
+          "chinese": "絲竹空",
+          "transliteration": "Sizhukong",
+          "english": "Silken Bamboo Hollow",
+          "pinyin": "sī zhú kōng",
+          "korean": "sa juk gong 사죽공"
+        }
+      ]
+    },
+    {
+      "code": "GB",
+      "chinese": "足少阳胆经",
+      "pinyin": "zú shàoyáng dǎn jīng",
+      "english": "Gallbladder",
+      "korean": "족소양담경",
+      "pointCount": 44,
+      "points": [
+        {
+          "code": "GB1",
+          "chinese": "瞳子髎",
+          "transliteration": "Tongziliao",
+          "english": "Pupil Crevice",
+          "pinyin": "tóng zǐ liáo",
+          "korean": "dong ja ryo 동자료"
+        },
+        {
+          "code": "GB2",
+          "chinese": "聽會",
+          "transliteration": "Tinghui",
+          "english": "Meeting of Hearing",
+          "pinyin": "tīng huì",
+          "korean": "cheong hoe 청회"
+        },
+        {
+          "code": "GB3",
+          "chinese": "上關",
+          "transliteration": "Shangguan",
+          "english": "Above the Joint",
+          "pinyin": "shàng guān",
+          "korean": "sang gwan 상관/gaek ju in 객주인"
+        },
+        {
+          "code": "GB4",
+          "chinese": "頷厭",
+          "transliteration": "Hanyan",
+          "english": "Jaw Serenity",
+          "pinyin": "hàn yàn",
+          "korean": "ha yeom 함염"
+        },
+        {
+          "code": "GB5",
+          "chinese": "懸顱",
+          "transliteration": "Xuanlu",
+          "english": "Suspended Skull",
+          "pinyin": "xuán lú",
+          "korean": "hyeol lo 현로"
+        },
+        {
+          "code": "GB6",
+          "chinese": "懸厘",
+          "transliteration": "Xuanli",
+          "english": "Suspended Hair/tidbit",
+          "pinyin": "xuán lí",
+          "korean": "hyeol li 현리"
+        },
+        {
+          "code": "GB7",
+          "chinese": "曲鬢",
+          "transliteration": "Qubin",
+          "english": "Crook of the Temple",
+          "pinyin": "qū bìn",
+          "korean": "gok bin 곡빈"
+        },
+        {
+          "code": "GB8",
+          "chinese": "率谷",
+          "transliteration": "Shuaigu",
+          "english": "Leading Valley",
+          "pinyin": "shuài gǔ",
+          "korean": "sol gok 솔곡"
+        },
+        {
+          "code": "GB9",
+          "chinese": "天沖",
+          "transliteration": "Tianchong",
+          "english": "Heavenly Surge",
+          "pinyin": "tiān chōng",
+          "korean": "cheon chung 천충"
+        },
+        {
+          "code": "GB10",
+          "chinese": "浮白",
+          "transliteration": "Fubai",
+          "english": "Floating White",
+          "pinyin": "fú bái",
+          "korean": "bu baek 부백"
+        },
+        {
+          "code": "GB11",
+          "chinese": "頭竅陰",
+          "transliteration": "Touqiaoyin",
+          "english": "Yin Portals of the Head",
+          "pinyin": "tóu qiào yīn",
+          "korean": "[du] gyu eum [두] 규음"
+        },
+        {
+          "code": "GB12",
+          "chinese": "完骨",
+          "transliteration": "Wangu",
+          "english": "Mastoid Process",
+          "pinyin": "wán gǔ",
+          "korean": "wan gol 완골"
+        },
+        {
+          "code": "GB13",
+          "chinese": "本神",
+          "transliteration": "Benshen",
+          "english": "Root of the Spirit",
+          "pinyin": "běn shén",
+          "korean": "bon sin 본신"
+        },
+        {
+          "code": "GB14",
+          "chinese": "陽白",
+          "transliteration": "Yangbai",
+          "english": "Yang White",
+          "pinyin": "yáng bái",
+          "korean": "yang baek 양백"
+        },
+        {
+          "code": "GB15",
+          "chinese": "頭臨泣",
+          "transliteration": "Toulinqi",
+          "english": "Head on the Verge of Tears",
+          "pinyin": "tóu lín qì",
+          "korean": "[du] im eup [두] 임읍"
+        },
+        {
+          "code": "GB16",
+          "chinese": "目窗",
+          "transliteration": "Muchuang",
+          "english": "Window of the Eye",
+          "pinyin": "mù chuāng",
+          "korean": "mok chang 목창"
+        },
+        {
+          "code": "GB17",
+          "chinese": "正營",
+          "transliteration": "Zhengying",
+          "english": "Upright Nutrition",
+          "pinyin": "zhèng yíng",
+          "korean": "jyeong yeong 정영"
+        },
+        {
+          "code": "GB18",
+          "chinese": "承靈",
+          "transliteration": "Chengling",
+          "english": "Support Spirit",
+          "pinyin": "chéng líng",
+          "korean": "seung nyeong 승령"
+        },
+        {
+          "code": "GB19",
+          "chinese": "腦空",
+          "transliteration": "Naokong",
+          "english": "Brain Hollow",
+          "pinyin": "nǎo kōng",
+          "korean": "noe gong 뇌공"
+        },
+        {
+          "code": "GB20",
+          "chinese": "風池",
+          "transliteration": "Fengchi",
+          "english": "Wind Pool",
+          "pinyin": "fēng chí",
+          "korean": "pung ji 풍지"
+        },
+        {
+          "code": "GB21",
+          "chinese": "肩井",
+          "transliteration": "Jianjing",
+          "english": "Shoulder Well",
+          "pinyin": "jīan jǐng",
+          "korean": "gyeon jeong 견정"
+        },
+        {
+          "code": "GB22",
+          "chinese": "淵腋",
+          "transliteration": "Yuanye",
+          "english": "Armpit Abyss",
+          "pinyin": "yuān yè",
+          "korean": "yeon aek 연액"
+        },
+        {
+          "code": "GB23",
+          "chinese": "輒筋",
+          "transliteration": "Zhejin",
+          "english": "Flank Sinews",
+          "pinyin": "zhé jīn",
+          "korean": "cheop geun 첩근"
+        },
+        {
+          "code": "GB24",
+          "chinese": "日月",
+          "transliteration": "Riyue",
+          "english": "Sun and Moon",
+          "pinyin": "rì yuè",
+          "korean": "il weol 일월"
+        },
+        {
+          "code": "GB25",
+          "chinese": "京門",
+          "transliteration": "Jingmen",
+          "english": "Capital Gate",
+          "pinyin": "jīng mén",
+          "korean": "gyeong mun 경문"
+        },
+        {
+          "code": "GB26",
+          "chinese": "帶脈",
+          "transliteration": "Daimai",
+          "english": "Girdling Vessel",
+          "pinyin": "dài mài",
+          "korean": "dae maek 대맥"
+        },
+        {
+          "code": "GB27",
+          "chinese": "五樞",
+          "transliteration": "Wushu",
+          "english": "Five Pivots",
+          "pinyin": "wǔ shū",
+          "korean": "o chu 오추"
+        },
+        {
+          "code": "GB28",
+          "chinese": "維道",
+          "transliteration": "Weidao",
+          "english": "Linking Path",
+          "pinyin": "wéi dào",
+          "korean": "yu do 유도"
+        },
+        {
+          "code": "GB29",
+          "chinese": "居髎",
+          "transliteration": "Juliao",
+          "english": "Stationary Crevice",
+          "pinyin": "jū liáo",
+          "korean": "geo ryo 거료"
+        },
+        {
+          "code": "GB30",
+          "chinese": "環跳",
+          "transliteration": "Huantiao",
+          "english": "Jumping Circle",
+          "pinyin": "huán tiào",
+          "korean": "hwan do 환도"
+        },
+        {
+          "code": "GB31",
+          "chinese": "風市",
+          "transliteration": "Fengshi",
+          "english": "Wind Market",
+          "pinyin": "fēng shì",
+          "korean": "pung si 풍시"
+        },
+        {
+          "code": "GB32",
+          "chinese": "中瀆",
+          "transliteration": "Zhongdu",
+          "english": "Middle Ditch",
+          "pinyin": "zhōng dú",
+          "korean": "jung dok 중독"
+        },
+        {
+          "code": "GB33",
+          "chinese": "膝陽關",
+          "transliteration": "Xiyangguan",
+          "english": "Knee Yang Gate",
+          "pinyin": "xī yáng guān",
+          "korean": "[seul] yang gwan [슬] 양관"
+        },
+        {
+          "code": "GB34",
+          "chinese": "陽陵泉",
+          "transliteration": "Yanglingquan",
+          "english": "Yang Mound Spring",
+          "pinyin": "yáng líng quán",
+          "korean": "yang neung cheon 양릉천"
+        },
+        {
+          "code": "GB35",
+          "chinese": "陽交",
+          "transliteration": "Yangjiao",
+          "english": "Yang Intersection",
+          "pinyin": "yáng jiāo",
+          "korean": "yang gyo 양교"
+        },
+        {
+          "code": "GB36",
+          "chinese": "外丘",
+          "transliteration": "Waiqiu",
+          "english": "Outer Hill",
+          "pinyin": "wài qiū",
+          "korean": "woe gu 외구"
+        },
+        {
+          "code": "GB37",
+          "chinese": "光明",
+          "transliteration": "Guangming",
+          "english": "Bright Light",
+          "pinyin": "guāng míng",
+          "korean": "gwang myeong 광명"
+        },
+        {
+          "code": "GB38",
+          "chinese": "陽輔",
+          "transliteration": "Yangfu",
+          "english": "Yang Assistance",
+          "pinyin": "yáng fǔ",
+          "korean": "yang bo 양보"
+        },
+        {
+          "code": "GB39",
+          "chinese": "懸鐘",
+          "transliteration": "Xuanzhong",
+          "english": "Suspended Bell",
+          "pinyin": "xuán zhōng",
+          "korean": "hyeon jong 현종/jeol gol 절골"
+        },
+        {
+          "code": "GB40",
+          "chinese": "丘墟",
+          "transliteration": "Qiuxu",
+          "english": "Mound of Ruins",
+          "pinyin": "qiū xū",
+          "korean": "gu heo 구허"
+        },
+        {
+          "code": "GB41",
+          "chinese": "足臨泣",
+          "transliteration": "Zulinqi",
+          "english": "Foot on the Verge of Tears",
+          "pinyin": "zú lín qì",
+          "korean": "[jok] im eup [족] 임읍"
+        },
+        {
+          "code": "GB42",
+          "chinese": "地五會",
+          "transliteration": "Diwuhui",
+          "english": "Earth Five Meetings",
+          "pinyin": "dì wǔ huì",
+          "korean": "ji o hoe 지오회"
+        },
+        {
+          "code": "GB43",
+          "chinese": "俠谿",
+          "transliteration": "Xiaxi",
+          "english": "Clamped Stream",
+          "pinyin": "xiá xī",
+          "korean": "hyeop gye 협계"
+        },
+        {
+          "code": "GB44",
+          "chinese": "足竅陰",
+          "transliteration": "Zuqiaoyin",
+          "english": "Yin Portals of the Foot",
+          "pinyin": "zú qiào yīn",
+          "korean": "[jok] gyu eum [족] 규음"
+        }
+      ]
+    },
+    {
+      "code": "LR",
+      "chinese": "足厥阴肝经",
+      "pinyin": "zú juéyīn gān jīng",
+      "english": "Liver",
+      "korean": "족궐음간경",
+      "pointCount": 14,
+      "points": [
+        {
+          "code": "LR1",
+          "chinese": "大敦",
+          "transliteration": "Dadun",
+          "english": "Great and Thick",
+          "pinyin": "dà dūn",
+          "korean": "dae don 대돈"
+        },
+        {
+          "code": "LR2",
+          "chinese": "行間",
+          "transliteration": "Xingjian",
+          "english": "Interval Pass",
+          "pinyin": "xíng jiān",
+          "korean": "haeng gan 행간"
+        },
+        {
+          "code": "LR3",
+          "chinese": "太沖",
+          "transliteration": "Taichong",
+          "english": "Supreme Rush",
+          "pinyin": "taì chōng",
+          "korean": "tae chung 태충"
+        },
+        {
+          "code": "LR4",
+          "chinese": "中封",
+          "transliteration": "Zhongfeng",
+          "english": "Middle Margin",
+          "pinyin": "zhōng fēng",
+          "korean": "jung bong 중봉"
+        },
+        {
+          "code": "LR5",
+          "chinese": "蠡溝",
+          "transliteration": "Ligou",
+          "english": "Gnawed Channel",
+          "pinyin": "lǐ gōu",
+          "korean": "yeo gu 여구"
+        },
+        {
+          "code": "LR6",
+          "chinese": "中都",
+          "transliteration": "Zhongdu",
+          "english": "Central Capital",
+          "pinyin": "zhōng dū",
+          "korean": "jung do 중도"
+        },
+        {
+          "code": "LR7",
+          "chinese": "膝關",
+          "transliteration": "Xiguan",
+          "english": "Knee Pass",
+          "pinyin": "xī guān",
+          "korean": "seul gwan 슬관"
+        },
+        {
+          "code": "LR8",
+          "chinese": "曲泉",
+          "transliteration": "Ququan",
+          "english": "Pool Spring",
+          "pinyin": "qū quán",
+          "korean": "gok cheon 곡천"
+        },
+        {
+          "code": "LR9",
+          "chinese": "陰包",
+          "transliteration": "Yinbao",
+          "english": "Yin Wrapping",
+          "pinyin": "yīn bāo",
+          "korean": "eum bo 음보"
+        },
+        {
+          "code": "LR10",
+          "chinese": "足五里",
+          "transliteration": "Zuwuli",
+          "english": "Foot Governor of Tears",
+          "pinyin": "zú wǔ li",
+          "korean": "[jok] o ri [족] 오리"
+        },
+        {
+          "code": "LR11",
+          "chinese": "陰廉",
+          "transliteration": "Yinlian",
+          "english": "Yin Side",
+          "pinyin": "yīn lián",
+          "korean": "eum yeom 음염"
+        },
+        {
+          "code": "LR12",
+          "chinese": "急脈",
+          "transliteration": "Jimai",
+          "english": "Rapid Pulse",
+          "pinyin": "jí mài",
+          "korean": "geum maek 금맥"
+        },
+        {
+          "code": "LR13",
+          "chinese": "章門",
+          "transliteration": "Zhangmen",
+          "english": "Gate of the Ordering",
+          "pinyin": "zhāng mén",
+          "korean": "jang mun 장문"
+        },
+        {
+          "code": "LR14",
+          "chinese": "期門",
+          "transliteration": "Qimen",
+          "english": "Cyclic Gate",
+          "pinyin": "qí mén",
+          "korean": "gi mun 기문"
+        }
+      ]
+    },
+    {
+      "code": "GV",
+      "chinese": "督脉",
+      "pinyin": "dū mài",
+      "english": "Governing Vessel",
+      "korean": "독맥",
+      "pointCount": 28,
+      "points": [
+        {
+          "code": "GV1",
+          "chinese": "長強",
+          "transliteration": "Changqiang",
+          "english": "Long and Rigid",
+          "pinyin": "cháng qiáng",
+          "korean": "jang gang 장강"
+        },
+        {
+          "code": "GV2",
+          "chinese": "腰俞",
+          "transliteration": "Yaoshu",
+          "english": "Low Back Transporter",
+          "pinyin": "yāo shū",
+          "korean": "yo yu 요유"
+        },
+        {
+          "code": "GV3",
+          "chinese": "腰陽關",
+          "transliteration": "Yaoyangquan",
+          "english": "Low Back Yang Passage",
+          "pinyin": "yāo yáng guān",
+          "korean": "[yo] yang gwan [요] 양관"
+        },
+        {
+          "code": "GV4",
+          "chinese": "命門",
+          "transliteration": "Mingmen",
+          "english": "Life Gate",
+          "pinyin": "mìng mén",
+          "korean": "myeong mun 명문"
+        },
+        {
+          "code": "GV5",
+          "chinese": "懸樞",
+          "transliteration": "Xuanshu",
+          "english": "Suspended Pivot",
+          "pinyin": "xuán shū",
+          "korean": "hyeon chu 현추"
+        },
+        {
+          "code": "GV6",
+          "chinese": "脊中",
+          "transliteration": "Jizhong",
+          "english": "Middle of the Spine",
+          "pinyin": "jì zhōng",
+          "korean": "cheok jung 척중"
+        },
+        {
+          "code": "GV7",
+          "chinese": "中樞",
+          "transliteration": "Zhongshu",
+          "english": "Central Pivot",
+          "pinyin": "zhōng shū",
+          "korean": "jung chu 중추"
+        },
+        {
+          "code": "GV8",
+          "chinese": "筋縮",
+          "transliteration": "Jinsuo",
+          "english": "Muscle Spasm",
+          "pinyin": "jīn suō",
+          "korean": "geun chuk 근축"
+        },
+        {
+          "code": "GV9",
+          "chinese": "至陽",
+          "transliteration": "Zhiyang",
+          "english": "Reaching Yang",
+          "pinyin": "zhì yáng",
+          "korean": "ji yang 지양"
+        },
+        {
+          "code": "GV10",
+          "chinese": "靈台",
+          "transliteration": "Lingtai",
+          "english": "Spirit Platform",
+          "pinyin": "líng tái",
+          "korean": "yeong dae 영대"
+        },
+        {
+          "code": "GV11",
+          "chinese": "神道",
+          "transliteration": "Shendao",
+          "english": "Way of the Spirit",
+          "pinyin": "shén dào",
+          "korean": "sin do 신도"
+        },
+        {
+          "code": "GV12",
+          "chinese": "身柱",
+          "transliteration": "Shenzhu",
+          "english": "Body Pillar",
+          "pinyin": "shēn zhù",
+          "korean": "sin ju 신주"
+        },
+        {
+          "code": "GV13",
+          "chinese": "陶道",
+          "transliteration": "Taodao",
+          "english": "Way of the Pot",
+          "pinyin": "táo dào",
+          "korean": "do do 도도"
+        },
+        {
+          "code": "GV14",
+          "chinese": "大椎",
+          "transliteration": "Dazhui",
+          "english": "Great Vertebra",
+          "pinyin": "dà zhuī",
+          "korean": "dae chu 대추"
+        },
+        {
+          "code": "GV15",
+          "chinese": "瘂門 (啞門)",
+          "transliteration": "Yamen",
+          "english": "Mutism Gate",
+          "pinyin": "yǎ mén",
+          "korean": "a mun 아문"
+        },
+        {
+          "code": "GV16",
+          "chinese": "風府",
+          "transliteration": "Fengfu",
+          "english": "Wind Palace",
+          "pinyin": "fēng fǔ",
+          "korean": "pung bu 풍부"
+        },
+        {
+          "code": "GV17",
+          "chinese": "腦戶",
+          "transliteration": "Naohu",
+          "english": "Brain Door",
+          "pinyin": "nǎo hù",
+          "korean": "noe ho 뇌호"
+        },
+        {
+          "code": "GV18",
+          "chinese": "強間",
+          "transliteration": "Qiangjian",
+          "english": "Rigid Space",
+          "pinyin": "qiáng jiān",
+          "korean": "gang gan 강간"
+        },
+        {
+          "code": "GV19",
+          "chinese": "後頂",
+          "transliteration": "Houding",
+          "english": "Back Vertex",
+          "pinyin": "hòu dǐng",
+          "korean": "hu jeong 후정"
+        },
+        {
+          "code": "GV20",
+          "chinese": "百會",
+          "transliteration": "Baihui",
+          "english": "One Hundred Meetings",
+          "pinyin": "bǎi huì",
+          "korean": "baek hoe 백회"
+        },
+        {
+          "code": "GV21",
+          "chinese": "前頂",
+          "transliteration": "Qianding",
+          "english": "Front Vertex",
+          "pinyin": "qián dǐng",
+          "korean": "jeon jeong 전정"
+        },
+        {
+          "code": "GV22",
+          "chinese": "囟會",
+          "transliteration": "Xinhui",
+          "english": "Fontanelle Meeting",
+          "pinyin": "xìn huì",
+          "korean": "sin hoe 신회"
+        },
+        {
+          "code": "GV23",
+          "chinese": "上星",
+          "transliteration": "Shangxing",
+          "english": "Upper Star",
+          "pinyin": "shàng xīng",
+          "korean": "sang seong 상성"
+        },
+        {
+          "code": "GV24",
+          "chinese": "神庭",
+          "transliteration": "Shenting",
+          "english": "Spirit Courtyard",
+          "pinyin": "shén tíng",
+          "korean": "sin jeong 신정"
+        },
+        {
+          "code": "GV25",
+          "chinese": "素髎",
+          "transliteration": "Suliao",
+          "english": "Plain Space",
+          "pinyin": "sù liáo",
+          "korean": "so ryo 소료"
+        },
+        {
+          "code": "GV26",
+          "chinese": "人中",
+          "transliteration": "Renzhong",
+          "english": "Middle of the Person",
+          "pinyin": "rén zhōng",
+          "korean": "in jung 인중/su gu 수구"
+        },
+        {
+          "code": "GV27",
+          "chinese": "兌端",
+          "transliteration": "Duiduan",
+          "english": "End Exchange",
+          "pinyin": "duì duān",
+          "korean": "tae don 태단"
+        },
+        {
+          "code": "GV28",
+          "chinese": "齦交",
+          "transliteration": "Yinjiao",
+          "english": "Gum Union",
+          "pinyin": "yín jiāo",
+          "korean": "eun gyo 은교"
+        }
+      ]
+    },
+    {
+      "code": "CV",
+      "chinese": "任脉",
+      "pinyin": "rèn mài",
+      "english": "Conception Vessel",
+      "korean": "임맥",
+      "pointCount": 24,
+      "points": [
+        {
+          "code": "CV1",
+          "chinese": "會陰",
+          "transliteration": "Huiyin",
+          "english": "Yin Meeting",
+          "pinyin": "huì yīn",
+          "korean": "hoe eum 회음"
+        },
+        {
+          "code": "CV2",
+          "chinese": "曲骨",
+          "transliteration": "Qugu",
+          "english": "Crooked Bone",
+          "pinyin": "qū gǔ",
+          "korean": "gok gol 곡골"
+        },
+        {
+          "code": "CV3",
+          "chinese": "中極",
+          "transliteration": "Zhongji",
+          "english": "Middle Extremity",
+          "pinyin": "zhōng jí",
+          "korean": "jung geuk 중극"
+        },
+        {
+          "code": "CV4",
+          "chinese": "關元",
+          "transliteration": "Guanyuan",
+          "english": "Origin Pass",
+          "pinyin": "guān yuán",
+          "korean": "gwan won 관원"
+        },
+        {
+          "code": "CV5",
+          "chinese": "石門",
+          "transliteration": "Shimen",
+          "english": "Stone Gate",
+          "pinyin": "shí mén",
+          "korean": "seong mun 석문"
+        },
+        {
+          "code": "CV6",
+          "chinese": "氣海",
+          "transliteration": "Qihai",
+          "english": "Sea of Qi",
+          "pinyin": "qì hǎi",
+          "korean": "gi hae 기해"
+        },
+        {
+          "code": "CV7",
+          "chinese": "陰交",
+          "transliteration": "Yinjiao",
+          "english": "Yin Intersection",
+          "pinyin": "yīn jiāo",
+          "korean": "eum gyo 음교"
+        },
+        {
+          "code": "CV8",
+          "chinese": "神闕",
+          "transliteration": "Shenque",
+          "english": "Spirit Palace",
+          "pinyin": "shén què",
+          "korean": "sin gwol 신궐"
+        },
+        {
+          "code": "CV9",
+          "chinese": "水分",
+          "transliteration": "Shuifen",
+          "english": "Water Division",
+          "pinyin": "shuǐ fēn",
+          "korean": "su bun 수분"
+        },
+        {
+          "code": "CV10",
+          "chinese": "下脘",
+          "transliteration": "Xiawan",
+          "english": "Lower Epigastrium",
+          "pinyin": "xià wǎn [or xià guǎn]",
+          "korean": "ha wan 하완"
+        },
+        {
+          "code": "CV11",
+          "chinese": "建里",
+          "transliteration": "Jianli",
+          "english": "Internal Foundation",
+          "pinyin": "jiàn lǐ",
+          "korean": "geol li 건리"
+        },
+        {
+          "code": "CV12",
+          "chinese": "中脘",
+          "transliteration": "Zhongwan",
+          "english": "Middle Epigastrium",
+          "pinyin": "zhōng wǎn [or zhōng guǎn]",
+          "korean": "jung wan 중완"
+        },
+        {
+          "code": "CV13",
+          "chinese": "上脘",
+          "transliteration": "Shangwan",
+          "english": "Upper Epigastrium",
+          "pinyin": "shàng wǎn [or shàng guǎn]",
+          "korean": "sang wan 상완"
+        },
+        {
+          "code": "CV14",
+          "chinese": "巨闕",
+          "transliteration": "Juque",
+          "english": "Great Palace",
+          "pinyin": "jù què",
+          "korean": "geo gwol 거궐"
+        },
+        {
+          "code": "CV15",
+          "chinese": "鳩尾",
+          "transliteration": "Jiuwei",
+          "english": "Bird Tail",
+          "pinyin": "jiū wěi",
+          "korean": "gu mi 구미"
+        },
+        {
+          "code": "CV16",
+          "chinese": "中庭",
+          "transliteration": "Zhongting",
+          "english": "Central Courtyard",
+          "pinyin": "zhōng tíng",
+          "korean": "jung jeong 중정"
+        },
+        {
+          "code": "CV17",
+          "chinese": "膻中",
+          "transliteration": "Shanzhong",
+          "english": "Middle of the Chest",
+          "pinyin": "shān zhōng",
+          "korean": "dan jung 단중"
+        },
+        {
+          "code": "CV18",
+          "chinese": "玉堂",
+          "transliteration": "Yutang",
+          "english": "Jade Hall",
+          "pinyin": "yù táng",
+          "korean": "ok dang 옥당"
+        },
+        {
+          "code": "CV19",
+          "chinese": "紫宮",
+          "transliteration": "Zigong",
+          "english": "Violet Palace",
+          "pinyin": "zǐ gōng",
+          "korean": "ja gung 자궁"
+        },
+        {
+          "code": "CV20",
+          "chinese": "華蓋",
+          "transliteration": "Huagai",
+          "english": "Splendid Cover",
+          "pinyin": "huá gài",
+          "korean": "hwa gae 화개"
+        },
+        {
+          "code": "CV21",
+          "chinese": "璇璣",
+          "transliteration": "Xuanji",
+          "english": "Jade Rotator",
+          "pinyin": "xuán jī",
+          "korean": "seon gi 선기"
+        },
+        {
+          "code": "CV22",
+          "chinese": "天突",
+          "transliteration": "Tiantu",
+          "english": "Heaven Projection",
+          "pinyin": "tiān tū",
+          "korean": "cheon dol 천돌"
+        },
+        {
+          "code": "CV23",
+          "chinese": "廉泉",
+          "transliteration": "Lianquan",
+          "english": "Lateral Spring",
+          "pinyin": "lián quán",
+          "korean": "yeom cheon 염천"
+        },
+        {
+          "code": "CV24",
+          "chinese": "承漿",
+          "transliteration": "Chengjiang",
+          "english": "Saliva Container",
+          "pinyin": "chéng jiāng",
+          "korean": "seung jang 승장"
+        }
+      ]
+    }
+  ]
+}

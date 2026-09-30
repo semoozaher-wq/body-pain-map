@@ -518,7 +518,7 @@
     "label": "الغدة الدرقية",
     "organId": "thyroid",
     "x": 50,
-    "y": 15,
+    "y": 17,
     "view": "front",
     "type": "organ",
     "relatedGroupSlugs": [
