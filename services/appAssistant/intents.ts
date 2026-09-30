@@ -36,6 +36,7 @@ export type IntentKind =
   | 'describe_screen'
   | 'record_pain'
   | 'locate_pain'
+  | 'keep_marker'
   | 'move_marker'
   | 'move_toward'
   | 'open_last_entry'
@@ -134,6 +135,23 @@ const PAIN_WORDS = [
 const MARKER_VERBS = [
   'حط علامه', 'حط علامة', 'ضع علامه', 'ضع علامة', 'علم على مكان', 'حدد مكان', 'حددلي مكان',
   'place marker', 'set marker', 'marker',
+];
+
+// ---------------------------------------------------------------------------
+// «نفس المكان» / «سيبه هنا» — تأكيد أن الألم في نفس المكان دون تحريك العلامة.
+// ---------------------------------------------------------------------------
+// ROOT-CAUSE FIX (spec: "نفس المكان" fall-through): قبل هذا، «نفس المكان» لم
+// تُطابق أي نيّة فسقطت إلى «غير مفهوم» أو أعادت سؤال الموقع. الآن تُطابق
+// keep_marker فتبقى العلامة كما هي ولا يُعاد السؤال.
+const KEEP_MARKER_PHRASES = [
+  'نفس المكان', 'نفس المكان ده', 'نفس المكان دا', 'نفس الموقع', 'نفس المنطقه', 'نفس المنطقة',
+  'نفس النقطه', 'نفس النقطة', 'نفس الحته', 'نفس الحتة', 'نفس المكان بالظبط',
+  'سيبه هنا', 'سيبه زي ما هو', 'سيبه زي ماهو', 'سيبها هنا', 'خليه هنا', 'خليه زي ما هو', 'خليه زي ماهو',
+  'متتحركه', 'متتحركهوش', 'ما تحركه', 'متحركه', 'متغيرش المكان', 'متغيرش', 'ماتغيرش',
+  'زي ما هو', 'زي ماهو', 'خلاص كده', 'خلاص كدا', 'كده تمام', 'كدا تمام', 'تمام كده', 'تمام كدا',
+  'keep it', 'keep it there', 'same place', 'same spot', 'same area', 'leave it', 'leave it there',
+  "don't move", 'do not move', 'keep the marker',
+  'meme endroit', 'même endroit', 'laisser', 'ne bouge pas',
 ];
 
 // كلمات تعني «التحرّك ناحية منطقة حقيقية» (أقرب للكتف، ناحية البطن، جنب الرقبة…)
@@ -425,7 +443,12 @@ export function parseIntents(
   // «وسط الظهر/نص الظهر/في النص/وسط» تُعدّ تحديدًا لمكان الألم (وسط الظهر) حتى بلا كلمة ألم،
   // لأن المستخدم غالبًا يذكر الموقع مباشرة بعد شكوى سابقة («عندي وجع في ظهري» → «وسط الظهر»).
   const mentionsMidBack = isMidBackTerm(text);
-  if (isPainComplaint || hasMarkerVerb || mentionsMidBack) {
+  // --- تأكيد «نفس المكان» (keep_marker) قبل أي محاولة لتحريك/إعادة تحديد ---
+  const wantsKeepMarker = KEEP_MARKER_PHRASES.some((p) => text.includes(normalize(p)));
+  if (wantsKeepMarker) {
+    intents.push({ kind: 'keep_marker', refersToContext: true, raw: utterance });
+  }
+  if (!wantsKeepMarker && (isPainComplaint || hasMarkerVerb || mentionsMidBack)) {
     const target = stripVerbs(text);
     // نحمل الاتجاه المذكور داخل الجملة ("تحت صدري بشوية"، "جنب القلب ناحية الشمال")
     // حتى تزيح طبقة المحرّك العلامة عن إحداثيات الهدف الحقيقية بدل تجاهله.
@@ -436,7 +459,7 @@ export function parseIntents(
   // نستخرجه قبل التحريك الاتجاهي حتى لا تُفسَّر «ناحية الكتف» كاتجاه، ونتيح تحريك العلامة
   // الحالية نحو إحداثيات منطقة موجودة فعلاً في الكتالوج (لا اختراع مواضع).
   const towardAnchor = !isQuestion && !hasWhere && !text.includes('اللي') ? findTowardAnchor(text) : undefined;
-  if (towardAnchor && !intents.some((i) => i.kind === 'locate_pain')) {
+  if (towardAnchor && !wantsKeepMarker && !intents.some((i) => i.kind === 'locate_pain')) {
     intents.push({ kind: 'move_toward', targetTerm: towardAnchor, refersToContext: true, raw: utterance });
   }
 
@@ -448,7 +471,7 @@ export function parseIntents(
     !text.includes('اللي') &&
     !towardAnchor &&
     (refersToContext || hasMarkerVerb || hasBase || text.includes('شويه') || text.includes('شوية') || text.includes('بتاع') || text.includes('علامه') || text.includes('علامة') || text.includes('ناحيه') || text.includes('ناحية') || text.includes('جنب') || text.includes('جوه'));
-  if (isDirectionalOnly && !intents.some((i) => i.kind === 'locate_pain')) {
+  if (isDirectionalOnly && !wantsKeepMarker && !intents.some((i) => i.kind === 'locate_pain')) {
     intents.push({ kind: 'move_marker', direction, refersToContext: true, raw: utterance });
   }
 

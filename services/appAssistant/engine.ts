@@ -389,10 +389,14 @@ export function interpret(
               `D’accord, j’ai marqué la zone ${dirWord} ${labelFor(target, lang)} sur la carte. Dites « un peu plus haut » ou « plus bas » pour ajuster.`,
             ));
           } else {
+            // ROOT-CAUSE FIX (premature questionnaire): a bare complaint with a
+            // named region already placed the marker, so we must NOT interrogate
+            // the user ("فين بالظبط؟ فوق، تحت…"). We give a natural, optional
+            // fine-tune hint instead — no question, no questionnaire.
             replyParts.push(L(
-              `تمام، علّمت ${labelFor(target, lang)} على الخريطة. فين بالظبط؟ فوق، تحت، يمين، شمال، ولا جنب حاجة تانية؟`,
-              `Okay, I marked ${labelFor(target, lang)} on the map. Where exactly? Above, below, left, right, or next to something?`,
-              `D’accord, j’ai marqué ${labelFor(target, lang)} sur la carte. Où exactement ? Au-dessus, en dessous, à gauche, à droite ?`,
+              `تمام، علّمت ${labelFor(target, lang)} على الخريطة. لو حبيت أدقّ قول «فوق شوية» أو «تحت شوية» أو «ناحية اليمين».`,
+              `Okay, I marked ${labelFor(target, lang)} on the map. Say “a bit up”, “a bit down” or “to the right” to fine-tune.`,
+              `D’accord, j’ai marqué ${labelFor(target, lang)} sur la carte. Dites « un peu plus haut », « plus bas » ou « à droite » pour ajuster.`,
             ));
           }
         } else {
@@ -455,6 +459,35 @@ export function interpret(
           ));
           understood = true;
         }
+        break;
+      }
+      case 'keep_marker': {
+        // «نفس المكان»: نُبقي العلامة الحالية كما هي ولا نعيد السؤال. نُبرز العنصر
+        // المرجعي فقط إن وُجد فعلاً في الكتالوج (لا اختراع معرّفات).
+        const refId = state.conversationContext.lastReferencedId;
+        const refEntry = refId ? getEntry(refId) : undefined;
+        const hasMarker = !!(state.selectedPainLocation || state.conversationContext.lastReferencedCoords);
+        if (hasMarker && refEntry) {
+          actions.push({ type: 'highlight', targetId: refEntry.id, label: refEntry.label });
+          replyParts.push(L(
+            `تمام، سايب العلامة في نفس المكان (${labelFor(refEntry, lang)}). لو حبيت أحرّكها قول «فوق شوية» أو «ناحية اليمين».`,
+            `Okay, I’ll keep the marker in the same place (${labelFor(refEntry, lang)}). Say “a bit up” or “to the right” to move it.`,
+            `D’accord, je garde le repère au même endroit (${labelFor(refEntry, lang)}). Dites « un peu plus haut » ou « à droite » pour le déplacer.`,
+          ));
+        } else if (hasMarker) {
+          replyParts.push(L(
+            'تمام، سايب العلامة في نفس المكان. لو حبيت أحرّكها قول «فوق شوية» أو «ناحية اليمين».',
+            'Okay, I’ll keep the marker in the same place. Say “a bit up” or “to the right” to move it.',
+            'D’accord, je garde le repère au même endroit. Dites « un peu plus haut » ou « à droite » pour le déplacer.',
+          ));
+        } else {
+          replyParts.push(L(
+            'تمام. قول لي الألم فين بالظبط (مثلاً: جنبي، كتفي، بطني، ظهري) وأنا أعلّم المكان.',
+            'Okay. Tell me exactly where it hurts (e.g. my flank, my shoulder, my belly, my back) and I’ll place the marker.',
+            'D’accord. Dites-moi exactement où vous avez mal (par ex. le flanc, l’épaule, le ventre, le dos) et je place le repère.',
+          ));
+        }
+        understood = true;
         break;
       }
       case 'open_last_entry': {
@@ -603,8 +636,13 @@ export function interpret(
       // نُثري فقط عندما تكون الجملة شكوى ألم جديدة (locate_pain) لنطلب التوضيح/المتابعة الطبيعية.
       const complaint = intents.some((i) => i.kind === 'locate_pain');
       const controlMarked = actions.some((a) => a.type === 'set_marker');
-      const naturalIsClarify = !!aiReply.clarifyingQuestion && !aiReply.followUpQuestion;
-      if (complaint && !alreadyAsks && !(controlMarked && naturalIsClarify)) {
+      // ROOT-CAUSE FIX (premature severity / medical question): when the control
+      // layer already handled the complaint by placing a marker for a named
+      // region, the turn is complete. We must NOT tack on the medical engine's
+      // follow-up (the "قيّم شدة الألم من 1 لـ 10" severity question) — that
+      // question belongs to its own, later turn. Enrich only when the control
+      // layer did not already place a marker.
+      if (complaint && !alreadyAsks && !controlMarked) {
         const natural = aiNaturalParts(aiReply);
         if (natural) replyParts.push(natural);
       }
