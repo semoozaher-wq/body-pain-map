@@ -21,7 +21,7 @@ import {
 import { splitBySafety, withLabel } from './actions';
 import { parseIntents, type RawIntent } from './intents';
 import { classifyGeneralChat, generalChatReply } from './generalChat';
-import { analyzeMessage, type AssistantReply } from '../aiAssistant/engine';
+import { analyzeMessage, type AssistantReply, type PainContext } from '../aiAssistant/engine';
 import {
   describePoint,
   describePosition,
@@ -144,12 +144,15 @@ function highlightActions(entry: CatalogEntry): AssistantAction[] {
 export interface InterpretOptions {
   /** هل نطلب تأكيدًا للإجراءات الحسّاسة (افتراضي: نعم). */
   confirmSensitive?: boolean;
+  /** السياق الطبي المُجمَّع من الجولات السابقة (spec #4d): يُمرَّر إلى محرّك الفهم الطبي
+   *  حتى لا يُعيد المساعد السؤال عن معلومة قالها المستخدم بالفعل. */
+  previousContext?: PainContext | null;
 }
 
 export function interpret(
   utterance: string,
   state: AppState,
-  _options: InterpretOptions = {},
+  options: InterpretOptions = {},
 ): AssistantTurn {
   const lang: Lang = state.language;
   const hasBase = !!(state.selectedPainLocation || state.conversationContext.lastReferencedCoords);
@@ -525,7 +528,11 @@ export function interpret(
   // ---------------------------------------------------------------------------
   let aiReply: AssistantReply | null = null;
   try {
-    aiReply = analyzeMessage(utterance, lang, false);
+    aiReply = analyzeMessage(utterance, lang, false, {
+      // السياق الطبي بين الرسائل (spec #4d): نمرّر ما فهمناه سابقًا حتى يبني عليه
+      // بدل أن يسأل من جديد. مصدره حالة التطبيق (state.painContext) أو الخيارات.
+      previousContext: options.previousContext ?? state.painContext ?? undefined,
+    });
   } catch {
     aiReply = null;
   }

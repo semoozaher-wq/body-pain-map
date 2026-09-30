@@ -9,7 +9,7 @@
 // لا يوجد أي تخمين تشريحي: كل عنصر له id ثابت وإحداثيات فعلية من ملفات data/.
 // ============================================================================
 
-import type { AssistantReply } from '../aiAssistant/engine';
+import type { AssistantReply, PainContext } from '../aiAssistant/engine';
 
 export type Lang = 'ar' | 'en' | 'fr';
 
@@ -114,6 +114,8 @@ export interface AppState {
   zoomLevel: number;
   visibleStructures: string[];
   conversationContext: ConversationContext;
+  /** السياق الطبي المُجمَّع بين الرسائل (spec #4d). اختياري للتوافق مع الاستدعاءات القديمة. */
+  painContext?: PainContext | null;
   language: Lang;
   /** نمط الحوار الحالي (اختياري للتوافق مع الاستدعاءات القديمة). */
   conversationMode?: ConversationMode;
