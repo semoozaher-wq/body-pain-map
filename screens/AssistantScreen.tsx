@@ -26,6 +26,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services/speechRecognition';
 import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
 import { voiceLog } from '../services/speech/voiceLog';
+import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
 import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
 import { Palette, Gradients, Radii, Elevation, Type } from '../constants/design';
@@ -265,19 +266,20 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // ------------------------------------------------------------------
   // تبادل الأدوار الصوتي (نفس سلوك GlobalAssistant): استماع مستمر + مهلة صمت
   // ------------------------------------------------------------------
-  const silenceTimerRef = useRef<any>(null);
   const noResultTimerRef = useRef<any>(null);
-  // Live transcript bookkeeping (web). `liveRef` = everything the recogniser has
-  // heard; `committedRef` = the prefix already sent; `currentRef` = the
-  // not-yet-sent remainder we display and send. This makes the flow immune to
-  // Android replacing `event.results` instead of appending to it.
-  const liveRef = useRef('');
-  const committedRef = useRef('');
-  const currentRef = useRef('');
+  // TurnGate: single source of truth for voice-transcript bookkeeping
+  // (live/committed/pending + silence debounce). It replaces the previous
+  // hand-rolled per-ref bookkeeping so one utterance produces
+  // exactly one turn — no interim -> final -> onend -> silence double-send, and
+  // it is immune to Android re-finalising / replacing `event.results`.
+  const gateRef = useRef<TurnGate | null>(null);
+  // Cumulative transcript for the native (expo-speech-recognition) path, whose
+  // final results arrive as segments; we accumulate them so the TurnGate sees a
+  // cumulative live string exactly like the web path does.
+  const nativeLiveRef = useRef('');
   const gotResultRef = useRef(false);
   const startListeningRef = useRef<() => void>(() => {});
   const stopListeningRef = useRef<() => void>(() => {});
-  const commitTurnRef = useRef<() => void>(() => {});
   const sendRef = useRef<(text: string, imageUri?: string | null) => void>(() => {});
   const listeningRef = useRef(false);
   listeningRef.current = listening;
@@ -287,6 +289,28 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   languageRef.current = language;
   const TURN_SILENCE_MS = 1500;
   const NO_RESULT_WATCHDOG_MS = 7000;
+
+  // --- TurnGate: one utterance => one turn (shared, tested implementation) ---
+  // Both the web and native recognition paths funnel through this single gate so
+  // the "live/committed/pending + silence debounce" logic lives in exactly one
+  // place (services/speech/turnGate.ts) instead of being duplicated per screen.
+  const getGate = useCallback((): TurnGate => {
+    if (!gateRef.current) {
+      gateRef.current = createTurnGate({
+        silenceMs: TURN_SILENCE_MS,
+        onInterim: (text) => setInterim(text),
+        onTurn: (text) => {
+          sendRef.current(text);
+          if (!voiceSessionRef.current) stopListeningRef.current?.();
+        },
+        onEmpty: () => {
+          if (!voiceSessionRef.current) stopListeningRef.current?.();
+        },
+        onLog: (stage, data) => voiceLog(stage, data),
+      });
+    }
+    return gateRef.current;
+  }, []);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -313,6 +337,9 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   useSpeechRecognitionEvents('end', () => {
     voiceLog('mic-end', { platform: 'native' });
     setListening(false);
+    // لا نُهدر النص: نُفرّغ أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
+    getGate().flush();
+    setInterim('');
     // متابعة تلقائية على الأندرويد: بعض محرّكات الكلام تُنهي الجلسة بعد صمت،
     // فنعيد الاستماع ما دامت الجلسة الصوتية شغّالة (نفس سلوك مسار الويب).
     if (voiceSessionRef.current) {
@@ -327,72 +354,22 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
     if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
     if (event?.isFinal) {
-      // النتيجة النهائية = جملة جديدة تُضاف للنص المتراكم المعروض.
-      liveRef.current = `${liveRef.current} ${transcript}`.trim();
-      currentRef.current = `${currentRef.current} ${transcript}`.trim();
-      setInterim(currentRef.current);
+      // النتيجة النهائية = مقطع جديد يُضاف للنص المتراكم، ثم نمرّره للـ TurnGate
+      // (جولة واحدة لكل جملة؛ لا إرسال فوري — البوّابة تنتظر صمتًا كافيًا).
+      nativeLiveRef.current = `${nativeLiveRef.current} ${transcript}`.trim();
+      getGate().onFinal(nativeLiveRef.current);
     } else {
-      // الجزئية = معاينة حيّة فقط (لا تُضاف للنص المرسل).
-      setInterim(transcript);
+      // الجزئية = معاينة حيّة فقط (لا تُرسل)؛ نُمرّر النص المتراكم للعرض.
+      getGate().onSnapshot({ liveText: `${nativeLiveRef.current} ${transcript}`.trim(), hasFinal: false });
     }
-    // تبادل أدوار حقيقي على الأندرويد: لا نرسل فورًا — ننتظر صمتًا كافيًا
-    // حتى يكمل المستخدم كلامه ثم نرسل الجولة (نفس منطق مسار الويب).
-    scheduleTurnSend();
   });
 
-  // نهاية جولة المستخدم: نُرسل النص المتراكم بعد صمت كافٍ (منع القطع المبكر).
-  const commitTurn = useCallback(() => {
-    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
-    if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
-    const text = currentRef.current.trim();
-    if (text) {
-      // نحفظ ما تم إرساله حتى لا نعيد إرساله في الجلسة المستمرة، ثم نُفرّغ العرض.
-      committedRef.current = liveRef.current;
-      currentRef.current = '';
-      setInterim('');
-      voiceLog('sendTurn', { text });
-      sendRef.current(text);
-      if (!voiceSessionRef.current) stopListeningRef.current?.();
-    } else if (!voiceSessionRef.current) {
-      stopListeningRef.current?.();
-    }
-  }, []);
-  commitTurnRef.current = commitTurn;
-
-  const scheduleTurnSend = useCallback(() => {
-    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-    silenceTimerRef.current = setTimeout(commitTurn, TURN_SILENCE_MS);
-  }, [commitTurn]);
-
-  // معالجة نتيجة تعرّف (ويب): نبني النص من الصفر ونتعامل مع نموذجي الإلحاق/الاستبدال.
-  const handleWebResult = useCallback(
-    (snap: SpeechSnapshot) => {
-      gotResultRef.current = true;
-      if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
-      // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
-      if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
-      const live = snap.liveText;
-      liveRef.current = live;
-      let current = live;
-      if (committedRef.current) {
-        if (live.startsWith(committedRef.current)) {
-          current = live.slice(committedRef.current.length).trim();
-        } else {
-          // المتعرّف استبدل مخزونه (أندرويد) ⇒ جملة جديدة.
-          committedRef.current = '';
-          current = live;
-        }
-      }
-      currentRef.current = current;
-      setInterim(current);
-      voiceLog('transcript', { live, current, hasFinal: snap.hasFinal });
-      scheduleTurnSend();
-    },
-    [scheduleTurnSend],
-  );
+  // نهاية جولة المستخدم + معالجة نتيجة التعرّف (ويب) انتقلت إلى services/speech/turnGate.ts:
+  // البوّابة تجمع النص (live/committed/pending)، تمنع الإرسال المزدوج، وتُطلق جولة واحدة
+  // بعد صمت كافٍ. مسار الويب يغذّيها عبر getGate().onSnapshot(snap) داخل startListening.
 
   const stopListening = useCallback(() => {
-    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+    gateRef.current?.dispose?.();
     if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
     try {
       if (Platform.OS === 'web') webRecognizerRef.current?.stop?.();
@@ -415,10 +392,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           setVoiceError(isLikelyInAppBrowser() ? 'voiceInApp' : 'voiceUnsupported');
           return;
         }
-        // جولة جديدة: نصفّر المخزن والمؤشرات.
-        liveRef.current = '';
-        committedRef.current = '';
-        currentRef.current = '';
+        // جولة جديدة: نُصفّر البوّابة والمؤشرات.
+        getGate().reset();
         gotResultRef.current = false;
         const recognizer = createWebRecognizer(
           { lang: speechLang(languageRef.current), continuous: true, interimResults: true },
@@ -434,7 +409,14 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
                 }
               }, NO_RESULT_WATCHDOG_MS);
             },
-            onResult: (snap) => handleWebResult(snap),
+            onResult: (snap: SpeechSnapshot) => {
+              gotResultRef.current = true;
+              if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
+              // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
+              if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
+              // البوّابة تتعامل مع نموذجي الإلحاق/الاستبدال وتُطلق جولة واحدة لكل جملة.
+              getGate().onSnapshot(snap);
+            },
             onError: (code) => {
               setListening(false);
               setInterim('');
@@ -443,8 +425,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             },
             onEnd: () => {
               setListening(false);
-              // لا نُهدر النص: نُرسل أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
-              if (currentRef.current.trim()) commitTurnRef.current();
+              // لا نُهدر النص: نُفرّغ أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
+              getGate().flush();
               setInterim('');
               webRecognizerRef.current = null;
               // متابعة تلقائية: نعيد الاستماع ما دامت الجلسة الصوتية شغّالة.
@@ -461,6 +443,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       }
       const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
       if (!perm?.granted) { voiceLog('mic-permission-denied'); return; }
+      getGate().reset();
+      nativeLiveRef.current = '';
       setInterim('');
       SpeechRecognitionModule?.start?.({
         lang: speechLang(languageRef.current),
@@ -471,7 +455,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       voiceLog('mic-error', { message: e?.message });
       setListening(false);
     }
-  }, [handleWebResult]);
+  }, [getGate]);
 
   // نربط المراجع بالدوال الفعلية لاستخدامها داخل الـ callbacks المستقرة.
   stopListeningRef.current = stopListening;
@@ -503,9 +487,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     setAskCount(0);
     persistedMessages = [];
     persistedAskCount = 0;
-    liveRef.current = '';
-    committedRef.current = '';
-    currentRef.current = '';
+    gateRef.current?.reset?.();
+    nativeLiveRef.current = '';
     gotResultRef.current = false;
     setInterim('');
     setVoiceError(null);
@@ -547,7 +530,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   useEffect(() => () => {
     try {
       voiceSessionRef.current = false;
-      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      gateRef.current?.dispose?.();
       if (noResultTimerRef.current) clearTimeout(noResultTimerRef.current);
       Speech.stop();
       webRecognizerRef.current?.abort?.();
