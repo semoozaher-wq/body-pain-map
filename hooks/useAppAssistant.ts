@@ -13,6 +13,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import * as Speech from 'expo-speech';
 import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services/speechRecognition';
+import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
+import { voiceLog } from '../services/speech/voiceLog';
 import { interpret } from '../services/appAssistant/engine';
 import type { AppState, AssistantAction, AssistantTurn, Lang } from '../services/appAssistant/types';
 import { afterSpeechEnd, type VoiceState } from '../services/appAssistant/voiceMachine';
@@ -59,19 +61,26 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   const [speakerOn, setSpeakerOn] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const webRecognitionRef = useRef<any>(null);
+  const webRecognizerRef = useRef<WebRecognizer | null>(null);
   const silenceTimerRef = useRef<any>(null);
-  const turnBufferRef = useRef('');
+  const noResultTimerRef = useRef<any>(null);
   const startListeningRef = useRef<() => void>(() => {});
   const stopListeningRef = useRef<() => void>(() => {});
-  const interimRef = useRef('');
-  const lastResultIndexRef = useRef(0);
-  const resultsLengthRef = useRef(0);
+  const commitTurnRef = useRef<() => void>(() => {});
+  // Live transcript bookkeeping (web). `liveRef` = everything the recogniser has
+  // heard; `committedRef` = the prefix already sent; `currentRef` = the
+  // not-yet-sent remainder that we display and send. This makes the flow immune
+  // to Android replacing `event.results` instead of appending to it.
+  const liveRef = useRef('');
+  const committedRef = useRef('');
+  const currentRef = useRef('');
+  const gotResultRef = useRef(false);
   // السياق الطبي المُجمَّع بين الرسائل (spec #4d): نمرّره للمحرّك في كل جولة حتى يبني
   // على ما قاله المستخدم سابقًا بدل أن يعيد السؤال.
   const painContextRef = useRef<any>(null);
   // مهلة الصمت التي نعتبرها نهاية جولة المستخدم (تمنحه وقتًا طبيعيًا للكلام قبل الرد).
   const TURN_SILENCE_MS = 1500;
+  const NO_RESULT_WATCHDOG_MS = 7000;
   const languageRef = useRef(language);
   languageRef.current = language;
   const mutedRef = useRef(muted);
@@ -145,6 +154,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       setMessages((prev) => [...prev, userMsg, botMsg]);
       runTurn(turn);
       onTurn?.(turn);
+      voiceLog('assistant-response', { reply: turn.reply[state.language]?.slice(0, 80), mode: turn.mode });
       if (autoSpeak || callActiveRef.current) speak(turn.reply[state.language], botMsg.id);
       else setVoiceState(afterSpeechEnd(callActiveRef.current));
       return turn;
@@ -155,24 +165,56 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   // --- نهاية جولة المستخدم: نُرسل النص المتراكم بعد صمت كافٍ (منع القطع المبكر) ---
   const commitTurn = useCallback(() => {
     if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
-    const text = `${turnBufferRef.current} ${interimRef.current}`.trim();
-    turnBufferRef.current = '';
-    interimRef.current = '';
-    setInterim('');
-    // نتجاهل أي نتائج نهائية متأخرة تخصّ الجولة المُرسلة.
-    lastResultIndexRef.current = resultsLengthRef.current;
+    if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
+    const text = currentRef.current.trim();
     if (text) {
+      // نحفظ ما تم إرساله حتى لا نعيد إرساله في الجلسة المستمرة، ثم نُفرّغ العرض.
+      committedRef.current = liveRef.current;
+      currentRef.current = '';
+      setInterim('');
+      voiceLog('sendTurn', { text });
       send(text);
       if (!callActiveRef.current) stopListeningRef.current?.();
     } else if (!callActiveRef.current) {
       stopListeningRef.current?.();
     }
   }, [send]);
+  commitTurnRef.current = commitTurn;
 
   const scheduleTurnSend = useCallback(() => {
     if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     silenceTimerRef.current = setTimeout(commitTurn, TURN_SILENCE_MS);
   }, [commitTurn]);
+
+  // --- معالجة نتيجة تعرّف (ويب): نبني النص من الصفر ونتعامل مع نموذجي الإلحاق/الاستبدال ---
+  const handleWebResult = useCallback(
+    (snap: SpeechSnapshot) => {
+      gotResultRef.current = true;
+      if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
+      // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
+      if (voiceStateRef.current === 'speaking') {
+        try { Speech.stop(); } catch {}
+        setSpeakingId(null);
+      }
+      const live = snap.liveText;
+      liveRef.current = live;
+      let current = live;
+      if (committedRef.current) {
+        if (live.startsWith(committedRef.current)) {
+          current = live.slice(committedRef.current.length).trim();
+        } else {
+          // المتعرّف استبدل مخزونه (أندرويد) ⇒ جملة جديدة.
+          committedRef.current = '';
+          current = live;
+        }
+      }
+      currentRef.current = current;
+      setInterim(current);
+      voiceLog('transcript', { live, current, hasFinal: snap.hasFinal });
+      scheduleTurnSend();
+    },
+    [scheduleTurnSend],
+  );
 
   // --- تأكيد الإجراءات الحسّاسة المعلّقة ---
   const confirmPending = useCallback(() => {
@@ -185,14 +227,16 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
 
   const cancelPending = useCallback(() => setPending([]), []);
 
-  // --- أحداث التعرّف على الكلام (الأصلي) ---
-  useSpeechRecognitionEvents('start', () => { setListening(true); setVoiceState('listening'); });
+  // --- أحداث التعرّف على الكلام (المسار الأصلي/Expo) ---
+  useSpeechRecognitionEvents('start', () => { voiceLog('mic-start', { platform: 'native' }); setListening(true); setVoiceState('listening'); });
   useSpeechRecognitionEvents('end', () => {
+    voiceLog('mic-end', { platform: 'native' });
     setListening(false);
     setInterim('');
     if (voiceStateRef.current === 'listening' && !callActiveRef.current) setVoiceState('idle');
   });
   useSpeechRecognitionEvents('error', (event: any) => {
+    voiceLog('speech-error', { platform: 'native', code: event?.error });
     setListening(false);
     setInterim('');
     setError(event?.error ?? 'speech-error');
@@ -201,6 +245,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   useSpeechRecognitionEvents('result', (event: any) => {
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
+    voiceLog('speech-result', { platform: 'native', transcript, isFinal: !!event?.isFinal });
     // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
     if (voiceStateRef.current === 'speaking') {
       try { Speech.stop(); } catch {}
@@ -208,6 +253,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     }
     if (event?.isFinal) {
       setInterim('');
+      voiceLog('sendTurn', { platform: 'native', text: transcript });
       send(transcript);
     } else {
       setInterim(transcript);
@@ -219,81 +265,77 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     setError(null);
     try {
       if (Platform.OS === 'web') {
-        const browserWindow = globalThis as any;
-        const Recognition = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition;
-        if (!Recognition) { setError('no-speech-api'); return; }
         if (listeningRef.current) return;
+        if (!webSpeechSupported()) {
+          voiceLog('mic-start', { supported: false, inApp: isLikelyInAppBrowser() });
+          setError(isLikelyInAppBrowser() ? 'in-app-browser' : 'no-speech-api');
+          return;
+        }
         // جولة جديدة: نصفّر المخزن والمؤشرات.
-        turnBufferRef.current = '';
-        interimRef.current = '';
-        lastResultIndexRef.current = 0;
-        resultsLengthRef.current = 0;
-        const recognition = new Recognition();
-        webRecognitionRef.current = recognition;
-        recognition.lang = speechLang(languageRef.current);
-        recognition.interimResults = true;
-        // نستمع باستمرار حتى لا نقطع المستخدم بعد كلمة أو جملة قصيرة.
-        recognition.continuous = true;
-        recognition.onstart = () => { setListening(true); setVoiceState('listening'); };
-        recognition.onresult = (event: any) => {
-          resultsLengthRef.current = event?.results?.length ?? 0;
-          // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
-          if (voiceStateRef.current === 'speaking') {
-            try { Speech.stop(); } catch {}
-            setSpeakingId(null);
-          }
-          let newFinal = '';
-          let interimText = '';
-          let lastFinalIdx = lastResultIndexRef.current - 1;
-          for (let i = lastResultIndexRef.current; i < event.results.length; i++) {
-            const r = event.results[i];
-            if (r.isFinal) { newFinal += `${r[0].transcript} `; lastFinalIdx = i; }
-            else interimText += r[0].transcript;
-          }
-          if (newFinal) {
-            turnBufferRef.current = `${turnBufferRef.current} ${newFinal}`.trim();
-            lastResultIndexRef.current = lastFinalIdx + 1;
-          }
-          interimRef.current = interimText;
-          setInterim(interimText);
-          // لا نرسل فورًا: ننتظر صمتًا كافيًا حتى يكمل المستخدم كلامه.
-          scheduleTurnSend();
-        };
-        recognition.onerror = (event: any) => {
-          setListening(false);
-          setInterim('');
-          setError(event?.error ?? 'speech-error');
-          if (callActiveRef.current) setVoiceState('listening');
-        };
-        recognition.onend = () => {
-          setListening(false);
-          setInterim('');
-          webRecognitionRef.current = null;
-          // متابعة تلقائية: نعيد الاستماع ما دامت المكالمة شغّالة.
-          if (callActiveRef.current) {
-            setTimeout(() => { if (callActiveRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
-          } else {
-            setVoiceState('idle');
-          }
-        };
-        recognition.start();
+        liveRef.current = '';
+        committedRef.current = '';
+        currentRef.current = '';
+        gotResultRef.current = false;
+        const recognizer = createWebRecognizer(
+          { lang: speechLang(languageRef.current), continuous: true, interimResults: true },
+          {
+            log: (stage, data) => voiceLog(stage, data),
+            onStart: () => {
+              setListening(true);
+              setVoiceState('listening');
+              // حارس: لو لم تصل أي نتيجة خلال مهلة، نسجّل ذلك بوضوح (يساعد في تشخيص WebView).
+              if (noResultTimerRef.current) clearTimeout(noResultTimerRef.current);
+              noResultTimerRef.current = setTimeout(() => {
+                if (!gotResultRef.current) {
+                  voiceLog('no-speech-result-watchdog', { afterMs: NO_RESULT_WATCHDOG_MS, inApp: isLikelyInAppBrowser() });
+                }
+              }, NO_RESULT_WATCHDOG_MS);
+            },
+            onResult: (snap) => handleWebResult(snap),
+            onError: (code) => {
+              setListening(false);
+              setInterim('');
+              setError(code);
+              voiceLog('speech-error', { code });
+              if (callActiveRef.current) setVoiceState('listening');
+            },
+            onEnd: () => {
+              setListening(false);
+              // لا نُهدر النص: نُرسل أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
+              if (currentRef.current.trim()) commitTurnRef.current();
+              setInterim('');
+              webRecognizerRef.current = null;
+              // متابعة تلقائية: نعيد الاستماع ما دامت المكالمة شغّالة.
+              if (callActiveRef.current) {
+                setTimeout(() => { if (callActiveRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
+              } else {
+                setVoiceState('idle');
+              }
+            },
+          },
+        );
+        if (!recognizer) return;
+        webRecognizerRef.current = recognizer;
+        recognizer.start();
         return;
       }
       // الأصلي (Expo)
       const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
-      if (!perm?.granted) { setError('mic-permission'); return; }
+      if (!perm?.granted) { voiceLog('mic-permission-denied'); setError('mic-permission'); return; }
       setInterim('');
       SpeechRecognitionModule?.start?.({ lang: speechLang(languageRef.current), interimResults: true, continuous: true });
-    } catch {
+    } catch (e: any) {
+      voiceLog('mic-error', { message: e?.message });
       setListening(false);
       setError('mic-error');
     }
-  }, [scheduleTurnSend]);
+  }, [handleWebResult]);
 
   const stopListening = useCallback(() => {
     if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+    if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
     try {
-      if (Platform.OS === 'web') webRecognitionRef.current?.stop?.();
+      if (Platform.OS === 'web') webRecognizerRef.current?.stop?.();
       else SpeechRecognitionModule?.stop?.();
     } catch {}
     setListening(false);
@@ -341,7 +383,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   useEffect(() => () => {
     try {
       Speech.stop();
-      webRecognitionRef.current?.abort?.();
+      webRecognizerRef.current?.abort?.();
       SpeechRecognitionModule?.abort?.();
     } catch {}
   }, []);
