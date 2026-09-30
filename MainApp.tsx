@@ -286,7 +286,13 @@ export default function App() {
           issueBodyControl({ highlightId: targetId });
           conversationContext.current.lastReferencedId = targetId;
         }
-        conversationContext.current.lastReferencedKind = action.type === 'highlight' ? 'organ' : null;
+        conversationContext.current.lastReferencedKind = targetId.startsWith('organ:')
+          ? 'organ'
+          : targetId.startsWith('region:')
+            ? 'region'
+            : targetId.startsWith('point:')
+              ? 'point'
+              : null;
         break;
       }
       case 'clear_highlight':
