@@ -313,9 +313,12 @@ export default function App() {
         const raw = String(action.value ?? '');
         const [mx, my, mv] = raw.split(',');
         if (!Number.isNaN(Number(mx)) && !Number.isNaN(Number(my))) {
-          setPainMarker({ x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' });
-          issueBodyControl({ painMarker: { x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' } });
-          conversationContext.current.lastReferencedCoords = { x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' };
+          const view: 'front' | 'back' = mv === 'back' ? 'back' : 'front';
+          const marker = { x: Number(mx), y: Number(my), view };
+          setPainMarker(marker);
+          // نُزامن العرض النشط مع عرض العلامة حتى تظهر دائمًا (مثلاً «ورا» تنقلنا لعرض الظهر تلقائيًا).
+          issueBodyControl({ painMarker: marker, view });
+          conversationContext.current.lastReferencedCoords = marker;
           setConversationState('awaiting_location');
         }
         break;
@@ -324,9 +327,12 @@ export default function App() {
         const raw = String(action.value ?? '');
         const [mx, my, mv] = raw.split(',');
         if (!Number.isNaN(Number(mx)) && !Number.isNaN(Number(my))) {
-          setPainMarker({ x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' });
-          issueBodyControl({ painMarker: { x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' } });
-          conversationContext.current.lastReferencedCoords = { x: Number(mx), y: Number(my), view: mv === 'back' ? 'back' : 'front' };
+          const view: 'front' | 'back' = mv === 'back' ? 'back' : 'front';
+          const marker = { x: Number(mx), y: Number(my), view };
+          setPainMarker(marker);
+          // نُزامن العرض النشط مع عرض العلامة حتى تظهر دائمًا (مثلاً «ورا» تنقلنا لعرض الظهر تلقائيًا).
+          issueBodyControl({ painMarker: marker, view });
+          conversationContext.current.lastReferencedCoords = marker;
         }
         break;
       }
