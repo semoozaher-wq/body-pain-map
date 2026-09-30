@@ -67,6 +67,9 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   const interimRef = useRef('');
   const lastResultIndexRef = useRef(0);
   const resultsLengthRef = useRef(0);
+  // السياق الطبي المُجمَّع بين الرسائل (spec #4d): نمرّره للمحرّك في كل جولة حتى يبني
+  // على ما قاله المستخدم سابقًا بدل أن يعيد السؤال.
+  const painContextRef = useRef<any>(null);
   // مهلة الصمت التي نعتبرها نهاية جولة المستخدم (تمنحه وقتًا طبيعيًا للكلام قبل الرد).
   const TURN_SILENCE_MS = 1500;
   const languageRef = useRef(language);
@@ -116,7 +119,12 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   // --- تنفيذ إجراءات جولة ---
   const runTurn = useCallback(
     (turn: AssistantTurn) => {
-      for (const action of turn.actions) onAction(action);
+      for (const action of turn.actions) {
+        // تغيير الموضوع/محادثة جديدة: نفرّغ السياق الطبي المحلي أيضًا.
+        if (action.type === 'reset_context') painContextRef.current = null;
+        onAction(action);
+      }
+      if (turn.mode === 'medical' && turn.medical?.painContext) painContextRef.current = turn.medical.painContext;
       if (turn.needsConfirmation) setPending(turn.pendingConfirmation);
       else setPending([]);
     },
@@ -131,7 +139,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       setError(null);
       setVoiceState('thinking');
       const state = getState();
-      const turn = interpret(trimmed, state);
+      const turn = interpret(trimmed, state, { previousContext: painContextRef.current ?? undefined });
       const userMsg: AssistantMessage = { id: nextId(), role: 'user', text: trimmed };
       const botMsg: AssistantMessage = { id: nextId(), role: 'assistant', text: turn.reply[state.language], turn };
       setMessages((prev) => [...prev, userMsg, botMsg]);
@@ -358,6 +366,11 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     toggleSpeaker,
     confirmPending,
     cancelPending,
-    clearMessages: () => setMessages([]),
+    clearMessages: () => {
+      // محادثة جديدة: نفرّغ الرسائل والسياق الطبي المتراكم معًا (فصل السياق القديم عن الجديد).
+      painContextRef.current = null;
+      setMessages([]);
+      setPending([]);
+    },
   };
 }
