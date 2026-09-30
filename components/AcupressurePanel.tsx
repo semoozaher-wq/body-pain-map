@@ -1,33 +1,73 @@
 import { useEffect, useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import Svg, { Circle, Ellipse, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 import pointData from '../data/acupressurePoints.json';
+import atlasData from '../data/acupunctureAtlas.json';
 import type { Language } from '../services/i18n';
 
 type Point = (typeof pointData.points)[number];
+type Meridian = (typeof atlasData.meridians)[number];
 type Props = {
   language: Language;
   /** نقطة مطلوب إبرازها/فتحها بأمر من المساعد المركزي (معرّف النقطة أو كودها مثل LI4). */
   highlightId?: string | null;
 };
 const text = (value: { ar: string; en: string; fr: string }, language: Language) => value[language] ?? value.ar;
+const tr = (language: Language, ar: string, en: string, fr: string) => (language === 'ar' ? ar : language === 'fr' ? fr : en);
+
+// ---------------------------------------------------------------------------
+// أطلس النقاط الكامل (361 نقطة / 14 خط) — WHO nomenclature
+// بيانات الاسم/الكود/النطق مأخوذة حرفيًا من مصدر موثّق؛ لا اختراع.
+// ---------------------------------------------------------------------------
+type AtlasPoint = Meridian['points'][number] & { meridian: string; meridianEnglish: string };
+const ATLAS_INDEX: AtlasPoint[] = atlasData.meridians.flatMap((meridian) =>
+  meridian.points.map((point) => ({ ...point, meridian: meridian.code, meridianEnglish: meridian.english })),
+);
+const DETAIL_BY_CODE = new Map(pointData.points.map((point) => [point.code.toUpperCase(), point]));
+const normalizeCode = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, '');
 
 export function AcupressurePanel({ language, highlightId }: Props) {
   const [selectedId, setSelectedId] = useState(pointData.points[0].id);
   const point = pointData.points.find((candidate) => candidate.id === selectedId) ?? pointData.points[0];
-  // فتح/إبراز النقطة المطلوبة من المساعد المركزي (بالكود أو المعرّف).
+  const [atlasMeridian, setAtlasMeridian] = useState<string>('ALL');
+  const [query, setQuery] = useState('');
+  const [atlasCode, setAtlasCode] = useState<string | null>(null);
+  // فتح/إبراز النقطة المطلوبة من المساعد المركزي (بالكود أو المعرّف) في القسمين.
   useEffect(() => {
     if (!highlightId) return;
     const match = pointData.points.find((candidate) => candidate.id === highlightId || candidate.code.toUpperCase() === highlightId.toUpperCase());
     if (match) setSelectedId(match.id);
+    const atlasMatch = ATLAS_INDEX.find((candidate) => candidate.code.toUpperCase() === normalizeCode(highlightId));
+    if (atlasMatch) {
+      setAtlasCode(atlasMatch.code);
+      setAtlasMeridian('ALL');
+      setQuery('');
+    }
   }, [highlightId]);
+
   const ar = language === 'ar';
+  const trimmedQuery = query.trim();
+  const needle = trimmedQuery.toLowerCase();
+  const filtered = ATLAS_INDEX.filter((candidate) => {
+    if (atlasMeridian !== 'ALL' && candidate.meridian !== atlasMeridian) return false;
+    if (!needle) return true;
+    return (
+      candidate.code.toLowerCase().includes(needle) ||
+      candidate.transliteration.toLowerCase().includes(needle) ||
+      candidate.english.toLowerCase().includes(needle) ||
+      candidate.pinyin.toLowerCase().includes(needle) ||
+      candidate.chinese.includes(trimmedQuery)
+    );
+  });
+  const atlasPoint = atlasCode ? ATLAS_INDEX.find((candidate) => candidate.code === atlasCode) ?? null : null;
+  const atlasDetail = atlasPoint ? DETAIL_BY_CODE.get(atlasPoint.code.toUpperCase()) ?? null : null;
+
   return (
     <View style={styles.container}>
       <View style={styles.notice}><Text style={styles.noticeTitle}>{ar ? 'ضغط خارجي فقط — بدون إبر' : language === 'fr' ? 'Pression externe uniquement — sans aiguilles' : 'External pressure only — no needles'}</Text><Text style={styles.noticeText}>{text(pointData.notice, language)}</Text></View>
       <View style={styles.warning}><Text style={styles.warningTitle}>{ar ? 'احتياطات قبل التجربة' : language === 'fr' ? 'Précautions avant utilisation' : 'Safety before trying'}</Text><Text style={styles.warningText}>{text(pointData.safety, language)}</Text></View>
       <Text style={styles.sectionTitle}>{ar ? 'نقاط تعليمية موثقة' : language === 'fr' ? 'Points éducatifs documentés' : 'Documented educational points'}</Text>
-      <Text style={styles.sectionHint}>{ar ? 'هذه عينة أساسية وليست كل نقاط الجسم أو خريطة تشخيصية.' : language === 'fr' ? 'Sélection de base, pas une liste exhaustive ni une carte diagnostique.' : 'A core selection, not every body point or a diagnostic map.'}</Text>
+      <Text style={styles.sectionHint}>{ar ? 'هذه عينة أساسية موثّقة بالتفصيل (مكان/استخدام/احتياطات) وليست كل نقاط الجسم.' : language === 'fr' ? 'Sélection de base documentée en détail (emplacement/usage/précautions), pas tous les points.' : 'A core selection documented in detail (location/use/cautions), not every body point.'}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tabs}>
         {pointData.points.map((item) => <Pressable key={item.id} onPress={() => setSelectedId(item.id)} style={[styles.tab, item.id === point.id && styles.tabActive]}><Text style={[styles.tabText, item.id === point.id && styles.tabTextActive]}>{item.code}</Text><Text style={[styles.tabSub, item.id === point.id && styles.tabTextActive]}>{text(item.name, language)}</Text></Pressable>)}
       </ScrollView>
@@ -42,6 +82,60 @@ export function AcupressurePanel({ language, highlightId }: Props) {
         <Text style={styles.sourcesTitle}>{ar ? 'المراجع' : language === 'fr' ? 'Sources' : 'Sources'}</Text>
         {point.sources.map((source) => <Pressable key={source.url} onPress={() => Linking.openURL(source.url)} style={styles.sourceLink}><Text style={styles.sourceText}>↗ {source.title}</Text></Pressable>)}
       </View>
+
+      {/* ===================== أطلس النقاط الكامل ===================== */}
+      <Text style={styles.sectionTitle}>{ar ? 'أطلس النقاط الكامل' : language === 'fr' ? 'Atlas complet des points' : 'Complete point atlas'}</Text>
+      <Text style={styles.sectionHint}>
+        {ar
+          ? `مرجع تسمية موثّق وفق منظمة الصحة العالمية: ${ATLAS_INDEX.length} نقطة كلاسيكية على ${atlasData.meridians.length} خطًا. الأسماء والأكواد منقولة حرفيًا من المصدر (بلا اختراع)؛ التفاصيل العلاجية (المكان/الطريقة/الاحتياطات) موثّقة فقط للنقاط التعليمية أعلاه.`
+          : language === 'fr'
+            ? `Référentiel de nomenclature documenté (OMS) : ${ATLAS_INDEX.length} points classiques sur ${atlasData.meridians.length} méridiens. Noms et codes repris tels quels de la source (aucune invention) ; les détails thérapeutiques ne sont documentés que pour les points ci-dessus.`
+            : `Documented WHO nomenclature reference: ${ATLAS_INDEX.length} classical points across ${atlasData.meridians.length} meridians. Names and codes are taken verbatim from the source (nothing invented); therapeutic detail is documented only for the points above.`}
+      </Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+        <Pressable onPress={() => setAtlasMeridian('ALL')} style={[styles.chip, atlasMeridian === 'ALL' && styles.chipActive]}><Text style={[styles.chipText, atlasMeridian === 'ALL' && styles.chipTextActive]}>{ar ? 'الكل' : language === 'fr' ? 'Tous' : 'All'}</Text></Pressable>
+        {atlasData.meridians.map((meridian: Meridian) => <Pressable key={meridian.code} onPress={() => setAtlasMeridian(meridian.code)} style={[styles.chip, atlasMeridian === meridian.code && styles.chipActive]}><Text style={[styles.chipText, atlasMeridian === meridian.code && styles.chipTextActive]}>{meridian.code} · {meridian.pointCount}</Text></Pressable>)}
+      </ScrollView>
+      <TextInput
+        value={query}
+        onChangeText={setQuery}
+        placeholder={ar ? 'ابحث بالكود أو الاسم (مثال: LI4 أو Hegu أو 合谷)' : language === 'fr' ? 'Rechercher par code ou nom (ex. LI4, Hegu)' : 'Search by code or name (e.g. LI4, Hegu)'}
+        placeholderTextColor="#8AA0A6"
+        style={[styles.search, { textAlign: ar ? 'right' : 'left' }]}
+        autoCorrect={false}
+        autoCapitalize="none"
+      />
+      <Text style={styles.resultCount}>{ar ? `${filtered.length} نقطة` : language === 'fr' ? `${filtered.length} points` : `${filtered.length} points`}</Text>
+      <ScrollView style={styles.atlasList} nestedScrollEnabled contentContainerStyle={styles.atlasListContent}>
+        {filtered.map((item) => (
+          <Pressable key={item.code} onPress={() => setAtlasCode(item.code)} style={[styles.atlasRow, atlasCode === item.code && styles.atlasRowActive]}>
+            <Text style={[styles.atlasCode, atlasCode === item.code && styles.atlasCodeActive]}>{item.code}</Text>
+            <View style={styles.atlasNames}>
+              <Text style={styles.atlasName}>{item.transliteration} <Text style={styles.atlasChinese}>{item.chinese}</Text></Text>
+              <Text style={styles.atlasEnglish}>{item.english} · {item.meridian}</Text>
+            </View>
+          </Pressable>
+        ))}
+        {filtered.length === 0 && <Text style={styles.empty}>{ar ? 'لا توجد نقطة مطابقة.' : language === 'fr' ? 'Aucun point correspondant.' : 'No matching point.'}</Text>}
+      </ScrollView>
+      {atlasPoint && (
+        <View style={styles.card}>
+          <Text style={styles.title}>{atlasPoint.transliteration} <Text style={styles.code}>· {atlasPoint.code}</Text></Text>
+          <Text style={styles.atlasMeta}>{atlasPoint.chinese} · {atlasPoint.pinyin} · {atlasPoint.english}</Text>
+          <Text style={styles.atlasMeta}>{tr(language, 'الخط', 'Meridian', 'Méridien')}: {atlasPoint.meridian} — {atlasPoint.meridianEnglish}</Text>
+          {atlasDetail ? (
+            <>
+              <Info label={ar ? 'المكان على الجسم' : language === 'fr' ? 'Emplacement' : 'Location'} value={text(atlasDetail.location, language)} />
+              <Info label={ar ? 'الاستخدام المذكور' : language === 'fr' ? 'Usage décrit' : 'Described use'} value={text(atlasDetail.use, language)} />
+              <Info label={ar ? 'طريقة آمنة عامة' : language === 'fr' ? 'Méthode générale sûre' : 'General safe method'} value={text(atlasDetail.technique, language)} />
+              <View style={styles.warning}><Info label={ar ? 'موانع وتنبيهات' : language === 'fr' ? 'Précautions' : 'Cautions'} value={text(atlasDetail.caution, language)} /></View>
+            </>
+          ) : (
+            <Text style={styles.atlasOnlyNote}>{ar ? 'هذه النقطة مدرجة في مرجع التسمية فقط؛ لا تتوفّر لها تفاصيل مكان/طريقة موثّقة داخل التطبيق، لذلك لا نعرض أي إرشاد ضغط غير موثّق.' : language === 'fr' ? 'Ce point figure uniquement dans le référentiel de nomenclature ; aucun détail d’emplacement/technique documenté n’est disponible, donc aucune consigne non documentée n’est affichée.' : 'This point is listed in the nomenclature reference only; no documented location/technique detail is available, so no undocumented pressure guidance is shown.'}</Text>
+          )}
+        </View>
+      )}
+      <Pressable onPress={() => Linking.openURL(atlasData.source.url)} style={styles.sourceLink}><Text style={styles.sourceText}>↗ {atlasData.source.title}</Text></Pressable>
     </View>
   );
 }
@@ -100,4 +194,24 @@ const styles = StyleSheet.create({
   info: { marginTop: 10 }, label: { color: '#0E6972', textAlign: 'right', fontWeight: '900', fontSize: 12 }, body: { color: '#344F57', textAlign: 'right', lineHeight: 21, fontSize: 13, marginTop: 3 },
   sourcesTitle: { color: '#173D48', fontWeight: '900', textAlign: 'right', marginTop: 13 },
   sourceLink: { borderTopWidth: 1, borderTopColor: '#E3ECEE', paddingVertical: 8 }, sourceText: { color: '#176F79', textAlign: 'right', fontSize: 12, textDecorationLine: 'underline' },
+  chips: { flexDirection: 'row-reverse', gap: 7, paddingVertical: 10 },
+  chip: { borderWidth: 1, borderColor: '#CBDDDF', borderRadius: 20, paddingVertical: 6, paddingHorizontal: 12, backgroundColor: '#FFF' },
+  chipActive: { backgroundColor: '#0E6972', borderColor: '#0E6972' },
+  chipText: { color: '#0E6972', fontWeight: '800', fontSize: 12 },
+  chipTextActive: { color: '#FFF' },
+  search: { borderWidth: 1, borderColor: '#CBDDDF', borderRadius: 11, paddingVertical: 9, paddingHorizontal: 12, backgroundColor: '#FFF', color: '#173D48', marginTop: 2 },
+  resultCount: { color: '#61747B', textAlign: 'right', fontSize: 12, marginTop: 8, marginBottom: 4 },
+  atlasList: { maxHeight: 300, borderWidth: 1, borderColor: '#D7E5E7', borderRadius: 14, backgroundColor: '#FFF' },
+  atlasListContent: { paddingVertical: 4 },
+  atlasRow: { flexDirection: 'row-reverse', alignItems: 'center', gap: 10, paddingVertical: 9, paddingHorizontal: 12, borderBottomWidth: 1, borderBottomColor: '#EEF4F5' },
+  atlasRowActive: { backgroundColor: '#EAF8F5' },
+  atlasCode: { color: '#0E6972', fontWeight: '900', fontSize: 13, minWidth: 46, textAlign: 'center' },
+  atlasCodeActive: { color: '#0A4E55' },
+  atlasNames: { flex: 1 },
+  atlasName: { color: '#173D48', fontWeight: '800', textAlign: 'right', fontSize: 13 },
+  atlasChinese: { color: '#8AA0A6', fontWeight: '600' },
+  atlasEnglish: { color: '#61747B', textAlign: 'right', fontSize: 11, marginTop: 2 },
+  empty: { color: '#8AA0A6', textAlign: 'center', paddingVertical: 16 },
+  atlasMeta: { color: '#45646C', textAlign: 'right', fontSize: 12, marginTop: 5 },
+  atlasOnlyNote: { color: '#6E5319', textAlign: 'right', lineHeight: 20, fontSize: 12, marginTop: 10, backgroundColor: '#FFF4E5', borderWidth: 1, borderColor: '#F0D4A1', borderRadius: 12, padding: 11 },
 });

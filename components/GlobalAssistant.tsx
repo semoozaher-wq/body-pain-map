@@ -49,6 +49,7 @@ const LABELS: Record<Lang, Record<string, string>> = {
     speaking: 'بتكلّم…',
     send: 'إرسال',
     close: 'إغلاق',
+    newConversation: 'محادثة جديدة',
     confirmTitle: 'هذا الإجراء يحتاج تأكيدًا',
     confirm: 'تأكيد',
     cancel: 'إلغاء',
@@ -74,6 +75,7 @@ const LABELS: Record<Lang, Record<string, string>> = {
     speaking: 'Speaking…',
     send: 'Send',
     close: 'Close',
+    newConversation: 'New chat',
     confirmTitle: 'This action needs confirmation',
     confirm: 'Confirm',
     cancel: 'Cancel',
@@ -159,6 +161,7 @@ export function GlobalAssistant({ appState, onAction, onTurn, language, directio
     toggleSpeaker,
     confirmPending,
     cancelPending,
+    clearMessages,
   } = useAppAssistant({
     getState: () => appState,
     onAction: handleAction,
@@ -173,6 +176,15 @@ export function GlobalAssistant({ appState, onAction, onTurn, language, directio
     try { Speech.stop(); } catch {}
     setOpen(false);
   }, []);
+
+  // محادثة جديدة (spec #4b): نفرّغ الرسائل والسياق الطبي، وننهي أي مكالمة/نطق جارٍ،
+  // حتى لا يتسرّب سياق المحادثة القديمة إلى الجديدة.
+  const handleNewConversation = useCallback(() => {
+    endCallRef.current?.();
+    try { Speech.stop(); } catch {}
+    clearMessages();
+    setInput('');
+  }, [clearMessages]);
 
   const handleSend = useCallback(() => {
     if (!input.trim()) return;
@@ -228,9 +240,14 @@ export function GlobalAssistant({ appState, onAction, onTurn, language, directio
                 <Text style={styles.title}>{t.title}</Text>
                 <Text style={styles.subtitle}>{stateLabel || t.subtitle}</Text>
               </View>
-              <Pressable onPress={handleClose} accessibilityRole="button" accessibilityLabel={t.close} style={styles.closeBtn}>
-                <Text style={styles.closeGlyph}>✕</Text>
-              </Pressable>
+              <View style={styles.headerActions}>
+                <Pressable onPress={handleNewConversation} accessibilityRole="button" accessibilityLabel={t.newConversation} style={styles.closeBtn}>
+                  <Text style={styles.closeGlyph}>✚</Text>
+                </Pressable>
+                <Pressable onPress={handleClose} accessibilityRole="button" accessibilityLabel={t.close} style={styles.closeBtn}>
+                  <Text style={styles.closeGlyph}>✕</Text>
+                </Pressable>
+              </View>
             </View>
 
             {/* شريط الحالة الصوتية */}
@@ -365,6 +382,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontWeight: '900', color: Palette.ink800 },
   subtitle: { fontSize: 11, color: Palette.slate500, marginTop: 2 },
   closeBtn: { width: 34, height: 34, borderRadius: Radii.pill, backgroundColor: Palette.slate100, alignItems: 'center', justifyContent: 'center' },
+  headerActions: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   closeGlyph: { fontSize: 15, color: Palette.slate600, fontWeight: '800' },
   callBar: {
     alignItems: 'center',

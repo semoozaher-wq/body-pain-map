@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing, Image, ImageSourcePropType, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Image, ImageSourcePropType, PanResponder, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Language } from '../services/i18n';
 
 export type IllustratedMarker = { id: string; x: number; y: number; label: string };
@@ -14,12 +14,23 @@ type Props = {
   highlight?: { id: string; x: number; y: number; label: string } | null;
   /** علامة ألم وضعها المساعد المركزي على الخريطة (دبوس أحمر). */
   painMarker?: { x: number; y: number } | null;
+  /** عند تمريره: يُمكّن المستخدم من سحب/لمس الخريطة لتحريك مؤشر الألم بسلاسة (spec #4c). */
+  onPainMarkerChange?: (pos: { x: number; y: number }) => void;
 };
 
-export function IllustratedBodyMap({ source, markers, language, title, hint, onSelect, highlight, painMarker }: Props) {
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+export function IllustratedBodyMap({ source, markers, language, title, hint, onSelect, highlight, painMarker, onPainMarkerChange }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const markerMap = useMemo(() => new Map(markers.map((marker) => [marker.id, marker])), [markers]);
   const pulse = useRef(new Animated.Value(0)).current;
+  const editable = !!onPainMarkerChange;
+  // أبعاد إطار الصورة (بالبكسل) لتحويل موضع اللمس إلى نسبة 0..100.
+  const frameSize = useRef({ w: 1, h: 1 });
+  // مرجع دائم لأحدث دالة تغيير حتى لا نُعيد إنشاء PanResponder في كل تصيير.
+  const changeRef = useRef(onPainMarkerChange);
+  changeRef.current = onPainMarkerChange;
+
   useEffect(() => {
     if (!highlight) return;
     pulse.setValue(0);
@@ -30,10 +41,53 @@ export function IllustratedBodyMap({ source, markers, language, title, hint, onS
     loop.start();
     return () => loop.stop();
   }, [highlight?.id, pulse]);
+
+  // تحويل إحداثيات اللمس (نسبة من إطار الصورة) إلى نسبة 0..100 على الخريطة.
+  const placeFromTouch = useMemo(
+    () => (lx: number, ly: number) => {
+      const { w, h } = frameSize.current;
+      const x = clamp((lx / (w || 1)) * 100, 0, 100);
+      const y = clamp((ly / (h || 1)) * 100, 0, 100);
+      changeRef.current?.({ x: Math.round(x * 10) / 10, y: Math.round(y * 10) / 10 });
+    },
+    [],
+  );
+
+  // سحب/لمس سلس لتحريك مؤشر الألم: نلتقط المؤشر من أول لمسة (لمس = وضع، سحب = تحريك)
+  // ونمنع الـScrollView الأب من سرقة الإيماءة أثناء السحب حتى تبقى الحركة سلسة.
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => editable,
+        onMoveShouldSetPanResponder: () => editable,
+        onPanResponderGrant: (evt) => placeFromTouch(evt.nativeEvent.locationX, evt.nativeEvent.locationY),
+        onPanResponderMove: (evt) => placeFromTouch(evt.nativeEvent.locationX, evt.nativeEvent.locationY),
+        onPanResponderTerminationRequest: () => false,
+      }),
+    [editable, placeFromTouch],
+  );
+
+  const dragHint =
+    language === 'ar' ? 'اسحب أو المس الجسم لتحريك مؤشر الألم' : language === 'fr' ? 'Glissez ou touchez pour déplacer le repère' : 'Drag or tap the body to move the pain marker';
+
   return <View style={styles.card}>
     <View style={styles.heading}><View style={styles.texts}><Text style={styles.title}>{title}</Text><Text style={styles.hint}>{hint}</Text></View><View style={styles.badge}><Text style={styles.badgeText}>{language === 'ar' ? 'خريطة بصرية' : language === 'fr' ? 'Vue visuelle' : 'Visual map'}</Text></View></View>
-    <View style={styles.imageFrame}>
+    <View
+      style={styles.imageFrame}
+      onLayout={(e) => {
+        const layout = e.nativeEvent.layout;
+        frameSize.current = { w: layout.width || 1, h: layout.height || 1 };
+      }}
+    >
       <Image source={source} style={styles.image} resizeMode="contain" accessibilityLabel={language === 'ar' ? 'رسم تشريحي توضيحي قابل للتفاعل' : language === 'fr' ? 'Illustration anatomique interactive' : 'Interactive anatomical illustration'} />
+      {editable && (
+        <View
+          style={styles.dragLayer}
+          accessibilityRole="adjustable"
+          accessibilityLabel={dragHint}
+          {...panResponder.panHandlers}
+        />
+      )}
       {markers.map((marker) => {
         const active = selected === marker.id;
         return <Pressable key={marker.id} onPress={() => { setSelected(marker.id); onSelect(marker); }} accessibilityRole="button" accessibilityLabel={marker.label} accessibilityState={{ selected: active }} style={[styles.marker, { left: `${marker.x}%`, top: `${marker.y}%` }, active && styles.markerActive]}>
@@ -54,6 +108,7 @@ export function IllustratedBodyMap({ source, markers, language, title, hint, onS
         <View style={styles.painMarkerLabel}><Text style={styles.painMarkerLabelText}>{language === 'ar' ? 'مكان الألم' : language === 'fr' ? 'Douleur' : 'Pain'}</Text></View>
       </View>}
     </View>
+    {editable && <Text style={styles.dragHint}>{dragHint}</Text>}
     {markers.length <= 8 && <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.markerList}>{markers.map((marker) => <Pressable key={marker.id} onPress={() => { setSelected(marker.id); onSelect(marker); }} accessibilityRole="button" accessibilityLabel={marker.label} accessibilityState={{ selected: selected === marker.id }} style={[styles.markerChip, selected === marker.id && styles.markerChipActive]}><Text style={[styles.markerChipText, selected === marker.id && styles.markerChipTextActive]}>{marker.label}</Text></Pressable>)}</ScrollView>}
     <Text style={styles.footer}>{hint}</Text>
     {selected && markerMap.has(selected) && <Text style={styles.selectedText}>{markerMap.get(selected)?.label}</Text>}
@@ -68,6 +123,8 @@ const styles = StyleSheet.create({
   badge: { backgroundColor: '#E7F5F2', borderRadius: 10, paddingHorizontal: 8, paddingVertical: 6 }, badgeText: { color: '#0B7774', fontSize: 10, fontWeight: '900' },
   imageFrame: { width: '100%', maxWidth: 560, alignSelf: 'center', aspectRatio: 0.67, maxHeight: 900, backgroundColor: '#F9FBFB', borderRadius: 16, position: 'relative', overflow: 'hidden', borderWidth: 1, borderColor: '#E5ECEC' },
   image: { width: '100%', height: '100%' },
+  dragLayer: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 2 },
+  dragHint: { color: '#0B7774', fontSize: 10, fontWeight: '800', textAlign: 'center', marginTop: 8 },
   marker: { position: 'absolute', width: 44, height: 44, marginLeft: -22, marginTop: -22, borderRadius: 22, backgroundColor: 'transparent', borderWidth: 0, alignItems: 'center', justifyContent: 'center', zIndex: 3 },
   markerActive: { zIndex: 10, transform: [{ scale: 1.08 }], backgroundColor: 'rgba(213,78,78,0.18)', borderWidth: 2, borderColor: 'rgba(213,78,78,0.48)', shadowColor: '#D54E4E', shadowOpacity: 0.55, shadowRadius: 12, shadowOffset: { width: 0, height: 0 }, elevation: 5 },
   dot: { width: 1, height: 1, borderRadius: 1, backgroundColor: 'transparent' }, dotActive: { backgroundColor: 'transparent' },
