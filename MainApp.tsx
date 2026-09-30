@@ -574,6 +574,8 @@ export default function App() {
       </View>
 
       {/* المساعد المركزي العائم — متاح في كل الشاشات ويتحكّم في التطبيق بأوامر منظّمة. */}
+      {/* يُخفى أثناء عرض شاشة المساعد الكامل (AssistantScreen) حتى لا تتداخل النافذتان،
+          دون إلغاء تحميله، فتبقى الرسائل والسياق وحالة الصوت محفوظة ويعود عند الرجوع. */}
       <GlobalAssistant
         appState={appState}
         onAction={handleAssistantAction}
@@ -581,6 +583,7 @@ export default function App() {
         language={language as Lang}
         direction={direction}
         bottomOffset={92}
+        hidden={screen === 'assistant'}
       />
     </SafeAreaView>
   );
