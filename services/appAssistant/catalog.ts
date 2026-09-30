@@ -365,6 +365,35 @@ const GROUP_EXTRA_ALIASES: Record<string, string[]> = {
   lower: BACK_ALIASES,
   chest: ['صدر', 'صدري', 'صدرى', 'chest', 'poitrine'],
 };
+
+// ---------------------------------------------------------------------------
+// مرادفات إضافية للمناطق بالصيغ الدارجة والضمائر الملتصقة (عامية مصرية/فصحى مبسّطة)
+// ---------------------------------------------------------------------------
+// الهدف: أن يفهم المساعد وصف المستخدم الطبيعي («جنبي بيوجعني»، «كتفي»، «بطني»، «ضهري»)
+// دون أن يطلب منه الضغط على الخريطة. لا اختراع إحداثيات: المرادفات تُطابَق مع المناطق
+// الحقيقية الموجودة في anatomyHotspots.json فقط.
+const REGION_EXTRA_ALIASES: Record<string, string[]> = {
+  obliques: ['جنبي', 'جنبه', 'جنبها', 'خصر', 'خصري', 'الخصر', 'خواصري', 'flank', 'side', 'cote', 'côté'],
+  deltoids: ['كتف', 'كتفي', 'كتفه', 'كتفها', 'الكتفين', 'shoulder', 'shoulders', 'epaule', 'épaule'],
+  abs: ['بطن', 'بطني', 'بطنه', 'كرش', 'كرشي', 'abdomen', 'belly', 'ventre'],
+  neck: ['رقبه', 'رقبتي', 'الرقبه', 'neck', 'cou'],
+  head: ['راس', 'راسي', 'الراس', 'head', 'tete', 'tête'],
+  knees: ['ركبه', 'ركبتي', 'الركبه', 'knee', 'genou'],
+  feet: ['قدم', 'قدمي', 'القدم', 'foot', 'feet', 'pied'],
+  hands: ['ايد', 'ايدي', 'الايد', 'يد', 'يدي', 'hand', 'hands', 'main'],
+  forearm: ['ساعد', 'ساعدي', 'الساعد', 'forearm', 'avant-bras'],
+  quadriceps: ['فخذ', 'فخذي', 'الفخذ', 'thigh', 'cuisse'],
+  calves: ['سمانه', 'سمانتي', 'السمانه', 'calf', 'mollet'],
+  ankles: ['كاحل', 'كاحلي', 'الكاحل', 'ankle', 'cheville'],
+  gluteal: ['ارداف', 'اردافي', 'glutes', 'fessiers'],
+  biceps: ['باي', 'biceps'],
+  triceps: ['تراي', 'triceps'],
+  trapezius: ['ترابيس', 'trapezius'],
+  hamstring: ['خلف الفخذ', 'hamstrings'],
+  tibialis: ['ظنبوب', 'shin'],
+  hair: ['فروه', 'scalp'],
+};
+
 for (const spot of HOTSPOTS) {
   if (spot.type !== 'muscle' || !spot.muscleId) continue;
   const group = spot.muscleId.split('-')[0];
@@ -372,7 +401,7 @@ for (const spot of HOTSPOTS) {
   seenGroups.add(`${group}-${spot.view}`);
   const label = MUSCLE_GROUP_LABELS[group];
   if (!label) continue;
-  const extra = GROUP_EXTRA_ALIASES[group] ?? [];
+  const extra = [...(GROUP_EXTRA_ALIASES[group] ?? []), ...(REGION_EXTRA_ALIASES[group] ?? [])];
   entries.push({
     id: `region:${group}:${spot.view}`,
     kind: 'region',

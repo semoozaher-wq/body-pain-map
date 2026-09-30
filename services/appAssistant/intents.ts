@@ -37,6 +37,7 @@ export type IntentKind =
   | 'record_pain'
   | 'locate_pain'
   | 'move_marker'
+  | 'move_toward'
   | 'open_last_entry'
   | 'doctor_summary'
   | 'medications'
@@ -134,6 +135,53 @@ const MARKER_VERBS = [
   'حط علامه', 'حط علامة', 'ضع علامه', 'ضع علامة', 'علم على مكان', 'حدد مكان', 'حددلي مكان',
   'place marker', 'set marker', 'marker',
 ];
+
+// كلمات تعني «التحرّك ناحية منطقة حقيقية» (أقرب للكتف، ناحية البطن، جنب الرقبة…)
+// تُستخدم لتحريك العلامة الحالية نحو إحداثيات منطقة موجودة فعلاً في الكتالوج،
+// لا لاختراع موضع جديد. المطابقة على التوكن المستقل حتى لا تلتقط «جنبي» (الخصر) ككلمة اتجاه.
+const TOWARD_WORDS = [
+  'اقرب', 'قرب', 'ناحيه', 'ناحيه', 'نحو', 'باتجاه', 'تجاه', 'جنب', 'بجوار', 'جانب', 'عند',
+  'toward', 'towards', 'near', 'next to', 'vers', 'pres de',
+];
+// كلمات قياس/حشو نتجاوزها عند التقاط اسم المنطقة بعد كلمة «ناحية/أقرب».
+const TOWARD_STOP = new Set(
+  [
+    'شويه', 'شوي', 'شوية', 'قليل', 'بسيط', 'اكتر', 'اكثر', 'كمان', 'تاني', 'تانى',
+    'خالص', 'اوي', 'اوى', 'جدا', 'حبه', 'حبة', 'بس', 'من', 'في', 'على', 'عن',
+  ].map((w) => normalize(w)),
+);
+
+/** يزيل لام الجر/التعريف في بداية اسم المنطقة («للكتف» → «كتف»، «البطن» → «بطن»). */
+function cleanAnchorToken(tok: string): string {
+  return tok
+    .replace(/^(ل+)?(ال)/, '')
+    .replace(/^(ل+)/, '')
+    .replace(/^من/, '')
+    .trim();
+}
+
+/**
+ * يستخرج اسم المنطقة التي نتحرّك «ناحيتها» («أقرب للكتف» → «كتف»، «ناحية البطن» → «بطن»).
+ * يعمل على التوكنات المستقلة ويتجاوز كلمات القياس، ويرفض الصيغ الاتجاهية المحضة
+ * («ناحية اليمين»/«جنب الشمال») حتى تُعالَج كتحريك اتجاهي عادي لا كمنطقة هدف.
+ */
+function findTowardAnchor(text: string): string | undefined {
+  const toks = tokenize(text);
+  for (let i = 0; i < toks.length; i += 1) {
+    if (!TOWARD_WORDS.includes(toks[i])) continue;
+    const rest: string[] = [];
+    for (let j = i + 1; j < toks.length && rest.length < 3; j += 1) {
+      if (rest.length === 0 && TOWARD_STOP.has(toks[j])) continue;
+      rest.push(toks[j]);
+    }
+    const cleaned = rest.map(cleanAnchorToken).filter(Boolean).join(' ').trim();
+    if (!cleaned) continue;
+    // صيغة اتجاهية محضة (يمين/شمال/فوق/تحت…) ⇒ ليست منطقة هدف، نتركها للتحريك الاتجاهي.
+    if (findDirection(cleaned)) continue;
+    return cleaned;
+  }
+  return undefined;
+}
 
 // كلمات الأدوية
 const MEDICATION_WORDS = [
@@ -384,12 +432,21 @@ export function parseIntents(
     intents.push({ kind: 'locate_pain', targetTerm: target || undefined, direction, refersToContext, value: severity, raw: utterance });
   }
 
+  // --- التحرّك ناحية منطقة حقيقية ("أقرب للكتف"، "ناحية البطن") ---
+  // نستخرجه قبل التحريك الاتجاهي حتى لا تُفسَّر «ناحية الكتف» كاتجاه، ونتيح تحريك العلامة
+  // الحالية نحو إحداثيات منطقة موجودة فعلاً في الكتالوج (لا اختراع مواضع).
+  const towardAnchor = !isQuestion && !hasWhere && !text.includes('اللي') ? findTowardAnchor(text) : undefined;
+  if (towardAnchor && !intents.some((i) => i.kind === 'locate_pain')) {
+    intents.push({ kind: 'move_toward', targetTerm: towardAnchor, refersToContext: true, raw: utterance });
+  }
+
   // --- تحريك علامة الألم الحالية ("تحت شوية"، "ناحية اليمين") ---
   const isDirectionalOnly =
     direction &&
     !isQuestion &&
     !hasWhere &&
     !text.includes('اللي') &&
+    !towardAnchor &&
     (refersToContext || hasMarkerVerb || hasBase || text.includes('شويه') || text.includes('شوية') || text.includes('بتاع') || text.includes('علامه') || text.includes('علامة') || text.includes('ناحيه') || text.includes('ناحية') || text.includes('جنب') || text.includes('جوه'));
   if (isDirectionalOnly && !intents.some((i) => i.kind === 'locate_pain')) {
     intents.push({ kind: 'move_marker', direction, refersToContext: true, raw: utterance });

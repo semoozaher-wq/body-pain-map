@@ -264,15 +264,33 @@ export function offsetPoint(point: Coords, direction: Direction, amount = 8): Co
       return { ...point, x: clamp(point.x + amount) };
     case 'diagonal':
       return { ...point, x: clamp(point.x + amount / 2), y: clamp(point.y + amount / 2) };
+    // «ورا» = الجهة الخلفية من الجسم ⇒ ننتقل لعرض الظهر مع الحفاظ على نفس الموضع (x,y).
+    case 'behind':
+      return { ...point, view: 'back' };
+    // «قدام» = الجهة الأمامية من الجسم ⇒ ننتقل لعرض الأمام مع الحفاظ على نفس الموضع (x,y).
+    case 'in_front':
+      return { ...point, view: 'front' };
     case 'near':
     case 'between':
     case 'between_two':
     case 'far':
-    case 'in_front':
-    case 'behind':
     default:
       return { ...point };
   }
+}
+
+/**
+ * يحرّك نقطة خطوة نحو هدف حقيقي («أقرب للكتف»، «ناحية البطن») بنسبة `fraction` من المسافة.
+ * يستخدم إحداثيات الكتالوج الحقيقية فقط (لا اختراع مواقع تشريحية) ويتبنّى عرض الهدف.
+ */
+export function moveToward(point: Coords, target: Coords, fraction = 0.5): Coords {
+  const clamp = (v: number) => Math.max(0, Math.min(100, v));
+  const f = Math.max(0.1, Math.min(0.9, fraction));
+  return {
+    x: clamp(point.x + (target.x - point.x) * f),
+    y: clamp(point.y + (target.y - point.y) * f),
+    view: target.view,
+  };
 }
 
 export { DIRECTION_LABELS };

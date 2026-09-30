@@ -29,6 +29,7 @@ import {
   nearestInDirection,
   nearestBetweenTwo,
   offsetPoint,
+  moveToward,
   DIRECTION_LABELS,
   type Direction,
 } from './spatial';
@@ -82,6 +83,8 @@ function moveAmount(rawText: string): number {
     .replace(/\u0649/g, '\u064a')
     .replace(/\u0629/g, '\u0647');
   if (t.includes('\u0628\u0639\u064a\u062f') || t.includes('\u0627\u0628\u0639\u062f')) return 16;
+  // «أكتر/أكثر/بكتير» = تصحيح بمدى أكبر («لا، تحت أكتر») ⇒ إزاحة أكبر من الافتراضي.
+  if (t.includes('\u0627\u0643\u062a\u0631') || t.includes('\u0627\u0643\u062b\u0631') || t.includes('\u0628\u0643\u062a\u064a\u0631')) return 14;
   if (t.includes('\u0642\u0631\u064a\u0628') || t.includes('\u0627\u0642\u0631\u0628')) return 4;
   if (t.includes('\u0634\u0648\u064a') || t.includes('\u0642\u0644\u064a\u0644') || t.includes('\u0628\u0633\u064a\u0637')) return 6;
   return 8;
@@ -394,9 +397,9 @@ export function interpret(
           }
         } else {
           replyParts.push(L(
-            'تمام، فتحت خريطة الجسم. اضغط على مكان الألم أو قول لي المنطقة (مثلاً: أسفل الظهر، الركبة، البطن).',
-            'Okay, I opened the body map. Tap where it hurts, or tell me the area (e.g. lower back, knee, abdomen).',
-            'D’accord, j’ai ouvert la carte. Touchez l’endroit ou nommez la zone (bas du dos, genou, abdomen).',
+            'تمام، فتحت خريطة الجسم. قول لي الألم فين بالظبط (مثلاً: جنبي، كتفي، بطني، ظهري) وأنا هحدّد العلامة.',
+            'Okay, I opened the body map. Just tell me where it hurts (e.g. my flank, my shoulder, my belly, my back) and I’ll place the marker.',
+            'D’accord, j’ai ouvert la carte. Dites-moi où vous avez mal (par ex. le flanc, l’épaule, le ventre, le dos) et je place le repère.',
           ));
         }
         understood = true;
@@ -417,9 +420,38 @@ export function interpret(
           understood = true;
         } else {
           replyParts.push(L(
-            'محتاج أعرف مكان الألم الأول. قول لي المنطقة أو اضغط على الخريطة.',
-            'I need the pain location first. Tell me the area or tap the map.',
-            'J’ai d’abord besoin de l’emplacement. Nommez la zone ou touchez la carte.',
+            'قول لي الألم فين الأول (مثلاً: جنبي، كتفي، بطني، ظهري) وأنا هحدّد العلامة وأحرّكها معاك.',
+            'First tell me where it hurts (e.g. my flank, my shoulder, my belly, my back) and I’ll set and move the marker with you.',
+            'Dites-moi d’abord où vous avez mal (par ex. le flanc, l’épaule, le ventre, le dos) et je place le repère.',
+          ));
+          understood = true;
+        }
+        break;
+      }
+      case 'move_toward': {
+        // تحريك العلامة الحالية نحو منطقة حقيقية («أقرب للكتف»، «ناحية البطن») باستخدام إحداثيات الكتالوج فقط (لا اختراع مواضع).
+        const base = state.selectedPainLocation ?? state.conversationContext.lastReferencedCoords;
+        const anchor = intent.targetTerm
+          ? findTarget(intent.targetTerm, ['region', 'organ', 'point'])
+          : undefined;
+        if (base && anchor && anchor.coords) {
+          const moved = moveToward(
+            { x: base.x, y: base.y, view: base.view },
+            { x: anchor.coords.x, y: anchor.coords.y, view: anchor.coords.view },
+            0.6,
+          );
+          actions.push({ type: 'move_marker', targetId: 'pain_marker', value: `${moved.x},${moved.y},${moved.view}` });
+          replyParts.push(L(
+            `قرّبت العلامة ناحية ${labelFor(anchor, lang)}. لو عايز أدقّ أكتر قول «فوق شوية» أو «ناحية اليمين».`,
+            `Moved the marker closer to ${labelFor(anchor, lang)}. Say “a bit up” or “to the right” to fine-tune.`,
+            `J’ai rapproché le repère de ${labelFor(anchor, lang)}. Dites « un peu plus haut » ou « à droite » pour ajuster.`,
+          ));
+          understood = true;
+        } else {
+          replyParts.push(L(
+            'قول لي الألم فين الأول (مثلاً: جنبي، كتفي، بطني) وأنا هحدّد العلامة، وبعدها أقرّبها من أي منطقة تقولها.',
+            'First tell me where it hurts (e.g. my flank, my shoulder, my belly), then I can move it closer to any area you name.',
+            'Dites-moi d’abord où vous avez mal (par ex. le flanc, l’épaule, le ventre), puis je le rapproche de la zone que vous indiquez.',
           ));
           understood = true;
         }
@@ -483,15 +515,15 @@ export function interpret(
         if (intent.value !== undefined) {
           actions.push({ type: 'save', targetId: 'pain_entry', value: intent.value, requiresConfirmation: true, label: L(`حفظ ألم شدّته ${intent.value}/10`, `Save pain ${intent.value}/10`, `Enregistrer douleur ${intent.value}/10`) });
           replyParts.push(L(
-            `جهّزت تسجيل ألم شدّته ${intent.value} من 10. حدّد المكان على الخريطة وقول «احفظ» للتأكيد.`,
-            `Prepared a pain entry with severity ${intent.value}/10. Pick the spot on the map and say “save” to confirm.`,
-            `Entrée de douleur ${intent.value}/10 préparée. Choisissez l’emplacement et dites « enregistrer ».`,
+            `جهّزت تسجيل ألم شدّته ${intent.value} من 10. قول «احفظ» للتأكيد.`,
+            `Prepared a pain entry with severity ${intent.value}/10. Say “save” to confirm.`,
+            `Entrée de douleur ${intent.value}/10 préparée. Dites « enregistrer » pour confirmer.`,
           ));
         } else {
           replyParts.push(L(
-            'تمام، اضغط على مكان الوجع على الخريطة وقول الشدّة من 10.',
-            'Okay, tap where it hurts on the map and tell me the severity out of 10.',
-            'D’accord, touchez l’endroit douloureux et indiquez l’intensité sur 10.',
+            'تمام، قول لي مكان الوجع (مثلاً: جنبي، كتفي، بطني) والشدّة من 10 وأنا هحدّد العلامة.',
+            'Okay, tell me where it hurts (e.g. my flank, my shoulder, my belly) and the severity out of 10, and I’ll place the marker.',
+            'D’accord, dites-moi où vous avez mal (par ex. le flanc, l’épaule, le ventre) et l’intensité sur 10, et je place le repère.',
           ));
         }
         understood = true;
@@ -593,7 +625,7 @@ export function interpret(
   // لأن إجراءاتها المشتقّة (فتح الخريطة + العلامة + الإبراز) نتيجة الفهم الطبي لا أمر تنقّل مباشر.
   if (understood && mode === 'app') {
     const medicalish = intents.some(
-      (i) => i.kind === 'locate_pain' || i.kind === 'record_pain' || i.kind === 'move_marker',
+      (i) => i.kind === 'locate_pain' || i.kind === 'record_pain' || i.kind === 'move_marker' || i.kind === 'move_toward',
     );
     const appish = intents.some(
       (i) =>
