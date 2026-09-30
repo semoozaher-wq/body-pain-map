@@ -167,6 +167,8 @@
     "voiceInput": "Voice input",
     "voiceStop": "Stop recording",
     "listening": "Listening… speak now",
+    "voiceUnsupported": "Your browser doesn't support speech recognition. Try Chrome or Safari.",
+    "voiceInApp": "Speech recognition doesn't work inside the in-app browser (Facebook/Instagram). Open the link in Chrome.",
     "attachImage": "Attach a photo",
     "removeImage": "Remove photo",
     "speakReply": "Listen to reply",

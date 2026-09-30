@@ -167,6 +167,8 @@
     "voiceInput": "تسجيل صوتي",
     "voiceStop": "إيقاف التسجيل",
     "listening": "أستمع… تكلّم الآن",
+    "voiceUnsupported": "متصفحك لا يدعم التعرّف على الصوت. جرّب Chrome أو Safari.",
+    "voiceInApp": "التعرّف على الصوت لا يعمل داخل المتصفح الداخلي (فيسبوك/إنستجرام). افتح الرابط في Chrome.",
     "attachImage": "إرفاق صورة",
     "removeImage": "إزالة الصورة",
     "speakReply": "اسمع الرد",

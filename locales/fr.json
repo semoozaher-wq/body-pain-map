@@ -167,6 +167,8 @@
     "voiceInput": "Saisie vocale",
     "voiceStop": "Arrêter l'enregistrement",
     "listening": "J'écoute… parlez",
+    "voiceUnsupported": "Votre navigateur ne prend pas en charge la reconnaissance vocale. Essayez Chrome ou Safari.",
+    "voiceInApp": "La reconnaissance vocale ne fonctionne pas dans le navigateur intégré (Facebook/Instagram). Ouvrez le lien dans Chrome.",
     "attachImage": "Joindre une photo",
     "removeImage": "Retirer la photo",
     "speakReply": "Écouter la réponse",
