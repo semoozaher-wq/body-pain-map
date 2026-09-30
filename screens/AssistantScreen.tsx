@@ -24,6 +24,8 @@ import * as Speech from 'expo-speech';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services/speechRecognition';
+import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
+import { voiceLog } from '../services/speech/voiceLog';
 import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
 import { Palette, Gradients, Radii, Elevation, Type } from '../constants/design';
@@ -234,6 +236,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const [thinking, setThinking] = useState(false);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState('');
+  const [voiceError, setVoiceError] = useState<string | null>(null);
   const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [autoSpeak, setAutoSpeak] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
@@ -241,7 +244,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   /** How many clarifying questions were asked in a row (shown in the status line). */
   const [askCount, setAskCount] = useState(persistedAskCount);
   const scrollRef = useRef<ScrollView>(null);
-  const webRecognitionRef = useRef<any>(null);
+  const webRecognizerRef = useRef<WebRecognizer | null>(null);
   // Mirror of `askCount` so two sends in the same tick can never both read a
   // stale counter (this is what previously made the question repeat forever).
   const askCountRef = useRef(persistedAskCount);
@@ -263,18 +266,27 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // تبادل الأدوار الصوتي (نفس سلوك GlobalAssistant): استماع مستمر + مهلة صمت
   // ------------------------------------------------------------------
   const silenceTimerRef = useRef<any>(null);
-  const turnBufferRef = useRef('');
-  const interimRef = useRef('');
-  const lastResultIndexRef = useRef(0);
-  const resultsLengthRef = useRef(0);
+  const noResultTimerRef = useRef<any>(null);
+  // Live transcript bookkeeping (web). `liveRef` = everything the recogniser has
+  // heard; `committedRef` = the prefix already sent; `currentRef` = the
+  // not-yet-sent remainder we display and send. This makes the flow immune to
+  // Android replacing `event.results` instead of appending to it.
+  const liveRef = useRef('');
+  const committedRef = useRef('');
+  const currentRef = useRef('');
+  const gotResultRef = useRef(false);
   const startListeningRef = useRef<() => void>(() => {});
   const stopListeningRef = useRef<() => void>(() => {});
+  const commitTurnRef = useRef<() => void>(() => {});
   const sendRef = useRef<(text: string, imageUri?: string | null) => void>(() => {});
   const listeningRef = useRef(false);
   listeningRef.current = listening;
   const voiceSessionRef = useRef(false);
   const speakingRef = useRef(false);
+  const languageRef = useRef(language);
+  languageRef.current = language;
   const TURN_SILENCE_MS = 1500;
+  const NO_RESULT_WATCHDOG_MS = 7000;
 
   useEffect(() => {
     mountedRef.current = true;
@@ -297,8 +309,9 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // ------------------------------------------------------------------
   // التعرّف على الكلام (الإدخال الصوتي) — تبادل أدوار طبيعي
   // ------------------------------------------------------------------
-  useSpeechRecognitionEvents('start', () => setListening(true));
+  useSpeechRecognitionEvents('start', () => { voiceLog('mic-start', { platform: 'native' }); setListening(true); });
   useSpeechRecognitionEvents('end', () => {
+    voiceLog('mic-end', { platform: 'native' });
     setListening(false);
     // متابعة تلقائية على الأندرويد: بعض محرّكات الكلام تُنهي الجلسة بعد صمت،
     // فنعيد الاستماع ما دامت الجلسة الصوتية شغّالة (نفس سلوك مسار الويب).
@@ -306,19 +319,20 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       setTimeout(() => { if (voiceSessionRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
     }
   });
-  useSpeechRecognitionEvents('error', () => setListening(false));
+  useSpeechRecognitionEvents('error', (event: any) => { voiceLog('speech-error', { platform: 'native', code: event?.error }); setListening(false); });
   useSpeechRecognitionEvents('result', (event: any) => {
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
+    voiceLog('speech-result', { platform: 'native', transcript, isFinal: !!event?.isFinal });
     // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
     if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
     if (event?.isFinal) {
-      // النتيجة النهائية = جملة جديدة (تُضاف للمخزن)، والجزئية = الجملة الحالية.
-      turnBufferRef.current = `${turnBufferRef.current} ${transcript}`.trim();
-      interimRef.current = '';
-      setInterim('');
+      // النتيجة النهائية = جملة جديدة تُضاف للنص المتراكم المعروض.
+      liveRef.current = `${liveRef.current} ${transcript}`.trim();
+      currentRef.current = `${currentRef.current} ${transcript}`.trim();
+      setInterim(currentRef.current);
     } else {
-      interimRef.current = transcript;
+      // الجزئية = معاينة حيّة فقط (لا تُضاف للنص المرسل).
       setInterim(transcript);
     }
     // تبادل أدوار حقيقي على الأندرويد: لا نرسل فورًا — ننتظر صمتًا كافيًا
@@ -329,28 +343,59 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // نهاية جولة المستخدم: نُرسل النص المتراكم بعد صمت كافٍ (منع القطع المبكر).
   const commitTurn = useCallback(() => {
     if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
-    const text = `${turnBufferRef.current} ${interimRef.current}`.trim();
-    turnBufferRef.current = '';
-    interimRef.current = '';
-    setInterim('');
-    lastResultIndexRef.current = resultsLengthRef.current;
+    if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
+    const text = currentRef.current.trim();
     if (text) {
+      // نحفظ ما تم إرساله حتى لا نعيد إرساله في الجلسة المستمرة، ثم نُفرّغ العرض.
+      committedRef.current = liveRef.current;
+      currentRef.current = '';
+      setInterim('');
+      voiceLog('sendTurn', { text });
       sendRef.current(text);
       if (!voiceSessionRef.current) stopListeningRef.current?.();
     } else if (!voiceSessionRef.current) {
       stopListeningRef.current?.();
     }
   }, []);
+  commitTurnRef.current = commitTurn;
 
   const scheduleTurnSend = useCallback(() => {
     if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     silenceTimerRef.current = setTimeout(commitTurn, TURN_SILENCE_MS);
   }, [commitTurn]);
 
+  // معالجة نتيجة تعرّف (ويب): نبني النص من الصفر ونتعامل مع نموذجي الإلحاق/الاستبدال.
+  const handleWebResult = useCallback(
+    (snap: SpeechSnapshot) => {
+      gotResultRef.current = true;
+      if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
+      // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
+      if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
+      const live = snap.liveText;
+      liveRef.current = live;
+      let current = live;
+      if (committedRef.current) {
+        if (live.startsWith(committedRef.current)) {
+          current = live.slice(committedRef.current.length).trim();
+        } else {
+          // المتعرّف استبدل مخزونه (أندرويد) ⇒ جملة جديدة.
+          committedRef.current = '';
+          current = live;
+        }
+      }
+      currentRef.current = current;
+      setInterim(current);
+      voiceLog('transcript', { live, current, hasFinal: snap.hasFinal });
+      scheduleTurnSend();
+    },
+    [scheduleTurnSend],
+  );
+
   const stopListening = useCallback(() => {
     if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
+    if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
     try {
-      if (Platform.OS === 'web') webRecognitionRef.current?.stop?.();
+      if (Platform.OS === 'web') webRecognizerRef.current?.stop?.();
       else SpeechRecognitionModule?.stop?.();
     } catch {}
     setListening(false);
@@ -358,73 +403,75 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   }, []);
 
   const startListening = useCallback(async () => {
+    setVoiceError(null);
     try {
       // expo-speech-recognition is native-first and does not reliably expose
       // a permission flow on Expo Web/Vercel. Use the browser Web Speech API
       // there, which triggers the browser's own microphone permission prompt.
       if (Platform.OS === 'web') {
-        const browserWindow = globalThis as any;
-        const Recognition = browserWindow.SpeechRecognition || browserWindow.webkitSpeechRecognition;
-        if (!Recognition) return;
-        if (listening) return;
+        if (listeningRef.current) return;
+        if (!webSpeechSupported()) {
+          voiceLog('mic-start', { supported: false, inApp: isLikelyInAppBrowser() });
+          setVoiceError(isLikelyInAppBrowser() ? 'voiceInApp' : 'voiceUnsupported');
+          return;
+        }
         // جولة جديدة: نصفّر المخزن والمؤشرات.
-        turnBufferRef.current = '';
-        interimRef.current = '';
-        lastResultIndexRef.current = 0;
-        resultsLengthRef.current = 0;
-        const recognition = new Recognition();
-        webRecognitionRef.current = recognition;
-        recognition.lang = speechLang(language);
-        recognition.interimResults = true;
-        // نستمع باستمرار حتى لا نقطع المستخدم بعد كلمة أو جملة قصيرة.
-        recognition.continuous = true;
-        recognition.onstart = () => setListening(true);
-        recognition.onresult = (event: any) => {
-          resultsLengthRef.current = event?.results?.length ?? 0;
-          // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
-          if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
-          let newFinal = '';
-          let interimText = '';
-          let lastFinalIdx = lastResultIndexRef.current - 1;
-          for (let i = lastResultIndexRef.current; i < event.results.length; i++) {
-            const r = event.results[i];
-            if (r.isFinal) { newFinal += `${r[0].transcript} `; lastFinalIdx = i; }
-            else interimText += r[0].transcript;
-          }
-          if (newFinal) {
-            turnBufferRef.current = `${turnBufferRef.current} ${newFinal}`.trim();
-            lastResultIndexRef.current = lastFinalIdx + 1;
-          }
-          interimRef.current = interimText;
-          setInterim(interimText);
-          // لا نرسل فورًا: ننتظر صمتًا كافيًا حتى يكمل المستخدم كلامه.
-          scheduleTurnSend();
-        };
-        recognition.onerror = () => { setListening(false); setInterim(''); };
-        recognition.onend = () => {
-          setListening(false);
-          setInterim('');
-          webRecognitionRef.current = null;
-          // متابعة تلقائية: نعيد الاستماع ما دامت الجلسة الصوتية شغّالة.
-          if (voiceSessionRef.current) {
-            setTimeout(() => { if (voiceSessionRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
-          }
-        };
-        recognition.start();
+        liveRef.current = '';
+        committedRef.current = '';
+        currentRef.current = '';
+        gotResultRef.current = false;
+        const recognizer = createWebRecognizer(
+          { lang: speechLang(languageRef.current), continuous: true, interimResults: true },
+          {
+            log: (stage, data) => voiceLog(stage, data),
+            onStart: () => {
+              setListening(true);
+              // حارس: لو لم تصل أي نتيجة خلال مهلة، نسجّل ذلك بوضوح (يساعد في تشخيص WebView).
+              if (noResultTimerRef.current) clearTimeout(noResultTimerRef.current);
+              noResultTimerRef.current = setTimeout(() => {
+                if (!gotResultRef.current) {
+                  voiceLog('no-speech-result-watchdog', { afterMs: NO_RESULT_WATCHDOG_MS, inApp: isLikelyInAppBrowser() });
+                }
+              }, NO_RESULT_WATCHDOG_MS);
+            },
+            onResult: (snap) => handleWebResult(snap),
+            onError: (code) => {
+              setListening(false);
+              setInterim('');
+              voiceLog('speech-error', { code });
+              if (code === 'not-allowed' || code === 'service-not-allowed') setVoiceError('voiceUnsupported');
+            },
+            onEnd: () => {
+              setListening(false);
+              // لا نُهدر النص: نُرسل أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
+              if (currentRef.current.trim()) commitTurnRef.current();
+              setInterim('');
+              webRecognizerRef.current = null;
+              // متابعة تلقائية: نعيد الاستماع ما دامت الجلسة الصوتية شغّالة.
+              if (voiceSessionRef.current) {
+                setTimeout(() => { if (voiceSessionRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
+              }
+            },
+          },
+        );
+        if (!recognizer) return;
+        webRecognizerRef.current = recognizer;
+        recognizer.start();
         return;
       }
       const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
-      if (!perm?.granted) return;
+      if (!perm?.granted) { voiceLog('mic-permission-denied'); return; }
       setInterim('');
       SpeechRecognitionModule?.start?.({
-        lang: speechLang(language),
+        lang: speechLang(languageRef.current),
         interimResults: true,
         continuous: true,
       });
-    } catch {
+    } catch (e: any) {
+      voiceLog('mic-error', { message: e?.message });
       setListening(false);
     }
-  }, [listening, language, scheduleTurnSend]);
+  }, [handleWebResult]);
 
   // نربط المراجع بالدوال الفعلية لاستخدامها داخل الـ callbacks المستقرة.
   stopListeningRef.current = stopListening;
@@ -456,11 +503,12 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     setAskCount(0);
     persistedMessages = [];
     persistedAskCount = 0;
-    turnBufferRef.current = '';
-    interimRef.current = '';
-    lastResultIndexRef.current = 0;
-    resultsLengthRef.current = 0;
+    liveRef.current = '';
+    committedRef.current = '';
+    currentRef.current = '';
+    gotResultRef.current = false;
     setInterim('');
+    setVoiceError(null);
     setInput('');
     setMessages([]);
   }, [stopListening]);
@@ -500,8 +548,9 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     try {
       voiceSessionRef.current = false;
       if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      if (noResultTimerRef.current) clearTimeout(noResultTimerRef.current);
       Speech.stop();
-      webRecognitionRef.current?.abort?.();
+      webRecognizerRef.current?.abort?.();
       SpeechRecognitionModule?.abort?.();
     } catch {}
   }, []);
@@ -579,6 +628,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             setAskCount(nextAskCount);
             const id = nextId();
             setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'rich', reply }]);
+            voiceLog('assistant-response', { mode: 'image', text: reply.intro?.[language as Lang]?.slice(0, 80) });
             setThinking(false);
             if (autoSpeak) speak(replyToSpeech(reply), id);
             return;
@@ -609,6 +659,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             askCountRef.current = nextAskCount;
             setAskCount(nextAskCount);
             setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'rich', reply }]);
+            voiceLog('assistant-response', { mode: 'medical', text: reply.intro?.[language as Lang]?.slice(0, 80) });
             setThinking(false);
             if (autoSpeak) speak(replyToSpeech(reply), id);
           } else {
@@ -617,6 +668,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             askCountRef.current = 0;
             setAskCount(0);
             setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'text', text: replyText }]);
+            voiceLog('assistant-response', { mode: 'text', text: replyText.slice(0, 80) });
             setThinking(false);
             if (autoSpeak) speak(replyText, id);
           }
@@ -795,6 +847,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
 
       {/* شريط الإدخال */}
       <View style={[styles.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        {voiceError && (
+          <View style={[styles.voiceErrorRow, { flexDirection: row }]}>
+            <Text style={styles.voiceErrorText}>{t(`assistant.${voiceError}`)}</Text>
+          </View>
+        )}
         {(pendingImage || listening) && (
           <View style={[styles.pendingRow, { flexDirection: row }]}>
             {pendingImage && (
@@ -1227,6 +1284,8 @@ const styles = StyleSheet.create({
   listeningPill: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Palette.teal100, borderRadius: Radii.pill, paddingHorizontal: 12, paddingVertical: 8 },
   listeningDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Palette.rose },
   listeningText: { flex: 1, color: Palette.teal700, fontFamily: Fonts.arabic.medium, fontSize: Type.caption },
+  voiceErrorRow: { backgroundColor: '#FDECEC', borderRadius: Radii.md, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8 },
+  voiceErrorText: { flex: 1, color: '#B42318', fontFamily: Fonts.arabic.medium, fontSize: Type.caption },
   inputBar: { alignItems: 'flex-end', gap: 9 },
   iconButton: { width: 46, height: 46, borderRadius: Radii.md, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   iconGlyph: { fontSize: 19 },
