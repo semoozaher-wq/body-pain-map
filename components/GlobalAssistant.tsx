@@ -36,6 +36,13 @@ interface GlobalAssistantProps {
   direction: 'rtl' | 'ltr';
   /** موضع الزر العائم أسفل الشاشة (لتجنّب شريط التنقّل). */
   bottomOffset?: number;
+  /**
+   * يخفي المساعد العائم (الزر + النافذة) دون إلغاء تحميل المكوّن أو مسح حالته.
+   * يُستخدم أثناء عرض شاشة المساعد الكامل (AssistantScreen) حتى لا تظهر النافذة
+   * العائمة فوقها. تبقى الرسائل والسياق الطبي وحالة الصوت محفوظة كما هي، ويعود
+   * الظهور تلقائيًا عند العودة إلى الصفحة الرئيسية.
+   */
+  hidden?: boolean;
 }
 
 const LABELS: Record<Lang, Record<string, string>> = {
@@ -118,7 +125,7 @@ const LABELS: Record<Lang, Record<string, string>> = {
   },
 };
 
-export function GlobalAssistant({ appState, onAction, onTurn, language, direction, bottomOffset = 92 }: GlobalAssistantProps) {
+export function GlobalAssistant({ appState, onAction, onTurn, language, direction, bottomOffset = 92, hidden = false }: GlobalAssistantProps) {
   const t = LABELS[language] ?? LABELS.ar;
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -218,8 +225,8 @@ export function GlobalAssistant({ appState, onAction, onTurn, language, directio
 
   return (
     <>
-      {/* الزر العائم */}
-      {!open && (
+      {/* الزر العائم — مخفي أثناء عرض شاشة المساعد الكامل. */}
+      {!open && !hidden && (
         <Pressable
           onPress={() => setOpen(true)}
           accessibilityRole="button"
@@ -231,7 +238,8 @@ export function GlobalAssistant({ appState, onAction, onTurn, language, directio
         </Pressable>
       )}
 
-      <Modal visible={open} animationType="slide" transparent onRequestClose={handleClose}>
+      {/* النافذة العائمة — لا تظهر أبدًا فوق شاشة المساعد الكامل. */}
+      <Modal visible={open && !hidden} animationType="slide" transparent onRequestClose={handleClose}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.overlay}>
           <View style={styles.sheet}>
             {/* الرأس */}
