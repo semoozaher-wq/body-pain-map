@@ -97,6 +97,7 @@ const LABELS: Record<Lang, Record<string, string>> = {
     errPermission: 'Microphone permission was denied.',
     errMic: 'Could not access the microphone.',
     errSpeech: 'A speech error occurred. Please try again.',
+    errInApp: 'Speech recognition does not work inside an in-app browser (e.g. Facebook/Instagram). Open the link in Chrome.',
   },
   fr: {
     fab: 'Assistant',
@@ -212,6 +213,8 @@ export function GlobalAssistant({ appState, onAction, onTurn, language, directio
   const errorText =
     error === 'no-speech-api'
       ? t.errNoApi
+      : error === 'in-app-browser'
+      ? t.errInApp
       : error === 'mic-permission'
       ? t.errPermission
       : error === 'mic-error'
