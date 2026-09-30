@@ -130,10 +130,18 @@ export function createWebRecognizer(
 
   let running = false;
   let liveText = '';
+  // Event-level dedup: Android Chrome frequently re-emits the *same* result
+  // event (notably the same final text). We remember the last emitted snapshot
+  // and drop exact repeats so the downstream TurnGate never sees a phantom
+  // second utterance. Reset on every new recognition session.
+  let lastLiveText = '';
+  let lastHasFinal = false;
 
   rec.onstart = () => {
     running = true;
     liveText = '';
+    lastLiveText = '';
+    lastHasFinal = false;
     callbacks.log?.('mic-start', { lang: rec.lang, continuous: rec.continuous, interimResults: rec.interimResults });
     callbacks.onStart?.();
   };
@@ -148,6 +156,14 @@ export function createWebRecognizer(
   };
   rec.onresult = (event: any) => {
     const snap = snapshotFromEvent(event);
+    // Drop an exact repeat of the previous event (Android re-finalisation):
+    // identical live text AND identical final/interim classification.
+    if (snap.liveText === lastLiveText && snap.hasFinal === lastHasFinal) {
+      callbacks.log?.('speech-result-dedup', { liveText: snap.liveText, hasFinal: snap.hasFinal });
+      return;
+    }
+    lastLiveText = snap.liveText;
+    lastHasFinal = snap.hasFinal;
     liveText = snap.liveText;
     callbacks.log?.('speech-result', {
       results: event?.results?.length ?? 0,
