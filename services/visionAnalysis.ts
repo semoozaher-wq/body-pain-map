@@ -8,9 +8,12 @@ import { mergeWithModelPossibilities, runRuleBasedTriage } from './clinicalAnaly
 import type { MergedPossibility, TriageInput } from './clinicalAnalysis';
 
 const endpoint = String(process.env.EXPO_PUBLIC_MEDICAL_VISION_ENDPOINT ?? '').trim();
+const VISION_TIMEOUT_MS = 20_000;
+const MAX_IMAGE_DATA_URL_LENGTH = 12_000_000;
 
 // لا نقرأ EXPO_PUBLIC_* كمفتاح سري. متغيرات Expo العامة قد تدخل حزمة العميل.
 export const isVisionConfigured = Boolean(endpoint);
+export const visionEndpointTimeoutMs = VISION_TIMEOUT_MS;
 
 export const MEDICAL_SYSTEM_PROMPT = [
   'أنت مساعد توعية صحية تعليمي، ولست طبيبًا ولا تقدّم تشخيصًا.',
@@ -52,10 +55,21 @@ export async function analyseImageWithPossibilities(request: VisionRequest): Pro
     };
   }
 
+  if (!request.imageDataUrl || request.imageDataUrl.length > MAX_IMAGE_DATA_URL_LENGTH) {
+    return {
+      ...mergeWithModelPossibilities(triage, []),
+      configured: true,
+      noteAr: 'تعذّر إرسال الصورة: الملف فارغ أو أكبر من الحد الآمن. استخدم صورة أصغر ثم حاول مجددًا.',
+    };
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), VISION_TIMEOUT_MS);
   try {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       body: JSON.stringify({
         system: MEDICAL_SYSTEM_PROMPT,
         image: request.imageDataUrl,
@@ -65,9 +79,11 @@ export async function analyseImageWithPossibilities(request: VisionRequest): Pro
     });
     if (!response.ok) throw new Error(`vision endpoint returned ${response.status}`);
     const payload: unknown = await response.json();
-    const list: string[] = Array.isArray((payload as { possibilities?: unknown }).possibilities)
-      ? ((payload as { possibilities: unknown[] }).possibilities.filter((item): item is string => typeof item === 'string'))
+    const rawList = Array.isArray((payload as { possibilities?: unknown }).possibilities)
+      ? (payload as { possibilities: unknown[] }).possibilities
       : [];
+    const list = rawList.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+      .map((item) => item.trim().slice(0, 240)).slice(0, 8);
     return {
       ...mergeWithModelPossibilities(triage, list),
       configured: true,
@@ -79,5 +95,7 @@ export async function analyseImageWithPossibilities(request: VisionRequest): Pro
       configured: true,
       noteAr: 'تعذّر الاتصال بخدمة التحليل؛ تُعرض النتائج الإرشادية القائمة على القواعد فقط.',
     };
+  } finally {
+    clearTimeout(timeout);
   }
 }
