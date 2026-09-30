@@ -7,6 +7,10 @@
 // يحتوي آلة حالة صوتية حقيقية: استماع → تفكير → تحدّث → استماع (متابعة تلقائية)،
 // مع مقاطعة (barge-in)، كتم، مكبّر صوت، إنهاء المكالمة، ومعالجة أخطاء الميكروفون/الشبكة.
 // لا يعرف تفاصيل الشاشات — يتعامل فقط مع AppState + onAction (فصل تام).
+//
+// v2 (voice-pipeline fix): كل منطق النصّ الصوتي (live/committed/pending + مهلة
+// الصمت) انتقل إلى وحدة واحدة قابلة للاختبار services/speech/turnGate.ts،
+// لضمان أن كل جملة تُنتج جولة واحدة فقط (منع الإرسال المزدوج).
 // ============================================================================
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -15,6 +19,7 @@ import * as Speech from 'expo-speech';
 import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services/speechRecognition';
 import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
 import { voiceLog } from '../services/speech/voiceLog';
+import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
 import { interpret } from '../services/appAssistant/engine';
 import type { AppState, AssistantAction, AssistantTurn, Lang } from '../services/appAssistant/types';
 import { afterSpeechEnd, type VoiceState } from '../services/appAssistant/voiceMachine';
@@ -62,18 +67,12 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   const [error, setError] = useState<string | null>(null);
 
   const webRecognizerRef = useRef<WebRecognizer | null>(null);
-  const silenceTimerRef = useRef<any>(null);
   const noResultTimerRef = useRef<any>(null);
   const startListeningRef = useRef<() => void>(() => {});
   const stopListeningRef = useRef<() => void>(() => {});
-  const commitTurnRef = useRef<() => void>(() => {});
-  // Live transcript bookkeeping (web). `liveRef` = everything the recogniser has
-  // heard; `committedRef` = the prefix already sent; `currentRef` = the
-  // not-yet-sent remainder that we display and send. This makes the flow immune
-  // to Android replacing `event.results` instead of appending to it.
-  const liveRef = useRef('');
-  const committedRef = useRef('');
-  const currentRef = useRef('');
+  // TurnGate: المصدر الوحيد للحقيقة في تتبّع النصّ الصوتي (يمنع الإرسال المزدوج).
+  const gateRef = useRef<TurnGate | null>(null);
+  const sendRef = useRef<(text: string) => void>(() => {});
   const gotResultRef = useRef(false);
   // السياق الطبي المُجمَّع بين الرسائل (spec #4d): نمرّره للمحرّك في كل جولة حتى يبني
   // على ما قاله المستخدم سابقًا بدل أن يعيد السؤال.
@@ -93,6 +92,25 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   voiceStateRef.current = voiceState;
   const listeningRef = useRef(listening);
   listeningRef.current = listening;
+
+  // --- إنشاء/جلب الـ TurnGate (مرة واحدة) ---
+  const getGate = useCallback((): TurnGate => {
+    if (!gateRef.current) {
+      gateRef.current = createTurnGate({
+        silenceMs: TURN_SILENCE_MS,
+        onInterim: (text) => setInterim(text),
+        onTurn: (text) => {
+          sendRef.current(text);
+          if (!callActiveRef.current) stopListeningRef.current?.();
+        },
+        onEmpty: () => {
+          if (!callActiveRef.current) stopListeningRef.current?.();
+        },
+        onLog: (stage, data) => voiceLog(stage, data),
+      });
+    }
+    return gateRef.current;
+  }, []);
 
   // --- نهاية النطق: نعود للاستماع داخل المكالمة، أو للخمول خارجها ---
   const finishSpeech = useCallback(() => {
@@ -161,60 +179,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     },
     [getState, runTurn, onTurn, autoSpeak, speak],
   );
-
-  // --- نهاية جولة المستخدم: نُرسل النص المتراكم بعد صمت كافٍ (منع القطع المبكر) ---
-  const commitTurn = useCallback(() => {
-    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
-    if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
-    const text = currentRef.current.trim();
-    if (text) {
-      // نحفظ ما تم إرساله حتى لا نعيد إرساله في الجلسة المستمرة، ثم نُفرّغ العرض.
-      committedRef.current = liveRef.current;
-      currentRef.current = '';
-      setInterim('');
-      voiceLog('sendTurn', { text });
-      send(text);
-      if (!callActiveRef.current) stopListeningRef.current?.();
-    } else if (!callActiveRef.current) {
-      stopListeningRef.current?.();
-    }
-  }, [send]);
-  commitTurnRef.current = commitTurn;
-
-  const scheduleTurnSend = useCallback(() => {
-    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-    silenceTimerRef.current = setTimeout(commitTurn, TURN_SILENCE_MS);
-  }, [commitTurn]);
-
-  // --- معالجة نتيجة تعرّف (ويب): نبني النص من الصفر ونتعامل مع نموذجي الإلحاق/الاستبدال ---
-  const handleWebResult = useCallback(
-    (snap: SpeechSnapshot) => {
-      gotResultRef.current = true;
-      if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
-      // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
-      if (voiceStateRef.current === 'speaking') {
-        try { Speech.stop(); } catch {}
-        setSpeakingId(null);
-      }
-      const live = snap.liveText;
-      liveRef.current = live;
-      let current = live;
-      if (committedRef.current) {
-        if (live.startsWith(committedRef.current)) {
-          current = live.slice(committedRef.current.length).trim();
-        } else {
-          // المتعرّف استبدل مخزونه (أندرويد) ⇒ جملة جديدة.
-          committedRef.current = '';
-          current = live;
-        }
-      }
-      currentRef.current = current;
-      setInterim(current);
-      voiceLog('transcript', { live, current, hasFinal: snap.hasFinal });
-      scheduleTurnSend();
-    },
-    [scheduleTurnSend],
-  );
+  sendRef.current = send;
 
   // --- تأكيد الإجراءات الحسّاسة المعلّقة ---
   const confirmPending = useCallback(() => {
@@ -232,6 +197,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   useSpeechRecognitionEvents('end', () => {
     voiceLog('mic-end', { platform: 'native' });
     setListening(false);
+    // لا نُهدر النص: نُفرّغ أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
+    getGate().flush();
     setInterim('');
     if (voiceStateRef.current === 'listening' && !callActiveRef.current) setVoiceState('idle');
   });
@@ -252,9 +219,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       setSpeakingId(null);
     }
     if (event?.isFinal) {
-      setInterim('');
-      voiceLog('sendTurn', { platform: 'native', text: transcript });
-      send(transcript);
+      // كل نتيجة نهائية تمرّ عبر TurnGate ⇒ جولة واحدة لكل جملة.
+      getGate().onFinal(transcript);
     } else {
       setInterim(transcript);
     }
@@ -271,10 +237,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
           setError(isLikelyInAppBrowser() ? 'in-app-browser' : 'no-speech-api');
           return;
         }
-        // جولة جديدة: نصفّر المخزن والمؤشرات.
-        liveRef.current = '';
-        committedRef.current = '';
-        currentRef.current = '';
+        // جولة جديدة: نُصفّر الـ TurnGate والمؤشرات.
+        getGate().reset();
         gotResultRef.current = false;
         const recognizer = createWebRecognizer(
           { lang: speechLang(languageRef.current), continuous: true, interimResults: true },
@@ -291,7 +255,16 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
                 }
               }, NO_RESULT_WATCHDOG_MS);
             },
-            onResult: (snap) => handleWebResult(snap),
+            onResult: (snap: SpeechSnapshot) => {
+              gotResultRef.current = true;
+              if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
+              // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
+              if (voiceStateRef.current === 'speaking') {
+                try { Speech.stop(); } catch {}
+                setSpeakingId(null);
+              }
+              getGate().onSnapshot(snap);
+            },
             onError: (code) => {
               setListening(false);
               setInterim('');
@@ -301,8 +274,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
             },
             onEnd: () => {
               setListening(false);
-              // لا نُهدر النص: نُرسل أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
-              if (currentRef.current.trim()) commitTurnRef.current();
+              // لا نُهدر النص: نُفرّغ أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
+              getGate().flush();
               setInterim('');
               webRecognizerRef.current = null;
               // متابعة تلقائية: نعيد الاستماع ما دامت المكالمة شغّالة.
@@ -322,6 +295,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       // الأصلي (Expo)
       const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
       if (!perm?.granted) { voiceLog('mic-permission-denied'); setError('mic-permission'); return; }
+      getGate().reset();
       setInterim('');
       SpeechRecognitionModule?.start?.({ lang: speechLang(languageRef.current), interimResults: true, continuous: true });
     } catch (e: any) {
@@ -329,11 +303,11 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       setListening(false);
       setError('mic-error');
     }
-  }, [handleWebResult]);
+  }, [getGate]);
 
   const stopListening = useCallback(() => {
-    if (silenceTimerRef.current) { clearTimeout(silenceTimerRef.current); silenceTimerRef.current = null; }
     if (noResultTimerRef.current) { clearTimeout(noResultTimerRef.current); noResultTimerRef.current = null; }
+    gateRef.current?.dispose?.();
     try {
       if (Platform.OS === 'web') webRecognizerRef.current?.stop?.();
       else SpeechRecognitionModule?.stop?.();
@@ -383,6 +357,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   useEffect(() => () => {
     try {
       Speech.stop();
+      gateRef.current?.dispose?.();
       webRecognizerRef.current?.abort?.();
       SpeechRecognitionModule?.abort?.();
     } catch {}
@@ -411,6 +386,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     clearMessages: () => {
       // محادثة جديدة: نفرّغ الرسائل والسياق الطبي المتراكم معًا (فصل السياق القديم عن الجديد).
       painContextRef.current = null;
+      gateRef.current?.reset?.();
       setMessages([]);
       setPending([]);
     },
