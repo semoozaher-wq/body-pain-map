@@ -33,7 +33,11 @@ export function stripArabicDiacritics(text: string): string {
     .replace(/[\u064B-\u0652\u0670\u0640]/g, '') // harakat + tatweel
     .replace(/[\u0623\u0625\u0622\u0671]/g, '\u0627') // alef variants -> alef
     .replace(/\u0649/g, '\u064A') // alef maqsura -> ya
-    .replace(/\u0629/g, '\u0647'); // ta marbuta -> ha
+    .replace(/\u0629/g, '\u0647') // ta marbuta -> ha
+    // Common Egyptian speech-recognition spelling of ظهر. This is only used
+    // for equality/deduplication, never for the displayed transcript or
+    // location inference.
+    .replace(/\u0636\u0647\u0631/g, '\u0638\u0647\u0631');
 }
 
 /** Canonical form used for equality / prefix comparisons. */
