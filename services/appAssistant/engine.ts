@@ -701,8 +701,29 @@ export function interpret(
   if (options.aiDecision) {
     const decision = options.aiDecision;
     const g = actionsFromGeminiDecision(decision, state);
-    const gReply = geminiReplyText(decision);
+    let gReply = geminiReplyText(decision);
     const redFlags = aiReply?.redFlags?.length ?? 0;
+
+    // ثقة منخفضة: لا نخمّن مكانًا/اتجاهًا عبر Gemini إطلاقًا.
+    //   • إن كان محرّك القواعد قد فهم المكان بوضوح ⇒ نُبقي فهمه وردّه (الأوامر الواضحة Rule-Based).
+    //   • وإلا ⇒ نُلغي إجراء العلامة ونردّ بسؤال توضيحي قصير بدل التخمين.
+    // (لا نُخفي تحذير الخطر الطبي المحلي: نتجاهل هذا المنطق عند وجود علامة خطر.)
+    const lowConfidence = decision.confidence < GEMINI_CONFIDENCE_THRESHOLD;
+    const geminiGuessingLocation =
+      lowConfidence &&
+      (g.hasMarker || decision.intent === 'locate_pain' || decision.intent === 'move_marker');
+    if (geminiGuessingLocation) {
+      const rulesHaveMarker = actions.some((a) => a.type === 'set_marker' || a.type === 'move_marker');
+      for (let i = g.actions.length - 1; i >= 0; i--) {
+        if (g.actions[i].type === 'set_marker' || g.actions[i].type === 'move_marker') g.actions.splice(i, 1);
+      }
+      g.hasMarker = false;
+      if (rulesHaveMarker) {
+        gReply = null;
+      } else if (redFlags === 0) {
+        gReply = lowConfidenceClarification(decision);
+      }
+    }
 
     if (g.hasMarker) {
       // Gemini هو المرجع في العلامة: نُزيل أي علامة أنتجها محرّك القواعد لنفس الجولة
@@ -899,6 +920,12 @@ function geminiMoveAmount(raw?: string | null): number {
 const GEMINI_SCREENS = new Set<string>(['welcome', 'body', 'details', 'results', 'history', 'assistant', 'healthInfo']);
 const GEMINI_TABS = new Set<string>(['muscles', 'organs', 'acupressure', 'naturalRelief', 'medicalLibrary', 'drugLookup']);
 
+/**
+ * عتبة ثقة قرار Gemini (0..1). قرارٌ يخمّن مكانًا/اتجاهًا بثقة أقل من هذه القيمة لا يُنفَّذ مباشرةً،
+ * بل نطلب من المستخدم توضيحًا قصيرًا بدل التخمين. الأوامر الواضحة تبقى عبر محرّك القواعد (Rule-Based).
+ */
+const GEMINI_CONFIDENCE_THRESHOLD = 0.5;
+
 interface GeminiDerived {
   actions: AssistantAction[];
   entry?: CatalogEntry;
@@ -1033,6 +1060,21 @@ function actionsFromGeminiDecision(decision: GeminiDecision, state: AppState): G
   }
 
   return { actions, entry, hasMarker, mode };
+}
+
+/**
+ * سؤال توضيحي قصير يُستخدم عند انخفاض ثقة النموذج في فهم المكان/الاتجاه/الطلب:
+ * نُفضّل سؤال المتابعة الذي صاغه النموذج نفسه إن وُجد، وإلا نستخدم صيغة محلية قصيرة
+ * توجّه المستخدم لتحديد المنطقة بدل أن نخمّنها.
+ */
+function lowConfidenceClarification(decision: GeminiDecision): LocalizedText {
+  const follow = (decision.followUpQuestion ?? '').trim();
+  if (follow) return L(follow, follow, follow);
+  return L(
+    'ممكن توضّح المكان بالظبط؟ قول لي المنطقة أو الاتجاه اللي بيوجعك.',
+    'Could you be more specific about the spot? Tell me the area or direction that hurts.',
+    'Peux-tu préciser l’endroit exact ? Dis-moi la zone ou la direction qui fait mal.',
+  );
 }
 
 /**
