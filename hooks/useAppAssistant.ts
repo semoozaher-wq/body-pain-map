@@ -20,6 +20,7 @@ import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services
 import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
 import { voiceLog } from '../services/speech/voiceLog';
 import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
+import { claimVoiceSession, releaseVoiceSession, isVoiceSessionOwner } from '../services/speech/voiceSession';
 import { interpretAsync } from '../services/appAssistant/engine';
 import type { AppState, AssistantAction, AssistantTurn, Lang } from '../services/appAssistant/types';
 import { afterSpeechEnd, type VoiceState } from '../services/appAssistant/voiceMachine';
@@ -42,6 +43,9 @@ const ttsLang = (language: string): string =>
 let msgSeq = 0;
 const nextId = () => `am-${Date.now()}-${msgSeq++}`;
 
+// هوية هذا المسار الصوتي في قفل الجلسة المفردة (services/speech/voiceSession).
+const VOICE_OWNER = 'global';
+
 export interface UseAppAssistantOptions {
   /** يقرأ حالة التطبيق الحالية عند كل جولة. */
   getState: () => AppState;
@@ -52,9 +56,16 @@ export interface UseAppAssistantOptions {
   language: Lang;
   /** نطق الردود تلقائيًا. */
   autoSpeak?: boolean;
+  /**
+   * هل هذا المسار هو السطح النشط الآن؟ عندما false (مثلًا المساعد العائم
+   * مخفي أثناء عرض AssistantScreen) يُصبح المسار خاملًا تمامًا: لا يعالج أي
+   * حدث تعرّف، ولا يبدأ استماعًا، ويحرّر قفل الجلسة. هذا يضمن ألّا يعمل أكثر
+   * من مسار صوتي واحد في نفس الوقت.
+   */
+  enabled?: boolean;
 }
 
-export function useAppAssistant({ getState, onAction, onTurn, language, autoSpeak = false }: UseAppAssistantOptions) {
+export function useAppAssistant({ getState, onAction, onTurn, language, autoSpeak = false, enabled = true }: UseAppAssistantOptions) {
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [listening, setListening] = useState(false);
   const [interim, setInterim] = useState('');
@@ -92,6 +103,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   voiceStateRef.current = voiceState;
   const listeningRef = useRef(listening);
   listeningRef.current = listening;
+  const enabledRef = useRef(enabled);
+  enabledRef.current = enabled;
 
   // --- إنشاء/جلب الـ TurnGate (مرة واحدة) ---
   const getGate = useCallback((): TurnGate => {
@@ -195,8 +208,14 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   const cancelPending = useCallback(() => setPending([]), []);
 
   // --- أحداث التعرّف على الكلام (المسار الأصلي/Expo) ---
-  useSpeechRecognitionEvents('start', () => { voiceLog('mic-start', { platform: 'native' }); setListening(true); setVoiceState('listening'); });
+  useSpeechRecognitionEvents('start', () => {
+    if (!enabledRef.current || !isVoiceSessionOwner(VOICE_OWNER)) return;
+    voiceLog('mic-start', { platform: 'native' });
+    setListening(true);
+    setVoiceState('listening');
+  });
   useSpeechRecognitionEvents('end', () => {
+    if (!enabledRef.current || !isVoiceSessionOwner(VOICE_OWNER)) return;
     voiceLog('mic-end', { platform: 'native' });
     setListening(false);
     // لا نُهدر النص: نُفرّغ أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
@@ -205,6 +224,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     if (voiceStateRef.current === 'listening' && !callActiveRef.current) setVoiceState('idle');
   });
   useSpeechRecognitionEvents('error', (event: any) => {
+    if (!enabledRef.current || !isVoiceSessionOwner(VOICE_OWNER)) return;
     voiceLog('speech-error', { platform: 'native', code: event?.error });
     setListening(false);
     setInterim('');
@@ -212,6 +232,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     setVoiceState(afterSpeechEnd(callActiveRef.current));
   });
   useSpeechRecognitionEvents('result', (event: any) => {
+    if (!enabledRef.current || !isVoiceSessionOwner(VOICE_OWNER)) return;
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
     voiceLog('speech-result', { platform: 'native', transcript, isFinal: !!event?.isFinal });
@@ -239,6 +260,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
           setError(isLikelyInAppBrowser() ? 'in-app-browser' : 'no-speech-api');
           return;
         }
+        // قفل الجلسة: مسار واحد فقط يملك الميكروفون في أي لحظة.
+        if (!claimVoiceSession(VOICE_OWNER)) { voiceLog('mic-session-busy', { platform: 'web' }); return; }
         // جولة جديدة: نُصفّر الـ TurnGate والمؤشرات.
         getGate().reset();
         gotResultRef.current = false;
@@ -289,7 +312,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
             },
           },
         );
-        if (!recognizer) return;
+        if (!recognizer) { releaseVoiceSession(VOICE_OWNER); return; }
         webRecognizerRef.current = recognizer;
         recognizer.start();
         return;
@@ -297,6 +320,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       // الأصلي (Expo)
       const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
       if (!perm?.granted) { voiceLog('mic-permission-denied'); setError('mic-permission'); return; }
+      // قفل الجلسة: مسار واحد فقط يملك الميكروفون في أي لحظة.
+      if (!claimVoiceSession(VOICE_OWNER)) { voiceLog('mic-session-busy', { platform: 'native' }); return; }
       getGate().reset();
       setInterim('');
       SpeechRecognitionModule?.start?.({ lang: speechLang(languageRef.current), interimResults: true, continuous: true });
@@ -314,6 +339,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       if (Platform.OS === 'web') webRecognizerRef.current?.stop?.();
       else SpeechRecognitionModule?.stop?.();
     } catch {}
+    releaseVoiceSession(VOICE_OWNER);
     setListening(false);
     setInterim('');
   }, []);
@@ -356,12 +382,23 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
 
   const toggleSpeaker = useCallback(() => setSpeakerOn((prev) => !prev), []);
 
+  // عندما يصبح هذا المسار غير نشط (مخفي)، نوقف أي استماع ونحرّر قفل الجلسة فورًا
+  // حتى لا يبقى مساران صوتيان يعملان في نفس الوقت (AssistantScreen + العائم).
+  useEffect(() => {
+    if (enabled) return;
+    try { Speech.stop(); } catch {}
+    setSpeakingId(null);
+    stopListeningRef.current?.();
+    setVoiceState('idle');
+  }, [enabled]);
+
   useEffect(() => () => {
     try {
       Speech.stop();
       gateRef.current?.dispose?.();
       webRecognizerRef.current?.abort?.();
       SpeechRecognitionModule?.abort?.();
+      releaseVoiceSession(VOICE_OWNER);
     } catch {}
   }, []);
 
@@ -388,7 +425,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     clearMessages: () => {
       // محادثة جديدة: نفرّغ الرسائل والسياق الطبي المتراكم معًا (فصل السياق القديم عن الجديد).
       painContextRef.current = null;
-      gateRef.current?.reset?.();
+      gateRef.current?.newSession?.();
       setMessages([]);
       setPending([]);
     },
