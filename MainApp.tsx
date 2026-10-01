@@ -321,6 +321,20 @@ export default function App() {
         if (!Number.isNaN(Number(mx)) && !Number.isNaN(Number(my))) {
           const view: 'front' | 'back' = mv === 'back' ? 'back' : 'front';
           const marker = { x: Number(mx), y: Number(my), view };
+          // حفظ العلامة وحده لا يكفي لفهم جمل مثل «اللي فوقه» لاحقًا.
+          // اجعل المنطقة التي أنشأت العلامة هي المرجع الحواري الحالي، مع الحفاظ
+          // على المرجع السابق لاستخدام صيغ «بين الاتنين».
+          conversationContext.current.previousReferencedId = conversationContext.current.lastReferencedId;
+          conversationContext.current.previousReferencedCoords = conversationContext.current.lastReferencedCoords;
+          conversationContext.current.lastReferencedId = action.targetId ?? null;
+          conversationContext.current.lastReferencedKind = action.targetId?.startsWith('organ:')
+            ? 'organ'
+            : action.targetId?.startsWith('region:')
+              ? 'region'
+              : action.targetId?.startsWith('point:')
+                ? 'point'
+                : null;
+          conversationContext.current.lastReferencedLabel = action.label ?? null;
           setPainMarker(marker);
           // نُزامن العرض النشط مع عرض العلامة حتى تظهر دائمًا (مثلاً «ورا» تنقلنا لعرض الظهر تلقائيًا).
           issueBodyControl({ painMarker: marker, view });
