@@ -23,6 +23,12 @@ import { parseIntents, type RawIntent } from './intents';
 import { classifyGeneralChat, generalChatReply } from './generalChat';
 import { analyzeMessage, type AssistantReply, type PainContext } from '../aiAssistant/engine';
 import {
+  requestGeminiDecision,
+  mergePainContext,
+  type GeminiDecision,
+  type GeminiContext,
+} from '../aiAssistant/gemini';
+import {
   describePoint,
   describePosition,
   describeSpatialRelation,
@@ -38,6 +44,7 @@ import type {
   AssistantAction,
   AssistantTurn,
   CatalogEntry,
+  ConversationMode,
   Lang,
   LocalizedText,
   ResolvedTarget,
@@ -150,6 +157,25 @@ export interface InterpretOptions {
   /** السياق الطبي المُجمَّع من الجولات السابقة (spec #4d): يُمرَّر إلى محرّك الفهم الطبي
    *  حتى لا يُعيد المساعد السؤال عن معلومة قالها المستخدم بالفعل. */
   previousContext?: PainContext | null;
+  /**
+   * قرار موحّد (Structured JSON) قادم من طبقة الذكاء الاصطناعي الحقيقية (Gemini)
+   * عبر {@link interpretAsync}. عند وجوده يُفسَّر هنا إلى إجراءات موجودة فعلًا،
+   * ويُطبَّق عليه سياسة العلامة الواحدة. عند غيابه (فشل/عدم تهيئة) لا يتغيّر أي
+   * سلوك: محرّك القواعد يبقى المرجع الاحتياطي.
+   */
+  aiDecision?: GeminiDecision | null;
+  /** هل توجد صورة مرفقة مع الجملة؟ (تُمرَّر لمحرّك القواعد كطبقة احتياطية). */
+  hasImage?: boolean;
+  /** صورة كـ data URL (اختياري) — تُمرَّر إلى Gemini كمدخل متعدّد الوسائط. */
+  image?: string | null;
+  /** آخر رسائل المستخدم (سياق حواري قصير المدى يُمرَّر إلى Gemini). */
+  recentUserMessages?: string[];
+  /** كاسر الحلقة: منع السؤال التوضيحي بعد عدد محدّد (يُمرَّر لمحرّك القواعد). */
+  forceAnswer?: boolean;
+  /** عدد الأسئلة التوضيحية التي طُرحت بالفعل (يُمرَّر لمحرّك القواعد). */
+  askCount?: number;
+  /** عدد رسائل المستخدم (سقف كسر الحلقة، يُمرَّر لمحرّك القواعد). */
+  userTurnCount?: number;
 }
 
 export function interpret(
@@ -593,7 +619,12 @@ export function interpret(
   // ---------------------------------------------------------------------------
   let aiReply: AssistantReply | null = null;
   try {
-    aiReply = analyzeMessage(utterance, lang, false, {
+    aiReply = analyzeMessage(utterance, lang, options.hasImage ?? false, {
+      // كاسر الحلقة (spec): نمرّر عدّاد الأسئلة التوضيحية وسقف رسائل المستخدم حتى
+      // لا يظل المساعد يسأل عن الموقع إلى ما لا نهاية. عند غيابها تبقى القيم الافتراضية.
+      forceAnswer: options.forceAnswer,
+      askCount: options.askCount,
+      userTurnCount: options.userTurnCount,
       // السياق الطبي بين الرسائل (spec #4d): نمرّر ما فهمناه سابقًا حتى يبني عليه
       // بدل أن يسأل من جديد. مصدره حالة التطبيق (state.painContext) أو الخيارات.
       previousContext: options.previousContext ?? state.painContext ?? undefined,
@@ -659,6 +690,53 @@ export function interpret(
     replyParts.push(generalChatReply(generalKind, utterance));
   }
 
+  // ---------------------------------------------------------------------------
+  // طبقة الذكاء الاصطناعي الحقيقية (Gemini): قرار مُوحّد (Structured JSON) يصل من
+  // interpretAsync. نُفسّره هنا إلى إجراءات موجودة فعلًا (لا اختراع إجراءات/إحداثيات)،
+  // ونُطبّق سياسة العلامة الواحدة، ونجعل ردّ النموذج الطبيعي هو الردّ الأساسي.
+  // الأمان لا يعتمد على Gemini وحده: عند وجود علامة خطر من المحرّك المحلي نُبقي
+  // رسالة الأمان. عند غياب القرار (فشل/عدم تهيئة) لا يتغيّر أي سلوك.
+  // ---------------------------------------------------------------------------
+  let geminiPainContext: PainContext | null = null;
+  if (options.aiDecision) {
+    const decision = options.aiDecision;
+    const g = actionsFromGeminiDecision(decision, state);
+    const gReply = geminiReplyText(decision);
+    const redFlags = aiReply?.redFlags?.length ?? 0;
+
+    if (g.hasMarker) {
+      // Gemini هو المرجع في العلامة: نُزيل أي علامة أنتجها محرّك القواعد لنفس الجولة
+      // حتى لا تظهر علامتان (set_marker/move_marker) على الخريطة.
+      for (let i = actions.length - 1; i >= 0; i--) {
+        if (actions[i].type === 'set_marker' || actions[i].type === 'move_marker') actions.splice(i, 1);
+      }
+    }
+    if (g.actions.length) actions.push(...g.actions);
+    if (g.entry) resolved.push(toResolved(g.entry));
+
+    if (gReply) {
+      if (redFlags > 0) {
+        // إبقاء رسالة الأمان المحلية + إضافة فهم النموذج (لا نحجب تحذير الخطر).
+        replyParts.push(gReply);
+      } else {
+        replyParts.length = 0;
+        replyParts.push(gReply);
+      }
+      understood = true;
+    } else if (g.actions.length && !understood) {
+      understood = true;
+    }
+
+    if (g.mode) mode = g.mode;
+
+    if (decision.painContext) {
+      geminiPainContext = mergePainContext(
+        options.previousContext ?? state.painContext ?? null,
+        decision.painContext,
+      );
+    }
+  }
+
   // ضبط الوضع النهائي: الجولات الطبية (شكوى ألم / تحريك العلامة / الشدّة) تُصنَّف «طبي» لا «تحكّم»،
   // لأن إجراءاتها المشتقّة (فتح الخريطة + العلامة + الإبراز) نتيجة الفهم الطبي لا أمر تنقّل مباشر.
   if (understood && mode === 'app') {
@@ -718,6 +796,9 @@ export function interpret(
     pendingConfirmation: pending,
     suggestions: suggestionsFor(state),
     mode,
+    // السياق الطبي الموحّد القادم من Gemini (إن وُجد) بعد دمجه مع السياق السابق،
+    // حتى يُحفظ بين الرسائل ولا يُعيد المساعد السؤال عن معلومة معروفة.
+    painContext: geminiPainContext ?? undefined,
     // الردّ الطبي الكامل (إن وُجد) يُمرَّر مع الجولة حتى تعرضه شاشة «المساعد الذكي»
     // كبطاقة غنية دون استدعاء محرّك ثانٍ متناقض.
     medical: aiReply ?? undefined,
@@ -764,6 +845,251 @@ function actionsFromAiReply(reply: AssistantReply): { entry?: CatalogEntry; acti
   }
   actions.push({ type: 'highlight', targetId: entry.id, label: entry.label });
   return { entry, actions };
+}
+
+// ---------------------------------------------------------------------------
+// طبقة الذكاء الاصطناعي الحقيقية (Gemini) — تفسير القرار الموحّد إلى إجراءات فعلية
+// ---------------------------------------------------------------------------
+/** تحويل اتجاه Gemini النصّي إلى اتجاه مكاني موجود فعلاً في المحرّك. */
+const GEMINI_DIRECTIONS: Record<string, Direction> = {
+  above: 'above',
+  up: 'above',
+  over: 'above',
+  below: 'below',
+  down: 'below',
+  under: 'below',
+  left: 'left',
+  right: 'right',
+  behind: 'behind',
+  back: 'behind',
+  in_front: 'in_front',
+  front: 'in_front',
+  ahead: 'in_front',
+  near: 'near',
+  far: 'far',
+};
+
+function geminiDirection(raw?: string | null): Direction | null {
+  if (!raw) return null;
+  return GEMINI_DIRECTIONS[raw.trim().toLowerCase()] ?? null;
+}
+
+/** تحويل مقدار الحركة النصّي من Gemini إلى وحدات الإحداثيات (0..100). */
+function geminiMoveAmount(raw?: string | null): number {
+  switch ((raw ?? '').trim().toLowerCase()) {
+    case 'little':
+    case 'slight':
+    case 'small':
+    case 'a_little':
+      return 6;
+    case 'more':
+    case 'much':
+    case 'big':
+    case 'a_lot':
+      return 14;
+    case 'far':
+      return 16;
+    case 'near':
+      return 4;
+    default:
+      return 8;
+  }
+}
+
+const GEMINI_SCREENS = new Set<string>(['welcome', 'body', 'details', 'results', 'history', 'assistant', 'healthInfo']);
+const GEMINI_TABS = new Set<string>(['muscles', 'organs', 'acupressure', 'naturalRelief', 'medicalLibrary', 'drugLookup']);
+
+interface GeminiDerived {
+  actions: AssistantAction[];
+  entry?: CatalogEntry;
+  hasMarker: boolean;
+  mode?: ConversationMode;
+}
+
+/**
+ * يُفسّر قرار Gemini إلى إجراءات {@link AssistantAction} حقيقية موجودة في التطبيق.
+ * لا يُخترع أي إجراء أو إحداثي: المناطق تُحلّ عبر الكتالوج (findTarget) والحركة
+ * تُحسب عبر offsetPoint من موضع العلامة الحالي. سياسة العلامة الواحدة:
+ *   • set_marker فقط عند عدم وجود علامة سابقة (أول مرة).
+ *   • move_marker فقط عند وجود علامة سابقة، ونفس العلامة (لا علامة جديدة).
+ *   • عند intent=keep_marker أو direction=same: لا set_marker ولا move_marker.
+ */
+function actionsFromGeminiDecision(decision: GeminiDecision, state: AppState): GeminiDerived {
+  const actions: AssistantAction[] = [];
+  let entry: CatalogEntry | undefined;
+  let hasMarker = false;
+
+  const base = state.selectedPainLocation
+    ? { x: state.selectedPainLocation.x, y: state.selectedPainLocation.y, view: state.selectedPainLocation.view }
+    : state.conversationContext.lastReferencedCoords ?? null;
+  const hasBase = !!base;
+  const keepMarker = decision.intent === 'keep_marker';
+
+  for (const ga of decision.actions) {
+    switch (ga.type) {
+      case 'set_marker': {
+        // العلامة الواحدة: لا نُنشئ علامة جديدة إن وُجدت علامة، ولا عند «نفس المكان».
+        if (keepMarker || hasBase) break;
+        const found = ga.target ? findTarget(ga.target, ['region', 'organ', 'point']) : undefined;
+        if (found?.coords) {
+          entry = found;
+          actions.push({
+            type: 'set_marker',
+            targetId: found.id,
+            value: `${found.coords.x},${found.coords.y},${found.coords.view}`,
+          });
+          hasMarker = true;
+        }
+        break;
+      }
+      case 'move_marker': {
+        // نُحرّك نفس العلامة الحالية فقط (لا نُنشئ واحدة جديدة).
+        if (keepMarker || !hasBase || !base) break;
+        const dir = geminiDirection(ga.direction);
+        if (!dir) break; // «same» أو اتجاه غير معروف ⇒ لا حركة.
+        const moved = offsetPoint(base, dir, geminiMoveAmount(ga.amount));
+        actions.push({ type: 'move_marker', targetId: 'pain_marker', value: `${moved.x},${moved.y},${moved.view}` });
+        hasMarker = true;
+        break;
+      }
+      case 'set_view': {
+        const v = ga.view === 'back' ? 'back' : ga.view === 'front' ? 'front' : null;
+        if (v) actions.push({ type: 'set_view', targetId: v });
+        break;
+      }
+      case 'set_sex': {
+        const s = ga.value === 'female' ? 'female' : ga.value === 'male' ? 'male' : null;
+        if (s) actions.push({ type: 'set_sex', targetId: s });
+        break;
+      }
+      case 'navigate': {
+        const screen = ga.screen && GEMINI_SCREENS.has(ga.screen) ? ga.screen : null;
+        if (screen) actions.push({ type: 'navigate', targetId: `screen:${screen}` });
+        break;
+      }
+      case 'open_tab': {
+        const tab = ga.tab && GEMINI_TABS.has(ga.tab) ? ga.tab : null;
+        if (tab) {
+          actions.push({ type: 'navigate', targetId: 'screen:body' });
+          actions.push({ type: 'open_tab', targetId: `tab:${tab}` });
+        }
+        break;
+      }
+      case 'highlight': {
+        const found = ga.target ? findTarget(ga.target, ['organ', 'point', 'region']) : undefined;
+        if (found) {
+          entry = entry ?? found;
+          actions.push({ type: 'highlight', targetId: found.id, label: found.label });
+        }
+        break;
+      }
+      case 'clear_highlight':
+        actions.push({ type: 'clear_highlight' });
+        break;
+      case 'search':
+        if (ga.value != null) actions.push({ type: 'search', value: String(ga.value) });
+        break;
+      case 'filter':
+        if (ga.value != null) actions.push({ type: 'filter', value: String(ga.value) });
+        break;
+      case 'zoom':
+        if (ga.value != null) actions.push({ type: 'zoom', value: Number(ga.value) || 1 });
+        break;
+      case 'set_severity':
+        if (ga.value != null) actions.push({ type: 'set_severity', value: ga.value });
+        break;
+      case 'back':
+        actions.push({ type: 'back' });
+        break;
+      case 'open_last_entry':
+        actions.push({ type: 'navigate', targetId: 'screen:history' });
+        actions.push({ type: 'open_last_entry' });
+        break;
+      case 'doctor_summary':
+        actions.push({ type: 'navigate', targetId: 'screen:history' });
+        actions.push({ type: 'doctor_summary' });
+        break;
+      case 'reset_context':
+        actions.push({ type: 'reset_context' });
+        break;
+      case 'save':
+        actions.push({ type: 'save', targetId: 'current', requiresConfirmation: true });
+        break;
+      default:
+        break;
+    }
+  }
+
+  let mode: ConversationMode | undefined;
+  if (
+    decision.intent === 'locate_pain' ||
+    decision.intent === 'move_marker' ||
+    decision.intent === 'keep_marker' ||
+    decision.intent === 'medical_question'
+  ) {
+    mode = 'medical';
+  } else if (actions.length) {
+    mode = 'app';
+  }
+
+  return { actions, entry, hasMarker, mode };
+}
+
+/**
+ * يبني الردّ الطبيعي من قرار Gemini (ردّ + سؤال متابعة). النموذج يجيب بلغة المستخدم
+ * بالفعل، فنضع النص في اللغات الثلاث حتى يظهر مهما كانت لغة الواجهة.
+ */
+function geminiReplyText(decision: GeminiDecision): LocalizedText | null {
+  const main = (decision.reply ?? '').trim();
+  const follow = (decision.followUpQuestion ?? '').trim();
+  const text = [main, follow].filter(Boolean).join(' ').trim();
+  if (!text) return null;
+  return L(text, text, text);
+}
+
+/** يبني سياقًا مضغوطًا (بلا بيانات حسّاسة) يُرسَل إلى Gemini مع كل جملة. */
+function buildGeminiContext(state: AppState, recentUserMessages?: string[]): GeminiContext {
+  const marker = state.selectedPainLocation
+    ? { x: state.selectedPainLocation.x, y: state.selectedPainLocation.y, view: state.selectedPainLocation.view }
+    : state.conversationContext.lastReferencedCoords ?? null;
+  return {
+    screen: state.currentScreen,
+    tab: state.currentTab,
+    view: state.currentBodyView,
+    sex: state.currentSex,
+    painSeverity: state.painSeverity,
+    painMarker: marker,
+    lastReferenced: state.conversationContext.lastReferencedId,
+    lastReferencedKind: state.conversationContext.lastReferencedKind,
+    lastReferencedCoords: state.conversationContext.lastReferencedCoords,
+    painContext: state.painContext ?? null,
+    recentUserMessages: recentUserMessages ?? [],
+  };
+}
+
+/**
+ * المسار الموحّد للذكاء الاصطناعي: يستدعي Gemini أولًا (نصّ + صورة + سياق + لغة)،
+ * ثم يمرّر قراره إلى {@link interpret} (نفس محرّك القواعد) الذي يُفسّره إلى إجراءات
+ * موجودة فعلًا ويطبّق السياسات. عند فشل Gemini يُستدعى interpret بدون قرار فيسقط
+ * النظام تلقائيًا إلى محرّك القواعد (نفس السلوك السابق تمامًا).
+ */
+export async function interpretAsync(
+  utterance: string,
+  state: AppState,
+  options: InterpretOptions = {},
+): Promise<AssistantTurn> {
+  let aiDecision: GeminiDecision | null = null;
+  try {
+    aiDecision = await requestGeminiDecision({
+      text: utterance,
+      image: options.image ?? null,
+      language: state.language,
+      context: buildGeminiContext(state, options.recentUserMessages),
+    });
+  } catch {
+    aiDecision = null;
+  }
+  return interpret(utterance, state, { ...options, aiDecision });
 }
 
 function combine(parts: LocalizedText[]): LocalizedText {  return {
