@@ -1503,6 +1503,7 @@ export function analyzeMessage(
   // Correction-aware back-segment resolution (spec #1, #2, #12). A directional
   // phrase or an explicit correction ("لا، قصدي فوق") must override the default
   // reading of a bare "ظهري" instead of being silently ignored.
+  const previous = options.previousContext;
   const isCorrection = detectCorrection(text);
   const hasBackRegion = regions.some((region) => BACK_REGION_IDS.includes(region.id));
   let corrected = false;
@@ -1513,6 +1514,29 @@ export function analyzeMessage(
       const others = regions.filter((region) => !BACK_REGION_IDS.includes(region.id));
       corrected = isCorrection || !regions.some((region) => region.id === segment);
       regions = [{ id: segRegion.id, region: segRegion.region, label: segRegion.label }, ...others];
+    }
+  }
+
+  // Relative follow-ups are contextual. If the previous turn established a
+  // back segment, a bare "فوق" / "تحت" / "وسط" updates that segment instead
+  // of being interpreted as a brand-new generic complaint.
+  if (previous?.painLocation && BACK_REGION_IDS.includes(previous.painLocation) && !hasBackRegion) {
+    const prev = previous.painLocation;
+    let relative: 'upper-back' | 'mid-back' | 'lower-back' | null = null;
+    if (/(^|\s)(فوق|اعلى|اعلي|أعلى)(\s|$)/.test(text)) {
+      relative = prev === 'lower-back' ? 'mid-back' : prev === 'mid-back' ? 'upper-back' : 'upper-back';
+    } else if (/(^|\s)(تحت|اسفل|أسفل)(\s|$)/.test(text)) {
+      relative = prev === 'upper-back' ? 'mid-back' : prev === 'mid-back' ? 'lower-back' : 'lower-back';
+    } else if (/(^|\s)(وسط|نص|منتصف)(\s|$)/.test(text)) {
+      relative = 'mid-back';
+    }
+    if (relative) {
+      const segRegion = BODY_REGIONS.find((region) => region.id === relative);
+      if (segRegion) {
+        const others = regions.filter((region) => !BACK_REGION_IDS.includes(region.id));
+        regions = [{ id: segRegion.id, region: segRegion.region, label: segRegion.label }, ...others];
+        corrected = true;
+      }
     }
   }
   const symptoms = detectSymptoms(text);
@@ -1544,7 +1568,6 @@ export function analyzeMessage(
 
   // Structured, updatable pain context (spec #5, #13). New information wins;
   // anything the user already told us is carried forward so we never re-ask it.
-  const previous = options.previousContext;
   const painContext: PainContext = {
     painLocation: regions[0]?.id ?? previous?.painLocation ?? null,
     painLocationLabel: regions[0]?.label ?? previous?.painLocationLabel ?? null,
