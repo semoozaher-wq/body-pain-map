@@ -132,7 +132,12 @@ function runArabicSpeechQuality() {
       isFinal: true,
     }],
   }, 'ar');
-  return { normalized, picked, snapshot: snap.liveText };
+  return {
+    normalized,
+    picked,
+    snapshot: snap.liveText,
+    dialectDedup: sameUtterance('ضهري بيوجعني', 'ظهري بيوجعني'),
+  };
 }
 
 function runWebIntegration() {

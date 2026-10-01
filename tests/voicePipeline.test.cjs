@@ -37,6 +37,7 @@ test('Arabic speech quality picks a useful alternative and normalizes common dia
   assert.strictEqual(a.normalized, 'ظهري بيوجعني');
   assert.strictEqual(a.picked, 'وجع في ظهري');
   assert.strictEqual(a.snapshot, 'وجع في ظهري');
+  assert.strictEqual(a.dialectDedup, true, 'common ضهر/ظهر spelling is treated as the same utterance for dedup only');
 });
 
 test('A. one utterance produces exactly one turn (interim→final→onend→silence)', () => {
