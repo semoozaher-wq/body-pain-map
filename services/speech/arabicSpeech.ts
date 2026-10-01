@@ -2,6 +2,8 @@
 // Keeps recogniser output readable and helps Web Speech choose a useful
 // alternative when Android/Chrome returns several candidates.
 
+import { collapseRepeatedSegments } from './transcript';
+
 const ARABIC_DIACRITICS = /[\u064B-\u0652\u0670\u0640]/g;
 const INVISIBLE = /[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g;
 
@@ -30,7 +32,15 @@ function foldArabic(text: string): string {
     .trim();
 }
 
-/** Safe display/input cleanup: spelling variants only, never a location guess. */
+/**
+ * Safe display/input cleanup: spelling variants only, never a location guess.
+ *
+ * This is the SHARED normalisation for BOTH manual typing and voice: every
+ * user-text entry point (AssistantScreen.send, useAppAssistant.send, quick
+ * prompts, symptom chips) funnels through here. Besides fixing common Egyptian
+ * STT spellings it now also collapses consecutive repeated words/phrases, so a
+ * recogniser or a paste of «نص الرجل نص الرجل نص الرجل» becomes «نص الرجل».
+ */
 export function normalizeSpeechText(text: string): string {
   let value = (text || '').replace(INVISIBLE, '').replace(/\s+/g, ' ').trim();
   if (!value) return '';
@@ -46,7 +56,8 @@ export function normalizeSpeechText(text: string): string {
     [/\bودني\b/gi, 'ودني'],
   ];
   for (const [pattern, replacement] of replacements) value = value.replace(pattern, replacement);
-  return value;
+  // Root-cause fix: drop consecutive repeated words/phrases (STT / paste / typing).
+  return collapseRepeatedSegments(value);
 }
 
 /** Score only semantic usefulness; never decides the medical meaning itself. */

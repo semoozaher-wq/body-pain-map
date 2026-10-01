@@ -57,6 +57,76 @@ export function sameUtterance(a: string, b: string): boolean {
   return !!na && na === nb;
 }
 
+/**
+ * Comparison key used only for repeat detection: like {@link normalizeTranscript}
+ * but with trailing punctuation stripped so «الرجل،» and «الرجل» count as the
+ * same word (STT and users sprinkle commas between repeated fragments).
+ */
+function repeatKey(token: string): string {
+  return normalizeTranscript(token).replace(/[.,،؛;:!؟?]+$/g, '');
+}
+
+/** True when norm[a..a+len) equals norm[b..b+len). */
+function blocksEqual(norm: string[], a: number, b: number, len: number): boolean {
+  for (let k = 0; k < len; k++) {
+    if (norm[a + k] !== norm[b + k]) return false;
+  }
+  return true;
+}
+
+/**
+ * Collapse consecutive repeated words/phrases inside a single string.
+ *
+ * This is the root-cause fix for the «نص الرجل نص الرجل نص الرجل» class of bug.
+ * Speech recognisers (and users pasting/typing) sometimes emit the same word or
+ * phrase back-to-back. {@link mergeSpeechTranscript} only removes overlap
+ * *between* two strings; this helper removes repeats *within* one string. It is
+ * intentionally conservative: it only drops a block when the exact same block
+ * repeats immediately after itself, so normal sentences are never touched.
+ *
+ *   collapseRepeatedSegments('نص الرجل نص الرجل نص الرجل') -> 'نص الرجل'
+ *   collapseRepeatedSegments('من وقت من وقت من وقت')        -> 'من وقت'
+ *   collapseRepeatedSegments('وجع وجع وجع في الرجل')         -> 'وجع في الرجل'
+ *   collapseRepeatedSegments('عندي وجع في الرجل')            -> 'عندي وجع في الرجل'
+ *
+ * Comparison is diacritic/whitespace/punctuation-insensitive, so «ضهري ضهري»
+ * and «ظهري ظهري» both collapse. The first occurrence (original spelling) is
+ * always the one kept.
+ */
+export function collapseRepeatedSegments(text: string): string {
+  const tokens = collapseWhitespace(text).split(' ').filter(Boolean);
+  if (tokens.length < 2) return tokens.join(' ');
+  // Guard against pathological inputs: the scan below is O(n^3) worst case.
+  if (tokens.length > 400) return tokens.join(' ');
+  const norm = tokens.map(repeatKey);
+  const out: string[] = [];
+  let i = 0;
+  while (i < tokens.length) {
+    let matched = false;
+    const remaining = tokens.length - i;
+    for (let block = 1; block * 2 <= remaining; block++) {
+      // Count how many times the block starting at `i` repeats consecutively.
+      let reps = 1;
+      let j = i + block;
+      while (j + block <= tokens.length && blocksEqual(norm, i, j, block)) {
+        reps += 1;
+        j += block;
+      }
+      if (reps >= 2) {
+        for (let k = 0; k < block; k++) out.push(tokens[i + k]);
+        i += block * reps;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      out.push(tokens[i]);
+      i += 1;
+    }
+  }
+  return out.join(' ');
+}
+
 export interface DeltaResult {
   /** The new (not-yet-committed) text. Empty when the live text adds nothing. */
   text: string;
@@ -111,8 +181,10 @@ export function deltaFromCommitted(committed: string, live: string): DeltaResult
  * with the collapsed previous text.
  */
 export function mergeSpeechTranscript(prev: string, next: string): string {
-  const p = collapseWhitespace(prev);
-  const n = collapseWhitespace(next);
+  // Collapse intra-string repeats first so a recogniser that re-sends the same
+  // word/phrase inside one result cannot leak «نص الرجل نص الرجل» downstream.
+  const p = collapseRepeatedSegments(prev);
+  const n = collapseRepeatedSegments(next);
   if (!n) return p;
   if (!p) return n;
   const np = normalizeTranscript(p);
@@ -137,6 +209,6 @@ export function mergeSpeechTranscript(prev: string, next: string): string {
       break;
     }
   }
-  if (overlap > 0) return collapseWhitespace([...pt, ...nt.slice(overlap)].join(' '));
-  return `${p} ${n}`; // مقطع جديد فعلًا (لا تداخل)
+  if (overlap > 0) return collapseRepeatedSegments([...pt, ...nt.slice(overlap)].join(' '));
+  return collapseRepeatedSegments(`${p} ${n}`); // مقطع جديد فعلًا (لا تداخل)
 }
