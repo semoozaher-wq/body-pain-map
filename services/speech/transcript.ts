@@ -87,3 +87,34 @@ export function deltaFromCommitted(committed: string, live: string): DeltaResult
   if (prefixMatches) return { text: lt.slice(ct.length).join(' '), replaced: false };
   return { text: l, replaced: true };
 }
+
+/**
+ * Safely merge an incoming (native) transcript fragment into the running
+ * transcript for the current session, dropping Android's duplicated text.
+ *
+ * Android/Expo often *re-finalises* the same utterance, or *re-sends the whole
+ * cumulative transcript* instead of only the new words. Naive concatenation
+ * (`prev + next`) therefore doubles the speech. This helper keeps the merge
+ * idempotent:
+ *
+ *   mergeSpeechTranscript('', 'عندي وجع')                        -> 'عندي وجع'
+ *   mergeSpeechTranscript('عندي وجع', 'في بطني')                 -> 'عندي وجع في بطني'
+ *   mergeSpeechTranscript('عندي وجع في بطني', 'في بطني')         -> 'عندي وجع في بطني'   (tail already present)
+ *   mergeSpeechTranscript('عندي وجع في بطني', 'عندي وجع في بطني') -> 'عندي وجع في بطني'  (literal repeat)
+ *
+ * Always returns a string (never null). A duplicate simply yields the previous
+ * value unchanged, so callers can detect "no change" by comparing the result
+ * with the collapsed previous text.
+ */
+export function mergeSpeechTranscript(prev: string, next: string): string {
+  const p = collapseWhitespace(prev);
+  const n = collapseWhitespace(next);
+  if (!n) return p;
+  if (!p) return n;
+  const np = normalizeTranscript(p);
+  const nn = normalizeTranscript(n);
+  if (np === nn) return p; // إعادة تثبيت حرفية لنفس الجملة
+  if (nn.startsWith(`${np} `)) return n; // المتعرّف أعاد النص التراكمي كاملًا
+  if (np.endsWith(` ${nn}`)) return p; // المقطع موجود بالفعل في الذيل
+  return `${p} ${n}`; // مقطع جديد فعلًا
+}
