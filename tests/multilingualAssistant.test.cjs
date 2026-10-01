@@ -36,6 +36,7 @@ const byName = (arr, n) => arr.find((r) => r.name === n);
 const rule = (n) => byName(data.ruleBased, n);
 const gem = (n) => byName(data.gemini, n);
 const chat = (n) => byName(data.general, n);
+const conf = (n) => byName(data.confidence, n);
 
 const actionTypes = (r) => (r?.actions || []).map((a) => a.type);
 const findAction = (r, type) => (r?.actions || []).find((a) => a.type === type);
@@ -187,6 +188,46 @@ test('Gemini [ar]: an app-control decision opens the organs tab', () => {
   const tab = findAction(r, 'open_tab');
   assert.ok(tab, 'opens a tab');
   assert.strictEqual(tab.targetId, 'tab:organs');
+});
+
+// ---------------------------------------------------------------------------
+// 6b) الثقة (confidence): ثقة عالية ⇒ تنفيذ مباشر، ثقة منخفضة + تخمين مكان/اتجاه ⇒ سؤال توضيحي قصير
+// ---------------------------------------------------------------------------
+for (const name of ['conf.ar.vague', 'conf.en.vague', 'conf.fr.vague']) {
+  test(`Confidence [${name}]: low confidence does NOT guess a location (no marker) and asks a short question`, () => {
+    const r = conf(name);
+    assert.ok(r, `case ${name} exists`);
+    assert.strictEqual(r.markerCount, 0, 'no marker placed/moved on low confidence');
+    assert.strictEqual(markerActions(r).length, 0, 'no set_marker/move_marker action');
+    assert.strictEqual(r.understood, true, 'still understood (asks for clarification)');
+    assert.strictEqual(r.mode, 'medical', 'stays in medical mode');
+    assert.ok(r.replyLang && r.replyLang.length > 0, 'reply non-empty');
+    if (r.lang === 'ar') assert.ok(hasArabic(r.replyLang), 'Arabic clarifying question');
+    else assert.ok(hasLatin(r.replyLang), 'en/fr clarifying question in Latin script');
+    assert.ok(/[?؟]/.test(r.replyLang), 'reply is a short question');
+  });
+}
+
+test('Confidence [conf.ar.vagueFollow]: uses the model follow-up question when provided', () => {
+  const r = conf('conf.ar.vagueFollow');
+  assert.strictEqual(r.markerCount, 0, 'no marker on low confidence');
+  assert.ok(hasArabic(r.replyLang), 'Arabic follow-up');
+  assert.ok(r.replyLang.includes('فين'), 'uses the model follow-up question');
+});
+
+test('Confidence [conf.ar.high]: high confidence executes directly (real marker on the map)', () => {
+  const r = conf('conf.ar.high');
+  assert.strictEqual(r.understood, true, 'understood');
+  assert.strictEqual(r.markerCount, 1, 'exactly one marker action');
+  assert.strictEqual(r.markerTarget, 'region:abs:front', 'marks a real region');
+  assert.ok(hasArabic(r.replyLang), 'reply in Arabic');
+});
+
+test('Confidence [conf.ar.clearRule]: a clear rule-based command wins over a low-confidence guess', () => {
+  const r = conf('conf.ar.clearRule');
+  assert.strictEqual(r.markerCount, 1, 'rule-based marker still placed');
+  assert.strictEqual(r.markerTarget, 'region:abs:front', 'marks a real region');
+  assert.ok(!r.replyLang.includes('توضّح'), 'does NOT ask for clarification when rules understood it');
 });
 
 // ---------------------------------------------------------------------------

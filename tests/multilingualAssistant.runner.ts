@@ -240,6 +240,111 @@ const gemini = gemCases.map((c) => {
 });
 
 // ---------------------------------------------------------------------------
+// 2b) الثقة (confidence): ثقة عالية ⇒ تنفيذ مباشر، ثقة منخفضة + تخمين مكان/اتجاه ⇒ سؤال توضيحي قصير
+// ---------------------------------------------------------------------------
+interface ConfCase {
+  name: string;
+  lang: Lang;
+  utterance: string;
+  withMarker?: boolean;
+  decision: GeminiDecision;
+}
+const confCases: ConfCase[] = [
+  {
+    // ثقة منخفضة + تخمين مكان ⇒ لا علامة، سؤال توضيحي بالعربية.
+    name: 'conf.ar.vague',
+    lang: 'ar',
+    utterance: 'وجع هنا كده',
+    decision: decision({
+      intent: 'locate_pain',
+      confidence: 0.35,
+      reply: 'حاسس بألم في المنطقة دي.',
+      actions: [{ type: 'set_marker', target: 'بطن', view: 'front' }],
+    }),
+  },
+  {
+    // ثقة منخفضة + تخمين مكان ⇒ لا علامة، سؤال توضيحي بالإنجليزية.
+    name: 'conf.en.vague',
+    lang: 'en',
+    utterance: 'it hurts here',
+    decision: decision({
+      intent: 'locate_pain',
+      confidence: 0.4,
+      reply: 'I can see the pain is around here.',
+      actions: [{ type: 'set_marker', target: 'belly', view: 'front' }],
+    }),
+  },
+  {
+    // ثقة منخفضة + تخمين اتجاه على علامة موجودة ⇒ لا تحريك، سؤال توضيحي بالفرنسية.
+    name: 'conf.fr.vague',
+    lang: 'fr',
+    utterance: 'ça fait mal ici',
+    withMarker: true,
+    decision: decision({
+      intent: 'move_marker',
+      confidence: 0.4,
+      reply: 'Je déplace le repère.',
+      actions: [{ type: 'move_marker', direction: 'left', amount: 'little' }],
+    }),
+  },
+  {
+    // ثقة منخفضة + سؤال متابعة من النموذج ⇒ نستخدم سؤال النموذج نفسه.
+    name: 'conf.ar.vagueFollow',
+    lang: 'ar',
+    utterance: 'وجع هنا كده',
+    decision: decision({
+      intent: 'locate_pain',
+      confidence: 0.3,
+      reply: '',
+      followUpQuestion: 'فين بالظبط؟',
+      actions: [{ type: 'set_marker', target: 'بطن', view: 'front' }],
+    }),
+  },
+  {
+    // ثقة عالية ⇒ تنفيذ مباشر (علامة حقيقية على الخريطة).
+    name: 'conf.ar.high',
+    lang: 'ar',
+    utterance: 'وجع في بطني',
+    decision: decision({
+      intent: 'locate_pain',
+      confidence: 0.95,
+      reply: 'فهمت — ألم في البطن، علّمت المكان على الخريطة.',
+      painContext: { painLocation: 'البطن' },
+      actions: [{ type: 'set_marker', target: 'بطن', view: 'front' }],
+    }),
+  },
+  {
+    // ثقة منخفضة لكن القواعد فهمت الأمر الواضح ⇒ القواعد تفوز (علامة + ردّ القواعد، بلا سؤال توضيحي).
+    name: 'conf.ar.clearRule',
+    lang: 'ar',
+    utterance: 'وجع في بطني',
+    decision: decision({
+      intent: 'locate_pain',
+      confidence: 0.3,
+      reply: 'حاسس بألم في البطن.',
+      actions: [{ type: 'set_marker', target: 'بطن', view: 'front' }],
+    }),
+  },
+];
+
+const confidence = confCases.map((c) => {
+  const st = baseState({
+    language: c.lang,
+    selectedPainLocation: c.withMarker ? { x: 50, y: 50, view: 'front' } : null,
+  });
+  const turn = interpret(c.utterance, st, { aiDecision: c.decision });
+  const markers = turn.actions.filter((a) => a.type === 'set_marker' || a.type === 'move_marker');
+  return {
+    name: c.name,
+    lang: c.lang,
+    utterance: c.utterance,
+    markerCount: markers.length,
+    markerTarget: markers[0]?.targetId ?? null,
+    ...slim(turn, c.lang),
+  };
+});
+
+// ---------------------------------------------------------------------------
 // 3) General Chat: ردّ بنفس اللغة + تصنيف صحيح
 // ---------------------------------------------------------------------------
 const generalCases: Array<{ name: string; lang: Lang; utterance: string }> = [
@@ -381,6 +486,7 @@ process.stdout.write(
     {
       ruleBased,
       gemini,
+      confidence,
       general,
       contextSwitch,
       voice,
