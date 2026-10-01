@@ -19,6 +19,7 @@ import * as Speech from 'expo-speech';
 import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services/speechRecognition';
 import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
 import { voiceLog } from '../services/speech/voiceLog';
+import { normalizeSpeechText } from '../services/speech/arabicSpeech';
 import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
 import { claimVoiceSession, releaseVoiceSession, isVoiceSessionOwner } from '../services/speech/voiceSession';
 import { interpretAsync } from '../services/appAssistant/engine';
@@ -38,7 +39,7 @@ export type { VoiceState } from '../services/appAssistant/voiceMachine';
 const speechLang = (language: string): string =>
   language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
 const ttsLang = (language: string): string =>
-  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-SA';
+  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
 
 let msgSeq = 0;
 const nextId = () => `am-${Date.now()}-${msgSeq++}`;
@@ -175,7 +176,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
   // --- إرسال رسالة نصية/صوتية (نفس المسار للكتابة والصوت ⇒ سياق متصل) ---
   const send = useCallback(
     async (text: string): Promise<AssistantTurn | null> => {
-      const trimmed = text.trim();
+      const trimmed = normalizeSpeechText(text).trim();
       if (!trimmed) return null;
       setError(null);
       setVoiceState('thinking');
@@ -266,7 +267,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
         getGate().reset();
         gotResultRef.current = false;
         const recognizer = createWebRecognizer(
-          { lang: speechLang(languageRef.current), continuous: true, interimResults: true },
+          { lang: speechLang(languageRef.current), continuous: callActiveRef.current, interimResults: true, maxAlternatives: 3 },
           {
             log: (stage, data) => voiceLog(stage, data),
             onStart: () => {
