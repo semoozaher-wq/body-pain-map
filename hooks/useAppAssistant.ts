@@ -20,7 +20,7 @@ import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services
 import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
 import { voiceLog } from '../services/speech/voiceLog';
 import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
-import { interpret } from '../services/appAssistant/engine';
+import { interpretAsync } from '../services/appAssistant/engine';
 import type { AppState, AssistantAction, AssistantTurn, Lang } from '../services/appAssistant/types';
 import { afterSpeechEnd, type VoiceState } from '../services/appAssistant/voiceMachine';
 
@@ -151,7 +151,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
         if (action.type === 'reset_context') painContextRef.current = null;
         onAction(action);
       }
-      if (turn.mode === 'medical' && turn.medical?.painContext) painContextRef.current = turn.medical.painContext;
+      if (turn.painContext) painContextRef.current = turn.painContext;
+      else if (turn.mode === 'medical' && turn.medical?.painContext) painContextRef.current = turn.medical.painContext;
       if (turn.needsConfirmation) setPending(turn.pendingConfirmation);
       else setPending([]);
     },
@@ -160,13 +161,14 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
 
   // --- إرسال رسالة نصية/صوتية (نفس المسار للكتابة والصوت ⇒ سياق متصل) ---
   const send = useCallback(
-    (text: string): AssistantTurn | null => {
+    async (text: string): Promise<AssistantTurn | null> => {
       const trimmed = text.trim();
       if (!trimmed) return null;
       setError(null);
       setVoiceState('thinking');
       const state = getState();
-      const turn = interpret(trimmed, state, { previousContext: painContextRef.current ?? undefined });
+      // المسار الموحّد: Gemini (نصّ + سياق + لغة) ثم محرّك القواعد كطبقة تفسير/احتياط.
+      const turn = await interpretAsync(trimmed, state, { previousContext: painContextRef.current ?? undefined });
       const userMsg: AssistantMessage = { id: nextId(), role: 'user', text: trimmed };
       const botMsg: AssistantMessage = { id: nextId(), role: 'assistant', text: turn.reply[state.language], turn };
       setMessages((prev) => [...prev, userMsg, botMsg]);
