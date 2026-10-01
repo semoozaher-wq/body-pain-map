@@ -1,0 +1,1033 @@
+diff --git a/App.tsx b/App.tsx
+index 5359c10..3f787f8 100644
+--- a/App.tsx
++++ b/App.tsx
+@@ -1,12 +1,18 @@
+ // App.tsx
+ 
++import { useEffect } from 'react';
+ import { GestureHandlerRootView } from 'react-native-gesture-handler';
+ import { StyleSheet } from 'react-native';
+ import { ThemeProvider } from './hooks/useTheme';
+ import MainApp from './MainApp';
+ import AppErrorBoundary from './components/AppErrorBoundary';
++import { ensureTtsVoices } from './services/speech/tts';
+ 
+ export default function App() {
++  // تسخين أصوات النطق الطبيعية عند بدء التطبيق (أفضل صوت لكل لغة).
++  useEffect(() => {
++    void ensureTtsVoices();
++  }, []);
+   return (
+     <AppErrorBoundary>
+       <GestureHandlerRootView style={styles.root}>
+diff --git a/hooks/useAppAssistant.ts b/hooks/useAppAssistant.ts
+index 2bb720f..cad5743 100644
+--- a/hooks/useAppAssistant.ts
++++ b/hooks/useAppAssistant.ts
+@@ -20,6 +20,7 @@ import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services
+ import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
+ import { voiceLog } from '../services/speech/voiceLog';
+ import { normalizeSpeechText } from '../services/speech/arabicSpeech';
++import { speakNatural, ensureTtsVoices } from '../services/speech/tts';
+ import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
+ import { claimVoiceSession, releaseVoiceSession, isVoiceSessionOwner } from '../services/speech/voiceSession';
+ import { interpretAsync } from '../services/appAssistant/engine';
+@@ -38,8 +39,6 @@ export type { VoiceState } from '../services/appAssistant/voiceMachine';
+ 
+ const speechLang = (language: string): string =>
+   language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
+-const ttsLang = (language: string): string =>
+-  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
+ 
+ let msgSeq = 0;
+ const nextId = () => `am-${Date.now()}-${msgSeq++}`;
+@@ -146,8 +145,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
+       Speech.stop();
+       if (id) setSpeakingId(id);
+       setVoiceState('speaking');
+-      Speech.speak(text, {
+-        language: ttsLang(languageRef.current),
++      // نطق طبيعي: أفضل صوت متاح للغة + نبرة/سرعة طبيعية (بدل الصوت الآلي الافتراضي).
++      speakNatural(text, languageRef.current, {
+         onDone: finishSpeech,
+         onStopped: finishSpeech,
+         onError: finishSpeech,
+@@ -405,6 +404,11 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
+     setVoiceState('idle');
+   }, [enabled]);
+ 
++  // تسخين أصوات النطق الطبيعية مرة واحدة (أفضل صوت لكل لغة).
++  useEffect(() => {
++    void ensureTtsVoices();
++  }, []);
++
+   useEffect(() => () => {
+     try {
+       Speech.stop();
+diff --git a/screens/AssistantScreen.tsx b/screens/AssistantScreen.tsx
+index 4fa419c..421cd3d 100644
+--- a/screens/AssistantScreen.tsx
++++ b/screens/AssistantScreen.tsx
+@@ -31,6 +31,7 @@ import { voiceLog } from '../services/speech/voiceLog';
+ import { normalizeSpeechText } from '../services/speech/arabicSpeech';
+ import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
+ import { collapseWhitespace, mergeSpeechTranscript, normalizeTranscript } from '../services/speech/transcript';
++import { speakNatural, ensureTtsVoices } from '../services/speech/tts';
+ import { claimVoiceSession, releaseVoiceSession, isVoiceSessionOwner } from '../services/speech/voiceSession';
+ import { Colors } from '../constants/colors';
+ import { Fonts } from '../constants/fonts';
+@@ -200,10 +201,6 @@ const MAX_CLARIFY_ASKS = 2;
+ const speechLang = (language: string): string =>
+   language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
+ 
+-/** لغة النطق (Text-to-Speech) حسب لغة الواجهة. */
+-const ttsLang = (language: string): string =>
+-  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
+-
+ /** يبني نصًّا مختصرًا قابلًا للنطق من رد المساعد. */
+ function replyToSpeech(reply: AssistantReply): string {
+   const L = reply.__lang ?? 'ar';
+@@ -484,7 +481,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
+         getGate().reset();
+         gotResultRef.current = false;
+         const recognizer = createWebRecognizer(
+-          { lang: speechLang(languageRef.current), continuous: callActiveRef.current, interimResults: true, maxAlternatives: 3 },
++          { lang: speechLang(languageRef.current), continuous: voiceSessionRef.current, interimResults: true, maxAlternatives: 3 },
+           {
+             log: (stage, data) => voiceLog(stage, data),
+             onStart: () => {
+@@ -607,8 +604,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
+         Speech.stop();
+         if (id) setSpeakingId(id);
+         speakingRef.current = true;
+-        Speech.speak(text, {
+-          language: ttsLang(language),
++        // نطق طبيعي: أفضل صوت متاح للغة + نبرة/سرعة طبيعية (بدل الصوت الآلي الافتراضي).
++        speakNatural(text, language, {
+           onDone: finishSpeech,
+           onStopped: finishSpeech,
+           onError: finishSpeech,
+@@ -620,6 +617,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
+     [language, finishSpeech],
+   );
+ 
++  // تسخين أصوات النطق الطبيعية مرة واحدة عند فتح الشاشة (أفضل صوت لكل لغة).
++  useEffect(() => {
++    void ensureTtsVoices();
++  }, []);
++
+   useEffect(() => () => {
+     try {
+       voiceSessionRef.current = false;
+diff --git a/services/aiAssistant/engine.ts b/services/aiAssistant/engine.ts
+index 747c636..8ff35a3 100644
+--- a/services/aiAssistant/engine.ts
++++ b/services/aiAssistant/engine.ts
+@@ -1449,14 +1449,14 @@ function buildDoctorSummary(ctx: PainContext, language: Lang): string {
+  * One relevant follow-up question at a time (spec #4, #25). Picks the most
+  * important still-missing field instead of dumping every question at once.
+  */
+-function buildSmartFollowUp(ctx: PainContext): LocalizedText | null {
++export function buildSmartFollowUp(ctx: PainContext): LocalizedText | null {
+   if (!ctx.painLocation) {
+-    return { ar: 'تقدر تحدد لي مكان الألم بالتحديد فين؟', en: 'Can you point to exactly where the pain is?', fr: 'Pouvez-vous préciser exactement où se situe la douleur ?' };
++    return { ar: 'مكان الألم بالظبط فين؟', en: 'Where exactly is the pain?', fr: 'Où se situe exactement la douleur ?' };
+   }
+   // Severity first, then duration: the natural clinical intake order and the
+   // order the acceptance dialogue expects ("في الساق" -> follow-up -> "شدته 7").
+   if (ctx.painSeverity === null) {
+-    return { ar: 'قيّم شدة الألم من 1 لـ 10، كام؟', en: 'On a scale of 1 to 10, how intense is the pain?', fr: 'Sur une échelle de 1 à 10, quelle est l\u2019intensité ?' };
++    return { ar: 'شدة الألم من 1 لـ 10، كام؟', en: 'On a scale of 1 to 10, how intense is the pain?', fr: 'Sur une échelle de 1 à 10, quelle est l\u2019intensité ?' };
+   }
+   if (!ctx.painDuration) {
+     return { ar: 'الألم بدأ من إمتى؟ (ساعات / أيام / أسابيع)', en: 'When did the pain start? (hours / days / weeks)', fr: 'Quand la douleur a-t-elle commencé ? (heures / jours / semaines)' };
+diff --git a/services/aiAssistant/gemini.ts b/services/aiAssistant/gemini.ts
+index 9d4319b..343ac95 100644
+--- a/services/aiAssistant/gemini.ts
++++ b/services/aiAssistant/gemini.ts
+@@ -114,6 +114,11 @@ export const GEMINI_SYSTEM_PROMPT = [
+   '- المستخدم قد يتكلم العربية (وبالأخص العامية المصرية) أو الإنجليزية أو الفرنسية. افهم اللغات الثلاث كلها.',
+   '- افهم وصف الألم ومناطق الجسم والاتجاهات بكل اللغات الثلاث. أمثلة عربية: "جنبي الشمال بيوجعني"، "فوق شوية"، "تحته"، "ورا شوية"، "لا نفس المكان"، "قصدي الناحية التانية". English: "my left side hurts"، "a bit higher"، "below it"، "a bit back"، "same place". Français: "mon côté gauche me fait mal"، "un peu plus haut"، "en dessous"، "un peu en arrière"، "même endroit".',
+   '- اعتمد على السياق السابق ولا تُعِد السؤال عن معلومة قالها المستخدم بالفعل.',
++  '- اجعل الرد قصيرًا وطبيعيًا بالعامية المصرية (جملة أو جملتان)، بصياغة إنسانية سلسة لا آلية ولا متقطعة.',
++  '- لا تكرر كلام المستخدم حرفيًا داخل الرد؛ اذكر فقط ما يلزم لفهم المقصود.',
++  '- لا تفترض جنس المستخدم: استخدم صياغة محايدة، وتجنّب صيغ المخاطبة المذكّرة/المؤنثة مثل «تقدر» و«تقدري». مثال محايد: «هل الألم بيظهر مع الحركة؟».',
++  '- اجعل سؤال المتابعة واحدًا فقط: ضعه في followUpQuestion، ولا تضع سؤالًا آخر داخل reply (reply جملة قصيرة أو نص فارغ).',
++  '- لا تسأل عن معلومة موجودة بالفعل في painContext أو في السياق السابق.',
+   '- أجب دائمًا بنفس لغة المستخدم (language): ar ⇒ العامية المصرية، en ⇒ English، fr ⇒ Français.',
+   '- احتفظ بالسياق (context) عند تبديل اللغة: تغيير لغة المستخدم ليس محادثة جديدة، بل استمرار لنفس المحادثة ونفس علامة الألم.',
+   '',
+diff --git a/services/appAssistant/engine.ts b/services/appAssistant/engine.ts
+index dd93007..b6b3558 100644
+--- a/services/appAssistant/engine.ts
++++ b/services/appAssistant/engine.ts
+@@ -28,6 +28,7 @@ import {
+   type GeminiDecision,
+   type GeminiContext,
+ } from '../aiAssistant/gemini';
++import { collapseRepeatedSegments, collapseWhitespace } from '../speech/transcript';
+ import {
+   describePoint,
+   describePosition,
+@@ -800,13 +801,13 @@ export function interpret(
+ 
+   // الردّ الافتراضي عند عدم الفهم ليس «معليش، مفهمتش الطلب»، بل سؤال توضيحي يوجّه
+   // المستخدم للطبقات الثلاث (عام/طبي/تحكّم) — التصنيف يسبق الرفض.
+-  const reply = dedupedReplies.length
++  const reply = cleanAssistantReply(dedupedReplies.length
+     ? combine(dedupedReplies)
+     : L(
+         'مش متأكد إني فهمت صح. تقصد تسألني عن ألم أو عرض، ولا عايز تتحكّم في التطبيق (تنقّل/إبراز/تسجيل)، ولا مجرد كلام عام؟',
+         'I’m not sure I got that. Do you mean to ask about a pain or symptom, control the app (navigate/highlight/log), or just chat?',
+         'Je ne suis pas sûr d’avoir compris. Veux-tu parler d’une douleur, contrôler l’app (naviguer/surligner), ou discuter ?',
+-      );
++      ));
+ 
+   return {
+     understood,
+@@ -1141,6 +1142,65 @@ export async function interpretAsync(
+   return interpret(utterance, state, { ...options, aiDecision });
+ }
+ 
++/**
++ * Split a message into sentence-ish segments on the terminators we use in the
++ * three supported languages. A '.' only ends a segment when followed by
++ * whitespace/end, so decimals like «7.5» are not broken apart.
++ */
++function splitSentences(text: string): string[] {
++  const parts: string[] = [];
++  let start = 0;
++  for (let i = 0; i < text.length; i++) {
++    const ch = text[i];
++    const terminator = ch === '؟' || ch === '?' || ch === '!';
++    const dot = ch === '.' && (i === text.length - 1 || /\s/.test(text[i + 1] ?? ' '));
++    if (terminator || dot) {
++      parts.push(text.slice(start, i + 1).trim());
++      start = i + 1;
++    }
++  }
++  const tail = text.slice(start).trim();
++  if (tail) parts.push(tail);
++  return parts.filter(Boolean);
++}
++
++/**
++ * Keep at most ONE follow-up question in an assistant message.
++ *
++ * The spec requires exactly one clear question per turn. Statements are always
++ * preserved; only *extra* question sentences are dropped (the first question
++ * wins). A single sentence that mixes a statement and a question is untouched.
++ */
++export function enforceSingleQuestion(text: string): string {
++  const value = collapseWhitespace(text);
++  if (!value) return '';
++  const segments = splitSentences(value);
++  if (segments.length <= 1) return value;
++  let questionSeen = false;
++  const kept: string[] = [];
++  for (const segment of segments) {
++    const isQuestion = /[؟?]/.test(segment);
++    if (isQuestion) {
++      if (questionSeen) continue; // drop the 2nd, 3rd, ... question
++      questionSeen = true;
++    }
++    kept.push(segment);
++  }
++  return kept.join(' ').trim();
++}
++
++/**
++ * Final hygiene applied to EVERY assistant reply before it is displayed:
++ *   • collapse accidental word/phrase repetition (STT or model artefacts),
++ *   • keep exactly one follow-up question per message.
++ * Applied per-language so ar/en/fr each stay natural and short.
++ */
++export function cleanAssistantReply(reply: LocalizedText): LocalizedText {
++  const clean = (value: string): string =>
++    enforceSingleQuestion(collapseRepeatedSegments(value ?? ''));
++  return { ar: clean(reply.ar), en: clean(reply.en), fr: clean(reply.fr) };
++}
++
+ function combine(parts: LocalizedText[]): LocalizedText {  return {
+     ar: parts.map((p) => p.ar).join(' '),
+     en: parts.map((p) => p.en).join(' '),
+diff --git a/services/speech/arabicSpeech.ts b/services/speech/arabicSpeech.ts
+index bf9a342..2da0997 100644
+--- a/services/speech/arabicSpeech.ts
++++ b/services/speech/arabicSpeech.ts
+@@ -2,6 +2,8 @@
+ // Keeps recogniser output readable and helps Web Speech choose a useful
+ // alternative when Android/Chrome returns several candidates.
+ 
++import { collapseRepeatedSegments } from './transcript';
++
+ const ARABIC_DIACRITICS = /[\u064B-\u0652\u0670\u0640]/g;
+ const INVISIBLE = /[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g;
+ 
+@@ -30,7 +32,15 @@ function foldArabic(text: string): string {
+     .trim();
+ }
+ 
+-/** Safe display/input cleanup: spelling variants only, never a location guess. */
++/**
++ * Safe display/input cleanup: spelling variants only, never a location guess.
++ *
++ * This is the SHARED normalisation for BOTH manual typing and voice: every
++ * user-text entry point (AssistantScreen.send, useAppAssistant.send, quick
++ * prompts, symptom chips) funnels through here. Besides fixing common Egyptian
++ * STT spellings it now also collapses consecutive repeated words/phrases, so a
++ * recogniser or a paste of «نص الرجل نص الرجل نص الرجل» becomes «نص الرجل».
++ */
+ export function normalizeSpeechText(text: string): string {
+   let value = (text || '').replace(INVISIBLE, '').replace(/\s+/g, ' ').trim();
+   if (!value) return '';
+@@ -46,7 +56,8 @@ export function normalizeSpeechText(text: string): string {
+     [/\bودني\b/gi, 'ودني'],
+   ];
+   for (const [pattern, replacement] of replacements) value = value.replace(pattern, replacement);
+-  return value;
++  // Root-cause fix: drop consecutive repeated words/phrases (STT / paste / typing).
++  return collapseRepeatedSegments(value);
+ }
+ 
+ /** Score only semantic usefulness; never decides the medical meaning itself. */
+diff --git a/services/speech/transcript.ts b/services/speech/transcript.ts
+index 7afdaba..7ad0919 100644
+--- a/services/speech/transcript.ts
++++ b/services/speech/transcript.ts
+@@ -57,6 +57,76 @@ export function sameUtterance(a: string, b: string): boolean {
+   return !!na && na === nb;
+ }
+ 
++/**
++ * Comparison key used only for repeat detection: like {@link normalizeTranscript}
++ * but with trailing punctuation stripped so «الرجل،» and «الرجل» count as the
++ * same word (STT and users sprinkle commas between repeated fragments).
++ */
++function repeatKey(token: string): string {
++  return normalizeTranscript(token).replace(/[.,،؛;:!؟?]+$/g, '');
++}
++
++/** True when norm[a..a+len) equals norm[b..b+len). */
++function blocksEqual(norm: string[], a: number, b: number, len: number): boolean {
++  for (let k = 0; k < len; k++) {
++    if (norm[a + k] !== norm[b + k]) return false;
++  }
++  return true;
++}
++
++/**
++ * Collapse consecutive repeated words/phrases inside a single string.
++ *
++ * This is the root-cause fix for the «نص الرجل نص الرجل نص الرجل» class of bug.
++ * Speech recognisers (and users pasting/typing) sometimes emit the same word or
++ * phrase back-to-back. {@link mergeSpeechTranscript} only removes overlap
++ * *between* two strings; this helper removes repeats *within* one string. It is
++ * intentionally conservative: it only drops a block when the exact same block
++ * repeats immediately after itself, so normal sentences are never touched.
++ *
++ *   collapseRepeatedSegments('نص الرجل نص الرجل نص الرجل') -> 'نص الرجل'
++ *   collapseRepeatedSegments('من وقت من وقت من وقت')        -> 'من وقت'
++ *   collapseRepeatedSegments('وجع وجع وجع في الرجل')         -> 'وجع في الرجل'
++ *   collapseRepeatedSegments('عندي وجع في الرجل')            -> 'عندي وجع في الرجل'
++ *
++ * Comparison is diacritic/whitespace/punctuation-insensitive, so «ضهري ضهري»
++ * and «ظهري ظهري» both collapse. The first occurrence (original spelling) is
++ * always the one kept.
++ */
++export function collapseRepeatedSegments(text: string): string {
++  const tokens = collapseWhitespace(text).split(' ').filter(Boolean);
++  if (tokens.length < 2) return tokens.join(' ');
++  // Guard against pathological inputs: the scan below is O(n^3) worst case.
++  if (tokens.length > 400) return tokens.join(' ');
++  const norm = tokens.map(repeatKey);
++  const out: string[] = [];
++  let i = 0;
++  while (i < tokens.length) {
++    let matched = false;
++    const remaining = tokens.length - i;
++    for (let block = 1; block * 2 <= remaining; block++) {
++      // Count how many times the block starting at `i` repeats consecutively.
++      let reps = 1;
++      let j = i + block;
++      while (j + block <= tokens.length && blocksEqual(norm, i, j, block)) {
++        reps += 1;
++        j += block;
++      }
++      if (reps >= 2) {
++        for (let k = 0; k < block; k++) out.push(tokens[i + k]);
++        i += block * reps;
++        matched = true;
++        break;
++      }
++    }
++    if (!matched) {
++      out.push(tokens[i]);
++      i += 1;
++    }
++  }
++  return out.join(' ');
++}
++
+ export interface DeltaResult {
+   /** The new (not-yet-committed) text. Empty when the live text adds nothing. */
+   text: string;
+@@ -111,8 +181,10 @@ export function deltaFromCommitted(committed: string, live: string): DeltaResult
+  * with the collapsed previous text.
+  */
+ export function mergeSpeechTranscript(prev: string, next: string): string {
+-  const p = collapseWhitespace(prev);
+-  const n = collapseWhitespace(next);
++  // Collapse intra-string repeats first so a recogniser that re-sends the same
++  // word/phrase inside one result cannot leak «نص الرجل نص الرجل» downstream.
++  const p = collapseRepeatedSegments(prev);
++  const n = collapseRepeatedSegments(next);
+   if (!n) return p;
+   if (!p) return n;
+   const np = normalizeTranscript(p);
+@@ -137,6 +209,6 @@ export function mergeSpeechTranscript(prev: string, next: string): string {
+       break;
+     }
+   }
+-  if (overlap > 0) return collapseWhitespace([...pt, ...nt.slice(overlap)].join(' '));
+-  return `${p} ${n}`; // مقطع جديد فعلًا (لا تداخل)
++  if (overlap > 0) return collapseRepeatedSegments([...pt, ...nt.slice(overlap)].join(' '));
++  return collapseRepeatedSegments(`${p} ${n}`); // مقطع جديد فعلًا (لا تداخل)
+ }
+diff --git a/services/speech/tts.ts b/services/speech/tts.ts
+new file mode 100644
+index 0000000..eb852c8
+--- /dev/null
++++ b/services/speech/tts.ts
+@@ -0,0 +1,87 @@
++// services/speech/tts.ts
++// ============================================================================
++// غلاف النطق الطبيعي (Natural TTS wrapper) فوق expo-speech.
++// ----------------------------------------------------------------------------
++// يختار أفضل صوت متاح للغة مرة واحدة ويخزّنه، ويطبّق نبرة/سرعة طبيعية، وينظّف
++// النص قبل النطق — فيصبح نطق المساعد طبيعيًا (شبيه بأصوات Gemini/Neural) بدل
++// الصوت الآلي الافتراضي.
++//
++// مهم: كل الاستدعاءات الحالية (Speech.stop / onDone / onStopped / onError) تبقى
++// كما هي حتى لا يتغيّر سلوك آلة حالة الجلسة الصوتية (Voice/STT/TTS سليم كما هو).
++// ============================================================================
++
++import * as Speech from 'expo-speech';
++import {
++  pickBestVoice,
++  prepareTtsText,
++  prosodyFor,
++  ttsLangFor,
++  type VoiceLike,
++} from './ttsVoice';
++
++const LANGS = ['ar-EG', 'en-US', 'fr-FR'] as const;
++
++/** أفضل صوت (identifier) لكل لغة، يُملأ مرة واحدة. */
++const voiceCache: Record<string, string | undefined> = {};
++let voicesLoaded = false;
++let loading: Promise<void> | null = null;
++
++/**
++ * يحمّل قائمة الأصوات مرة واحدة ويختار الأفضل لكل لغة.
++ * آمن تمامًا: أي فشل يُتجاهل ونبقى على صوت النظام الافتراضي (لا يرمي أخطاء).
++ */
++export async function ensureTtsVoices(): Promise<void> {
++  if (voicesLoaded) return;
++  if (loading) return loading;
++  loading = (async () => {
++    try {
++      const voices = (await Speech.getAvailableVoicesAsync()) as unknown as VoiceLike[];
++      for (const lang of LANGS) {
++        const best = pickBestVoice(voices, lang);
++        if (best) voiceCache[lang] = best.identifier;
++      }
++      voicesLoaded = true;
++    } catch {
++      // نبقى على صوت النظام الافتراضي.
++    } finally {
++      loading = null;
++    }
++  })();
++  return loading;
++}
++
++export interface TtsCallbacks {
++  onStart?: () => void;
++  onDone?: () => void;
++  onStopped?: () => void;
++  onError?: (error?: unknown) => void;
++}
++
++/**
++ * ينطق النص بصوت طبيعي.
++ *
++ * الاستدعاء متزامن (مثل Speech.speak) حتى تبقى آلة حالة الجلسة الصوتية كما هي؛
++ * اختيار الصوت يستخدم القيمة المخزّنة إن توفّرت (ويُسخّن القائمة للجولة القادمة).
++ */
++export function speakNatural(text: string, language: string, cb: TtsCallbacks = {}): void {
++  const clean = prepareTtsText(text);
++  if (!clean) {
++    cb.onDone?.();
++    return;
++  }
++  const lang = ttsLangFor(language);
++  const prosody = prosodyFor(lang);
++  const voice = voiceCache[lang];
++  if (!voicesLoaded) void ensureTtsVoices(); // تسخين للجولة القادمة
++  Speech.speak(clean, {
++    language: lang,
++    rate: prosody.rate,
++    pitch: prosody.pitch,
++    volume: prosody.volume,
++    ...(voice ? { voice } : {}),
++    onStart: cb.onStart,
++    onDone: cb.onDone,
++    onStopped: cb.onStopped,
++    onError: cb.onError,
++  });
++}
+diff --git a/services/speech/ttsVoice.ts b/services/speech/ttsVoice.ts
+new file mode 100644
+index 0000000..caf4ae6
+--- /dev/null
++++ b/services/speech/ttsVoice.ts
+@@ -0,0 +1,106 @@
++// services/speech/ttsVoice.ts
++// ============================================================================
++// منطق اختيار الصوت الطبيعي (Natural TTS voice selection) — منطق نقي قابل للاختبار.
++// ----------------------------------------------------------------------------
++// لا يعتمد على expo-speech حتى يمكن اختباره في Node. الغلاف الذي يستدعي
++// Speech.speak موجود في services/speech/tts.ts.
++//
++// الهدف: جعل نطق المساعد طبيعيًا قدر الإمكان (شبيه بأصوات Gemini/Neural) عبر:
++//   • اختيار أفضل صوت متاح للغة (تفضيل الأصوات العصبية/الطبيعية/المحسّنة)،
++//   • ضبط النبرة (pitch) والسرعة (rate) على قيم طبيعية غير آلية،
++//   • تنظيف النص قبل النطق (إزالة الماركداون/الإيموجي/الروابط).
++// ============================================================================
++
++/** وصف مختصر لصوت (مجموعة فرعية بنيوية من Voice/WebVoice في expo-speech). */
++export interface VoiceLike {
++  identifier: string;
++  name: string;
++  language: string;
++  localService?: boolean;
++  isDefault?: boolean;
++  quality?: string;
++}
++
++/** لغة النطق (BCP-47) حسب لغة الواجهة. */
++export function ttsLangFor(language: string): string {
++  return language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
++}
++
++/** المقطع اللغوي الأساسي: 'ar-EG' -> 'ar'. */
++function primarySubtag(tag: string): string {
++  return String(tag || '').toLowerCase().replace('_', '-').split('-')[0];
++}
++
++// كلمات مفتاحية في اسم الصوت تدل على جودة/طبيعية أعلى (موجبة) أو صوت آلي (سالبة).
++const NAME_SCORES: Array<[RegExp, number]> = [
++  [/neural/i, 60],
++  [/wavenet|studio|journey|polyglot/i, 58],
++  [/natural/i, 55],
++  [/premium|enhanced/i, 50],
++  [/siri/i, 45],
++  [/google/i, 40],
++  [/microsoft/i, 20],
++  [/eloquence|espeak|compact|festival|pico/i, -60],
++];
++
++/**
++ * يقيّم مدى ملاءمة صوت للغة المطلوبة. أعلى = أنسب/أكثر طبيعية.
++ * أي صوت بلغة مختلفة يُستبعد (قيمة سالبة كبيرة) حتى لا يُقرأ النص بلغة غلط.
++ */
++export function scoreVoice(voice: VoiceLike, lang: string): number {
++  const want = String(lang || '').toLowerCase().replace('_', '-');
++  const wantPrimary = primarySubtag(want);
++  const have = String(voice?.language || '').toLowerCase().replace('_', '-');
++  const havePrimary = primarySubtag(have);
++  if (!havePrimary || havePrimary !== wantPrimary) return -1000;
++  let score = 0;
++  if (have === want) score += 100; // نفس المنطقة بالظبط
++  else if (have.startsWith(wantPrimary + '-')) score += 55; // نفس اللغة، منطقة أخرى
++  else score += 30;
++  const name = String(voice?.name || '');
++  for (const [re, pts] of NAME_SCORES) if (re.test(name)) score += pts;
++  if (voice?.localService === false) score += 15; // الأصوات السحابية عادةً أجود
++  if (voice?.isDefault) score += 3;
++  return score;
++}
++
++/** يختار أفضل صوت للغة، أو null إن لم يوجد صوت بنفس اللغة. */
++export function pickBestVoice(voices: VoiceLike[], lang: string): VoiceLike | null {
++  let best: VoiceLike | null = null;
++  let bestScore = -Infinity;
++  for (const v of voices || []) {
++    const s = scoreVoice(v, lang);
++    if (s > bestScore) {
++      bestScore = s;
++      best = v;
++    }
++  }
++  return bestScore > 0 ? best : null;
++}
++
++/** نبرة/سرعة طبيعية غير آلية لكل لغة. */
++export function prosodyFor(lang: string): { rate: number; pitch: number; volume: number } {
++  const p = primarySubtag(lang);
++  if (p === 'ar') return { rate: 0.95, pitch: 1.0, volume: 1.0 };
++  if (p === 'fr') return { rate: 0.98, pitch: 1.0, volume: 1.0 };
++  return { rate: 1.0, pitch: 1.0, volume: 1.0 };
++}
++
++// إيموجي ورموز مصوّرة + محددات الاتجاه/الربط (لا تُنطق، فتُزال).
++const EMOJI =
++  /[\u{1F300}-\u{1FAFF}\u{1F1E6}-\u{1F1FF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}]/gu;
++
++/**
++ * ينظّف النص قبل النطق: ماركداون/إيموجي/روابط → كلام طبيعي.
++ * (لا يغيّر المعنى، فقط ما لا يُنطق بشكل مفهوم.)
++ */
++export function prepareTtsText(text: string): string {
++  let s = String(text ?? '');
++  s = s.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1'); // [label](url) -> label
++  s = s.replace(/https?:\/\/\S+/gi, ' '); // روابط عارية
++  s = s.replace(EMOJI, ' ');
++  s = s.replace(/[`*_~#>]+/g, ' '); // ماركداون
++  s = s.replace(/^\s*[-•]\s+/gm, ' '); // نقاط القوائم
++  s = s.replace(/\s+/g, ' ').trim();
++  return s;
++}
+diff --git a/tests/textRepetition.runner.ts b/tests/textRepetition.runner.ts
+new file mode 100644
+index 0000000..ee971e1
+--- /dev/null
++++ b/tests/textRepetition.runner.ts
+@@ -0,0 +1,154 @@
++// tests/textRepetition.runner.ts
++// ============================================================================
++// Regression runner for the assistant TYPING / repetition fix.
++// ----------------------------------------------------------------------------
++// Emits a single JSON object on stdout so tests/textRepetition.test.cjs can
++// assert on it via `node --test`. It drives the REAL units (no re-implementation):
++//   • services/speech/transcript.ts   (collapseRepeatedSegments, merge)
++//   • services/speech/arabicSpeech.ts (normalizeSpeechText — shared path)
++//   • services/appAssistant/engine.ts (enforceSingleQuestion, cleanAssistantReply)
++//   • services/aiAssistant/engine.ts  (buildSmartFollowUp — neutral phrasing)
++// ============================================================================
++
++import { collapseRepeatedSegments, mergeSpeechTranscript } from '../services/speech/transcript';
++import { normalizeSpeechText } from '../services/speech/arabicSpeech';
++import { enforceSingleQuestion, cleanAssistantReply } from '../services/appAssistant/engine';
++import { buildSmartFollowUp, type PainContext } from '../services/aiAssistant/engine';
++
++// ---------------------------------------------------------------------------
++// 1) collapseRepeatedSegments — the root-cause fix for repeated words/phrases.
++// ---------------------------------------------------------------------------
++const collapseCases: Array<[string, string]> = [
++  ['نص الرجل نص الرجل نص الرجل', 'نص الرجل'],
++  ['من وقت من وقت من وقت', 'من وقت'],
++  ['وجع وجع وجع في الرجل', 'وجع في الرجل'],
++  ['عندي وجع في الرجل', 'عندي وجع في الرجل'],
++  ['ضهري بيوجعني ضهري بيوجعني', 'ضهري بيوجعني'],
++  ['أنا عندي وجع في الرجل وجع في الرجل', 'أنا عندي وجع في الرجل'],
++  ['وجع، وجع، وجع', 'وجع،'],
++  ['كلمة', 'كلمة'],
++  ['', ''],
++];
++
++const collapse = collapseCases.map(([input, expected]) => ({
++  input,
++  expected,
++  output: collapseRepeatedSegments(input),
++}));
++
++// ---------------------------------------------------------------------------
++// 2) normalizeSpeechText — the SHARED path used by BOTH typing and voice.
++// ---------------------------------------------------------------------------
++const normalizeCases: Array<[string, string]> = [
++  ['ضهري بيوجعني ضهري بيوجعني', 'ظهري بيوجعني'],
++  ['نص الرجل نص الرجل نص الرجل', 'نص الرجل'],
++  ['من وقت من وقت من وقت', 'من وقت'],
++  ['راس راس راس', 'رأس'],
++  ['  وجع   وجع   وجع  ', 'وجع'],
++];
++
++const normalize = normalizeCases.map(([input, expected]) => ({
++  input,
++  expected,
++  output: normalizeSpeechText(input),
++}));
++
++// ---------------------------------------------------------------------------
++// 3) mergeSpeechTranscript — voice transcript merging must not keep repeats.
++// ---------------------------------------------------------------------------
++const mergeCases: Array<[string, string, string]> = [
++  ['', 'نص الرجل نص الرجل نص الرجل', 'نص الرجل'],
++  ['عندي وجع', 'في الرجل في الرجل', 'عندي وجع في الرجل'],
++  ['ظهري بيوجعني', 'ظهري بيوجعني', 'ظهري بيوجعني'],
++  ['وجع في الرجل', 'وجع في الرجل', 'وجع في الرجل'],
++  ['من وقت', 'من وقت من وقت', 'من وقت'],
++];
++
++const merge = mergeCases.map(([prev, next, expected]) => ({
++  prev,
++  next,
++  expected,
++  output: mergeSpeechTranscript(prev, next),
++}));
++
++// ---------------------------------------------------------------------------
++// 4) Reply hygiene — exactly ONE follow-up question, no repeated words.
++// ---------------------------------------------------------------------------
++const replyCases: Array<[string, string]> = [
++  ['تمام. إيه شدة الألم؟ إيه اللي بيزوّد الألم؟', 'تمام. إيه شدة الألم؟'],
++  ['فهمت، ألم في البطن بقاله يومين.', 'فهمت، ألم في البطن بقاله يومين.'],
++  ['إيه شدة الألم؟', 'إيه شدة الألم؟'],
++  ['تمام، سجّلت الألم في الساق. إيه شدة الألم؟', 'تمام، سجّلت الألم في الساق. إيه شدة الألم؟'],
++  ['إيه شدة الألم؟ إيه شدة الألم؟', 'إيه شدة الألم؟'],
++];
++
++const singleQuestion = replyCases.map(([input, expected]) => ({
++  input,
++  expected,
++  output: enforceSingleQuestion(input),
++  questionCount: (input.match(/[؟?]/g) || []).length,
++  outputQuestionCount: (enforceSingleQuestion(input).match(/[؟?]/g) || []).length,
++}));
++
++const cleanReply = cleanAssistantReply({
++  ar: 'وجع وجع وجع',
++  en: 'pain pain pain',
++  fr: 'douleur douleur douleur',
++});
++
++// ---------------------------------------------------------------------------
++// 5) Neutral follow-up phrasing (no gendered «تقدر/تقدري»).
++// ---------------------------------------------------------------------------
++const baseCtx: PainContext = {
++  painLocation: null,
++  painLocationLabel: null,
++  painOnset: null,
++  painDuration: null,
++  painSeverity: null,
++  painQuality: [],
++  radiation: false,
++  aggravatingFactors: [],
++  relievingFactors: [],
++  associatedSymptoms: [],
++  injury: false,
++  medications: [],
++  redFlags: [],
++  userCorrections: [],
++};
++
++const followUpLocation = buildSmartFollowUp({ ...baseCtx, painLocation: null });
++const followUpSeverity = buildSmartFollowUp({ ...baseCtx, painLocation: 'leg', painSeverity: null });
++const followUpDuration = buildSmartFollowUp({ ...baseCtx, painLocation: 'leg', painSeverity: 6, painDuration: null });
++const followUpQuality = buildSmartFollowUp({ ...baseCtx, painLocation: 'leg', painSeverity: 6, painDuration: 'يومين', painQuality: [] });
++const followUpRadiation = buildSmartFollowUp({ ...baseCtx, painLocation: 'leg', painSeverity: 6, painDuration: 'يومين', painQuality: ['شد'], radiation: false });
++
++const followUps = {
++  location: followUpLocation?.ar ?? null,
++  severity: followUpSeverity?.ar ?? null,
++  duration: followUpDuration?.ar ?? null,
++  quality: followUpQuality?.ar ?? null,
++  radiation: followUpRadiation?.ar ?? null,
++};
++const gendered = /تقدر|تقدري|تقدري/.test(Object.values(followUps).join(' '));
++
++// ---------------------------------------------------------------------------
++// 6) Manual typing vs voice→typing transitions (end-to-end through the shared path).
++// ---------------------------------------------------------------------------
++const manualTyping = {
++  // What AssistantScreen.send()/useAppAssistant.send() do with a typed message.
++  typed: 'ضهري بيوجعني ضهري بيوجعني ضهري بيوجعني',
++  sent: normalizeSpeechText('ضهري بيوجعني ضهري بيوجعني ضهري بيوجعني'),
++};
++
++const voiceToTyping = {
++  // 1) voice result arrives duplicated, 2) merged, 3) then the user types more.
++  rawVoice: 'نص الرجل نص الرجل نص الرجل',
++  mergedVoice: mergeSpeechTranscript('', normalizeSpeechText('نص الرجل نص الرجل نص الرجل')),
++  thenTyped: normalizeSpeechText('من وقت من وقت من وقت'),
++  combined: mergeSpeechTranscript(
++    mergeSpeechTranscript('', normalizeSpeechText('نص الرجل نص الرجل نص الرجل')),
++    normalizeSpeechText('من وقت من وقت من وقت'),
++  ),
++};
++
++console.log(JSON.stringify({ collapse, normalize, merge, singleQuestion, cleanReply, followUps, gendered, manualTyping, voiceToTyping }));
+diff --git a/tests/textRepetition.test.cjs b/tests/textRepetition.test.cjs
+new file mode 100644
+index 0000000..5998891
+--- /dev/null
++++ b/tests/textRepetition.test.cjs
+@@ -0,0 +1,113 @@
++// tests/textRepetition.test.cjs
++// ============================================================================
++// Regression tests for the assistant TYPING / repetition fix — via node --test.
++// Runs tests/textRepetition.runner.ts (through tsx) which drives the real units
++// and asserts on the JSON it emits.
++//   • consecutive word/phrase repetition is collapsed (STT / paste / typing),
++//   • the SHARED normalisation (typing + voice) removes the repeats,
++//   • voice transcript merging stays idempotent,
++//   • assistant replies carry exactly ONE follow-up question and no repeats,
++//   • follow-up phrasing is gender-neutral (no «تقدر/تقدري»),
++//   • switching voice <-> typing never re-introduces repetition.
++// ============================================================================
++const { test } = require('node:test');
++const assert = require('node:assert');
++const { spawnSync } = require('node:child_process');
++const path = require('node:path');
++
++const ROOT = path.join(__dirname, '..');
++const RUNNER = path.join('tests', 'textRepetition.runner.ts');
++
++function runRunner() {
++  const res = spawnSync('npx', ['tsx', RUNNER], {
++    cwd: ROOT,
++    encoding: 'utf8',
++    maxBuffer: 64 * 1024 * 1024,
++  });
++  assert.strictEqual(res.status, 0, `runner exited with ${res.status}: ${res.stderr}`);
++  const out = (res.stdout || '').trim();
++  assert.ok(out.length > 0, 'runner produced no output');
++  return JSON.parse(out);
++}
++
++const data = runRunner();
++
++// ---------------------------------------------------------------------------
++// 1) collapseRepeatedSegments — the root cause.
++// ---------------------------------------------------------------------------
++test('collapseRepeatedSegments removes consecutive repeated words/phrases', () => {
++  for (const c of data.collapse) {
++    assert.strictEqual(c.output, c.expected, `collapse(${JSON.stringify(c.input)}) = ${JSON.stringify(c.output)}`);
++  }
++  // The exact example from the bug report.
++  const example = data.collapse.find((c) => c.input === 'نص الرجل نص الرجل نص الرجل');
++  assert.strictEqual(example.output, 'نص الرجل', '«نص الرجل نص الرجل نص الرجل» -> «نص الرجل»');
++  const example2 = data.collapse.find((c) => c.input === 'من وقت من وقت من وقت');
++  assert.strictEqual(example2.output, 'من وقت', '«من وقت من وقت من وقت» -> «من وقت»');
++});
++
++test('collapseRepeatedSegments leaves normal sentences untouched', () => {
++  const normal = data.collapse.find((c) => c.input === 'عندي وجع في الرجل');
++  assert.strictEqual(normal.output, 'عندي وجع في الرجل');
++  const single = data.collapse.find((c) => c.input === 'كلمة');
++  assert.strictEqual(single.output, 'كلمة');
++});
++
++// ---------------------------------------------------------------------------
++// 2) Shared normalisation (typing + voice) collapses repeats + fixes spelling.
++// ---------------------------------------------------------------------------
++test('normalizeSpeechText (shared typing+voice path) collapses repeats', () => {
++  for (const c of data.normalize) {
++    assert.strictEqual(c.output, c.expected, `normalize(${JSON.stringify(c.input)}) = ${JSON.stringify(c.output)}`);
++  }
++});
++
++// ---------------------------------------------------------------------------
++// 3) Voice transcript merging stays idempotent and repeat-free.
++// ---------------------------------------------------------------------------
++test('mergeSpeechTranscript never keeps intra-string repetition', () => {
++  for (const c of data.merge) {
++    assert.strictEqual(c.output, c.expected, `merge(${JSON.stringify(c.prev)}, ${JSON.stringify(c.next)}) = ${JSON.stringify(c.output)}`);
++  }
++});
++
++// ---------------------------------------------------------------------------
++// 4) Reply hygiene — exactly one follow-up question.
++// ---------------------------------------------------------------------------
++test('enforceSingleQuestion keeps at most one question per message', () => {
++  for (const c of data.singleQuestion) {
++    assert.strictEqual(c.output, c.expected, `enforceSingleQuestion(${JSON.stringify(c.input)}) = ${JSON.stringify(c.output)}`);
++    assert.ok(c.outputQuestionCount <= 1, `at most one question in ${JSON.stringify(c.output)}`);
++  }
++});
++
++test('cleanAssistantReply collapses repeats in every language', () => {
++  assert.strictEqual(data.cleanReply.ar, 'وجع');
++  assert.strictEqual(data.cleanReply.en, 'pain');
++  assert.strictEqual(data.cleanReply.fr, 'douleur');
++});
++
++// ---------------------------------------------------------------------------
++// 5) Neutral follow-up phrasing.
++// ---------------------------------------------------------------------------
++test('follow-up questions are gender-neutral (no «تقدر/تقدري»)', () => {
++  assert.strictEqual(data.gendered, false, `no gendered phrasing in ${JSON.stringify(data.followUps)}`);
++  assert.strictEqual(data.followUps.location, 'مكان الألم بالظبط فين؟');
++  assert.strictEqual(data.followUps.severity, 'شدة الألم من 1 لـ 10، كام؟');
++  for (const [key, value] of Object.entries(data.followUps)) {
++    assert.ok(/[؟?]/.test(value), `${key} follow-up is a question: ${value}`);
++  }
++});
++
++// ---------------------------------------------------------------------------
++// 6) Manual typing + voice<->typing transitions.
++// ---------------------------------------------------------------------------
++test('manual typing is normalised through the shared path', () => {
++  assert.strictEqual(data.manualTyping.sent, 'ظهري بيوجعني', 'typed repeats collapse and spelling is fixed');
++});
++
++test('voice -> typing transition never re-introduces repetition', () => {
++  assert.strictEqual(data.voiceToTyping.mergedVoice, 'نص الرجل');
++  assert.strictEqual(data.voiceToTyping.thenTyped, 'من وقت');
++  assert.strictEqual(data.voiceToTyping.combined, 'نص الرجل من وقت');
++});
+diff --git a/tests/ttsVoice.runner.ts b/tests/ttsVoice.runner.ts
+new file mode 100644
+index 0000000..0949f21
+--- /dev/null
++++ b/tests/ttsVoice.runner.ts
+@@ -0,0 +1,65 @@
++// tests/ttsVoice.runner.ts
++// ============================================================================
++// Regression runner for the NATURAL VOICE (TTS) fix.
++// ----------------------------------------------------------------------------
++// Emits a single JSON object on stdout so tests/ttsVoice.test.cjs can assert on
++// it via `node --test`. It drives the REAL pure unit (no re-implementation):
++//   • services/speech/ttsVoice.ts (scoreVoice, pickBestVoice, prosodyFor,
++//     prepareTtsText, ttsLangFor)
++// ============================================================================
++
++import {
++  scoreVoice,
++  pickBestVoice,
++  prosodyFor,
++  prepareTtsText,
++  ttsLangFor,
++  type VoiceLike,
++} from '../services/speech/ttsVoice';
++
++const voices: VoiceLike[] = [
++  { identifier: 'ar-eg-espeak', name: 'eSpeak Arabic', language: 'ar-EG', localService: true },
++  { identifier: 'ar-eg-google', name: 'Google العربية', language: 'ar-EG', localService: false },
++  { identifier: 'ar-sa-natural', name: 'Microsoft Natural Arabic', language: 'ar-SA', localService: false },
++  { identifier: 'en-us-google', name: 'Google US English', language: 'en-US', localService: false },
++  { identifier: 'en-us-compact', name: 'English Compact', language: 'en_US', localService: true },
++  { identifier: 'fr-fr-siri', name: 'Siri Voice (French)', language: 'fr-FR', localService: false },
++  { identifier: 'de-de-google', name: 'Google Deutsch', language: 'de-DE', localService: false },
++];
++
++const out = {
++  scores: {
++    robotic: scoreVoice(voices[0], 'ar-EG'),
++    google: scoreVoice(voices[1], 'ar-EG'),
++    naturalOtherRegion: scoreVoice(voices[2], 'ar-EG'),
++    wrongLang: scoreVoice(voices[6], 'ar-EG'),
++  },
++  picks: {
++    ar: pickBestVoice(voices, 'ar-EG')?.identifier ?? null,
++    en: pickBestVoice(voices, 'en-US')?.identifier ?? null,
++    fr: pickBestVoice(voices, 'fr-FR')?.identifier ?? null,
++    none: pickBestVoice([voices[6]], 'ar-EG')?.identifier ?? null,
++    empty: pickBestVoice([], 'ar-EG')?.identifier ?? null,
++  },
++  prosody: {
++    ar: prosodyFor('ar-EG'),
++    en: prosodyFor('en-US'),
++    fr: prosodyFor('fr-FR'),
++  },
++  prepared: {
++    markdown: prepareTtsText('**ألم** شديد في `الرجل`'),
++    emoji: prepareTtsText('عندك ألم؟ 😟🔥'),
++    url: prepareTtsText('شوف https://example.com/very/long/path دلوقتي'),
++    link: prepareTtsText('اقرأ [التعليمات](https://x.com) الأول'),
++    bullets: prepareTtsText('- نقطة\n- نقطة تانية'),
++    plain: prepareTtsText('عندي ألم في الرجل'),
++  },
++  ttsLang: {
++    ar: ttsLangFor('ar'),
++    en: ttsLangFor('en'),
++    fr: ttsLangFor('fr'),
++    other: ttsLangFor('xx'),
++  },
++};
++
++console.log(JSON.stringify(out));
+diff --git a/tests/ttsVoice.test.cjs b/tests/ttsVoice.test.cjs
+new file mode 100644
+index 0000000..911f61e
+--- /dev/null
++++ b/tests/ttsVoice.test.cjs
+@@ -0,0 +1,75 @@
++// tests/ttsVoice.test.cjs
++// ============================================================================
++// Regression tests for the NATURAL VOICE (TTS) fix — via node --test.
++// Runs tests/ttsVoice.runner.ts (through tsx) which drives the real pure unit
++// services/speech/ttsVoice.ts and asserts on the JSON it emits:
++//   • the best available voice is chosen per language (natural > robotic),
++//   • voices of the wrong language are never selected,
++//   • prosody (rate/pitch) is tuned to natural, non-robotic values,
++//   • text is cleaned before speaking (markdown / emoji / urls / bullets).
++// ============================================================================
++const { test } = require('node:test');
++const assert = require('node:assert');
++const { spawnSync } = require('node:child_process');
++const path = require('node:path');
++
++const ROOT = path.join(__dirname, '..');
++const RUNNER = path.join('tests', 'ttsVoice.runner.ts');
++
++function runRunner() {
++  const res = spawnSync('npx', ['tsx', RUNNER], {
++    cwd: ROOT,
++    encoding: 'utf8',
++    maxBuffer: 64 * 1024 * 1024,
++  });
++  assert.strictEqual(res.status, 0, `runner exited with ${res.status}: ${res.stderr}`);
++  const out = (res.stdout || '').trim();
++  assert.ok(out.length > 0, 'runner produced no output');
++  return JSON.parse(out);
++}
++
++const data = runRunner();
++
++test('a natural/neural voice scores higher than a robotic one', () => {
++  assert.ok(data.scores.google > data.scores.robotic, `google=${data.scores.google} robotic=${data.scores.robotic}`);
++  assert.ok(data.scores.naturalOtherRegion > data.scores.robotic);
++});
++
++test('a voice of a different language is rejected (negative score)', () => {
++  assert.ok(data.scores.wrongLang < 0, `wrongLang=${data.scores.wrongLang}`);
++});
++
++test('best voice per language prefers the natural/cloud voice', () => {
++  assert.strictEqual(data.picks.ar, 'ar-eg-google');
++  assert.strictEqual(data.picks.en, 'en-us-google');
++  assert.strictEqual(data.picks.fr, 'fr-fr-siri');
++});
++
++test('no same-language voice => null (never pick a wrong-language voice)', () => {
++  assert.strictEqual(data.picks.none, null);
++  assert.strictEqual(data.picks.empty, null);
++});
++
++test('prosody is natural and non-robotic (pitch neutral, Arabic slightly slower)', () => {
++  assert.strictEqual(data.prosody.ar.pitch, 1);
++  assert.ok(data.prosody.ar.rate < 1, `ar.rate=${data.prosody.ar.rate}`);
++  assert.strictEqual(data.prosody.en.pitch, 1);
++  assert.strictEqual(data.prosody.en.rate, 1);
++  assert.strictEqual(data.prosody.fr.pitch, 1);
++});
++
++test('TTS text is cleaned before speaking (markdown / emoji / urls / bullets)', () => {
++  assert.strictEqual(data.prepared.markdown, 'ألم شديد في الرجل');
++  assert.strictEqual(data.prepared.emoji, 'عندك ألم؟');
++  assert.strictEqual(data.prepared.url, 'شوف دلوقتي');
++  assert.strictEqual(data.prepared.link, 'اقرأ التعليمات الأول');
++  assert.strictEqual(data.prepared.bullets, 'نقطة نقطة تانية');
++  assert.strictEqual(data.prepared.plain, 'عندي ألم في الرجل');
++});
++
++test('TTS language mapping matches the UI language', () => {
++  assert.strictEqual(data.ttsLang.ar, 'ar-EG');
++  assert.strictEqual(data.ttsLang.en, 'en-US');
++  assert.strictEqual(data.ttsLang.fr, 'fr-FR');
++  assert.strictEqual(data.ttsLang.other, 'ar-EG');
++});
