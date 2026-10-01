@@ -28,6 +28,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services/speechRecognition';
 import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
 import { voiceLog } from '../services/speech/voiceLog';
+import { normalizeSpeechText } from '../services/speech/arabicSpeech';
 import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
 import { collapseWhitespace, mergeSpeechTranscript, normalizeTranscript } from '../services/speech/transcript';
 import { claimVoiceSession, releaseVoiceSession, isVoiceSessionOwner } from '../services/speech/voiceSession';
@@ -201,7 +202,7 @@ const speechLang = (language: string): string =>
 
 /** لغة النطق (Text-to-Speech) حسب لغة الواجهة. */
 const ttsLang = (language: string): string =>
-  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-SA';
+  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
 
 /** يبني نصًّا مختصرًا قابلًا للنطق من رد المساعد. */
 function replyToSpeech(reply: AssistantReply): string {
@@ -481,7 +482,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
         getGate().reset();
         gotResultRef.current = false;
         const recognizer = createWebRecognizer(
-          { lang: speechLang(languageRef.current), continuous: true, interimResults: true },
+          { lang: speechLang(languageRef.current), continuous: callActiveRef.current, interimResults: true, maxAlternatives: 3 },
           {
             log: (stage, data) => voiceLog(stage, data),
             onStart: () => {
@@ -656,7 +657,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
 
   const send = useCallback(
     (raw: string, imageUri?: string | null) => {
-      const text = raw.trim();
+      const text = normalizeSpeechText(raw).trim();
       const hasImg = !!imageUri;
       if ((!text && !hasImg) || thinking) return;
 
