@@ -138,6 +138,16 @@ test('H. web speech recogniser drops exact duplicate result events', () => {
 });
 
 // ---------------------------------------------------------------------------
+// I — دمج نص التعرف الأصلي (native) ضد التكرار (انحدار Android/Expo).
+//     نفس حالات tests/nativeSpeechTranscriptMerge.regression.ts.
+// ---------------------------------------------------------------------------
+test('I. native transcript merge drops duplicates and cumulative re-sends', () => {
+  const i = data.I;
+  assert.strictEqual(i.pass, true, `merged value was: ${i.value}`);
+  assert.strictEqual(i.value, 'عندي وجع في بطني', 'duplicates dropped, new segment appended once');
+});
+
+// ---------------------------------------------------------------------------
 // Wiring — الخطّاف والشاشة يُمرّران المنطق إلى TurnGate (لا نسخة مكرّرة).
 // ---------------------------------------------------------------------------
 test('Wiring: hook and screen delegate voice bookkeeping to TurnGate', () => {

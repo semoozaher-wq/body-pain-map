@@ -30,6 +30,7 @@ import {
   deltaFromCommitted,
   stripArabicDiacritics,
   collapseWhitespace,
+  mergeSpeechTranscript,
 } from '../services/speech/transcript';
 import { createWebRecognizer } from '../services/speech/webSpeech';
 import { interpret } from '../services/appAssistant/engine';
@@ -434,6 +435,24 @@ function runWebSpeechDedup() {
 }
 
 // ---------------------------------------------------------------------------
+// I — دمج نص التعرف الأصلي (native) ضد التكرار: نفس حالات ملف الانحدار
+//     tests/nativeSpeechTranscriptMerge.regression.ts (مدمجة هنا لتُنفَّذ فعليًا في CI).
+// ---------------------------------------------------------------------------
+function runNativeMerge() {
+  // أزواج [prev, incoming] كما في ملف الانحدار؛ يُستخدم العنصر الثاني (incoming) فقط.
+  const cases = [
+    ['عندي وجع', 'عندي وجع'],
+    ['عندي وجع', 'في بطني'],
+    ['عندي وجع في بطني', 'في بطني'],
+    ['عندي وجع في بطني', 'عندي وجع في بطني'],
+  ] as const;
+  let value = '';
+  for (const [, incoming] of cases) value = mergeSpeechTranscript(value, incoming);
+  const expected = 'عندي وجع في بطني';
+  return { value, expected, pass: value === expected };
+}
+
+// ---------------------------------------------------------------------------
 // تشغيل الكل وإخراج JSON.
 // ---------------------------------------------------------------------------
 const output = {
@@ -445,6 +464,7 @@ const output = {
   F: runKeepMarker(),
   G: runTranscript(),
   H: runWebSpeechDedup(),
+  I: runNativeMerge(),
   catalogSanity: {
     upperBackExists: !!getEntry('region:upper:back'),
     absFrontExists: !!getEntry('region:abs:front'),
