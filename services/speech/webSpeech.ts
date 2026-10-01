@@ -17,6 +17,8 @@
 //   "append vs replace" difference in `event.results`.
 // ============================================================================
 
+import { pickBestSpeechAlternative } from './arabicSpeech';
+
 export interface SpeechSnapshot {
   /** Text confirmed as final so far in this recognition session. */
   finalText: string;
@@ -86,7 +88,7 @@ function isFinalResult(result: any, confidence: number | null): boolean {
 }
 
 /** Rebuild a clean transcript snapshot from a SpeechRecognitionEvent. */
-export function snapshotFromEvent(event: any): SpeechSnapshot {
+export function snapshotFromEvent(event: any, language = 'ar'): SpeechSnapshot {
   const results = event && event.results ? event.results : null;
   const n = results ? results.length : 0;
   let finalText = '';
@@ -94,10 +96,21 @@ export function snapshotFromEvent(event: any): SpeechSnapshot {
   let hasFinal = false;
   for (let i = 0; i < n; i++) {
     const result = results[i];
-    const alt = result && (result[0] || result[event.resultIndex]);
-    const transcript = (alt && alt.transcript) || '';
+    const alternatives: string[] = [];
+    const altCount = result && typeof result.length === 'number' ? result.length : 0;
+    for (let a = 0; a < altCount; a++) {
+      const candidate = result[a]?.transcript;
+      if (typeof candidate === 'string' && candidate.trim()) alternatives.push(candidate);
+    }
+    const fallback = result && (result[0] || result[event.resultIndex]);
+    if (!alternatives.length && fallback?.transcript) alternatives.push(fallback.transcript);
+    const transcript = pickBestSpeechAlternative(alternatives, language);
     if (!transcript) continue;
-    const confidence = alt && typeof alt.confidence === 'number' ? alt.confidence : null;
+    // Confidence is kept from the selected alternative when available.
+    const selected = alternatives.length
+      ? Array.from({ length: altCount }, (_, a) => result[a]).find((a: any) => pickBestSpeechAlternative([a?.transcript || ''], language) === transcript)
+      : fallback;
+    const confidence = selected && typeof selected.confidence === 'number' ? selected.confidence : null;
     if (isFinalResult(result, confidence)) {
       finalText += `${transcript} `;
       hasFinal = true;
@@ -155,7 +168,7 @@ export function createWebRecognizer(
     callbacks.onSpeechEnd?.();
   };
   rec.onresult = (event: any) => {
-    const snap = snapshotFromEvent(event);
+    const snap = snapshotFromEvent(event, /^(ar|ar-)/i.test(rec.lang) ? 'ar' : /^(fr|fr-)/i.test(rec.lang) ? 'fr' : 'en');
     // Drop an exact repeat of the previous event (Android re-finalisation):
     // identical live text AND identical final/interim classification.
     if (snap.liveText === lastLiveText && snap.hasFinal === lastHasFinal) {
