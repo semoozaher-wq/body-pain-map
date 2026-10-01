@@ -181,8 +181,18 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       setError(null);
       setVoiceState('thinking');
       const state = getState();
+      const recentUserMessages = messages
+        .filter((message) => message.role === 'user')
+        .slice(-4)
+        .map((message) => message.text)
+        .filter(Boolean);
       // المسار الموحّد: Gemini (نصّ + سياق + لغة) ثم محرّك القواعد كطبقة تفسير/احتياط.
-      const turn = await interpretAsync(trimmed, state, { previousContext: painContextRef.current ?? undefined });
+      // نمرّر نفس السياق الطبي + آخر الرسائل إلى Gemini حتى لا يرى النموذج جولة
+      // جديدة كأنها محادثة مستقلة عن الجولة السابقة.
+      const turn = await interpretAsync(trimmed, state, {
+        previousContext: painContextRef.current ?? undefined,
+        recentUserMessages,
+      });
       const userMsg: AssistantMessage = { id: nextId(), role: 'user', text: trimmed };
       const botMsg: AssistantMessage = { id: nextId(), role: 'assistant', text: turn.reply[state.language], turn };
       setMessages((prev) => [...prev, userMsg, botMsg]);
@@ -193,7 +203,7 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       else setVoiceState(afterSpeechEnd(callActiveRef.current));
       return turn;
     },
-    [getState, runTurn, onTurn, autoSpeak, speak],
+    [getState, runTurn, onTurn, autoSpeak, speak, messages],
   );
   sendRef.current = send;
 
@@ -236,7 +246,9 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     if (!enabledRef.current || !isVoiceSessionOwner(VOICE_OWNER)) return;
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
-    voiceLog('speech-result', { platform: 'native', transcript, isFinal: !!event?.isFinal });
+    const speechText = normalizeSpeechText(transcript);
+    if (!speechText) return;
+    voiceLog('speech-result', { platform: 'native', transcript, normalized: speechText, isFinal: !!event?.isFinal });
     // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
     if (voiceStateRef.current === 'speaking') {
       try { Speech.stop(); } catch {}
@@ -244,9 +256,9 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     }
     if (event?.isFinal) {
       // كل نتيجة نهائية تمرّ عبر TurnGate ⇒ جولة واحدة لكل جملة.
-      getGate().onFinal(transcript);
+      getGate().onFinal(speechText);
     } else {
-      setInterim(transcript);
+      setInterim(speechText);
     }
   });
 
