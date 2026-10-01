@@ -484,7 +484,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
         getGate().reset();
         gotResultRef.current = false;
         const recognizer = createWebRecognizer(
-          { lang: speechLang(languageRef.current), continuous: callActiveRef.current, interimResults: true, maxAlternatives: 3 },
+          { lang: speechLang(languageRef.current), continuous: voiceSessionRef.current, interimResults: true, maxAlternatives: 3 },
           {
             log: (stage, data) => voiceLog(stage, data),
             onStart: () => {
