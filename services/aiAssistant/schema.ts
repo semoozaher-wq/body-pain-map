@@ -101,7 +101,9 @@ export const assistantPainContextSchema = z.object({
 export const assistantDecisionSchema = z.object({
   intent: z.enum(ASSISTANT_INTENTS),
   reply: z.string(),
-  confidence: z.number(),
+  // ثقة النموذج في فهمه للمكان/الاتجاه/الطلب: من 0 (غير متأكد) إلى 1 (متأكد تمامًا).
+  // المحرّك يستخدمها للتفريق بين التنفيذ المباشر (ثقة عالية) والسؤال التوضيحي (ثقة منخفضة).
+  confidence: z.number().min(0).max(1),
   painContext: assistantPainContextSchema.nullable(),
   actions: z.array(assistantActionSchema),
   followUpQuestion: z.string().nullable(),
