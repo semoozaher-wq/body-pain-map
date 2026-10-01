@@ -33,6 +33,13 @@ import {
   mergeSpeechTranscript,
 } from '../services/speech/transcript';
 import { createWebRecognizer } from '../services/speech/webSpeech';
+import {
+  claimVoiceSession,
+  releaseVoiceSession,
+  isVoiceSessionOwner,
+  currentVoiceSessionOwner,
+  __resetVoiceSessionForTests,
+} from '../services/speech/voiceSession';
 import { interpret } from '../services/appAssistant/engine';
 import { parseIntents } from '../services/appAssistant/intents';
 import { getEntry } from '../services/appAssistant/catalog';
@@ -453,6 +460,153 @@ function runNativeMerge() {
 }
 
 // ---------------------------------------------------------------------------
+// J — سباق onend→restart: نفس الجملة النهائية لا تُرسَل مرّتين عبر إعادة تشغيل
+//     المتعرّف، بينما الجملة الجديدة فعلًا لا تُبتلع.
+// ---------------------------------------------------------------------------
+function runRestartDedup() {
+  const clock = makeClock();
+  const { gate, turns, logs } = makeGate(clock);
+  // جلسة A: الجملة النهائية ثم onend (flush) ⇒ الجولة 1.
+  gate.onFinal('عندي وجع في بطني');
+  gate.flush();
+  // إعادة تشغيل المتعرّف (onend→start): reset() يحافظ على حارس النصّ النهائي.
+  gate.reset();
+  // جلسة B: أندرويد يعيد تثبيت نفس الجملة ⇒ يجب أن تُسقَط (لا جولة ثانية).
+  gate.onFinal('عندي وجع في بطني');
+  gate.flush();
+  clock.advance(DEFAULT_TURN_SILENCE_MS * 2);
+  const sameUtteranceTurns = turns.length;
+  const finalDeduped = logs.includes('turn-final-dedup');
+  // جملة جديدة فعلًا بعد إعادة التشغيل ⇒ يجب ألّا تُبتلع.
+  gate.onFinal('عندي صداع');
+  gate.flush();
+  const newUtteranceTurns = turns.length - sameUtteranceTurns;
+  return { sameUtteranceTurns, finalDeduped, newUtteranceTurns, turns };
+}
+
+// ---------------------------------------------------------------------------
+// K — مسار واحد فقط يملك الميكروفون: بثّ نفس الحدث إلى مسارين ⇒ جولة واحدة فقط.
+// ---------------------------------------------------------------------------
+function runSingleActiveListener() {
+  __resetVoiceSessionForTests();
+  const clock = makeClock();
+  const a = makeGate(clock);
+  const b = makeGate(clock);
+  // المسار A (AssistantScreen) يبدأ الاستماع ⇒ يملك القفل.
+  const aClaimed = claimVoiceSession('assistant');
+  // المسار B (المساعد العائم) يحاول البدء ⇒ يفشل (مسار واحد فقط).
+  const bClaimed = claimVoiceSession('global');
+  // محاكاة بثّ نفس حدث النتيجة إلى الاثنين (كما يفعل expo useEventListener).
+  const deliver = (text: string) => {
+    if (isVoiceSessionOwner('assistant')) a.gate.onFinal(text);
+    if (isVoiceSessionOwner('global')) b.gate.onFinal(text);
+  };
+  deliver('عندي وجع في بطني');
+  clock.advance(DEFAULT_TURN_SILENCE_MS);
+  const ownerWhileListening = currentVoiceSessionOwner();
+  const aTurns = a.turns.length;
+  const bTurnsWhileAOwns = b.turns.length;
+  // المسار A يتوقف ⇒ يحرّر القفل ⇒ B يستطيع البدء بعدها.
+  releaseVoiceSession('assistant');
+  const bClaimedAfterRelease = claimVoiceSession('global');
+  deliver('عندي صداع');
+  clock.advance(DEFAULT_TURN_SILENCE_MS);
+  const bTurnsAfterOwnership = b.turns.length;
+  __resetVoiceSessionForTests();
+  return {
+    aClaimed,
+    bClaimed,
+    ownerWhileListening,
+    aTurns,
+    bTurnsWhileAOwns,
+    bClaimedAfterRelease,
+    bTurnsAfterOwnership,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// L — دمج التداخل الجزئي: وصول جزء من الكلام داخل نصّ جديد لا يُكرّره.
+// ---------------------------------------------------------------------------
+function runMergeOverlap() {
+  const cases = [
+    { prev: 'عندي وجع', next: 'وجع في بطني', expected: 'عندي وجع في بطني' },
+    { prev: 'عندي وجع في بطني', next: 'في بطني', expected: 'عندي وجع في بطني' },
+    { prev: 'عندي وجع في بطني', next: 'عندي وجع في بطني', expected: 'عندي وجع في بطني' },
+    { prev: 'عندي وجع', next: 'في بطني', expected: 'عندي وجع في بطني' },
+    { prev: 'عندي وجع', next: 'عندي وجع', expected: 'عندي وجع' },
+    { prev: '', next: 'عندي وجع', expected: 'عندي وجع' },
+  ];
+  return cases.map((c) => {
+    const actual = mergeSpeechTranscript(c.prev, c.next);
+    return { ...c, actual, pass: actual === c.expected };
+  });
+}
+
+// ---------------------------------------------------------------------------
+// M — حالات إزالة التكرار على البوّابة: نهائي مكرّر، interim→final، onresult مكرّر.
+// ---------------------------------------------------------------------------
+function runGateDedupCases() {
+  // نهائي مكرّر حرفيًا.
+  const c1 = makeClock();
+  const g1 = makeGate(c1);
+  g1.gate.onFinal('عندي وجع في بطني');
+  g1.gate.flush();
+  g1.gate.onFinal('عندي وجع في بطني');
+  g1.gate.flush();
+
+  // interim ثم final لنفس الكلام.
+  const c2 = makeClock();
+  const g2 = makeGate(c2);
+  g2.gate.onSnapshot({ liveText: 'عندي وجع', hasFinal: false });
+  g2.gate.onFinal('عندي وجع في بطني');
+  c2.advance(DEFAULT_TURN_SILENCE_MS);
+
+  // onresult مكرّر بنفس المعاينة.
+  const c3 = makeClock();
+  const g3 = makeGate(c3);
+  g3.gate.onSnapshot({ liveText: 'عندي وجع في بطني', hasFinal: true });
+  g3.gate.onSnapshot({ liveText: 'عندي وجع في بطني', hasFinal: true });
+  c3.advance(DEFAULT_TURN_SILENCE_MS);
+
+  return {
+    duplicateFinalTurns: g1.turns.length,
+    interimToFinalTurns: g2.turns.length,
+    interimToFinalText: g2.turns[0] ?? null,
+    repeatedOnresultTurns: g3.turns.length,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// N — TTS مرّة واحدة: تيّار أحداث واقعي (تكرار نهائي + onend + إعادة تشغيل) ⇒
+//     جولة واحدة ⇒ استدعاء نطق واحد. (send/speak نموذج مبني على البوّابة الحقيقية.)
+// ---------------------------------------------------------------------------
+function runTtsOnce() {
+  const clock = makeClock();
+  const turns: string[] = [];
+  const speaks: string[] = [];
+  const gate = createTurnGate({
+    silenceMs: DEFAULT_TURN_SILENCE_MS,
+    setTimeoutFn: clock.setTimeoutFn,
+    clearTimeoutFn: clock.clearTimeoutFn,
+    now: clock.now,
+    onTurn: (text) => {
+      turns.push(text);
+      // كل جولة ⇒ ردّ واحد ⇒ نطق واحد (speak يستدعي Speech.stop() قبل الجديد).
+      speaks.push(text);
+    },
+  });
+  gate.onSnapshot({ liveText: 'عندي وجع', hasFinal: false });
+  gate.onFinal('عندي وجع في بطني');
+  gate.onFinal('عندي وجع في بطني'); // نهائي مكرّر
+  gate.flush(); // onend
+  gate.reset(); // إعادة تشغيل
+  gate.onFinal('عندي وجع في بطني'); // إعادة تثبيت في الجلسة الجديدة
+  gate.flush(); // onend
+  clock.advance(DEFAULT_TURN_SILENCE_MS * 2);
+  return { turnCount: turns.length, speakCount: speaks.length, turns };
+}
+
+// ---------------------------------------------------------------------------
 // تشغيل الكل وإخراج JSON.
 // ---------------------------------------------------------------------------
 const output = {
@@ -465,6 +619,11 @@ const output = {
   G: runTranscript(),
   H: runWebSpeechDedup(),
   I: runNativeMerge(),
+  J: runRestartDedup(),
+  K: runSingleActiveListener(),
+  L: runMergeOverlap(),
+  M: runGateDedupCases(),
+  N: runTtsOnce(),
   catalogSanity: {
     upperBackExists: !!getEntry('region:upper:back'),
     absFrontExists: !!getEntry('region:abs:front'),

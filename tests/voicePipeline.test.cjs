@@ -148,6 +148,87 @@ test('I. native transcript merge drops duplicates and cumulative re-sends', () =
 });
 
 // ---------------------------------------------------------------------------
+// J — سباق onend→restart: نفس الجملة النهائية لا تُرسَل مرّتين؛ الجديدة لا تُبتلع.
+// ---------------------------------------------------------------------------
+test('J. onend→restart race: same final is not re-sent, a new utterance is not swallowed', () => {
+  const j = data.J;
+  assert.strictEqual(j.sameUtteranceTurns, 1, 'the re-finalised utterance across restart yields one turn');
+  assert.strictEqual(j.finalDeduped, true, 'the cross-restart final-dedup fired (turn-final-dedup)');
+  assert.strictEqual(j.newUtteranceTurns, 1, 'a genuinely new utterance after restart is still sent');
+  assert.deepStrictEqual(j.turns, ['عندي وجع في بطني', 'عندي صداع'], 'exactly the two distinct utterances');
+});
+
+// ---------------------------------------------------------------------------
+// K — مسار صوتي واحد فقط: بثّ نفس الحدث إلى مسارين ⇒ جولة واحدة فقط.
+// ---------------------------------------------------------------------------
+test('K. only one active voice listener: a broadcast event yields a single turn', () => {
+  const k = data.K;
+  assert.strictEqual(k.aClaimed, true, 'the assistant screen claims the mic session');
+  assert.strictEqual(k.bClaimed, false, 'the always-mounted floating assistant cannot claim it');
+  assert.strictEqual(k.ownerWhileListening, 'assistant', 'the assistant screen owns the mic');
+  assert.strictEqual(k.aTurns, 1, 'the owning pipeline produces exactly one turn');
+  assert.strictEqual(k.bTurnsWhileAOwns, 0, 'the non-owning pipeline produces no turn (no duplicate)');
+  assert.strictEqual(k.bClaimedAfterRelease, true, 'after release the other pipeline may take over');
+  assert.strictEqual(k.bTurnsAfterOwnership, 1, 'and then it works normally');
+});
+
+// ---------------------------------------------------------------------------
+// L — دمج التداخل الجزئي: جزء من الكلام داخل نصّ جديد لا يُكرّره.
+// ---------------------------------------------------------------------------
+test('L. mergeSpeechTranscript handles partial-overlap fragments without duplication', () => {
+  const l = data.L;
+  assert.ok(Array.isArray(l) && l.length >= 6, 'has the overlap cases');
+  for (const c of l) {
+    assert.strictEqual(c.pass, true, `merge("${c.prev}","${c.next}") => "${c.actual}" expected "${c.expected}"`);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// M — حالات إزالة التكرار على البوّابة.
+// ---------------------------------------------------------------------------
+test('M. TurnGate dedups duplicate final, interim→final, and repeated onresult', () => {
+  const m = data.M;
+  assert.strictEqual(m.duplicateFinalTurns, 1, 'a literal duplicate final yields one turn');
+  assert.strictEqual(m.interimToFinalTurns, 1, 'interim→final yields one turn');
+  assert.strictEqual(m.interimToFinalText, 'عندي وجع في بطني', 'the full utterance is sent');
+  assert.strictEqual(m.repeatedOnresultTurns, 1, 'a repeated onresult snapshot yields one turn');
+});
+
+// ---------------------------------------------------------------------------
+// N — TTS مرّة واحدة: تيّار أحداث واقعي ⇒ جولة واحدة ⇒ نطق واحد.
+// ---------------------------------------------------------------------------
+test('N. a realistic event stream (duplicate final + onend + restart) speaks exactly once', () => {
+  const n = data.N;
+  assert.strictEqual(n.turnCount, 1, 'exactly one turn');
+  assert.strictEqual(n.speakCount, 1, 'exactly one TTS invocation');
+  assert.deepStrictEqual(n.turns, ['عندي وجع في بطني'], 'one utterance only');
+});
+
+// ---------------------------------------------------------------------------
+// Wiring — قفل الجلسة المفردة مربوط في المسارين + GlobalAssistant يُعطّل العائم.
+// ---------------------------------------------------------------------------
+test('Wiring: single voice-session lock is enforced in both pipelines', () => {
+  assert.ok(fs.existsSync(path.join(ROOT, 'services/speech/voiceSession.ts')), 'voiceSession.ts exists');
+  const lock = read('services/speech/voiceSession.ts');
+  assert.match(lock, /claimVoiceSession/, 'exposes claimVoiceSession');
+  assert.match(lock, /isVoiceSessionOwner/, 'exposes isVoiceSessionOwner');
+
+  const hook = read('hooks/useAppAssistant.ts');
+  const screen = read('screens/AssistantScreen.tsx');
+  for (const [name, src] of [['hook', hook], ['screen', screen]]) {
+    assert.match(src, /claimVoiceSession/, `${name} claims the mic session`);
+    assert.match(src, /releaseVoiceSession/, `${name} releases the mic session`);
+    assert.match(src, /isVoiceSessionOwner/, `${name} guards its listeners by ownership`);
+  }
+  // المساعد العائم يُعطّى صوتيًا أثناء عرض الشاشة الكاملة.
+  assert.match(read('components/GlobalAssistant.tsx'), /enabled:\s*!hidden/, 'GlobalAssistant disables the pipeline when hidden');
+  // حارس النصّ النهائي عبر إعادة التشغيل + جلسة جديدة على البوّابة.
+  const gate = read('services/speech/turnGate.ts');
+  assert.match(gate, /turn-final-dedup/, 'turnGate logs turn-final-dedup');
+  assert.match(gate, /newSession/, 'turnGate exposes newSession()');
+});
+
+// ---------------------------------------------------------------------------
 // Wiring — الخطّاف والشاشة يُمرّران المنطق إلى TurnGate (لا نسخة مكرّرة).
 // ---------------------------------------------------------------------------
 test('Wiring: hook and screen delegate voice bookkeeping to TurnGate', () => {
