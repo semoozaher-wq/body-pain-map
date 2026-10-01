@@ -114,7 +114,25 @@ export function mergeSpeechTranscript(prev: string, next: string): string {
   const np = normalizeTranscript(p);
   const nn = normalizeTranscript(n);
   if (np === nn) return p; // إعادة تثبيت حرفية لنفس الجملة
-  if (nn.startsWith(`${np} `)) return n; // المتعرّف أعاد النص التراكمي كاملًا
-  if (np.endsWith(` ${nn}`)) return p; // المقطع موجود بالفعل في الذيل
-  return `${p} ${n}`; // مقطع جديد فعلًا
+
+  // دمج قائم على الرموز مع كشف التداخل: نجد أكبر عدد من الكلمات المتطابقة بين
+  // نهاية النص السابق وبداية النص الجديد، ثم نُلحق الجزء غير المتداخل فقط.
+  // هذا يغطّي ثلاث حالات دفعة واحدة:
+  //   • النص التراكمي الكامل (nn يبدأ بـ np)      ⇒ يُعاد n كما هو
+  //   • المقطع موجود في الذيل (np ينتهي بـ nn)     ⇒ تبقى p كما هي
+  //   • وصول جزء من الكلام داخل نص جديد (تداخل جزئي) ⇒ لا يتكرّر الجزء المشترك
+  const pt = tokenizeSpeech(p);
+  const nt = tokenizeSpeech(n);
+  const maxK = Math.min(pt.length, nt.length);
+  let overlap = 0;
+  for (let k = maxK; k >= 1; k--) {
+    const a = pt.slice(pt.length - k).map(normalizeTranscript).join(' ');
+    const b = nt.slice(0, k).map(normalizeTranscript).join(' ');
+    if (a === b) {
+      overlap = k;
+      break;
+    }
+  }
+  if (overlap > 0) return collapseWhitespace([...pt, ...nt.slice(overlap)].join(' '));
+  return `${p} ${n}`; // مقطع جديد فعلًا (لا تداخل)
 }

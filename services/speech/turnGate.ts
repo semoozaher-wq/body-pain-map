@@ -39,6 +39,12 @@ export interface TurnGateOptions {
   silenceMs?: number;
   /** Two identical utterances closer than this are treated as one (re-finalisation). */
   dedupWindowMs?: number;
+  /**
+   * Two identical *final* transcripts closer than this are treated as one, even
+   * across a recogniser restart (onend→start). Survives reset() so Android's
+   * re-finalisation in the new session does not re-send the same utterance.
+   */
+  finalDedupWindowMs?: number;
   /** Live display text (pending remainder). */
   onInterim?: (text: string) => void;
   /** A real utterance to send. Called at most once per utterance. */
@@ -54,8 +60,14 @@ export interface TurnGateOptions {
 }
 
 export interface TurnGate {
-  /** Start a fresh session: clears committed/pending and any timer. */
+  /**
+   * Restart the recogniser within the SAME session: clears committed/pending and
+   * any timer, but KEEPS the cross-restart final-dedup guard so a re-finalised
+   * utterance after onend→start is not sent twice.
+   */
   reset(): void;
+  /** Start a brand-new conversation: like reset() but also clears the final-dedup guard. */
+  newSession(): void;
   /** Feed a cumulative live transcript; returns the current pending remainder. */
   ingest(liveText: string, hasFinal: boolean): string;
   /** Convenience wrapper for a SpeechSnapshot. */
@@ -76,10 +88,12 @@ export interface TurnGate {
 
 export const DEFAULT_TURN_SILENCE_MS = 1500;
 export const DEFAULT_DEDUP_WINDOW_MS = 1200;
+export const DEFAULT_FINAL_DEDUP_WINDOW_MS = 2500;
 
 export function createTurnGate(options: TurnGateOptions): TurnGate {
   const silenceMs = options.silenceMs ?? DEFAULT_TURN_SILENCE_MS;
   const dedupWindowMs = options.dedupWindowMs ?? DEFAULT_DEDUP_WINDOW_MS;
+  const finalDedupWindowMs = options.finalDedupWindowMs ?? DEFAULT_FINAL_DEDUP_WINDOW_MS;
   const setTimeoutFn =
     options.setTimeoutFn ?? ((fn: () => void, ms: number) => setTimeout(fn, ms));
   const clearTimeoutFn = options.clearTimeoutFn ?? ((handle: any) => clearTimeout(handle));
@@ -92,6 +106,9 @@ export function createTurnGate(options: TurnGateOptions): TurnGate {
   let timer: any = null;
   let lastTurnText = '';
   let lastTurnAt = 0;
+  // Cross-restart final-dedup guard (survives reset(); cleared only by newSession()).
+  let lastFinalText = '';
+  let lastFinalAt = 0;
 
   function clearTimer(): void {
     if (timer != null) {
@@ -150,20 +167,42 @@ export function createTurnGate(options: TurnGateOptions): TurnGate {
     return pending;
   }
 
+  function resetState(clearFinal: boolean): void {
+    clearTimer();
+    live = '';
+    committed = '';
+    pending = '';
+    lastTurnText = '';
+    lastTurnAt = 0;
+    if (clearFinal) {
+      lastFinalText = '';
+      lastFinalAt = 0;
+    }
+  }
+
   return {
     reset(): void {
-      clearTimer();
-      live = '';
-      committed = '';
-      pending = '';
-      lastTurnText = '';
-      lastTurnAt = 0;
+      // Restart within the same session: keep the final-dedup guard so a
+      // re-finalised utterance after onend→start is not sent a second time.
+      resetState(false);
+    },
+    newSession(): void {
+      resetState(true);
     },
     ingest,
     onSnapshot(snap: TurnGateSnapshot): string {
       return ingest(snap.liveText, snap.hasFinal);
     },
     onFinal(text: string): string {
+      // Cross-restart guard: Android re-finalises the same utterance in the new
+      // session (after reset()), so dedup identical finals within the window.
+      const norm = normalizeTranscript(text);
+      if (norm && norm === lastFinalText && now() - lastFinalAt < finalDedupWindowMs) {
+        log('turn-final-dedup', { text });
+        return pending;
+      }
+      lastFinalText = norm;
+      lastFinalAt = now();
       return ingest(text, true);
     },
     flush(): void {
