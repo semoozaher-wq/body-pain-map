@@ -41,7 +41,7 @@ interface ServerResponse {
   end: () => void;
 }
 
-const GEMINI_MODEL = String(process.env.GEMINI_MODEL ?? 'gemini-2.5-flash').trim() || 'gemini-2.5-flash';
+const GEMINI_MODEL = String(process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite').trim() || 'gemini-3.5-flash-lite';
 const GEMINI_TIMEOUT_MS = 15_000;
 
 interface InlineImage {
