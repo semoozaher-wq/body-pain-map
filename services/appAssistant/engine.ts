@@ -1090,7 +1090,11 @@ function geminiReplyText(decision: GeminiDecision): LocalizedText | null {
 }
 
 /** يبني سياقًا مضغوطًا (بلا بيانات حسّاسة) يُرسَل إلى Gemini مع كل جملة. */
-function buildGeminiContext(state: AppState, recentUserMessages?: string[]): GeminiContext {
+function buildGeminiContext(
+  state: AppState,
+  previousContext?: PainContext | null,
+  recentUserMessages?: string[],
+): GeminiContext {
   const marker = state.selectedPainLocation
     ? { x: state.selectedPainLocation.x, y: state.selectedPainLocation.y, view: state.selectedPainLocation.view }
     : state.conversationContext.lastReferencedCoords ?? null;
@@ -1104,7 +1108,10 @@ function buildGeminiContext(state: AppState, recentUserMessages?: string[]): Gem
     lastReferenced: state.conversationContext.lastReferencedId,
     lastReferencedKind: state.conversationContext.lastReferencedKind,
     lastReferencedCoords: state.conversationContext.lastReferencedCoords,
-    painContext: state.painContext ?? null,
+    // The hook-held context is newer than MainApp's AppState (which intentionally
+    // stays UI-focused). Prefer it so Gemini sees the same medical conversation
+    // context that the local engine sees on this turn.
+    painContext: previousContext ?? state.painContext ?? null,
     recentUserMessages: recentUserMessages ?? [],
   };
 }
@@ -1126,7 +1133,7 @@ export async function interpretAsync(
       text: utterance,
       image: options.image ?? null,
       language: state.language,
-      context: buildGeminiContext(state, options.recentUserMessages),
+      context: buildGeminiContext(state, options.previousContext ?? state.painContext ?? null, options.recentUserMessages),
     });
   } catch {
     aiDecision = null;
