@@ -175,6 +175,9 @@ export function GlobalAssistant({ appState, onAction, onTurn, language, directio
     onAction: handleAction,
     onTurn,
     language,
+    // أثناء عرض AssistantScreen يُخفى هذا المساعد بصريًا فقط؛ نُعطّله صوتيًا
+    // حتى لا يعمل مساران صوتيان في نفس الوقت (سبب تكرار الجولات/الردود/TTS).
+    enabled: !hidden,
   });
   endCallRef.current = endCall;
 
