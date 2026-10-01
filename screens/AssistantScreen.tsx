@@ -416,14 +416,16 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     if (!isVoiceSessionOwner(VOICE_OWNER)) return;
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
-    voiceLog('speech-result', { platform: 'native', transcript, isFinal: !!event?.isFinal });
+    const speechText = normalizeSpeechText(transcript);
+    if (!speechText) return;
+    voiceLog('speech-result', { platform: 'native', transcript, normalized: speechText, isFinal: !!event?.isFinal });
     // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
     if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
 
     // دمج آمن ضدّ التكرار: أندرويد يعيد تثبيت الجملة أو يعيد النص التراكمي كاملًا،
     // فكان اللصق الأعمى (`prev + transcript`) يضاعف الكلام. mergeNativeTranscript
     // يُرجع null عند التكرار الحرفي حتى نتخطّاه بلا إرسال.
-    const merged = mergeNativeTranscript(nativeLiveRef.current, transcript);
+    const merged = mergeNativeTranscript(nativeLiveRef.current, speechText);
     if (merged === null) {
       voiceLog('speech-result-dedup', { platform: 'native', transcript });
       return;
@@ -726,7 +728,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'rich', reply }]);
             voiceLog('assistant-response', { mode: 'medical', text: reply.intro?.[language as Lang]?.slice(0, 80) });
             setThinking(false);
-            if (autoSpeak) speak(replyToSpeech(reply), id);
+            if (autoSpeak || voiceSessionRef.current) speak(replyToSpeech(reply), id);
           } else {
             // محادثة عامة / تحكّم: فقاعة نصية بسيطة (نفس سلوك GlobalAssistant).
             const replyText = turn.reply[language as Lang] ?? turn.reply.ar;
@@ -735,7 +737,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'text', text: replyText }]);
             voiceLog('assistant-response', { mode: 'text', text: replyText.slice(0, 80) });
             setThinking(false);
-            if (autoSpeak) speak(replyText, id);
+            if (autoSpeak || voiceSessionRef.current) speak(replyText, id);
           }
         } catch (error) {
           console.error('[BodyMap Pain] assistant analysis error', error);
