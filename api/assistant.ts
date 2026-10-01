@@ -21,6 +21,13 @@ import type { UserModelMessage } from 'ai';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { GEMINI_SYSTEM_PROMPT } from '../services/aiAssistant/gemini';
 import { assistantDecisionSchema } from '../services/aiAssistant/schema';
+import {
+  retrieveMedicalKnowledge,
+  buildGroundedSystemPrompt,
+  NO_RELIABLE_KNOWLEDGE,
+  type KnowledgeResult,
+} from '../services/medical/knowledgeRetrieval';
+import type { Language } from '../services/medical/diseaseLibrary';
 
 // أنواع مبسّطة (بلا اعتماد على حزم خارجية) حتى يمرّ tsc --noEmit.
 interface ServerRequest {
@@ -78,6 +85,57 @@ function buildMessages(body: Record<string, unknown>): UserModelMessage[] {
   return [{ role: 'user', content }];
 }
 
+// ----------------------------------------------------------------------------
+// طبقة المعرفة الطبية (Medical Knowledge Layer + Retrieval) — نقطة الربط الفعلية
+// ----------------------------------------------------------------------------
+// هذا هو الجسر بين Retrieval و Gemini: نستخرج سؤال المستخدم، نسترجع فقط المعرفة
+// المناسبة من مكتبة المشروع (مع مصدر كل معلومة)، ثم نبني تعليمات النظام المُقيَّدة
+// (grounded) التي تُمرَّر إلى generateObject. لا نضع آلاف المعلومات في الـPrompt،
+// بل أفضل عدد محدود (MAX_ITEMS). عند غياب معرفة موثوقة نُمرِّر القيمة الحسّاسة
+// no_reliable_knowledge حتى لا يخترع Gemini أي معلومة طبية.
+// ----------------------------------------------------------------------------
+
+/** لغة صالحة ضمن نطاق المكتبة الطبية. */
+function parseLanguage(value: unknown): Language {
+  const v = typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return v === 'en' || v === 'fr' ? (v as Language) : 'ar';
+}
+
+export interface GroundedKnowledgeSummary {
+  status: 'ok' | typeof NO_RELIABLE_KNOWLEDGE;
+  itemCount: number;
+  /** مصادر كل معلومة مسترجَعة (اسم + رابط). */
+  sources: { title: string; url: string }[];
+}
+
+export interface GroundedRequest {
+  /** تعليمات النظام النهائية = تعليمات Gemini الأصلية + طبقة المعرفة المسترجَعة. */
+  system: string;
+  language: Language;
+  knowledge: GroundedKnowledgeSummary;
+}
+
+/**
+ * يجهّز طلب Gemini المُقيَّد بالمعرفة (Retrieval → Prompt) بدون أي اتصال بالشبكة.
+ * دالة نقية قابلة للاختبار: تُثبت أن Gemini يستخدم Retrieval فعليًا.
+ */
+export function prepareGroundedRequest(body: Record<string, unknown>): GroundedRequest {
+  const language = parseLanguage(body?.language);
+  const text = typeof body?.text === 'string' ? body.text : '';
+  const result: KnowledgeResult = retrieveMedicalKnowledge(text, language);
+  const system = buildGroundedSystemPrompt(GEMINI_SYSTEM_PROMPT, result, language);
+  const sources = result.items.flatMap((item) => item.sources);
+  return {
+    system,
+    language,
+    knowledge: {
+      status: result.status,
+      itemCount: result.items.length,
+      sources,
+    },
+  };
+}
+
 export default async function handler(req: ServerRequest, res: ServerResponse): Promise<void> {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -110,6 +168,9 @@ export default async function handler(req: ServerRequest, res: ServerResponse): 
   const provider = createGoogleGenerativeAI({ apiKey });
   const messages = buildMessages(body);
 
+  // طبقة المعرفة: استرجاع المعرفة المناسبة من مكتبة المشروع + بناء تعليمات مُقيَّدة.
+  const grounded = prepareGroundedRequest(body);
+
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
   try {
@@ -119,7 +180,7 @@ export default async function handler(req: ServerRequest, res: ServerResponse): 
       schema: assistantDecisionSchema,
       schemaName: 'AssistantDecision',
       schemaDescription: 'قرار موحّد لمساعد BodyMap Pain: نية + ردّ بلغة المستخدم + سياق طبي + إجراءات تطبيق.',
-      system: GEMINI_SYSTEM_PROMPT,
+      system: grounded.system,
       messages,
       temperature: 0.2,
       maxOutputTokens: 1024,
