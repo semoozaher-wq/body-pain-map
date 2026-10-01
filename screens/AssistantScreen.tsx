@@ -35,14 +35,13 @@ import { GlowOrb } from '../components/GlowOrb';
 import { useTheme } from '../hooks/useTheme';
 import { translate } from '../services/i18n';
 import {
-  analyzeMessage,
   QUICK_PROMPTS,
   SYMPTOM_QUICK_CHIPS,
   type AssistantReply,
   type Lang,
   type TriageLevel,
 } from '../services/aiAssistant';
-import { interpret } from '../services/appAssistant/engine';
+import { interpretAsync } from '../services/appAssistant/engine';
 import type { AppState, AssistantAction } from '../services/appAssistant/types';
 
 type ChatMessage =
@@ -223,6 +222,35 @@ function fallbackState(language: Lang): AppState {
     language,
     conversationMode: 'idle',
   };
+}
+
+/**
+ * يحوّل صورة المستخدم (URI) إلى data URL حتى تُمرَّر إلى طبقة الذكاء الاصطناعي
+ * (Gemini) كمدخل متعدّد الوسائط. على الويب نقرأ الـ blob عبر FileReader، وعلى
+ * الأنظمة الأصلية نقرأ base64 عبر expo-file-system. عند أي فشل نُعيد null فيكمل
+ * المسار بلا صورة (لا نُعطّل الجولة).
+ */
+async function toImageDataUrl(uri: string): Promise<string | null> {
+  try {
+    if (uri.startsWith('data:')) return uri;
+    if (Platform.OS === 'web') {
+      const res = await fetch(uri);
+      const blob = await res.blob();
+      return await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(String(reader.result ?? ''));
+        reader.onerror = () => reject(new Error('image-read-error'));
+        reader.readAsDataURL(blob);
+      });
+    }
+    const legacyFs: any = await import('expo-file-system/legacy');
+    const base64: string = await legacyFs.readAsStringAsync(uri, { encoding: legacyFs.EncodingType.Base64 });
+    const ext = (uri.split('.').pop() ?? 'jpg').toLowerCase();
+    const mime = ext === 'png' ? 'image/png' : ext === 'webp' ? 'image/webp' : ext === 'gif' ? 'image/gif' : 'image/jpeg';
+    return `data:${mime};base64,${base64}`;
+  } catch {
+    return null;
+  }
 }
 
 export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, direction, onOpenRegion, onOpenOrgan, initialContext, appState, onAction }) => {
@@ -569,13 +597,12 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       const hasImg = !!imageUri;
       if ((!text && !hasImg) || thinking) return;
 
-      const userMessages = messages
+      const recentUserMessages = messages
         .filter((m) => m.role === 'user')
         .slice(-2)
         .map((m) => (m.role === 'user' ? m.text : ''))
-        .join(' ');
+        .filter(Boolean);
 
-      const fullText = `${userMessages} ${text}`.trim();
       // Loop breaker: `askCountRef` is the single source of truth for how many
       // clarifying questions we already asked, and `userTurnCount` is the hard
       // ceiling (from the user's 3rd message the engine must always answer).
@@ -592,40 +619,31 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       setPendingImage(null);
       setThinking(true);
       if (replyTimerRef.current) clearTimeout(replyTimerRef.current);
-      replyTimerRef.current = setTimeout(() => {
+      replyTimerRef.current = setTimeout(async () => {
         replyTimerRef.current = null;
         if (!mountedRef.current) return;
         try {
-          if (hasImg) {
-            // مسار الصورة: فهم طبي مباشر (نفس محرّك الفرز المحلي).
-            const reply = analyzeMessage(fullText, language as Lang, true, {
-              forceAnswer,
-              askCount: askedSoFar,
-              userTurnCount,
-              previousContext: painContextRef.current ?? undefined,
-            });
-            if (!mountedRef.current) return;
-            if (reply.painContext) painContextRef.current = reply.painContext;
-            const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
-            askCountRef.current = nextAskCount;
-            setAskCount(nextAskCount);
-            const id = nextId();
-            setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'rich', reply }]);
-            voiceLog('assistant-response', { mode: 'image', text: reply.intro?.[language as Lang]?.slice(0, 80) });
-            setThinking(false);
-            if (autoSpeak) speak(replyToSpeech(reply), id);
-            return;
-          }
-
-          // المحرّك الموحّد: نفس محرّك GlobalAssistant (محادثة عامة + ألم + تحديد مكان + تحكّم).
+          // المسار الموحّد: نفس محرّك GlobalAssistant (Gemini + محرّك القواعد كخطة بديلة).
+          // الصورة (إن وُجدت) تُحوَّل إلى data URL وتُمرَّر كمدخل متعدّد الوسائط لنفس المحرّك.
           const state = appStateRef.current ?? fallbackState(language as Lang);
-          // \u0646\u064f\u0645\u0631\u0651\u0631 \u0627\u0644\u062c\u0645\u0644\u0629 \u0627\u0644\u062d\u0627\u0644\u064a\u0629 \u0641\u0642\u0637 (\u0645\u062b\u0644 GlobalAssistant) \u0648\u0646\u062a\u0631\u0643 \u0627\u0644\u0633\u064a\u0627\u0642 \u0644\u0640 state.
-          const turn = interpret(text, state, { previousContext: painContextRef.current ?? undefined });
+          const imageData = hasImg && imageUri ? await toImageDataUrl(imageUri) : null;
+          const turn = await interpretAsync(text, state, {
+            previousContext: painContextRef.current ?? undefined,
+            hasImage: hasImg,
+            image: imageData,
+            recentUserMessages,
+            forceAnswer,
+            askCount: askedSoFar,
+            userTurnCount,
+          });
+          if (!mountedRef.current) return;
+
           for (const action of turn.actions) {
             if (action.type === 'reset_context') painContextRef.current = null;
             onActionRef.current?.(action);
           }
-          if (turn.mode === 'medical' && turn.medical?.painContext) painContextRef.current = turn.medical.painContext;
+          if (turn.painContext) painContextRef.current = turn.painContext;
+          else if (turn.mode === 'medical' && turn.medical?.painContext) painContextRef.current = turn.medical.painContext;
 
           const medical = turn.medical;
           const isMedical =
