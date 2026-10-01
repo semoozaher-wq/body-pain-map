@@ -1,61 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
+import { PainMarker } from '../components/PainMarker';
+import { OrganDetailModal } from '../components/OrganDetailModal';
+import { usePainContext } from '../context/PainContext';
 
-interface BodyPickerScreenProps {
-  selectedOrgan?: any;
-  painMarker?: { x: number; y: number } | null;
-  [key: string]: any;
-}
+export const BodyPickerScreen: React.FC = () => {
+  const { painMarker, setPainMarker, selectedOrgan, setSelectedOrgan } = usePainContext();
+  const [isOrganModalOpen, setIsOrganModalOpen] = useState(false);
 
-export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
-  selectedOrgan,
-  painMarker,
-  children,
-}) => {
-  // Hide painMarker visually when an organ is open, without removing it from state/context
-  const isOrganOpen = Boolean(selectedOrgan);
+  const handleCloseModal = () => {
+    setIsOrganModalOpen(false);
+    setSelectedOrgan(null);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Main Body Map Container */}
-      <View style={styles.mapContainer}>
-        {children}
-        
-        {/* Pain Marker overlay: visually hidden if organ is open */}
-        {painMarker && (
-          <View
-            style={[
-              styles.marker,
-              {
-                left: painMarker.x,
-                top: painMarker.y,
-                opacity: isOrganOpen ? 0 : 1, // Visually hidden when organ is opened
-              },
-            ]}
-            pointerEvents={isOrganOpen ? 'none' : 'auto'}
+      {/* Canvas الرئيسي */}
+      <View style={styles.bodyCanvas}>
+        {/* إخفاء علامة الألم بصرياً فقط أثناء فتح تفاصيل العضو لمنع التداخل */}
+        {painMarker && !isOrganModalOpen && (
+          <PainMarker 
+            x={painMarker.x} 
+            y={painMarker.y} 
+            intensity={painMarker.intensity} 
           />
         )}
       </View>
+
+      {/* نافذة تفاصيل العضو */}
+      {isOrganModalOpen && (
+        <OrganDetailModal 
+          organ={selectedOrgan} 
+          onClose={handleCloseModal} 
+        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  mapContainer: {
-    position: 'relative',
-    width: '100%',
-    height: '100%',
-  },
-  marker: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 0, 0, 0.8)',
-  },
+  container: { flex: 1 },
+  bodyCanvas: { flex: 1, position: 'relative' }
 });
-
-export default BodyPickerScreen;
