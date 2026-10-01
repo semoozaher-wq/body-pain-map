@@ -20,6 +20,7 @@ import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services
 import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
 import { voiceLog } from '../services/speech/voiceLog';
 import { normalizeSpeechText } from '../services/speech/arabicSpeech';
+import { speakNatural, ensureTtsVoices } from '../services/speech/tts';
 import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
 import { claimVoiceSession, releaseVoiceSession, isVoiceSessionOwner } from '../services/speech/voiceSession';
 import { interpretAsync } from '../services/appAssistant/engine';
@@ -37,8 +38,6 @@ export interface AssistantMessage {
 export type { VoiceState } from '../services/appAssistant/voiceMachine';
 
 const speechLang = (language: string): string =>
-  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
-const ttsLang = (language: string): string =>
   language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
 
 let msgSeq = 0;
@@ -146,8 +145,8 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
       Speech.stop();
       if (id) setSpeakingId(id);
       setVoiceState('speaking');
-      Speech.speak(text, {
-        language: ttsLang(languageRef.current),
+      // نطق طبيعي: أفضل صوت متاح للغة + نبرة/سرعة طبيعية (بدل الصوت الآلي الافتراضي).
+      speakNatural(text, languageRef.current, {
         onDone: finishSpeech,
         onStopped: finishSpeech,
         onError: finishSpeech,
@@ -404,6 +403,11 @@ export function useAppAssistant({ getState, onAction, onTurn, language, autoSpea
     stopListeningRef.current?.();
     setVoiceState('idle');
   }, [enabled]);
+
+  // تسخين أصوات النطق الطبيعية مرة واحدة (أفضل صوت لكل لغة).
+  useEffect(() => {
+    void ensureTtsVoices();
+  }, []);
 
   useEffect(() => () => {
     try {
