@@ -32,7 +32,8 @@ import {
   collapseWhitespace,
   mergeSpeechTranscript,
 } from '../services/speech/transcript';
-import { createWebRecognizer } from '../services/speech/webSpeech';
+import { createWebRecognizer, snapshotFromEvent } from '../services/speech/webSpeech';
+import { normalizeSpeechText, pickBestSpeechAlternative } from '../services/speech/arabicSpeech';
 import {
   claimVoiceSession,
   releaseVoiceSession,
@@ -116,6 +117,22 @@ function fakeEvent(items: Array<{ transcript: string; confidence: number; isFina
     return arr;
   });
   return { results, resultIndex: 0 };
+}
+
+function runArabicSpeechQuality() {
+  const normalized = normalizeSpeechText('ضهري بيوجعني');
+  const picked = pickBestSpeechAlternative(['كلام عشوائي', 'وجع في ضهري', 'وجع في ظهري'], 'ar');
+  const snap = snapshotFromEvent({
+    resultIndex: 0,
+    results: [{
+      length: 3,
+      0: { transcript: 'كلام عشوائي', confidence: 0.8 },
+      1: { transcript: 'وجع في ضهري', confidence: 0.8 },
+      2: { transcript: 'وجع في ظهري', confidence: 0.8 },
+      isFinal: true,
+    }],
+  }, 'ar');
+  return { normalized, picked, snapshot: snap.liveText };
 }
 
 function runWebIntegration() {
@@ -610,6 +627,7 @@ function runTtsOnce() {
 // تشغيل الكل وإخراج JSON.
 // ---------------------------------------------------------------------------
 const output = {
+  ArabicSpeechQuality: runArabicSpeechQuality(),
   A: runWebIntegration(),
   B: runAndroidReFinalisation(),
   C: runAppendModel(),

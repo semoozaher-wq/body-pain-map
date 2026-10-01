@@ -32,6 +32,13 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 // ---------------------------------------------------------------------------
 // A — جملة واحدة ⇒ جولة واحدة عبر التسلسل الكامل (لا إرسال مزدوج).
 // ---------------------------------------------------------------------------
+test('Arabic speech quality picks a useful alternative and normalizes common dialect spelling', () => {
+  const a = data.ArabicSpeechQuality;
+  assert.strictEqual(a.normalized, 'ظهري بيوجعني');
+  assert.strictEqual(a.picked, 'وجع في ظهري');
+  assert.strictEqual(a.snapshot, 'وجع في ظهري');
+});
+
 test('A. one utterance produces exactly one turn (interim→final→onend→silence)', () => {
   const a = data.A;
   assert.strictEqual(a.turnCount, 1, 'exactly one turn');
