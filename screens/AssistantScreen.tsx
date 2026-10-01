@@ -31,6 +31,7 @@ import { voiceLog } from '../services/speech/voiceLog';
 import { normalizeSpeechText } from '../services/speech/arabicSpeech';
 import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
 import { collapseWhitespace, mergeSpeechTranscript, normalizeTranscript } from '../services/speech/transcript';
+import { speakNatural, ensureTtsVoices } from '../services/speech/tts';
 import { claimVoiceSession, releaseVoiceSession, isVoiceSessionOwner } from '../services/speech/voiceSession';
 import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
@@ -198,10 +199,6 @@ const MAX_CLARIFY_ASKS = 2;
 
 /** لغة التعرّف على الكلام حسب لغة الواجهة. */
 const speechLang = (language: string): string =>
-  language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
-
-/** لغة النطق (Text-to-Speech) حسب لغة الواجهة. */
-const ttsLang = (language: string): string =>
   language === 'en' ? 'en-US' : language === 'fr' ? 'fr-FR' : 'ar-EG';
 
 /** يبني نصًّا مختصرًا قابلًا للنطق من رد المساعد. */
@@ -607,8 +604,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
         Speech.stop();
         if (id) setSpeakingId(id);
         speakingRef.current = true;
-        Speech.speak(text, {
-          language: ttsLang(language),
+        // نطق طبيعي: أفضل صوت متاح للغة + نبرة/سرعة طبيعية (بدل الصوت الآلي الافتراضي).
+        speakNatural(text, language, {
           onDone: finishSpeech,
           onStopped: finishSpeech,
           onError: finishSpeech,
@@ -619,6 +616,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     },
     [language, finishSpeech],
   );
+
+  // تسخين أصوات النطق الطبيعية مرة واحدة عند فتح الشاشة (أفضل صوت لكل لغة).
+  useEffect(() => {
+    void ensureTtsVoices();
+  }, []);
 
   useEffect(() => () => {
     try {
