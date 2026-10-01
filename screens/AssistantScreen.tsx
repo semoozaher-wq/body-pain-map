@@ -10,6 +10,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Animated,
+  Easing,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -27,6 +29,7 @@ import { SpeechRecognitionModule, useSpeechRecognitionEvents } from '../services
 import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type SpeechSnapshot, type WebRecognizer } from '../services/speech/webSpeech';
 import { voiceLog } from '../services/speech/voiceLog';
 import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
+import { collapseWhitespace, mergeSpeechTranscript, normalizeTranscript } from '../services/speech/transcript';
 import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
 import { Palette, Gradients, Radii, Elevation, Type } from '../constants/design';
@@ -160,6 +163,22 @@ function cleanMedicalName(name: string): string {
     .replace(/العنقي/g, 'الرقبة')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/**
+ * دمج نص التعرّف الأصلي (native) في النص التراكمي للجلسة.
+ *
+ * أندرويد يعيد "تثبيت" نفس الجملة، وأحيانًا يعيد إرسال النص التراكمي كاملًا،
+ * لذا فإن اللصق الأعمى (`prev + next`) يضاعف الكلام. هنا نجعل الدمج آمنًا
+ * ضدّ التكرار: المقطع الجديد يُلحق، والنص التراكمي المعاد يُستبدل، والتكرار
+ * الحرفي يُرجع null حتى يتخطّاه المستدعي.
+ */
+function mergeNativeTranscript(prev: string, next: string): string | null {
+  const p = collapseWhitespace(prev);
+  const n = collapseWhitespace(next);
+  if (!n) return p || null; // لا يوجد نص جديد
+  const merged = mergeSpeechTranscript(p, n);
+  return merged === p ? null : merged; // تكرار/إعادة إرسال مطابقة → تجاهل بلا إرسال
 }
 
 let msgCounter = 0;
@@ -305,6 +324,9 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // final results arrive as segments; we accumulate them so the TurnGate sees a
   // cumulative live string exactly like the web path does.
   const nativeLiveRef = useRef('');
+  // آخر جملة نهائية مُرّرت للـTurnGate. تبقى عبر دورة end→restart→reset حتى لا
+  // تُحتسب إعادة إرسالها من المتعرّف بعد إعادة التشغيل كجولة ثانية.
+  const nativeLastFinalRef = useRef<{ text: string; at: number }>({ text: '', at: 0 });
   const gotResultRef = useRef(false);
   const startListeningRef = useRef<() => void>(() => {});
   const stopListeningRef = useRef<() => void>(() => {});
@@ -317,6 +339,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   languageRef.current = language;
   const TURN_SILENCE_MS = 1500;
   const NO_RESULT_WATCHDOG_MS = 7000;
+  const NATIVE_DEDUP_WINDOW_MS = 2500;
 
   // --- TurnGate: one utterance => one turn (shared, tested implementation) ---
   // Both the web and native recognition paths funnel through this single gate so
@@ -381,14 +404,31 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     voiceLog('speech-result', { platform: 'native', transcript, isFinal: !!event?.isFinal });
     // مقاطعة: لو المساعد بيتكلم والمستخدم بدأ يتكلم، نوقف النطق فورًا.
     if (speakingRef.current) { try { Speech.stop(); } catch {} setSpeakingId(null); speakingRef.current = false; }
+
+    // دمج آمن ضدّ التكرار: أندرويد يعيد تثبيت الجملة أو يعيد النص التراكمي كاملًا،
+    // فكان اللصق الأعمى (`prev + transcript`) يضاعف الكلام. mergeNativeTranscript
+    // يُرجع null عند التكرار الحرفي حتى نتخطّاه بلا إرسال.
+    const merged = mergeNativeTranscript(nativeLiveRef.current, transcript);
+    if (merged === null) {
+      voiceLog('speech-result-dedup', { platform: 'native', transcript });
+      return;
+    }
+    nativeLiveRef.current = merged;
+
     if (event?.isFinal) {
-      // النتيجة النهائية = مقطع جديد يُضاف للنص المتراكم، ثم نمرّره للـ TurnGate
-      // (جولة واحدة لكل جملة؛ لا إرسال فوري — البوّابة تنتظر صمتًا كافيًا).
-      nativeLiveRef.current = `${nativeLiveRef.current} ${transcript}`.trim();
-      getGate().onFinal(nativeLiveRef.current);
+      // حارس عبر إعادة التشغيل: نفس الجملة النهائية لا تُحتسب مرّتين بعد end→restart→reset.
+      const norm = normalizeTranscript(merged);
+      const last = nativeLastFinalRef.current;
+      if (norm && norm === last.text && Date.now() - last.at < NATIVE_DEDUP_WINDOW_MS) {
+        voiceLog('speech-result-dedup', { platform: 'native', transcript });
+        return;
+      }
+      nativeLastFinalRef.current = { text: norm, at: Date.now() };
+      // جولة واحدة لكل جملة؛ لا إرسال فوري — البوّابة تنتظر صمتًا كافيًا.
+      getGate().onFinal(merged);
     } else {
-      // الجزئية = معاينة حيّة فقط (لا تُرسل)؛ نُمرّر النص المتراكم للعرض.
-      getGate().onSnapshot({ liveText: `${nativeLiveRef.current} ${transcript}`.trim(), hasFinal: false });
+      // الجزئية = معاينة حيّة فقط (لا تُرسل).
+      getGate().onSnapshot({ liveText: merged, hasFinal: false });
     }
   });
 
@@ -497,6 +537,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       return;
     }
     voiceSessionRef.current = true;
+    // جلسة جديدة: نصفّر ذاكرة إزالة تكرار الجملة الأخيرة (تبقى فقط عبر إعادة التشغيل).
+    nativeLastFinalRef.current = { text: '', at: 0 };
     await startListening();
   }, [startListening, stopListening]);
 
@@ -517,6 +559,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     persistedAskCount = 0;
     gateRef.current?.reset?.();
     nativeLiveRef.current = '';
+    nativeLastFinalRef.current = { text: '', at: 0 };
     gotResultRef.current = false;
     setInterim('');
     setVoiceError(null);
@@ -698,6 +741,28 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
   }, []);
 
+  // نبضة ناعمة لمؤشّر الاستماع (تصميم فقط — لا تمسّ منطق الصوت أو دورة الاستماع).
+  const listeningPulse = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (!listening) {
+      listeningPulse.stopAnimation();
+      listeningPulse.setValue(0);
+      return;
+    }
+    const loop = Animated.loop(
+      Animated.timing(listeningPulse, {
+        toValue: 1,
+        duration: 1200,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [listening, listeningPulse]);
+  const pulseScale = listeningPulse.interpolate({ inputRange: [0, 1], outputRange: [0.7, 2.3] });
+  const pulseOpacity = listeningPulse.interpolate({ inputRange: [0, 1], outputRange: [0.45, 0] });
+
   const canSend = (!!input.trim() || !!pendingImage) && !thinking;
 
   return (
@@ -850,25 +915,31 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       <View style={[styles.inputWrap, { backgroundColor: colors.surface, borderColor: colors.border }]}>
         {voiceError && (
           <View style={[styles.voiceErrorRow, { flexDirection: row }]}>
-            <Text style={styles.voiceErrorText}>{t(`assistant.${voiceError}`)}</Text>
+            <Text style={styles.voiceErrorGlyph}>⚠️</Text>
+            <Text style={[styles.voiceErrorText, { textAlign: align }]}>{t(`assistant.${voiceError}`)}</Text>
           </View>
         )}
-        {(pendingImage || listening) && (
+
+        {pendingImage && (
           <View style={[styles.pendingRow, { flexDirection: row }]}>
-            {pendingImage && (
-              <View style={styles.pendingImageWrap}>
-                <Image source={{ uri: pendingImage }} style={styles.pendingImage} resizeMode="cover" />
-                <Pressable onPress={() => setPendingImage(null)} style={styles.pendingRemove} accessibilityRole="button" accessibilityLabel={t('assistant.removeImage')}>
-                  <Text style={styles.pendingRemoveGlyph}>✕</Text>
-                </Pressable>
-              </View>
-            )}
-            {listening && (
-              <View style={styles.listeningPill}>
-                <View style={styles.listeningDot} />
-                <Text style={styles.listeningText}>{interim || t('assistant.listening')}</Text>
-              </View>
-            )}
+            <View style={styles.pendingImageWrap}>
+              <Image source={{ uri: pendingImage }} style={styles.pendingImage} resizeMode="cover" />
+              <Pressable onPress={() => setPendingImage(null)} style={styles.pendingRemove} accessibilityRole="button" accessibilityLabel={t('assistant.removeImage')}>
+                <Text style={styles.pendingRemoveGlyph}>✕</Text>
+              </Pressable>
+            </View>
+          </View>
+        )}
+
+        {listening && (
+          <View style={[styles.listeningBanner, { flexDirection: row }]}>
+            <View style={styles.listeningDotWrap}>
+              <Animated.View style={[styles.listeningPulse, { transform: [{ scale: pulseScale }], opacity: pulseOpacity }]} />
+              <View style={styles.listeningDot} />
+            </View>
+            <Text style={[styles.listeningText, { textAlign: align }]} numberOfLines={2}>
+              {interim || t('assistant.listening')}
+            </Text>
           </View>
         )}
 
@@ -885,7 +956,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           <TextInput
             value={input}
             onChangeText={setInput}
-            placeholder={listening ? t('assistant.listening') : t('assistant.placeholder')}
+            placeholder={t('assistant.placeholder')}
             placeholderTextColor={colors.textLight}
             style={[styles.input, { color: colors.textPrimary, backgroundColor: colors.backgroundAlt, textAlign: align }]}
             multiline
@@ -1282,15 +1353,18 @@ const styles = StyleSheet.create({
   pendingImage: { width: 56, height: 56, borderRadius: Radii.md },
   pendingRemove: { position: 'absolute', top: -6, right: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: Palette.rose, alignItems: 'center', justifyContent: 'center' },
   pendingRemoveGlyph: { color: Palette.white, fontSize: 12, fontWeight: '900' },
-  listeningPill: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: Palette.teal100, borderRadius: Radii.pill, paddingHorizontal: 12, paddingVertical: 8 },
-  listeningDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Palette.rose },
-  listeningText: { flex: 1, color: Palette.teal700, fontFamily: Fonts.arabic.medium, fontSize: Type.caption },
-  voiceErrorRow: { backgroundColor: '#FDECEC', borderRadius: Radii.md, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8 },
-  voiceErrorText: { flex: 1, color: '#B42318', fontFamily: Fonts.arabic.medium, fontSize: Type.caption },
+  listeningBanner: { alignItems: 'center', gap: 12, backgroundColor: Palette.teal50, borderWidth: 1, borderColor: Palette.teal200, borderRadius: Radii.lg, paddingHorizontal: 14, paddingVertical: 11 },
+  listeningDotWrap: { width: 18, height: 18, alignItems: 'center', justifyContent: 'center' },
+  listeningPulse: { position: 'absolute', width: 18, height: 18, borderRadius: 9, backgroundColor: Palette.rose },
+  listeningDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: Palette.rose },
+  listeningText: { flex: 1, color: Palette.teal700, fontFamily: Fonts.arabic.medium, fontSize: Type.bodySm, lineHeight: 20 },
+  voiceErrorRow: { alignItems: 'flex-start', gap: 8, backgroundColor: Colors.dangerLight, borderWidth: 1, borderColor: '#FBD5D5', borderRadius: Radii.md, paddingHorizontal: 12, paddingVertical: 9 },
+  voiceErrorGlyph: { fontSize: 14, marginTop: 1 },
+  voiceErrorText: { flex: 1, color: Colors.danger, fontFamily: Fonts.arabic.medium, fontSize: Type.caption, lineHeight: 18 },
   inputBar: { alignItems: 'flex-end', gap: 9 },
   iconButton: { width: 46, height: 46, borderRadius: Radii.md, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
   iconGlyph: { fontSize: 19 },
-  micActive: { backgroundColor: Palette.rose, borderWidth: 1, borderColor: Palette.rose },
+  micActive: { backgroundColor: Palette.rose, borderWidth: 1, borderColor: Palette.rose, shadowColor: Palette.rose, shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.4, shadowRadius: 14, elevation: 8 },
   input: { flex: 1, minHeight: 46, maxHeight: 120, borderRadius: Radii.md, paddingHorizontal: 14, paddingVertical: 11, fontFamily: Fonts.arabic.regular, fontSize: Type.body },
   sendButton: { width: 46, height: 46, borderRadius: Radii.pill, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', ...Elevation.glowTeal },
   sendDisabled: { opacity: 0.4 },
