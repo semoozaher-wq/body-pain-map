@@ -7,11 +7,20 @@
 // • يستقبل: { text, image?, language, context? } ويُعيد: { decision: <Structured JSON> }.
 // • عند أي فشل يُعيد { decision: null } كي يسقط التطبيق إلى المحرّك القائم على القواعد.
 //
+// الترقية (Vercel AI SDK): صار توليد القرار المنظّم يتم عبر `generateObject` من
+// حزمة `ai` + مزوّد `@ai-sdk/google` + مخطط `zod` مشترك (Structured Output)،
+// بدل نداء REST يدوي. عقد الاستجابة `{ decision }` لم يتغيّر، لذا بقي مسار
+// العميل (services/aiAssistant/gemini.ts → requestGeminiDecision) كما هو تمامًا.
+//
 // النشر: Vercel يكتشف مجلد api/ تلقائيًا. اضبط متغيّر البيئة GEMINI_API_KEY
 // (واختياريًا GEMINI_MODEL) في إعدادات المشروع على Vercel — وليس في الكود.
 // ============================================================================
 
+import { generateObject, APICallError, NoObjectGeneratedError } from 'ai';
+import type { UserModelMessage } from 'ai';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { GEMINI_SYSTEM_PROMPT } from '../services/aiAssistant/gemini';
+import { assistantDecisionSchema } from '../services/aiAssistant/schema';
 
 // أنواع مبسّطة (بلا اعتماد على حزم خارجية) حتى يمرّ tsc --noEmit.
 interface ServerRequest {
@@ -56,31 +65,17 @@ function buildUserText(body: Record<string, unknown>): string {
   ].join('\n');
 }
 
-/** يستخرج أول JSON صالح من نص النموذج (يتحمّل أسوار ```json). */
-function extractJson(text: string): unknown {
-  const trimmed = text.trim();
-  try {
-    return JSON.parse(trimmed);
-  } catch {
-    const fenced = /```(?:json)?\s*([\s\S]*?)```/i.exec(trimmed);
-    if (fenced) {
-      try {
-        return JSON.parse(fenced[1].trim());
-      } catch {
-        /* fall through */
-      }
-    }
-    const first = trimmed.indexOf('{');
-    const last = trimmed.lastIndexOf('}');
-    if (first !== -1 && last > first) {
-      try {
-        return JSON.parse(trimmed.slice(first, last + 1));
-      } catch {
-        /* fall through */
-      }
-    }
-    return null;
-  }
+/** يبني رسائل النموذج (نص + صورة اختيارية) بصيغة Vercel AI SDK. */
+function buildMessages(body: Record<string, unknown>): UserModelMessage[] {
+  const userText = buildUserText(body);
+  const image = parseDataUrl(body.image);
+  const content: UserModelMessage['content'] = image
+    ? [
+        { type: 'text', text: userText },
+        { type: 'image', image: image.data, mediaType: image.mimeType },
+      ]
+    : userText;
+  return [{ role: 'user', content }];
 }
 
 export default async function handler(req: ServerRequest, res: ServerResponse): Promise<void> {
@@ -112,49 +107,35 @@ export default async function handler(req: ServerRequest, res: ServerResponse): 
     return;
   }
 
-  const parts: Array<Record<string, unknown>> = [{ text: buildUserText(body) }];
-  const image = parseDataUrl(body.image);
-  if (image) parts.push({ inlineData: { mimeType: image.mimeType, data: image.data } });
+  const provider = createGoogleGenerativeAI({ apiKey });
+  const messages = buildMessages(body);
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(apiKey)}`;
-    const geminiRes = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: controller.signal,
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: GEMINI_SYSTEM_PROMPT }] },
-        contents: [{ role: 'user', parts }],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.2,
-          maxOutputTokens: 1024,
-        },
-      }),
+    // توليد قرار منظّم (Structured Output) عبر zod: يضمن أن الشكل مطابق للعقد.
+    const { object } = await generateObject({
+      model: provider(GEMINI_MODEL),
+      schema: assistantDecisionSchema,
+      schemaName: 'AssistantDecision',
+      schemaDescription: 'قرار موحّد لمساعد BodyMap Pain: نية + ردّ بلغة المستخدم + سياق طبي + إجراءات تطبيق.',
+      system: GEMINI_SYSTEM_PROMPT,
+      messages,
+      temperature: 0.2,
+      maxOutputTokens: 1024,
+      maxRetries: 0,
+      abortSignal: controller.signal,
     });
-
-    if (!geminiRes.ok) {
-      // لا نطبع المفتاح ولا جسم الطلب؛ رمز الحالة فقط.
-      res.status(200).json({ decision: null, error: `gemini_${geminiRes.status}` });
-      return;
-    }
-
-    const payload = (await geminiRes.json()) as {
-      candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
-    };
-    const rawText = (payload.candidates?.[0]?.content?.parts ?? [])
-      .map((p) => (typeof p.text === 'string' ? p.text : ''))
-      .join('');
-    const decision = extractJson(rawText);
-    if (!decision) {
+    res.status(200).json({ decision: object });
+  } catch (error) {
+    if (NoObjectGeneratedError.isInstance(error)) {
       res.status(200).json({ decision: null, error: 'unparseable' });
-      return;
+    } else if (APICallError.isInstance(error)) {
+      // لا نطبع المفتاح ولا جسم الطلب؛ رمز الحالة فقط.
+      res.status(200).json({ decision: null, error: `gemini_${error.statusCode ?? 'error'}` });
+    } else {
+      res.status(200).json({ decision: null, error: 'request_failed' });
     }
-    res.status(200).json({ decision });
-  } catch {
-    res.status(200).json({ decision: null, error: 'request_failed' });
   } finally {
     clearTimeout(timer);
   }
