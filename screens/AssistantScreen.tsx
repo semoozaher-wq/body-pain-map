@@ -30,6 +30,7 @@ import { createWebRecognizer, webSpeechSupported, isLikelyInAppBrowser, type Spe
 import { voiceLog } from '../services/speech/voiceLog';
 import { createTurnGate, type TurnGate } from '../services/speech/turnGate';
 import { collapseWhitespace, mergeSpeechTranscript, normalizeTranscript } from '../services/speech/transcript';
+import { claimVoiceSession, releaseVoiceSession, isVoiceSessionOwner } from '../services/speech/voiceSession';
 import { Colors } from '../constants/colors';
 import { Fonts } from '../constants/fonts';
 import { Palette, Gradients, Radii, Elevation, Type } from '../constants/design';
@@ -173,6 +174,9 @@ function cleanMedicalName(name: string): string {
  * ضدّ التكرار: المقطع الجديد يُلحق، والنص التراكمي المعاد يُستبدل، والتكرار
  * الحرفي يُرجع null حتى يتخطّاه المستدعي.
  */
+// هوية هذا المسار الصوتي في قفل الجلسة المفردة (services/speech/voiceSession).
+const VOICE_OWNER = 'assistant';
+
 function mergeNativeTranscript(prev: string, next: string): string | null {
   const p = collapseWhitespace(prev);
   const n = collapseWhitespace(next);
@@ -384,8 +388,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // ------------------------------------------------------------------
   // التعرّف على الكلام (الإدخال الصوتي) — تبادل أدوار طبيعي
   // ------------------------------------------------------------------
-  useSpeechRecognitionEvents('start', () => { voiceLog('mic-start', { platform: 'native' }); setListening(true); });
+  useSpeechRecognitionEvents('start', () => {
+    if (!isVoiceSessionOwner(VOICE_OWNER)) return;
+    voiceLog('mic-start', { platform: 'native' });
+    setListening(true);
+  });
   useSpeechRecognitionEvents('end', () => {
+    if (!isVoiceSessionOwner(VOICE_OWNER)) return;
     voiceLog('mic-end', { platform: 'native' });
     setListening(false);
     // لا نُهدر النص: نُفرّغ أي جولة معلّقة عند نهاية الجلسة (نهاية الكلام).
@@ -397,8 +406,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       setTimeout(() => { if (voiceSessionRef.current && !listeningRef.current) startListeningRef.current(); }, 250);
     }
   });
-  useSpeechRecognitionEvents('error', (event: any) => { voiceLog('speech-error', { platform: 'native', code: event?.error }); setListening(false); });
+  useSpeechRecognitionEvents('error', (event: any) => {
+    if (!isVoiceSessionOwner(VOICE_OWNER)) return;
+    voiceLog('speech-error', { platform: 'native', code: event?.error });
+    setListening(false);
+  });
   useSpeechRecognitionEvents('result', (event: any) => {
+    if (!isVoiceSessionOwner(VOICE_OWNER)) return;
     const transcript: string = event?.results?.[0]?.transcript ?? '';
     if (!transcript) return;
     voiceLog('speech-result', { platform: 'native', transcript, isFinal: !!event?.isFinal });
@@ -443,6 +457,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       if (Platform.OS === 'web') webRecognizerRef.current?.stop?.();
       else SpeechRecognitionModule?.stop?.();
     } catch {}
+    releaseVoiceSession(VOICE_OWNER);
     setListening(false);
     setInterim('');
   }, []);
@@ -460,6 +475,8 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           setVoiceError(isLikelyInAppBrowser() ? 'voiceInApp' : 'voiceUnsupported');
           return;
         }
+        // قفل الجلسة: مسار واحد فقط يملك الميكروفون في أي لحظة.
+        if (!claimVoiceSession(VOICE_OWNER)) { voiceLog('mic-session-busy', { platform: 'web' }); return; }
         // جولة جديدة: نُصفّر البوّابة والمؤشرات.
         getGate().reset();
         gotResultRef.current = false;
@@ -504,13 +521,15 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             },
           },
         );
-        if (!recognizer) return;
+        if (!recognizer) { releaseVoiceSession(VOICE_OWNER); return; }
         webRecognizerRef.current = recognizer;
         recognizer.start();
         return;
       }
       const perm = await SpeechRecognitionModule?.requestPermissionsAsync?.();
       if (!perm?.granted) { voiceLog('mic-permission-denied'); return; }
+      // قفل الجلسة: مسار واحد فقط يملك الميكروفون في أي لحظة.
+      if (!claimVoiceSession(VOICE_OWNER)) { voiceLog('mic-session-busy', { platform: 'native' }); return; }
       getGate().reset();
       nativeLiveRef.current = '';
       setInterim('');
@@ -557,7 +576,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     setAskCount(0);
     persistedMessages = [];
     persistedAskCount = 0;
-    gateRef.current?.reset?.();
+    gateRef.current?.newSession?.();
     nativeLiveRef.current = '';
     nativeLastFinalRef.current = { text: '', at: 0 };
     gotResultRef.current = false;
@@ -606,6 +625,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
       Speech.stop();
       webRecognizerRef.current?.abort?.();
       SpeechRecognitionModule?.abort?.();
+      releaseVoiceSession(VOICE_OWNER);
     } catch {}
   }, []);
 
