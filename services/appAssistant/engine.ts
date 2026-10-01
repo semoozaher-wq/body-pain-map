@@ -28,6 +28,7 @@ import {
   type GeminiDecision,
   type GeminiContext,
 } from '../aiAssistant/gemini';
+import { collapseRepeatedSegments, collapseWhitespace } from '../speech/transcript';
 import {
   describePoint,
   describePosition,
@@ -800,13 +801,13 @@ export function interpret(
 
   // الردّ الافتراضي عند عدم الفهم ليس «معليش، مفهمتش الطلب»، بل سؤال توضيحي يوجّه
   // المستخدم للطبقات الثلاث (عام/طبي/تحكّم) — التصنيف يسبق الرفض.
-  const reply = dedupedReplies.length
+  const reply = cleanAssistantReply(dedupedReplies.length
     ? combine(dedupedReplies)
     : L(
         'مش متأكد إني فهمت صح. تقصد تسألني عن ألم أو عرض، ولا عايز تتحكّم في التطبيق (تنقّل/إبراز/تسجيل)، ولا مجرد كلام عام؟',
         'I’m not sure I got that. Do you mean to ask about a pain or symptom, control the app (navigate/highlight/log), or just chat?',
         'Je ne suis pas sûr d’avoir compris. Veux-tu parler d’une douleur, contrôler l’app (naviguer/surligner), ou discuter ?',
-      );
+      ));
 
   return {
     understood,
@@ -1139,6 +1140,65 @@ export async function interpretAsync(
     aiDecision = null;
   }
   return interpret(utterance, state, { ...options, aiDecision });
+}
+
+/**
+ * Split a message into sentence-ish segments on the terminators we use in the
+ * three supported languages. A '.' only ends a segment when followed by
+ * whitespace/end, so decimals like «7.5» are not broken apart.
+ */
+function splitSentences(text: string): string[] {
+  const parts: string[] = [];
+  let start = 0;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    const terminator = ch === '؟' || ch === '?' || ch === '!';
+    const dot = ch === '.' && (i === text.length - 1 || /\s/.test(text[i + 1] ?? ' '));
+    if (terminator || dot) {
+      parts.push(text.slice(start, i + 1).trim());
+      start = i + 1;
+    }
+  }
+  const tail = text.slice(start).trim();
+  if (tail) parts.push(tail);
+  return parts.filter(Boolean);
+}
+
+/**
+ * Keep at most ONE follow-up question in an assistant message.
+ *
+ * The spec requires exactly one clear question per turn. Statements are always
+ * preserved; only *extra* question sentences are dropped (the first question
+ * wins). A single sentence that mixes a statement and a question is untouched.
+ */
+export function enforceSingleQuestion(text: string): string {
+  const value = collapseWhitespace(text);
+  if (!value) return '';
+  const segments = splitSentences(value);
+  if (segments.length <= 1) return value;
+  let questionSeen = false;
+  const kept: string[] = [];
+  for (const segment of segments) {
+    const isQuestion = /[؟?]/.test(segment);
+    if (isQuestion) {
+      if (questionSeen) continue; // drop the 2nd, 3rd, ... question
+      questionSeen = true;
+    }
+    kept.push(segment);
+  }
+  return kept.join(' ').trim();
+}
+
+/**
+ * Final hygiene applied to EVERY assistant reply before it is displayed:
+ *   • collapse accidental word/phrase repetition (STT or model artefacts),
+ *   • keep exactly one follow-up question per message.
+ * Applied per-language so ar/en/fr each stay natural and short.
+ */
+export function cleanAssistantReply(reply: LocalizedText): LocalizedText {
+  const clean = (value: string): string =>
+    enforceSingleQuestion(collapseRepeatedSegments(value ?? ''));
+  return { ar: clean(reply.ar), en: clean(reply.en), fr: clean(reply.fr) };
 }
 
 function combine(parts: LocalizedText[]): LocalizedText {  return {
