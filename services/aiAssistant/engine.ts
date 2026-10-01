@@ -1449,14 +1449,14 @@ function buildDoctorSummary(ctx: PainContext, language: Lang): string {
  * One relevant follow-up question at a time (spec #4, #25). Picks the most
  * important still-missing field instead of dumping every question at once.
  */
-function buildSmartFollowUp(ctx: PainContext): LocalizedText | null {
+export function buildSmartFollowUp(ctx: PainContext): LocalizedText | null {
   if (!ctx.painLocation) {
-    return { ar: 'تقدر تحدد لي مكان الألم بالتحديد فين؟', en: 'Can you point to exactly where the pain is?', fr: 'Pouvez-vous préciser exactement où se situe la douleur ?' };
+    return { ar: 'مكان الألم بالظبط فين؟', en: 'Where exactly is the pain?', fr: 'Où se situe exactement la douleur ?' };
   }
   // Severity first, then duration: the natural clinical intake order and the
   // order the acceptance dialogue expects ("في الساق" -> follow-up -> "شدته 7").
   if (ctx.painSeverity === null) {
-    return { ar: 'قيّم شدة الألم من 1 لـ 10، كام؟', en: 'On a scale of 1 to 10, how intense is the pain?', fr: 'Sur une échelle de 1 à 10, quelle est l\u2019intensité ?' };
+    return { ar: 'شدة الألم من 1 لـ 10، كام؟', en: 'On a scale of 1 to 10, how intense is the pain?', fr: 'Sur une échelle de 1 à 10, quelle est l\u2019intensité ?' };
   }
   if (!ctx.painDuration) {
     return { ar: 'الألم بدأ من إمتى؟ (ساعات / أيام / أسابيع)', en: 'When did the pain start? (hours / days / weeks)', fr: 'Quand la douleur a-t-elle commencé ? (heures / jours / semaines)' };
