@@ -57,8 +57,8 @@ import type { StoredConversation } from '../services/conversations/types';
 
 type ChatMessage =
   | { id: string; role: 'user'; text: string; imageUri?: string }
-  | { id: string; role: 'assistant'; kind: 'rich'; reply: AssistantReply }
-  | { id: string; role: 'assistant'; kind: 'text'; text: string };
+  | { id: string; role: 'assistant'; kind: 'rich'; reply: AssistantReply; source?: 'llm' | 'rules' }
+  | { id: string; role: 'assistant'; kind: 'text'; text: string; source?: 'llm' | 'rules' };
 
 // Keep the conversation alive across screen unmounts (e.g. when a pain message
 // navigates to the map). This mirrors GlobalAssistant, which stays mounted while
@@ -812,7 +812,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             const nextAskCount = reply.clarificationOnly ? askedSoFar + 1 : 0;
             askCountRef.current = nextAskCount;
             setAskCount(nextAskCount);
-            setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'rich', reply }]);
+            setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'rich', reply, source: turn.source }]);
             voiceLog('assistant-response', { mode: 'medical', text: reply.intro?.[language as Lang]?.slice(0, 80) });
             setThinking(false);
             if (autoSpeak || voiceSessionRef.current) speak(replyToSpeech(reply), id);
@@ -821,7 +821,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
             const replyText = turn.reply[language as Lang] ?? turn.reply.ar;
             askCountRef.current = 0;
             setAskCount(0);
-            setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'text', text: replyText }]);
+            setMessages((prev) => [...prev, { id, role: 'assistant', kind: 'text', text: replyText, source: turn.source }]);
             voiceLog('assistant-response', { mode: 'text', text: replyText.slice(0, 80) });
             setThinking(false);
             if (autoSpeak || voiceSessionRef.current) speak(replyText, id);
@@ -991,6 +991,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
               <AssistantBubble
                 key={message.id}
                 reply={message.reply}
+                source={message.source}
                 align={align}
                 row={row}
                 onOpenRegion={onOpenRegion}
@@ -1003,7 +1004,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
               />
             );
           }
-          return <SimpleBubble key={message.id} text={message.text} row={row} colors={colors} />;
+          return <SimpleBubble key={message.id} text={message.text} source={message.source} row={row} colors={colors} t={t} />;
         })}
 
         {messages.length > 0 && !thinking && (
@@ -1125,6 +1126,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
 // ---------------------------------------------------------------------------
 interface BubbleProps {
   reply: AssistantReply;
+  source?: 'llm' | 'rules';
   align: 'right' | 'left';
   row: 'row' | 'row-reverse';
   onOpenRegion: (regionId: string) => void;
@@ -1136,7 +1138,7 @@ interface BubbleProps {
   t: (key: Parameters<typeof translate>[1]) => string;
 }
 
-const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegion, onOpenOrgan, onSend, onSpeak, speaking, colors, t }) => {
+const AssistantBubble: React.FC<BubbleProps> = ({ reply, source, align, row, onOpenRegion, onOpenOrgan, onSend, onSpeak, speaking, colors, t }) => {
   const triage = TRIAGE_COLORS[reply.triage.level];
   const hasRedFlag = reply.redFlags.length > 0;
 
@@ -1360,6 +1362,8 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
 
         <Text style={[styles.disclaimer, { color: colors.textLight, textAlign: align }]}>{reply.disclaimer[replyIntroLang(reply)]}</Text>
         </>}
+
+        <SourceBadge source={source} row={row} colors={colors} t={t} />
       </View>
     </View>
   );
@@ -1370,11 +1374,13 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
 // ---------------------------------------------------------------------------
 interface SimpleBubbleProps {
   text: string;
+  source?: 'llm' | 'rules';
   row: 'row' | 'row-reverse';
   colors: typeof Colors;
+  t: (key: Parameters<typeof translate>[1]) => string;
 }
 
-const SimpleBubble: React.FC<SimpleBubbleProps> = ({ text, row, colors }) => (
+const SimpleBubble: React.FC<SimpleBubbleProps> = ({ text, source, row, colors, t }) => (
   <View style={[styles.agentRow, { flexDirection: row }]}>
     <View style={styles.agentMini}>
       <Gradient colors={Gradients.brandSoft} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
@@ -1382,9 +1388,33 @@ const SimpleBubble: React.FC<SimpleBubbleProps> = ({ text, row, colors }) => (
     </View>
     <View style={[styles.bubble, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Text style={[styles.intro, { color: colors.textPrimary }]}>{text}</Text>
+      <SourceBadge source={source} row={row} colors={colors} t={t} />
     </View>
   </View>
 );
+
+// ---------------------------------------------------------------------------
+// شارة مصدر الردّ — شفافية صادقة: هل جاء الردّ من الذكاء السحابي (Gemini) أم من
+// محرّك القواعد على الجهاز؟ لا ندّعي ذكاءً اصطناعيًا حقيقيًا إن لم يكن متصلًا.
+// ---------------------------------------------------------------------------
+interface SourceBadgeProps {
+  source?: 'llm' | 'rules';
+  row: 'row' | 'row-reverse';
+  colors: typeof Colors;
+  t: (key: Parameters<typeof translate>[1]) => string;
+}
+
+const SourceBadge: React.FC<SourceBadgeProps> = ({ source, row, colors, t }) => {
+  if (!source) return null;
+  const isLlm = source === 'llm';
+  return (
+    <View style={[styles.sourceBadge, { flexDirection: row, borderColor: colors.border, backgroundColor: colors.backgroundAlt }]}>
+      <Text style={[styles.sourceBadgeText, { color: isLlm ? Palette.teal500 : colors.textSecondary }]}>
+        {isLlm ? `☁️ ${t('assistant.sourceLlm')}` : `📱 ${t('assistant.sourceRules')}`}
+      </Text>
+    </View>
+  );
+};
 
 /**
  * اختيار لغة نص الرد — نستخدم لغة الواجهة الحالية.
@@ -1497,6 +1527,8 @@ const styles = StyleSheet.create({
   openOrganGlyph: { fontSize: 15 },
   openOrganText: { color: Palette.white, fontFamily: Fonts.arabic.bold, fontSize: Type.bodySm, fontWeight: Type.weight.black },
   disclaimer: { fontFamily: Fonts.arabic.regular, fontSize: Type.micro, lineHeight: 16, marginTop: 2 },
+  sourceBadge: { alignSelf: 'flex-start', marginTop: 8, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 999, borderWidth: StyleSheet.hairlineWidth },
+  sourceBadgeText: { fontFamily: Fonts.arabic.regular, fontSize: Type.micro, lineHeight: 15 },
   thinkingBubble: { flexDirection: 'row', alignItems: 'center', gap: 9, borderWidth: 1, borderRadius: Radii.lg, paddingHorizontal: 14, paddingVertical: 11 },
   thinkingText: { fontFamily: Fonts.arabic.medium, fontSize: Type.bodySm },
   inputWrap: { paddingHorizontal: 12, paddingTop: 8, paddingBottom: Platform.OS === 'ios' ? 22 : 12, borderTopWidth: 1, gap: 8 },
