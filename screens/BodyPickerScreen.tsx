@@ -1,37 +1,33 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { PainMarker } from '../components/PainMarker';
 import { OrganDetailModal } from '../components/OrganDetailModal';
 import { usePainContext } from '../context/PainContext';
 
-export const BodyPickerScreen: React.FC = () => {
-  const { painMarker, setPainMarker, selectedOrgan, setSelectedOrgan } = usePainContext();
-  const [isOrganModalOpen, setIsOrganModalOpen] = useState(false);
+export const BodyPickerScreen = () => {
+  const { selectedOrgan, setSelectedOrgan } = usePainContext();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOrganSelect = (organ: any) => {
+    setSelectedOrgan(organ);
+    setIsModalOpen(true);
+  };
 
   const handleCloseModal = () => {
-    setIsOrganModalOpen(false);
-    setSelectedOrgan(null);
+    setIsModalOpen(false);
   };
 
   return (
     <View style={styles.container}>
-      {/* Canvas الرئيسي */}
-      <View style={styles.bodyCanvas}>
-        {/* إخفاء علامة الألم بصرياً فقط أثناء فتح تفاصيل العضو لمنع التداخل */}
-        {painMarker && !isOrganModalOpen && (
-          <PainMarker 
-            x={painMarker.x} 
-            y={painMarker.y} 
-            intensity={painMarker.intensity} 
-          />
-        )}
+      {/* واجهة اختيار العضو / الخريطة */}
+      <View style={styles.canvasContainer}>
+        {/* يمكنك وضع مكون خريطة الجسم هنا بدون استدعاء PainMarker المفقود */}
       </View>
 
-      {/* نافذة تفاصيل العضو */}
-      {isOrganModalOpen && (
-        <OrganDetailModal 
-          organ={selectedOrgan} 
-          onClose={handleCloseModal} 
+      {/* النافذة المنبثقة للتفاصيل */}
+      {isModalOpen && (
+        <OrganDetailModal
+          organ={selectedOrgan}
+          onClose={handleCloseModal}
         />
       )}
     </View>
@@ -39,6 +35,15 @@ export const BodyPickerScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  bodyCanvas: { flex: 1, position: 'relative' }
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  canvasContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
+
+export default BodyPickerScreen;
