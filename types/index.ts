@@ -1,6 +1,6 @@
 // types/index.ts
 
-export type Screen = 'welcome' | 'body' | 'details' | 'results' | 'history' | 'assistant' | 'healthInfo';
+export type Screen = 'welcome' | 'body' | 'details' | 'results' | 'history' | 'assistant' | 'healthInfo' | 'settings';
 export type AppGender = 'male' | 'female';
 export type BodyView = 'front' | 'back' | 'organs';
 
