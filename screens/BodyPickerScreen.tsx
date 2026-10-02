@@ -45,14 +45,16 @@ export const BodyPickerScreen = () => {
       updated = [...selectedParts, part.id];
     }
     setSelectedParts(updated);
-    setSelectedOrgan(part);
+    if (typeof setSelectedOrgan === 'function') {
+      setSelectedOrgan(part);
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>خريطة تحديد آلام الجسم</Text>
       <Text style={styles.subtitle}>
-        اختر الجهة وحدد الموضع الذي تشعر بالألم فيه (يمكنك تحديد أكثر من موضع)
+        اختر الجهة وحدد الموضع الذي تشعر بالألم فيه
       </Text>
 
       {/* View Switcher Controls */}
@@ -62,7 +64,7 @@ export const BodyPickerScreen = () => {
           onPress={() => setCurrentView('front')}
         >
           <Text style={[styles.switchText, currentView === 'front' && styles.activeSwitchText]}>
-            المنظر الأمامي (Anterior)
+            المنظر الأمامي
           </Text>
         </TouchableOpacity>
 
@@ -71,7 +73,7 @@ export const BodyPickerScreen = () => {
           onPress={() => setCurrentView('back')}
         >
           <Text style={[styles.switchText, currentView === 'back' && styles.activeSwitchText]}>
-            المنظر الخلفي (Posterior)
+            المنظر الخلفي
           </Text>
         </TouchableOpacity>
       </View>
@@ -92,7 +94,6 @@ export const BodyPickerScreen = () => {
               style={[
                 styles.marker,
                 { left: `${part.coords.x}%`, top: `${part.coords.y}%` },
-                isSelected && styles.selectedMarker,
               ]}
               onPress={() => togglePartSelection(part)}
             >
@@ -211,9 +212,6 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
   },
-  selectedMarker: {
-    zIndex: 10,
-  },
   markerLabel: {
     color: '#f8fafc',
     fontSize: 11,
@@ -238,7 +236,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   chipsContainer: {
-    flexDirection: 'row-reverse',
+    flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
   },
