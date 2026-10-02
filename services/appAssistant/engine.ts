@@ -818,6 +818,9 @@ export function interpret(
     pendingConfirmation: pending,
     suggestions: suggestionsFor(state),
     mode,
+    // شفافية المصدر: هل فهمت هذه الجولة عبر LLM حقيقي (Gemini) أم عبر محرّك القواعد؟
+    // لا يغيّر السلوك؛ يُعرض فقط كمؤشّر صادق في الواجهة.
+    source: options.aiDecision ? 'llm' : 'rules',
     // السياق الطبي الموحّد القادم من Gemini (إن وُجد) بعد دمجه مع السياق السابق،
     // حتى يُحفظ بين الرسائل ولا يُعيد المساعد السؤال عن معلومة معروفة.
     painContext: geminiPainContext ?? undefined,
