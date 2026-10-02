@@ -1,41 +1,40 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// استخدام fetch المباشر لضمان التوافق التام مع Vercel بدون مكتبات خارجية
+export const generateGeminiResponse = async (prompt: string): Promise<string> => {
+  const apiKey = process.env.GEMINI_API_KEY || '';
 
-const apiKey = process.env.GEMINI_API_KEY || '';
-const genAI = new GoogleGenerativeAI(apiKey);
-
-export async function generateGeminiResponse({ prompt, painContext, medicalKnowledge, history }: any) {
   if (!apiKey) {
-    throw new Error('Missing Gemini API Key');
+    return 'لم يتم العثور على مفتاح API الخاص بـ Gemini. يرجى ضبط GEMINI_API_KEY في إعدادات البيئة.';
   }
 
-  const systemInstruction = `
-أنت مساعد طبي ذكي متخصص في تطبيق BodyMap Pain.
-وظيفتك فهم شكوى المريض المرفقة مع إحداثيات الألم والتفاعل معها بدقة.
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+        }),
+      }
+    );
 
-توجيهات معالجة التعديل المكاني (Spatial Adjustments):
-1. إذا ذكر المستخدم تعديلات مكانية بالعامية مثل: "تحت شوية"، "فوق"، "ورا أكتر"، "يمين شويه"، قم بتحديث الإحداثيات الحالية (updatedPainContext) بدلاً من إنشاء علامة جديدة.
-2. المرجعية الطبية المرفقة: ${JSON.stringify(medicalKnowledge)}.
+    const data = await response.json();
 
-يجب أن يكون الرد بصيغة JSON حصرية كالآتي:
-{
-  "reply": "نص الرد للمستخدم",
-  "action": "UPDATE_MARKER" | "NONE",
-  "updatedPainContext": { "x": number, "y": number, "bodyPart": "string" },
-  "redFlagsDetected": boolean
-}
-  `;
+    if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+      return data.candidates[0].content.parts[0].text;
+    }
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-pro',
-    systemInstruction
-  });
+    return 'عذراً، لم يتم إرجاع استجابة صالحة من الذكاء الاصطناعي.';
+  } catch (error) {
+    console.error('Error in Gemini API request:', error);
+    return 'حدث خطأ أثناء الاتصال بالذكاء الاصطناعي. يرجى المحاولة لاحقاً.';
+  }
+};
 
-  const response = await model.generateContent({
-    contents: [
-      ...(history || []),
-      { role: 'user', parts: [{ text: `Pain Context: ${JSON.stringify(painContext)}\nUser Prompt: ${prompt}` }] }
-    ]
-  });
-
-  return JSON.parse(response.response.text());
-}
+export default generateGeminiResponse;
