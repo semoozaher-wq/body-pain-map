@@ -1,23 +1,19 @@
-export interface TurnGate {
-  canProceed: () => boolean;
-  reset: () => void;
+export interface AssistantRequestBody {
+  prompt?: string;
+  painContext?: Record<string, any> | string;
 }
 
-export const createTurnGate = (): TurnGate => {
-  let lastTime = 0;
-  return {
-    canProceed: () => {
-      const now = Date.now();
-      if (now - lastTime > 1000) {
-        lastTime = now;
-        return true;
-      }
-      return false;
-    },
-    reset: () => {
-      lastTime = 0;
-    },
-  };
-};
+export default async function handler(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
 
-export default createTurnGate;
+  const { prompt, painContext }: AssistantRequestBody = req.body || {};
+
+  try {
+    const responseText = `تم استلام الاستفسار: ${prompt || 'بدون نص'}`;
+    return res.status(200).json({ response: responseText, painContext });
+  } catch (error) {
+    return res.status(500).json({ error: 'حدث خطأ في السيرفر' });
+  }
+}
