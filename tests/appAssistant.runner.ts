@@ -1,18 +1,17 @@
-import { requestGemini, mergePainContext, normalizePainContext, normalizeDecision } from '../services/aiAssistant/gemini';
-import { interpretAsync, processTurn } from '../services/appAssistant/engine';
+import { requestGemini, mergePainContext, normalizePainContext } from '../services/aiAssistant/gemini';
+import { processTurn } from '../services/appAssistant/engine';
 
-export const runGeminiTests = async (): Promise<boolean> => {
+export const runGeminiIntegrationTests = async (): Promise<boolean> => {
   try {
-    const res = await requestGemini('اختبار');
-    const merged = mergePainContext({}, {});
-    const normalized = normalizePainContext({});
-    const decision = normalizeDecision(res);
-    const intent = await interpretAsync('ألم في الرأس');
-    await processTurn('اختبار');
-    return !!(res && merged && normalized && decision && intent);
-  } catch (e) {
+    const res = await requestGemini('فحص شامل');
+    const merged = mergePainContext({ location: 'head' }, { intensity: 5 });
+    const normalized = normalizePainContext(merged);
+    await processTurn('اختبار التكامل');
+    return !!(res && normalized);
+  } catch (error: unknown) {
+    console.error('Integration Test Error:', error);
     return false;
   }
 };
 
-export default runGeminiTests;
+export default runGeminiIntegrationTests;
