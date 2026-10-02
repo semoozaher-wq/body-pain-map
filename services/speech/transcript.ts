@@ -17,6 +17,17 @@
 //   No DOM, no timers, no side effects -> trivially unit-testable.
 // ============================================================================
 
+/**
+ * B2b (report fix): الحدّ الأدنى (بالمللي ثانية) بين دمجين متتاليين لنصّ التعرف.
+ *
+ * كان دمج النصّ يجري على كل حدث بلا مهلة، فتصل نتائج متتالية سريعة لنفس الجملة
+ * فيُرسَل النصّ مرتين. نطبّق مهلة 300ms على مسار الدمج لإخماد التكرار السريع.
+ * هذا حدّ أدنى فقط: بوابة الجولات (TurnGate) تضيف نافذتَي إزالة تكرار أوسع
+ * (DEFAULT_DEDUP_WINDOW_MS = 1200ms للنص المتكرر وDEFAULT_FINAL_DEDUP_WINDOW_MS
+ * = 2500ms للتثبيت النهائي عبر إعادة التشغيل)، فتصبح الحماية أقوى من 300ms.
+ */
+export const TRANSCRIPT_MERGE_DEBOUNCE_MS = 300;
+
 /** Collapse runs of whitespace and trim. */
 export function collapseWhitespace(text: string): string {
   return (text || '').replace(/\s+/g, ' ').trim();
