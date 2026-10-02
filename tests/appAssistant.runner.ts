@@ -1,28 +1,18 @@
-import { interpretIntent, processTurn } from '../services/appAssistant/engine';
+import { requestGemini, mergePainContext, normalizePainContext, normalizeDecision } from '../services/aiAssistant/gemini';
+import { interpretAsync, processTurn } from '../services/appAssistant/engine';
 
-interface TestCase {
-  id: string;
-  input: string;
-  expectedIntent?: string;
-}
-
-const testCases: TestCase[] = [
-  { id: '1', input: 'عندي ألم في الرأس', expectedIntent: 'headache' },
-  { id: '2', input: 'مرحباً بك', expectedIntent: 'greeting' },
-];
-
-export const runAssistantTests = async (): Promise<boolean> => {
-  let allPassed = true;
-
-  for (const testCase of testCases) {
-    const result = interpretIntent(testCase.input);
-    if (!result) {
-      allPassed = false;
-    }
-    await processTurn({ input: testCase.input });
+export const runGeminiTests = async (): Promise<boolean> => {
+  try {
+    const res = await requestGemini('اختبار');
+    const merged = mergePainContext({}, {});
+    const normalized = normalizePainContext({});
+    const decision = normalizeDecision(res);
+    const intent = await interpretAsync('ألم في الرأس');
+    await processTurn('اختبار');
+    return !!(res && merged && normalized && decision && intent);
+  } catch (e) {
+    return false;
   }
-
-  return allPassed;
 };
 
-export default runAssistantTests;
+export default runGeminiTests;
