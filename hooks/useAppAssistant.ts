@@ -3,7 +3,7 @@ import { createTurnGate, TurnGate } from '../services/speech/turnGate';
 
 export interface AssistantData {
   lastText?: string;
-  [key: string]: unknown;
+  [key: string]: any;
 }
 
 export const useAppAssistant = () => {
@@ -22,7 +22,21 @@ export const useAppAssistant = () => {
     }, 500);
   }, [turnGate]);
 
-  return { stage, data, processInput, turnGate };
+  const reset = useCallback(() => {
+    setStage('idle');
+    setData({});
+    turnGate.reset();
+  }, [turnGate]);
+
+  return {
+    stage,
+    data,
+    processInput,
+    reset,
+    turnGate,
+    isListening: stage === 'listening',
+    isProcessing: stage === 'processing',
+  };
 };
 
 export default useAppAssistant;
