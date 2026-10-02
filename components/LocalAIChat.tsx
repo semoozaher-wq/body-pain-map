@@ -7,17 +7,17 @@ type Props = { language?: Language };
 
 const copy = {
   ar: {
-    title: 'مساعد إرشادي محلي', hint: 'يعمل على الجهاز دون إرسال بيانات أو مفتاح API.', placeholder: 'مثال: عندي ألم في صدري مع ضيق نفس', ask: 'حلّل الأعراض', empty: 'اكتب وصفًا للألم أو الأعراض أولًا.', emergency: 'علامات خطر: اطلب رعاية طارئة الآن.', urgent: 'يُنصح بتقييم طبي قريب ولا تعتمد على الدردشة وحدها.', education: 'إرشاد تعليمي وليس تشخيصًا أو وصفة علاج.', understanding: 'ما فهمته', triage: 'درجة الاستعجال', selfCare: 'إرشادات عامة',
+    title: 'مساعد إرشادي محلي', hint: 'يعمل على الجهاز دون إرسال بيانات أو مفتاح API.', placeholder: 'مثال: عندي ألم في صدري مع ضيق نفس', ask: 'حلّل الأعراض', empty: 'اكتب وصفًا للألم أو الأعراض أولًا.', emergency: 'علامات خطر: اطلب رعاية طارئة الآن.', urgent: 'يُنصح بتقييم طبي قريب ولا تعتمد على الدردشة وحدها.', education: 'إرشاد تعليمي وليس تشخيصًا أو وصفة علاج.', understanding: 'ما فهمته', triage: 'درجة الاستعجال', selfCare: 'إرشادات عامة', doctorSummary: 'ملخص للطبيب',
   },
   en: {
-    title: 'Local guidance assistant', hint: 'Runs on this device; no data or API key is sent.', placeholder: 'Example: chest pain with shortness of breath', ask: 'Analyse symptoms', empty: 'Describe the pain or symptoms first.', emergency: 'Red flags: seek emergency care now.', urgent: 'Prompt medical assessment is recommended; do not rely on chat alone.', education: 'Educational guidance only—not a diagnosis or prescription.', understanding: 'What I understood', triage: 'Urgency', selfCare: 'General guidance',
+    title: 'Local guidance assistant', hint: 'Runs on this device; no data or API key is sent.', placeholder: 'Example: chest pain with shortness of breath', ask: 'Analyse symptoms', empty: 'Describe the pain or symptoms first.', emergency: 'Red flags: seek emergency care now.', urgent: 'Prompt medical assessment is recommended; do not rely on chat alone.', education: 'Educational guidance only—not a diagnosis or prescription.', understanding: 'What I understood', triage: 'Urgency', selfCare: 'General guidance', doctorSummary: 'Summary for the doctor',
   },
   fr: {
-    title: 'Assistant local d’orientation', hint: 'Fonctionne sur l’appareil; aucune donnée ni clé API n’est envoyée.', placeholder: 'Exemple : douleur thoracique avec essoufflement', ask: 'Analyser les symptômes', empty: 'Décrivez d’abord la douleur ou les symptômes.', emergency: 'Signes d’alerte : consultez les urgences maintenant.', urgent: 'Une évaluation médicale rapide est recommandée; ne comptez pas seulement sur le chat.', education: 'Information éducative uniquement, sans diagnostic ni prescription.', understanding: 'Ce que j’ai compris', triage: 'Urgence', selfCare: 'Conseils généraux',
+    title: 'Assistant local d’orientation', hint: 'Fonctionne sur l’appareil; aucune donnée ni clé API n’est envoyée.', placeholder: 'Exemple : douleur thoracique avec essoufflement', ask: 'Analyser les symptômes', empty: 'Décrivez d’abord la douleur ou les symptômes.', emergency: 'Signes d’alerte : consultez les urgences maintenant.', urgent: 'Une évaluation médicale rapide est recommandée; ne comptez pas seulement sur le chat.', education: 'Information éducative uniquement, sans diagnostic ni prescription.', understanding: 'Ce que j’ai compris', triage: 'Urgence', selfCare: 'Conseils généraux', doctorSummary: 'Résumé pour le médecin',
   },
 } as const;
 
-type Copy = { title: string; hint: string; placeholder: string; ask: string; empty: string; emergency: string; urgent: string; education: string; understanding: string; triage: string; selfCare: string };
+type Copy = { title: string; hint: string; placeholder: string; ask: string; empty: string; emergency: string; urgent: string; education: string; understanding: string; triage: string; selfCare: string; doctorSummary: string };
 
 const triageLabel = (level: AssistantReply['triage']['level'], language: Language) => ({
   ar: { self_care: 'عناية ذاتية مع المراقبة', routine: 'موعد طبي روتيني', soon: 'تقييم قريب', urgent: 'تقييم عاجل', emergency: 'طوارئ' },
@@ -62,6 +62,7 @@ function ReplyCard({ reply, language, copy: c, rtl }: { reply: AssistantReply; l
     {alert ? <Text style={[styles.alertBox, { textAlign: rtl ? 'right' : 'left' }]}>{level === 'emergency' ? c.emergency : c.urgent}</Text> : null}
     {reply.understanding.length ? <><Text style={[styles.section, { textAlign: rtl ? 'right' : 'left' }]}>{c.understanding}</Text>{reply.understanding.slice(0, 4).map((item, index) => <Text key={`${index}-${item}`} style={[styles.line, { textAlign: rtl ? 'right' : 'left' }]}>• {item}</Text>)}</> : null}
     {reply.selfCare.length ? <><Text style={[styles.section, { textAlign: rtl ? 'right' : 'left' }]}>{c.selfCare}</Text>{reply.selfCare.slice(0, 3).map((item, index) => <Text key={`${index}-${item}`} style={[styles.line, { textAlign: rtl ? 'right' : 'left' }]}>• {item}</Text>)}</> : null}
+    {reply.doctorSummary ? <><Text style={[styles.section, { textAlign: rtl ? 'right' : 'left' }]}>{c.doctorSummary}</Text><Text style={[styles.summary, { textAlign: rtl ? 'right' : 'left' }]}>{reply.doctorSummary}</Text></> : null}
   </View>;
 }
 
@@ -81,5 +82,6 @@ const styles = StyleSheet.create({
   alertBox: { color: '#9F1239', backgroundColor: '#FFF1F2', borderRadius: 9, padding: 9, marginTop: 10, lineHeight: 19, fontWeight: '800' },
   section: { color: '#5B4B2A', fontWeight: '900', marginTop: 12 },
   line: { color: '#5B4B2A', lineHeight: 21, marginTop: 4 },
+  summary: { color: '#5B4B2A', lineHeight: 21, marginTop: 4, backgroundColor: '#FFF9ED', borderRadius: 9, padding: 9 },
   disclaimer: { color: '#8A7B5B', fontSize: 11, textAlign: 'center', marginTop: 10 },
 });
