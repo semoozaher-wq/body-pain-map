@@ -2,12 +2,14 @@ export interface TurnGate {
   canProceed: () => boolean;
   reset: () => void;
   onFinal: (callback: (text: string) => void) => void;
+  onSnapshot?: (callback: (text: string) => void) => void;
   flush: () => void;
 }
 
 export const createTurnGate = (): TurnGate => {
   let lastTime = 0;
-  let finalCallback: ((text: string) => void) | null = null;
+  let finalCb: ((text: string) => void) | null = null;
+  let snapCb: ((text: string) => void) | null = null;
 
   return {
     canProceed: () => {
@@ -20,16 +22,12 @@ export const createTurnGate = (): TurnGate => {
     },
     reset: () => {
       lastTime = 0;
-      finalCallback = null;
+      finalCb = null;
+      snapCb = null;
     },
-    onFinal: (callback: (text: string) => void) => {
-      finalCallback = callback;
-    },
-    flush: () => {
-      if (finalCallback) {
-        finalCallback('');
-      }
-    },
+    onFinal: (cb: (text: string) => void) => { finalCb = cb; },
+    onSnapshot: (cb: (text: string) => void) => { snapCb = cb; },
+    flush: () => { if (finalCb) finalCb(''); },
   };
 };
 
