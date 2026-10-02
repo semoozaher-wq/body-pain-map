@@ -379,6 +379,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 onSelect={(marker) => { const markerId = marker.id === 'organ-ovaries-right' ? 'organ-ovaries' : marker.id; const spot = visibleHotspots.find((item) => item.id === markerId); if (spot) handleHotspotPress(spot); }}
                 highlight={organHighlight}
                 painMarker={painMarker && painMarker.view === activeView ? painMarker : null}
+                hidePainMarker={showDetails}
                 onPainMarkerChange={(pos) => setPainMarker({ x: pos.x, y: pos.y, view: activeView })}
               />
             </>
@@ -400,6 +401,7 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
                 onSelect={(marker) => { const spot = visibleMuscleHotspots.find((item) => item.id === marker.id); if (spot) handleHotspotPress(spot); }}
                 highlight={muscleHighlight}
                 painMarker={painMarker && painMarker.view === activeView ? painMarker : null}
+                hidePainMarker={showDetails}
               /> : Platform.OS === 'web' ? <WebBodySilhouette
                 view={activeView}
                 selectedSlugs={muscleSelection.selectedIds}

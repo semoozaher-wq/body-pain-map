@@ -49,6 +49,10 @@ import {
 } from '../services/aiAssistant';
 import { interpretAsync } from '../services/appAssistant/engine';
 import type { AppState, AssistantAction } from '../services/appAssistant/types';
+import { useConversations } from '../hooks/useConversations';
+import { useSettings } from '../hooks/useSettings';
+import { SavedConversationsPanel } from '../components/SavedConversationsPanel';
+import type { StoredConversation } from '../services/conversations/types';
 
 type ChatMessage =
   | { id: string; role: 'user'; text: string; imageUri?: string }
@@ -305,6 +309,26 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const replyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ------------------------------------------------------------------
+  // مخزن المحادثات المحلي (البلوبرنت #1 و#13): حفظ/استعراض/استكمال المحادثات
+  // السابقة محليًا — بدون سحابة أو تسجيل دخول.
+  // ------------------------------------------------------------------
+  const {
+    conversations,
+    saveConversation,
+    deleteConversation,
+    clearAll: clearAllConversations,
+  } = useConversations();
+  const [showSavedConversations, setShowSavedConversations] = useState(false);
+
+  // إعدادات المستخدم (البلوبرنت #14): الصوت/السرعة/التنبيهات الطبية.
+  const { settings, loaded: settingsLoaded } = useSettings();
+  const settingsRef = useRef(settings);
+  settingsRef.current = settings;
+  // نطبّق "نطق الردود تلقائيًا" من الإعدادات مرة واحدة عند اكتمال تحميلها،
+  // حتى لا نطمس تبديل المستخدم اليدوي داخل الشاشة.
+  const appliedAutoSpeakRef = useRef(false);
+
+  // ------------------------------------------------------------------
   // المحرّك الموحّد + أوامر التحكّم (نفس مصدر GlobalAssistant)
   // ------------------------------------------------------------------
   const appStateRef = useRef<AppState | undefined>(appState);
@@ -384,6 +408,13 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // \u0646\u062d\u0641\u0637 \u0627\u0644\u0645\u062d\u0627\u062f\u062b\u0629 \u062e\u0627\u0631\u062c \u0627\u0644\u0645\u0643\u0648\u0651\u0646 \u0644\u062a\u0628\u0642\u0649 \u0628\u0639\u062f \u0627\u0644\u062a\u0646\u0642\u0651\u0644 (\u0645\u062b\u0644 GlobalAssistant \u0627\u0644\u0630\u064a \u064a\u0628\u0642\u0649 \u0645\u0648\u062c\u0648\u062f\u064b\u0627).
   useEffect(() => { persistedMessages = messages; }, [messages]);
   useEffect(() => { persistedAskCount = askCount; }, [askCount]);
+
+  // تطبيق إعداد "نطق الردود تلقائيًا" من الإعدادات مرة واحدة بعد التحميل.
+  useEffect(() => {
+    if (!settingsLoaded || appliedAutoSpeakRef.current) return;
+    appliedAutoSpeakRef.current = true;
+    if (settings.autoSpeakReplies) setAutoSpeak(true);
+  }, [settingsLoaded, settings.autoSpeakReplies]);
 
   // ------------------------------------------------------------------
   // التعرّف على الكلام (الإدخال الصوتي) — تبادل أدوار طبيعي
@@ -570,6 +601,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   // استماع/نطق جارٍ، حتى لا يتسرّب سياق المحادثة القديمة إلى الجديدة.
   // ------------------------------------------------------------------
   const newConversation = useCallback(() => {
+    // أرشفة المحادثة الحالية محليًا قبل بدء محادثة جديدة، حتى لا تضيع
+    // (البلوبرنت #1: "إنشاء محادثات جديدة مع الاحتفاظ بالمحادثات القديمة").
+    if (messages.length > 0) {
+      saveConversation({ messages, painContext: painContextRef.current ?? undefined });
+    }
     voiceSessionRef.current = false;
     stopListening();
     try { Speech.stop(); } catch {}
@@ -588,7 +624,35 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
     setVoiceError(null);
     setInput('');
     setMessages([]);
-  }, [stopListening]);
+  }, [stopListening, messages, saveConversation]);
+
+  // ------------------------------------------------------------------
+  // استكمال محادثة محفوظة (البلوبرنت #13): نستعيد الرسائل وسياق الألم معًا.
+  // ------------------------------------------------------------------
+  const restoreConversation = useCallback(
+    (conversation: StoredConversation) => {
+      voiceSessionRef.current = false;
+      stopListening();
+      try { Speech.stop(); } catch {}
+      speakingRef.current = false;
+      setSpeakingId(null);
+      gateRef.current?.newSession?.();
+      nativeLiveRef.current = '';
+      nativeLastFinalRef.current = { text: '', at: 0 };
+      gotResultRef.current = false;
+      setInterim('');
+      setVoiceError(null);
+      setInput('');
+      painContextRef.current = conversation.painContext ?? null;
+      askCountRef.current = 0;
+      setAskCount(0);
+      persistedMessages = conversation.messages;
+      persistedAskCount = 0;
+      setMessages(conversation.messages);
+      setShowSavedConversations(false);
+    },
+    [stopListening],
+  );
 
   // ------------------------------------------------------------------
   // نطق الردود (إخراج صوتي)
@@ -605,6 +669,11 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
   const speak = useCallback(
     (text: string, id?: string) => {
       try {
+        // احترام إعداد الصوت (البلوبرنت #14): إن كان النطق مُطفأً لا نتكلّم.
+        if (!settingsRef.current.voiceEnabled) {
+          finishSpeech();
+          return;
+        }
         Speech.stop();
         // B2a (report fix): أوقف الاستماع (STT) فورًا عند بدء النطق (TTS_SPEAKING)
         // لمنع تراكب الميكروفون مع صوت المساعد (صدى/تغذية راجعة). نُبقي جلسة الصوت
@@ -621,7 +690,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           onDone: finishSpeech,
           onStopped: finishSpeech,
           onError: finishSpeech,
-        });
+        }, { rate: settingsRef.current.voiceRate });
       } catch {
         finishSpeech();
       }
@@ -825,6 +894,14 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           </View>
         </View>
         <Pressable
+          onPress={() => setShowSavedConversations(true)}
+          accessibilityRole="button"
+          accessibilityLabel={t('assistant.savedConversations')}
+          style={[styles.speakToggle, { borderColor: colors.border, backgroundColor: colors.backgroundAlt, marginEnd: 8 }]}
+        >
+          <Text style={styles.speakToggleGlyph}>🗂️</Text>
+        </Pressable>
+        <Pressable
           onPress={newConversation}
           accessibilityRole="button"
           accessibilityLabel={t('assistant.newConversation')}
@@ -872,7 +949,7 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
 
         {messages.length === 0 && (
           <View style={styles.quickWrap}>
-            {returningReminder && <Text style={[styles.clarify, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.followUpReminder')}</Text>}
+            {returningReminder && settings.medicalAlerts && <Text style={[styles.clarify, { color: colors.textSecondary, textAlign: align }]}>{t('assistant.followUpReminder')}</Text>}
             <Text style={[styles.quickTitle, { color: colors.textSecondary, textAlign: align }]}>
               {t('assistant.tryThese')}
             </Text>
@@ -1022,6 +1099,19 @@ export const AssistantScreen: React.FC<AssistantScreenProps> = ({ language, dire
           </Pressable>
         </View>
       </View>
+
+      <SavedConversationsPanel
+        visible={showSavedConversations}
+        conversations={conversations}
+        language={language}
+        direction={direction}
+        colors={colors}
+        t={t}
+        onClose={() => setShowSavedConversations(false)}
+        onRestore={restoreConversation}
+        onDelete={deleteConversation}
+        onClearAll={clearAllConversations}
+      />
     </KeyboardAvoidingView>
   );
 };
