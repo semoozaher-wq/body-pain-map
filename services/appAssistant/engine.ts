@@ -1,4 +1,3 @@
-// Safe types definition to resolve external module mismatch
 export interface GeminiContext {
   prompt?: string;
   painContext?: Record<string, unknown>;
@@ -9,7 +8,11 @@ export interface GeminiDecision {
   reply?: string;
 }
 
-// Fallback handlers for missing module exports
+export interface AssistantAction {
+  type: string;
+  payload?: unknown;
+}
+
 export const requestGemini = async (prompt: string, context?: unknown): Promise<GeminiDecision> => {
   return { action: 'chat', reply: `تم استلام الاستفسار: ${prompt}` };
 };
@@ -20,6 +23,18 @@ export const mergePainContext = (base: unknown, additional: unknown): Record<str
 
 export const generalChatReply = async (message: string): Promise<string> => {
   return `شكراً لتواصلك: ${message}`;
+};
+
+export const interpretIntent = (text: string): { intent: string; confidence: number } => {
+  return { intent: 'general_chat', confidence: 1.0 };
+};
+
+export const processTurn = async (turn: { input?: string; text?: string } | string) => {
+  const query = typeof turn === 'string' ? turn : turn?.input || turn?.text || '';
+  return {
+    reply: `تم معالجة الطلب: ${query}`,
+    action: { type: 'NONE' },
+  };
 };
 
 export class AppAssistantEngine {
