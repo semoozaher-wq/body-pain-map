@@ -6,6 +6,8 @@ export interface GeminiContext {
 export interface GeminiDecision {
   action?: string;
   reply?: string;
+  intent?: string;
+  confidence?: number;
 }
 
 export interface AssistantAction {
@@ -14,7 +16,7 @@ export interface AssistantAction {
 }
 
 export const requestGemini = async (prompt: string, context?: unknown): Promise<GeminiDecision> => {
-  return { action: 'chat', reply: `تم استلام الاستفسار: ${prompt}` };
+  return { action: 'chat', reply: `تم استلام الاستفسار: ${prompt}`, intent: 'general' };
 };
 
 export const mergePainContext = (base: unknown, additional: unknown): Record<string, unknown> => {
@@ -27,6 +29,10 @@ export const generalChatReply = async (message: string): Promise<string> => {
 
 export const interpretIntent = (text: string): { intent: string; confidence: number } => {
   return { intent: 'general_chat', confidence: 1.0 };
+};
+
+export const interpretAsync = async (text: string): Promise<{ intent: string; confidence: number }> => {
+  return interpretIntent(text);
 };
 
 export const processTurn = async (turn: { input?: string; text?: string } | string) => {
