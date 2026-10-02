@@ -16,6 +16,7 @@ import type { BodyView, Muscle } from '../types';
 import { PainReliefPanel } from '../components/PainReliefPanel';
 import cleanData from '../data/cleanData';
 import { useMuscleSelection } from '../hooks/useMuscleSelection';
+import { usePainContext } from '../context/PainContext';
 import type { BodyControlCommand, BodyScreenState, BodyTab } from '../services/appAssistant/types';
 import {
   BODY_REGION_LABELS,
@@ -125,9 +126,9 @@ export const BodyPickerScreen: React.FC<BodyPickerScreenProps> = ({
   // عنصر مُبرَز بصريًا بأمر من المساعد المركزي (حلقة نابضة تبقى حتى يُطلب إزالتها).
   const [highlightId, setHighlightId] = useState<string | null>(null);
   // علامة الألم التي يضعها/يحرّكها المساعد المركزي على الخريطة.
-  const [painMarker, setPainMarker] = useState<{ x: number; y: number; view: 'front' | 'back' } | null>(null);
+  const { painMarker, setPainMarker, selectedOrganId, setSelectedOrganId } = usePainContext();
   // معرّف العضو الداخلي المحدَّد حاليًا (للإبلاغ عن الحالة البصرية للمساعد).
-  const [selectedOrganId, setSelectedOrganId] = useState<string | null>(null);
+  // (selectedOrganId يأتي الآن من سياق الألم المشترك أعلاه.)
   const lastControlNonce = useRef<number>(-1);
 
   // التبويب الحالي مشتقًّا من أعلام الأوضاع (مصدر حقيقة واحد للحالة المُبلَّغة).
