@@ -60,6 +60,8 @@ const LABELS: Record<Lang, Record<string, string>> = {
     confirmTitle: 'هذا الإجراء يحتاج تأكيدًا',
     confirm: 'تأكيد',
     cancel: 'إلغاء',
+    sourceLlm: '☁️ ذكاء سحابي (Gemini)',
+    sourceRules: '📱 على الجهاز (قواعد)',
     empty: 'اسألني عن أي حاجة في التطبيق: تنقّل، إبراز عنصر، أو مكان نسبي.',
     startCall: 'ابدأ محادثة صوتية',
     endCall: 'إنهاء المكالمة',
@@ -86,6 +88,8 @@ const LABELS: Record<Lang, Record<string, string>> = {
     confirmTitle: 'This action needs confirmation',
     confirm: 'Confirm',
     cancel: 'Cancel',
+    sourceLlm: '☁️ Cloud AI (Gemini)',
+    sourceRules: '📱 On-device (rules)',
     empty: 'Ask me anything in the app: navigate, highlight, or relative location.',
     startCall: 'Start voice chat',
     endCall: 'End call',
@@ -112,6 +116,8 @@ const LABELS: Record<Lang, Record<string, string>> = {
     confirmTitle: 'Cette action nécessite une confirmation',
     confirm: 'Confirmer',
     cancel: 'Annuler',
+    sourceLlm: '☁️ IA cloud (Gemini)',
+    sourceRules: '📱 Sur l\u2019appareil (règles)',
     empty: 'Demandez-moi tout dans l’app : naviguer, mettre en évidence, position.',
     startCall: 'Démarrer le chat vocal',
     endCall: 'Terminer l’appel',
@@ -305,6 +311,11 @@ export function GlobalAssistant({ appState, onAction, onTurn, language, directio
                     ]}
                   >
                     <Text style={m.role === 'user' ? styles.userText : styles.botText}>{m.text}</Text>
+                    {m.role === 'assistant' && m.turn?.source ? (
+                      <Text style={styles.sourceBadge}>
+                        {m.turn.source === 'llm' ? t.sourceLlm : t.sourceRules}
+                      </Text>
+                    ) : null}
                     {m.role === 'assistant' && m.turn?.resolved?.length ? (
                       <View style={styles.chipsRow}>
                         {m.turn.resolved.map((r) => (
@@ -430,6 +441,7 @@ const styles = StyleSheet.create({
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 8 },
   chip: { backgroundColor: Palette.white, borderRadius: Radii.pill, borderWidth: 1, borderColor: Palette.teal300, paddingHorizontal: 10, paddingVertical: 4 },
   chipText: { color: Palette.teal700, fontSize: 11, fontWeight: '700' },
+  sourceBadge: { color: Palette.ink500, fontSize: 10, marginTop: 6, opacity: 0.85 },
   errorText: { color: Palette.rose, fontSize: 12, fontWeight: '700', textAlign: 'center', paddingHorizontal: 16, paddingBottom: 6 },
   confirmBar: { marginHorizontal: 14, marginBottom: 8, backgroundColor: Palette.amberSoft, borderRadius: Radii.md, padding: 12, gap: 8 },
   confirmText: { color: '#92400E', fontSize: 12, fontWeight: '800' },
