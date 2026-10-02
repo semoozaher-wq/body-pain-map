@@ -57,13 +57,25 @@ export interface TtsCallbacks {
   onError?: (error?: unknown) => void;
 }
 
+/** خيارات إضافية للنطق (سرعة قابلة للضبط من الإعدادات — البلوبرنت #14). */
+export interface TtsOptions {
+  /** سرعة النطق المطلوبة (تُقيَّد ضمن 0.5 - 1.6). إن غابت تُستخدم السرعة الطبيعية. */
+  rate?: number;
+}
+
+/** يقيّد سرعة النطق ضمن نطاق آمن لتفادي صوت غير مفهوم. */
+function clampRate(value: number | undefined, fallback: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
+  return Math.min(1.6, Math.max(0.5, value));
+}
+
 /**
  * ينطق النص بصوت طبيعي.
  *
  * الاستدعاء متزامن (مثل Speech.speak) حتى تبقى آلة حالة الجلسة الصوتية كما هي؛
  * اختيار الصوت يستخدم القيمة المخزّنة إن توفّرت (ويُسخّن القائمة للجولة القادمة).
  */
-export function speakNatural(text: string, language: string, cb: TtsCallbacks = {}): void {
+export function speakNatural(text: string, language: string, cb: TtsCallbacks = {}, options: TtsOptions = {}): void {
   const clean = prepareTtsText(text);
   if (!clean) {
     cb.onDone?.();
@@ -71,11 +83,12 @@ export function speakNatural(text: string, language: string, cb: TtsCallbacks = 
   }
   const lang = ttsLangFor(language);
   const prosody = prosodyFor(lang);
+  const rate = clampRate(options.rate, prosody.rate);
   const voice = voiceCache[lang];
   if (!voicesLoaded) void ensureTtsVoices(); // تسخين للجولة القادمة
   Speech.speak(clean, {
     language: lang,
-    rate: prosody.rate,
+    rate,
     pitch: prosody.pitch,
     volume: prosody.volume,
     ...(voice ? { voice } : {}),
