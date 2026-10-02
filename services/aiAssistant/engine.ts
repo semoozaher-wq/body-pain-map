@@ -59,6 +59,10 @@ interface OrganDetailRaw {
 }
 const ORGAN_DETAILS = organDetailsData as unknown as Record<string, OrganDetailRaw>;
 
+// Fast id -> term lookup so the doctor summary can render the associated
+// symptoms the user reported as readable labels (not raw HPO ids).
+const SYMPTOM_TERM_BY_ID = new Map(SYMPTOM_TERMS.map((term) => [term.id, term]));
+
 export type TriageLevel = 'self_care' | 'routine' | 'soon' | 'urgent' | 'emergency';
 
 export interface DetectedRegion {
@@ -119,6 +123,57 @@ const INJURY_KEYWORDS = {
 };
 
 const uniq = (values: string[]): string[] => [...new Set(values.filter(Boolean))];
+
+// Explicit relief phrases the patient may report ("it eases with rest"). They
+// are deliberately unambiguous - each contains a relief verb - so a bare
+// "with heat" stays an aggravating context and is never double-counted.
+const RELIEF_LABELS: Record<string, LocalizedText> = {
+  rest: { ar: 'الراحة', en: 'rest', fr: 'le repos' },
+  heat: { ar: 'الحرارة / الكمادات الدافئة', en: 'heat / warm compress', fr: 'la chaleur / compresse chaude' },
+  cold: { ar: 'البرودة / الكمادات الباردة', en: 'cold / cold compress', fr: 'le froid / compresse froide' },
+  movement: { ar: 'الحركة', en: 'movement', fr: 'le mouvement' },
+  medication: { ar: 'المسكنات', en: 'painkillers', fr: 'les antalgiques' },
+  position: { ar: 'تغيير الوضعية', en: 'changing position', fr: 'le changement de position' },
+};
+
+const RELIEF_KEYWORDS: Record<string, Record<Lang, string[]>> = {
+  rest: {
+    ar: ['بيهدأ مع الراحة', 'بيهدا مع الراحة', 'بيخف مع الراحة', 'بترتاح', 'أرتاح', 'ارتاح', 'يرتاح', 'أستريح', 'استريح'],
+    en: ['better with rest', 'improves with rest', 'relieved by rest', 'rest helps', 'eases with rest'],
+    fr: ['mieux avec le repos', 's’améliore avec le repos', 'soulagé par le repos', 'le repos aide'],
+  },
+  heat: {
+    ar: ['بيخف مع الحرارة', 'بيهدأ مع الدفا', 'بيخف بالكمادة الدافئة', 'بيخف بالكمادات الدافئة', 'بيخف مع السخونة'],
+    en: ['better with heat', 'improves with heat', 'heat helps', 'relieved by heat', 'warm compress helps'],
+    fr: ['mieux avec la chaleur', 'soulagé par la chaleur', 'la chaleur aide'],
+  },
+  cold: {
+    ar: ['بيخف مع البرودة', 'بيخف بالكمادة الباردة', 'بيخف بالكمادات الباردة', 'بيخف بالثلج'],
+    en: ['better with cold', 'improves with cold', 'cold helps', 'relieved by cold', 'ice helps'],
+    fr: ['mieux avec le froid', 'soulagé par le froid', 'la glace aide'],
+  },
+  movement: {
+    ar: ['بيخف مع الحركة', 'أرتاح لما أتحرك', 'بترتاح لما أتحرك'],
+    en: ['better with movement', 'improves with movement', 'movement helps'],
+    fr: ['mieux avec le mouvement', 'le mouvement aide'],
+  },
+  medication: {
+    ar: ['بيخف بالمسكن', 'بيخف بالمسكنات', 'بيخف بالدوا', 'بيخف بالدواء', 'بيخف بالبروفين', 'بيخف بالبنادول'],
+    en: ['better with painkillers', 'better with medication', 'painkillers help', 'relieved by medication'],
+    fr: ['mieux avec des antalgiques', 'soulagé par un médicament'],
+  },
+  position: {
+    ar: ['أرتاح لما أغير وضعيتي', 'بيخف لما أغير وضعيتي', 'بيخف لما أمدد'],
+    en: ['better when i change position', 'changing position helps', 'stretching helps'],
+    fr: ['mieux en changeant de position', 'le changement de position aide'],
+  },
+};
+
+function extractRelief(text: string): string[] {
+  return Object.entries(RELIEF_KEYWORDS)
+    .filter(([, keywords]) => matchAny(text, keywords))
+    .map(([id]) => id);
+}
 
 export interface DetectedMedication {
   id: string;
@@ -1406,43 +1461,59 @@ const IMAGE_CLARIFY: LocalizedText = {
 // الدالة الرئيسية
 // ---------------------------------------------------------------------------
 /**
- * Copyable / shareable summary the patient can show a doctor (spec #11).
- * It only restates what the user reported - never a diagnosis.
+ * Very short, copyable summary the patient can write down or show a doctor
+ * (spec #11). It only restates what the user reported - never a diagnosis - and
+ * stays deliberately minimal: place of pain, duration, intensity, associated
+ * symptoms, and what makes it better or worse. It ends with the explicit
+ * instruction to take the summary to the doctor.
  */
 function buildDoctorSummary(ctx: PainContext, language: Lang): string {
   const L = (ar: string, en: string, fr: string) =>
     language === 'ar' ? ar : language === 'en' ? en : fr;
   const none = L('غير محدد', 'not specified', 'non précisé');
   const label = ctx.painLocationLabel ? ctx.painLocationLabel[language] : none;
-  const quality = ctx.painQuality.length
-    ? ctx.painQuality.map((id) => (SYMPTOM_TYPES[id]?.label[language] ?? id)).join('، ')
-    : none;
   const severity = ctx.painSeverity !== null ? `${ctx.painSeverity}/10` : none;
-  const duration = ctx.painDuration ?? none;
-  const onset = ctx.painOnset ?? none;
-  const aggrav = ctx.aggravatingFactors.length ? ctx.aggravatingFactors.join('، ') : none;
-  const meds = ctx.medications.length ? ctx.medications.join('، ') : L('لا يوجد', 'none', 'aucun');
-  const flags = ctx.redFlags.length ? ctx.redFlags.join('، ') : L('لا يوجد', 'none', 'aucun');
-  const yes = L('نعم', 'yes', 'oui');
-  const no = L('لا', 'no', 'non');
+  const durationLabels: Record<string, LocalizedText> = {
+    hours: { ar: 'منذ ساعات قليلة', en: 'a few hours', fr: 'quelques heures' },
+    days: { ar: 'منذ أيام', en: 'a few days', fr: 'quelques jours' },
+    weeks: { ar: 'منذ أسابيع', en: 'weeks', fr: 'des semaines' },
+    months: { ar: 'منذ شهور', en: 'months', fr: 'des mois' },
+  };
+  const duration = ctx.painDuration
+    ? durationLabels[ctx.painDuration]?.[language] ?? ctx.painDuration
+    : none;
+  const associated = ctx.associatedSymptoms.length
+    ? ctx.associatedSymptoms.map((id) => SYMPTOM_TERM_BY_ID.get(id)?.label[language] ?? id).join('، ')
+    : none;
+  const aggravating = ctx.aggravatingFactors.length
+    ? ctx.aggravatingFactors.map((id) => CONTEXTS[id]?.label[language] ?? id).join('، ')
+    : none;
+  const relieving = ctx.relievingFactors.length
+    ? ctx.relievingFactors.map((id) => RELIEF_LABELS[id]?.[language] ?? id).join('، ')
+    : none;
+  const factors = L(
+    `يزيده: ${aggravating} · يخففه: ${relieving}`,
+    `Worse with: ${aggravating} · Better with: ${relieving}`,
+    `Aggravé par : ${aggravating} · Soulagé par : ${relieving}`,
+  );
   return [
-    L('📋 ملخص زيارة الطبيب', '📋 Doctor visit summary', '📋 Résumé pour le médecin'),
-    `${L('• المنطقة', '• Area', '• Zone')}: ${label}`,
-    `${L('• البداية', '• Onset', '• Début')}: ${onset}`,
+    L('📋 ملخص للطبيب', '📋 Summary for the doctor', '📋 Résumé pour le médecin'),
+    `${L('• مكان الألم', '• Pain location', '• Localisation')}: ${label}`,
     `${L('• المدة', '• Duration', '• Durée')}: ${duration}`,
-    `${L('• شدة الألم', '• Pain intensity', '• Intensité')}: ${severity}`,
-    `${L('• نوع الألم', '• Pain quality', '• Type de douleur')}: ${quality}`,
-    `${L('• يمتد لمكان آخر', '• Radiates elsewhere', '• Irradiation')}: ${ctx.radiation ? yes : no}`,
-    `${L('• عوامل تزيد الألم', '• Aggravating factors', '• Facteurs aggravants')}: ${aggrav}`,
-    `${L('• أدوية تم تناولها', '• Medications taken', '• Médicaments pris')}: ${meds}`,
-    `${L('• إصابة سابقة', '• Injury', '• Traumatisme')}: ${ctx.injury ? yes : no}`,
-    `${L('• علامات تحذيرية', '• Red flags', '• Signes d\u2019alerte')}: ${flags}`,
-    L(
-      '⚠️ هذا ملخص للمعلومات التي ذكرتها، وليس تشخيصًا. اعرضه على الطبيب.',
-      '⚠️ This summarises what you reported, not a diagnosis. Show it to your doctor.',
-      '⚠️ Ceci résume ce que vous avez décrit, pas un diagnostic. Montrez-le à votre médecin.',
-    ),
+    `${L('• الشدة', '• Severity', '• Intensité')}: ${severity}`,
+    `${L('• الأعراض المصاحبة', '• Associated symptoms', '• Symptômes associés')}: ${associated}`,
+    `${L('• ما يزيده أو يخففه', '• Aggravating / relieving factors', '• Facteurs aggravants / soulageants')}: ${factors}`,
+    L('خذ هذا الملخص معك للطبيب.', 'Take this summary with you to the doctor.', 'Emportez ce résumé chez le médecin.'),
   ].join('\n');
+}
+
+/**
+ * True when the triage outcome warrants an actual doctor visit, so the short
+ * doctor summary should be offered. Self-care / routine follow-up do not.
+ */
+function warrantsDoctorVisit(triage: TriageLevel, redFlags: DetectedRedFlag[]): boolean {
+  if (redFlags.length > 0) return true;
+  return triage === 'soon' || triage === 'urgent' || triage === 'emergency';
 }
 
 /**
@@ -1577,7 +1648,7 @@ export function analyzeMessage(
     painQuality: uniq([...symptomTypes, ...(previous?.painQuality ?? [])]),
     radiation: matchAny(text, RADIATION_KEYWORDS) || (previous?.radiation ?? false),
     aggravatingFactors: uniq([...contexts, ...(previous?.aggravatingFactors ?? [])]),
-    relievingFactors: previous?.relievingFactors ?? [],
+    relievingFactors: uniq([...extractRelief(text), ...(previous?.relievingFactors ?? [])]),
     associatedSymptoms: uniq([...symptoms.map((item) => item.id), ...(previous?.associatedSymptoms ?? [])]),
     injury: matchAny(text, INJURY_KEYWORDS) || (previous?.injury ?? false),
     medications: uniq([...medications.map((item) => item.id), ...(previous?.medications ?? [])]),
@@ -1821,7 +1892,10 @@ export function analyzeMessage(
     suggestedOrganLabel: mapOrgan ? mapOrgan.label : null,
     disclaimer: DISCLAIMER,
     painContext,
-    doctorSummary: understood ? buildDoctorSummary(painContext, language) : '',
+    doctorSummary:
+      understood && !askForLocation && warrantsDoctorVisit(triage.level, redFlags)
+        ? buildDoctorSummary(painContext, language)
+        : '',
     corrected,
     __lang: language,
   };
