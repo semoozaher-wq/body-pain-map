@@ -7,25 +7,15 @@ export const AssistantScreen: React.FC = () => {
 
   const handleInput = (text: string): void => {
     if (turnGate.canProceed()) {
-      console.log('Processing input:', text);
+      console.log('Input processed:', text);
     }
-  };
-
-  const handleStageChange = (stage: string): void => {
-    console.log('Current stage:', stage);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>شاشة المساعد الصوتي والذكاء الاصطناعي</Text>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          handleInput('مرحباً');
-          handleStageChange('active');
-        }}
-      >
-        <Text style={styles.buttonText}>بدء المحادثة</Text>
+      <Text style={styles.title}>المساعد الذكي</Text>
+      <TouchableOpacity style={styles.button} onPress={() => handleInput('مرحباً')}>
+        <Text style={styles.buttonText}>بدء التحدث</Text>
       </TouchableOpacity>
     </View>
   );
