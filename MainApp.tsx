@@ -18,6 +18,7 @@ import { createLocalId } from './services/id';
 import { Header } from './components/Header';
 import { WelcomeScreen } from './screens/WelcomeScreen';
 import { BodyPickerScreen } from './screens/BodyPickerScreen';
+import { usePainContext } from './context/PainContext';
 import { DetailsScreen } from './screens/DetailsScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
@@ -92,7 +93,9 @@ export default function App() {
     previousReferencedCoords: null,
   });
   // ---- حالة إضافية للمساعد المركزي (بدون تخمين) ----
-  const [painMarker, setPainMarker] = useState<{ x: number; y: number; view: 'front' | 'back' } | null>(null);
+  // علامة الألم مصدرها سياق مشترك (PainContext) حتى يراها المساعد المركزي
+  // وأي شاشة أخرى، ويبقى مصدر حقيقة واحد بدل حالة محلية مكرّرة.
+  const { painMarker, setPainMarker } = usePainContext();
   const [lastAssistantAction, setLastAssistantAction] = useState<AssistantAction['type'] | null>(null);
   const [lastUserReference, setLastUserReference] = useState<string | null>(null);
   const [conversationState, setConversationState] = useState<AppState['conversationState']>('idle');
