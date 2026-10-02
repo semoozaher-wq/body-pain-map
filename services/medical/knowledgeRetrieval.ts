@@ -10,19 +10,19 @@ export const retrieveMedicalKnowledge = async (
   symptoms: string[]
 ): Promise<KnowledgeQueryResult> => {
   // 1. Failsafe Red Flag Check
-  const redFlagKeywords = ['ألم صدر حاد', 'ضيق تنفس شدید', 'ألم ممتد للذراع', 'chest pain'];
+  const redFlagKeywords = ['ألم صدر حاد', 'ضيق تنفس شديد', 'ألم ممتد للذراع', 'chest pain'];
   const hasRedFlag = symptoms.some(s => redFlagKeywords.some(rf => s.includes(rf)));
 
   if (hasRedFlag) {
     return {
       found: true,
-      content: "تنبيه طوارئ: الأغراض المذكورة قد تشير إلى حالة طبية حرجة. يرجى التوجه لأقرب مستشفى أو الاتصال بالعداف فوراً.",
+      content: "تنبيه طوارئ: الأعراض المذكورة قد تشير إلى حالة طبية حرجة. يرجى التوجه لأقرب مستشفى أو الاتصال بالعداف فوراً.",
       isRedFlag: true,
       status: 'RED_FLAG_DETECTED'
     };
   }
 
-  // 2. Mocking Retrieval Check (استبدل بالبحث الفعلي)
+  // 2. No Reliable Knowledge Check
   const hasKnowledge = false; // افتراض عدم وجود معرفة مؤكدة في القاعدة
 
   if (!hasKnowledge) {
