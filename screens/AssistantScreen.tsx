@@ -17,6 +17,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TextInput,
@@ -215,6 +216,9 @@ function replyToSpeech(reply: AssistantReply): string {
   reply.redFlags.forEach((f) => parts.push(f.label[L]));
   reply.selfCare.slice(0, 4).forEach((s) => parts.push(s));
   parts.push(reply.whenToSeeDoctor[L]);
+  if (reply.doctorSummary) {
+    parts.push(reply.doctorSummary.replace(/[•📋]/g, '').replace(/\n/g, '. ').replace(/\s+/g, ' ').trim());
+  }
   return parts.filter(Boolean).join('. ');
 }
 
@@ -1307,6 +1311,22 @@ const AssistantBubble: React.FC<BubbleProps> = ({ reply, align, row, onOpenRegio
           {t('assistant.whenToSee')}: {reply.whenToSeeDoctor[replyIntroLang(reply)]}
         </Text>
 
+        {/* ملخص قصير للطبيب — يظهر فقط عندما تستدعي الحالة زيارة طبيب */}
+        {reply.doctorSummary ? (
+          <View style={[styles.doctorSummaryBox, { borderColor: triage.accent, backgroundColor: colors.backgroundAlt }]}>
+            <Text style={[styles.doctorSummaryTitle, { color: triage.fg, textAlign: align }]}>{t('assistant.doctorSummaryTitle')}</Text>
+            <Text style={[styles.doctorSummaryText, { color: colors.textPrimary, textAlign: align }]}>{reply.doctorSummary}</Text>
+            <Pressable
+              onPress={() => { void Share.share({ message: reply.doctorSummary }); }}
+              accessibilityRole="button"
+              accessibilityLabel={t('assistant.shareDoctorSummary')}
+              style={[styles.doctorSummaryShare, { borderColor: colors.border }]}
+            >
+              <Text style={[styles.doctorSummaryShareText, { color: colors.textSecondary }]}>{t('assistant.shareDoctorSummary')}</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
         {reply.suggestedRegionId && (
           <Pressable
             onPress={() => onOpenRegion(reply.suggestedRegionId as string)}
@@ -1454,6 +1474,11 @@ const styles = StyleSheet.create({
   selfCareWrap: { gap: 5 },
   selfCareLine: { fontFamily: Fonts.arabic.regular, fontSize: Type.bodySm, lineHeight: 21 },
   whenToSee: { fontFamily: Fonts.arabic.medium, fontSize: Type.caption, lineHeight: 19 },
+  doctorSummaryBox: { borderWidth: 1.5, borderRadius: Radii.md, padding: 11, gap: 6, marginTop: 4 },
+  doctorSummaryTitle: { fontFamily: Fonts.arabic.bold, fontSize: Type.bodySm, fontWeight: Type.weight.black },
+  doctorSummaryText: { fontFamily: Fonts.arabic.regular, fontSize: Type.caption, lineHeight: 20 },
+  doctorSummaryShare: { alignSelf: 'flex-start', borderWidth: 1, borderRadius: Radii.sm, paddingVertical: 6, paddingHorizontal: 12, marginTop: 2 },
+  doctorSummaryShareText: { fontFamily: Fonts.arabic.medium, fontSize: Type.micro },
   openMapButton: { alignItems: 'center', justifyContent: 'center', borderRadius: Radii.md, paddingVertical: 12, paddingHorizontal: 16, overflow: 'hidden', ...Elevation.glowTeal },
   openMapText: { color: Palette.white, fontFamily: Fonts.arabic.bold, fontSize: Type.bodySm, fontWeight: Type.weight.black },
   organsWrap: { gap: 8 },
