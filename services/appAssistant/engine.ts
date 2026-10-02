@@ -918,7 +918,7 @@ function geminiMoveAmount(raw?: string | null): number {
   }
 }
 
-const GEMINI_SCREENS = new Set<string>(['welcome', 'body', 'details', 'results', 'history', 'assistant', 'healthInfo']);
+const GEMINI_SCREENS = new Set<string>(['welcome', 'body', 'details', 'results', 'history', 'assistant', 'healthInfo', 'settings']);
 const GEMINI_TABS = new Set<string>(['muscles', 'organs', 'acupressure', 'naturalRelief', 'medicalLibrary', 'drugLookup']);
 
 /**

@@ -28,7 +28,8 @@ export type AppScreen =
   | 'results'
   | 'history'
   | 'assistant'
-  | 'healthInfo';
+  | 'healthInfo'
+  | 'settings';
 
 /** أقسام شاشة الخريطة (BodyPickerScreen). */
 export type BodyTab =

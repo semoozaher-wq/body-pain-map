@@ -186,6 +186,11 @@ const SCREEN_DEFS: ScreenDef[] = [
     label: { ar: 'النتائج', en: 'Results', fr: 'Résultats' },
     aliases: ['النتائج', 'results'],
   },
+  {
+    id: 'settings',
+    label: { ar: 'الإعدادات', en: 'Settings', fr: 'Réglages' },
+    aliases: ['الإعدادات', 'الاعدادات', 'اعدادات', 'الضبط', 'settings', 'reglages', 'réglages'],
+  },
 ];
 
 // ---------------------------------------------------------------------------
