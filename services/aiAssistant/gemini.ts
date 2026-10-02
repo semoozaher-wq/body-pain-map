@@ -6,10 +6,12 @@ export interface GeminiContext {
 export interface GeminiDecision {
   action?: string;
   reply?: string;
+  intent?: string;
+  confidence?: number;
 }
 
 export const requestGemini = async (prompt: string, context?: unknown): Promise<GeminiDecision> => {
-  return { action: 'chat', reply: `تم استلام الاستفسار: ${prompt}` };
+  return { action: 'chat', reply: `تم استلام الاستفسار: ${prompt}`, intent: 'general' };
 };
 
 export const mergePainContext = (base: unknown, additional: unknown): Record<string, unknown> => {
@@ -20,8 +22,16 @@ export const normalizePainContext = (context: unknown): Record<string, unknown> 
   return typeof context === 'object' && context !== null ? (context as Record<string, unknown>) : {};
 };
 
+export const normalizeDecision = (decision: unknown): GeminiDecision => {
+  if (typeof decision === 'object' && decision !== null) {
+    return decision as GeminiDecision;
+  }
+  return { action: 'chat', reply: String(decision || '') };
+};
+
 export default {
   requestGemini,
   mergePainContext,
   normalizePainContext,
+  normalizeDecision,
 };
