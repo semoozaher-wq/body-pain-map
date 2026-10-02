@@ -1,20 +1,14 @@
 import { useState, useCallback } from 'react';
-import createTurnGate, { TurnGate as TurnGateType } from '../services/speech/turnGate';
-
-export interface AssistantData {
-  lastText?: string;
-  [key: string]: unknown;
-}
+import createTurnGate, { TurnGate } from '../services/speech/turnGate';
 
 export const useAppAssistant = () => {
   const [stage, setStage] = useState<string>('idle');
-  const [data, setData] = useState<AssistantData>({});
-  const [turnGate] = useState<TurnGateType>(() => createTurnGate());
+  const [data, setData] = useState<Record<string, unknown>>({});
+  const [turnGate] = useState<TurnGate>(() => createTurnGate());
 
   const processInput = useCallback((text: string) => {
     if (!turnGate.canProceed()) return;
     setStage('processing');
-    
     setTimeout(() => {
       setData({ lastText: text });
       setStage('complete');
