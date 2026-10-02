@@ -23,6 +23,7 @@ import { ResultsScreen } from './screens/ResultsScreen';
 import { HistoryScreen } from './screens/HistoryScreen';
 import { AssistantScreen } from './screens/AssistantScreen';
 import { HealthInfoScreen } from './screens/HealthInfoScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { BrandLogo } from './components/BrandLogo';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -437,6 +438,7 @@ export default function App() {
       history: t('historyTitle'),
       assistant: t('assistant.name'),
       healthInfo: t('nav.healthInfo'),
+      settings: t('settings.title'),
     };
     return titles[screen];
   };
@@ -489,6 +491,13 @@ export default function App() {
             }}
           />
         </ScrollView>
+      ) : screen === 'settings' ? (
+        <SettingsScreen
+          language={language}
+          direction={direction}
+          setLanguage={setLanguage}
+          onOpenAssistant={() => { setAssistantContext(undefined); navigateTo('assistant'); }}
+        />
       ) : (
       <ScrollView
         contentContainerStyle={styles.content}
@@ -597,6 +606,7 @@ export default function App() {
         <NavItem icon="✦" title={t('nav.assistant')} active={screen === 'assistant'} onPress={() => { setAssistantContext(undefined); navigateTo('assistant'); }} colors={colors} />
         <NavItem icon="♡" title={t('nav.healthInfo')} active={screen === 'healthInfo'} onPress={() => navigateTo('healthInfo')} colors={colors} />
         <NavItem icon="◷" title={t('nav.history')} active={screen === 'history'} onPress={() => navigateTo('history')} colors={colors} />
+        <NavItem icon="⚙" title={t('nav.settings')} active={screen === 'settings'} onPress={() => navigateTo('settings')} colors={colors} />
       </View>
 
       {/* المساعد المركزي العائم — متاح في كل الشاشات ويتحكّم في التطبيق بأوامر منظّمة. */}
