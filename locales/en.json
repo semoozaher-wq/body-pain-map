@@ -69,7 +69,8 @@
     "map": "Body",
     "history": "History",
     "assistant": "Assistant",
-    "healthInfo": "Health"
+    "healthInfo": "Health",
+    "settings": "Settings"
   },
   "quickLog": {
     "neck": "Neck",
@@ -180,7 +181,14 @@
     "clarifyDuration": "How long has it been?",
     "quickSymptoms": "Quick symptoms",
     "medicationsDetected": "Medicines mentioned",
-    "followUpReminder": "Is the pain still there? Has it improved or stayed the same?"
+    "followUpReminder": "Is the pain still there? Has it improved or stayed the same?",
+    "savedConversations": "Saved conversations",
+    "noSavedConversations": "No saved conversations yet.",
+    "untitledConversation": "Untitled conversation",
+    "messagesCount": "messages",
+    "deleteConversation": "Delete",
+    "clearAllConversations": "Clear all",
+    "close": "Close"
   },
   "emergency": {
     "title": "Emergency button",
@@ -212,5 +220,40 @@
     "invalidName": "Enter a valid name.",
     "invalidPhone": "Enter a valid phone number.",
     "localNotice": "All contact data is stored on your device only and is never sent to any server."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Personalize the app to fit you — everything stays on your device.",
+    "language": "Language",
+    "theme": "Appearance",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "voice": "Voice",
+    "voiceEnabled": "Spoken replies",
+    "voiceEnabledHint": "Read assistant replies aloud.",
+    "autoSpeak": "Auto-speak new replies",
+    "autoSpeakHint": "Reads each new reply as soon as it appears.",
+    "voiceSpeed": "Voice speed",
+    "voiceSpeedHint": "Adjust the reading speed.",
+    "slower": "Slower",
+    "faster": "Faster",
+    "medicalAlerts": "Medical alerts",
+    "medicalAlertsEnabled": "Enable critical alerts",
+    "medicalAlertsHint": "Show a reminder to seek care when red flags appear.",
+    "chatHistory": "Chat history",
+    "chatHistoryHint": "Your conversations are stored on this device only.",
+    "savedConversationsCount": "{count} saved conversations",
+    "openConversations": "Open saved conversations",
+    "clearHistory": "Delete all conversations",
+    "confirmClear": "Confirm delete?",
+    "cancel": "Cancel",
+    "privacy": "Privacy",
+    "privacyBadge": "No account · No cloud",
+    "privacyText": "We never upload your data. Checkups and chats stay on your device.",
+    "about": "About",
+    "appName": "App name",
+    "version": "Version",
+    "reset": "Restore default settings"
   }
 }

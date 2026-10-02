@@ -69,7 +69,8 @@
     "map": "Corps",
     "history": "Historique",
     "assistant": "Assistant",
-    "healthInfo": "Santé"
+    "healthInfo": "Santé",
+    "settings": "Réglages"
   },
   "quickLog": {
     "neck": "Cou",
@@ -180,7 +181,14 @@
     "clarifyDuration": "Depuis combien de temps ?",
     "quickSymptoms": "Symptômes rapides",
     "medicationsDetected": "Médicaments mentionnés",
-    "followUpReminder": "La douleur est-elle toujours là ? S’est-elle améliorée ou reste-t-elle la même ?"
+    "followUpReminder": "La douleur est-elle toujours là ? S’est-elle améliorée ou reste-t-elle la même ?",
+    "savedConversations": "Conversations enregistrées",
+    "noSavedConversations": "Aucune conversation enregistrée.",
+    "untitledConversation": "Conversation sans titre",
+    "messagesCount": "messages",
+    "deleteConversation": "Supprimer",
+    "clearAllConversations": "Tout effacer",
+    "close": "Fermer"
   },
   "emergency": {
     "title": "Bouton d'urgence",
@@ -212,5 +220,40 @@
     "invalidName": "Saisissez un nom valide.",
     "invalidPhone": "Saisissez un numéro valide.",
     "localNotice": "Toutes les données de contact sont stockées uniquement sur votre appareil."
+  },
+  "settings": {
+    "title": "Réglages",
+    "subtitle": "Personnalisez l'application — tout reste sur votre appareil.",
+    "language": "Langue",
+    "theme": "Apparence",
+    "themeLight": "Clair",
+    "themeDark": "Sombre",
+    "themeSystem": "Système",
+    "voice": "Voix",
+    "voiceEnabled": "Réponses vocales",
+    "voiceEnabledHint": "Lire les réponses à voix haute.",
+    "autoSpeak": "Lire automatiquement les nouvelles réponses",
+    "autoSpeakHint": "Lit chaque nouvelle réponse dès qu'elle apparaît.",
+    "voiceSpeed": "Vitesse de la voix",
+    "voiceSpeedHint": "Ajustez la vitesse de lecture.",
+    "slower": "Plus lent",
+    "faster": "Plus rapide",
+    "medicalAlerts": "Alertes médicales",
+    "medicalAlertsEnabled": "Activer les alertes critiques",
+    "medicalAlertsHint": "Afficher un rappel de consulter en cas de signes d'alerte.",
+    "chatHistory": "Historique des conversations",
+    "chatHistoryHint": "Vos conversations sont stockées uniquement sur cet appareil.",
+    "savedConversationsCount": "{count} conversations enregistrées",
+    "openConversations": "Ouvrir les conversations enregistrées",
+    "clearHistory": "Supprimer toutes les conversations",
+    "confirmClear": "Confirmer la suppression ?",
+    "cancel": "Annuler",
+    "privacy": "Confidentialité",
+    "privacyBadge": "Sans compte · Sans cloud",
+    "privacyText": "Nous ne téléversons jamais vos données. Bilans et discussions restent sur votre appareil.",
+    "about": "À propos",
+    "appName": "Nom de l'application",
+    "version": "Version",
+    "reset": "Restaurer les réglages par défaut"
   }
 }

@@ -69,7 +69,8 @@
     "map": "الجسم",
     "history": "السجل",
     "assistant": "المساعد",
-    "healthInfo": "المعلومات الصحية"
+    "healthInfo": "المعلومات الصحية",
+    "settings": "الإعدادات"
   },
   "quickLog": {
     "neck": "الرقبة",
@@ -180,7 +181,14 @@
     "clarifyDuration": "بقاله قد إيه؟",
     "quickSymptoms": "أعراض سريعة",
     "medicationsDetected": "أدوية مذكورة",
-    "followUpReminder": "لسه الألم موجود؟ حالته اتحسنت ولا زي ما هي؟"
+    "followUpReminder": "لسه الألم موجود؟ حالته اتحسنت ولا زي ما هي؟",
+    "savedConversations": "المحادثات المحفوظة",
+    "noSavedConversations": "لا توجد محادثات محفوظة بعد.",
+    "untitledConversation": "محادثة بدون عنوان",
+    "messagesCount": "رسالة",
+    "deleteConversation": "حذف",
+    "clearAllConversations": "حذف الكل",
+    "close": "إغلاق"
   },
   "emergency": {
     "title": "زر الطوارئ",
@@ -212,5 +220,40 @@
     "invalidName": "اكتب اسمًا صحيحًا.",
     "invalidPhone": "اكتب رقم هاتف صحيح.",
     "localNotice": "كل بيانات جهات الاتصال تُحفظ على جهازك فقط ولا تُرسل لأي خادم."
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "خصّص التطبيق كما يناسبك — كل شيء محفوظ على جهازك.",
+    "language": "اللغة",
+    "theme": "المظهر",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "themeSystem": "تلقائي",
+    "voice": "الصوت",
+    "voiceEnabled": "تشغيل الردود الصوتية",
+    "voiceEnabledHint": "نطق ردود المساعد بصوت مسموع.",
+    "autoSpeak": "نطق الردود الجديدة تلقائيًا",
+    "autoSpeakHint": "يقرأ كل رد جديد بمجرد ظهوره.",
+    "voiceSpeed": "سرعة الصوت",
+    "voiceSpeedHint": "اضبط سرعة القراءة.",
+    "slower": "أبطأ",
+    "faster": "أسرع",
+    "medicalAlerts": "التنبيهات الطبية",
+    "medicalAlertsEnabled": "تفعيل تنبيهات الحالات الحرجة",
+    "medicalAlertsHint": "إظهار تذكير بمراجعة الطبيب عند وجود علامات خطر.",
+    "chatHistory": "سجل المحادثات",
+    "chatHistoryHint": "محادثاتك محفوظة على هذا الجهاز فقط.",
+    "savedConversationsCount": "{count} محادثة محفوظة",
+    "openConversations": "فتح المحادثات المحفوظة",
+    "clearHistory": "حذف كل المحادثات",
+    "confirmClear": "تأكيد الحذف؟",
+    "cancel": "إلغاء",
+    "privacy": "الخصوصية",
+    "privacyBadge": "بدون حساب · بدون سحابة",
+    "privacyText": "لا نرفع بياناتك إلى أي خادم. تبقى الفحوصات والمحادثات على جهازك.",
+    "about": "عن التطبيق",
+    "appName": "اسم التطبيق",
+    "version": "الإصدار",
+    "reset": "استعادة الإعدادات الافتراضية"
   }
 }
